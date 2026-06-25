@@ -1,0 +1,2068 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="Expires" content="0" />
+<title>🏪 KHO Q2 (HOÀNG GIA COMPUTER)</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+/* CSS đầy đủ của bạn */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif; background: #F2F3F4; color: #1a1a1a; }
+.sticky { position: sticky; top: 0; z-index: 100; }
+.header { background: #1E3A5F; color: #fff; padding: 12px 14px 10px; box-shadow: 0 2px 8px rgba(0,0,0,.3); }
+.title { position: relative; display: flex; align-items: center; gap: 6px; width: 100%; max-width: 100%; font-size: clamp(12px, 3.8vw, 16px); font-weight: bold; margin-bottom: 8px; color: #fff; line-height: 1.2; overflow: visible; }
+.title-icon { flex-shrink: 0; line-height: 1; }
+.title-text { position: relative; display: inline-block; min-width: 0; max-width: 100%; overflow: hidden; line-height: 1.2; white-space: nowrap; }
+.title-base { position: relative; z-index: 1; display: inline-block; white-space: nowrap; }
+.title-shine { position: absolute; left: 0; top: 50%; width: 42%; height: 1.4em; z-index: 2; pointer-events: none; border-radius: 999px; background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,.15) 18%, rgba(255,255,255,.95) 50%, rgba(255,255,255,.15) 82%, rgba(255,255,255,0) 100%); filter: blur(.4px); opacity: .9; transform: translate(-140%, -50%) skewX(-18deg); animation: titleSweep 3.2s ease-in-out infinite alternate; }
+@keyframes titleSweep { from { transform: translate(-140%, -50%) skewX(-18deg); } to { transform: translate(260%, -50%) skewX(-18deg); } }
+.kpi-row { display: flex; gap: 5px; margin-bottom: 10px; }
+.kpi-hint { font-size: 7px; opacity: .7; vertical-align: middle; }
+.kpi { flex: 1; border-radius: 8px; padding: 5px 6px; text-align: center; }
+.kpi:active { opacity: .8; }
+.kpi-detail-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 4px; border-bottom: 1px solid #f0f0f0; font-size: 13px; }
+.kpi-detail-row:last-child { border-bottom: none; }
+.kpi-detail-sh { display: flex; align-items: center; gap: 6px; }
+.kpi-detail-badge { font-size: 10px; font-weight: bold; padding: 2px 7px; border-radius: 10px; color: #fff; }
+.kpi-detail-count { font-weight: bold; font-size: 14px; }
+.kpi-v { font-size: 13px; font-weight: bold; color: #fff; }
+.kpi-l { font-size: 9px; color: rgba(255,255,255,.85); }
+.search-box { display: flex; align-items: center; background: #FFFDE7; border: 2.5px solid #F39C12; border-radius: 12px; padding: 8px 12px; gap: 8px; }
+.search-box.is-fixed { position: fixed; left: 12px; right: 12px; top: 10px; z-index: 220; box-shadow: 0 10px 26px rgba(0,0,0,.16); max-width: 920px; margin: 0 auto; }
+.search-spacer { display: none; height: 0; }
+.search-spacer.on { display: block; }
+.search-box input { flex: 1; border: none; background: transparent; font-size: 16px; outline: none; color: #1A237E; font-weight: bold; min-width: 0; }
+.clear-btn { border: none; background: #FFC107; border-radius: 50%; width: 26px; height: 26px; cursor: pointer; font-size: 13px; font-weight: bold; color: #fff; display: none; align-items: center; justify-content: center; flex-shrink: 0; }
+.tabs { display: flex; overflow-x: auto; background: #fff; border-bottom: 2px solid #E0E0E0; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+.tabs::-webkit-scrollbar { display: none; }
+.tab-btn { flex-shrink: 0; padding: 10px 14px; border: none; border-bottom: 3px solid transparent; background: none; font-size: 12px; font-weight: normal; color: #777; cursor: pointer; white-space: nowrap; transition: all .15s; }
+.tab-btn.active { font-weight: bold; border-bottom-color: var(--c); }
+.filters { display: flex; gap: 6px; padding: 8px 12px; background: #fafafa; border-bottom: 1px solid #eee; align-items: center; flex-wrap: wrap; }
+.filters > * { flex-shrink: 0; }
+.filter-btn { padding: 5px 12px; border-radius: 20px; border: 1px solid #ddd; background: #fff; color: #666; font-size: 12px; cursor: pointer; }
+.filter-btn.active { border: none; font-weight: bold; }
+.count-badge { margin-left: auto; font-size: 11px; color: #999; background: #E8EAF6; padding: 3px 8px; border-radius: 10px; font-weight: bold; }
+#results { padding: 8px 10px 80px; }
+.empty { text-align: center; padding: 50px 20px; color: #aaa; }
+.empty-icon { font-size: 52px; margin-bottom: 12px; }
+.empty-title { font-size: 15px; font-weight: bold; color: #555; margin-bottom: 6px; }
+.empty-sub { font-size: 13px; }
+.card { background: #fff; border-radius: 12px; margin-bottom: 8px; overflow: hidden; border: 1.5px solid #E8E8E8; box-shadow: 0 1px 4px rgba(0,0,0,.06); }
+.card.het { border-color: #F1948A; }
+.card.sap { border-color: #F9E79F; }
+.card-top { display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; border-bottom: 2px solid var(--c); }
+.card-top-left { display: flex; align-items: center; gap: 6px; min-width: 0; flex-wrap: wrap; }
+.sheet-badge { background: var(--c); color: #fff; font-size: 10px; font-weight: bold; padding: 2px 7px; border-radius: 6px; margin-right: 6px; }
+.ma-code { font-size: 11px; color: #666; font-weight: bold; }
+.btn-copy-code { border: none; background: #F4F6F7; color: #1E3A5F; width: 26px; height: 26px; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; box-shadow: inset 0 -1px 0 rgba(0,0,0,.08); }
+.btn-copy-code span { display: block; font-size: 14px; line-height: 1; font-weight: 900; }
+.btn-copy-code.copied { background: #D5F5E3; color: #1E8449; }
+.btn-copy-code:active { transform: scale(.95); }
+.status-badge { font-size: 11px; font-weight: bold; padding: 3px 10px; border-radius: 12px; }
+.card-body { padding: 9px 12px; }
+.card-body-flex { display: flex; gap: 10px; align-items: flex-start; }
+.card-main { flex: 1; min-width: 0; }
+.prod-img { width: 64px; height: 64px; border-radius: 10px; object-fit: cover; flex-shrink: 0; border: 1px solid #eee; background: #fafafa; }
+.prod-img-ph { display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: bold; }
+.product-name-row { display: block; max-width: 100%; margin-bottom: 5px; cursor: copy; user-select: none; }
+.product-name { font-size: 14px; font-weight: bold; line-height: 1.35; margin-bottom: 0; display: inline; }
+.card-footer { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px; }
+.brand-tag { font-size: 12px; color: #666; background: #F4F4F4; padding: 2px 8px; border-radius: 6px; }
+.price { font-size: 15px; font-weight: bold; }
+.price-sale-on { color: #D50000 !important; font-weight: 900 !important; }
+.nguoi-ban-row { display: flex; align-items: center; gap: 6px; margin-top: 6px; padding: 5px 8px; background: #F4F6F9; border-radius: 8px; cursor: pointer; font-size: 12px; color: #555; }
+.nguoi-ban-row:active { background: #E8ECF1; }
+.nguoi-ban-label { font-weight: bold; color: #1E3A5F; flex: 1; }
+.nguoi-ban-count { color: #2E86C1; font-size: 11px; font-weight: bold; }
+.tx-summary { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; background: #EBF5FB; padding: 10px 12px; border-radius: 10px; margin-bottom: 10px; font-size: 12px; }
+.tx-summary-item { min-width: 0; }
+.tx-summary-label { display: block; font-size: 10px; color: #6C7A89; margin-bottom: 2px; }
+.tx-summary-value { display: block; font-size: 12px; font-weight: 700; color: #1E3A5F; }
+.tx-summary-value.revenue { color: #1E8449; }
+.tx-filter { display: grid; grid-template-columns: 1fr 1fr auto; gap: 8px; margin: 0 0 10px; }
+.tx-filter select, .tx-filter input { width: 100%; padding: 9px 10px; border-radius: 8px; border: 1.5px solid #D5DBDB; font-size: 13px; background: #fff; color: #2C3E50; }
+.tx-filter button { border: none; border-radius: 8px; padding: 9px 12px; background: #F4F6F9; color: #34495E; font-size: 13px; font-weight: 700; cursor: pointer; }
+.tx-filter button:active { transform: scale(.98); }
+.tx-row { padding: 10px 0; border-bottom: 1px solid #f0f0f0; font-size: 12px; }
+.tx-row:last-child { border-bottom: none; }
+.tx-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 6px; }
+.tx-nv { font-weight: bold; color: #1E3A5F; flex: 1; min-width: 0; }
+.tx-head-right { display: flex; align-items: flex-start; gap: 6px; flex-shrink: 0; }
+.tx-time { font-size: 10px; color: #7B7D7D; text-align: right; line-height: 1.35; white-space: nowrap; }
+.tx-meta { display: flex; flex-wrap: wrap; gap: 6px; color: #555; }
+.tx-pill { display: inline-flex; align-items: center; min-height: 24px; padding: 2px 8px; border-radius: 999px; background: #F4F6F9; color: #34495E; font-size: 11px; font-weight: 600; line-height: 1.2; }
+.tx-price-pill { background: #EAF7EE; color: #1E8449; }
+.tx-note { display: block; margin-top: 6px; color: #7B7D7D; font-size: 11px; line-height: 1.4; word-break: break-word; }
+.tx-delete { background: none; border: none; color: #C0392B; font-size: 12px; cursor: pointer; padding: 2px 6px; }
+.tx-delete:active { transform: scale(.96); }
+.card.highlight { box-shadow: 0 0 0 3px #F39C12; animation: flash 1.6s ease; }
+@keyframes flash { from { background: #FFF9E6; } to { background: #fff; } }
+.ton-ctrl { display: flex; align-items: center; gap: 6px; margin-top: 8px; border-top: 1px solid #eee; padding-top: 8px; flex-wrap: wrap; }
+.ton-label { font-size: 11px; color: #666; flex: 0 0 auto; white-space: nowrap; }
+.ton-val { font-size: 15px; font-weight: bold; min-width: 18px; text-align: left; }
+.btn-ton { border: none; border-radius: 50%; width: 28px; height: 28px; cursor: pointer; font-size: 16px; font-weight: bold; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.btn-minus { background: #FADBD8; color: #922B21; }
+.btn-plus { background: #D5F5E3; color: #1E8449; }
+.btn-location { border: none; background: transparent; color: #666; cursor: pointer; font-size: 11px; font-weight: 600; padding: 0; margin: 0; height: auto; min-height: 0; display: inline-flex; align-items: center; gap: 3px; line-height: 1.2; flex-shrink: 0; white-space: nowrap; font-family: inherit; text-align: left; }
+.btn-location:active { opacity: .75; }
+.note { font-size: 12px; color: #666; margin-top: 6px; line-height: 1.35; }
+.card-actions { display: flex; gap: 6px; margin-top: 8px; border-top: 1px solid #eee; padding-top: 8px; justify-content: flex-end; }
+.btn-edit { background: #EBF5FB; color: #1A5276; border: none; border-radius: 8px; padding: 5px 12px; font-size: 12px; cursor: pointer; font-weight: bold; }
+.btn-delete { background: #FADBD8; color: #922B21; border: none; border-radius: 8px; padding: 5px 12px; font-size: 12px; cursor: pointer; font-weight: bold; }
+.bulk-btn { border: none; border-radius: 18px; padding: 5px 10px; font-size: 12px; cursor: pointer; font-weight: bold; align-items: center; gap: 4px; }
+.bulk-btn-select { background: #EBF5FB; color: #1A5276; }
+.bulk-btn-delete { background: #FADBD8; color: #922B21; }
+.bulk-btn-all { background: #C0392B; color: #fff; }
+.bulk-btn:disabled { opacity: .45; cursor: not-allowed; }
+.bulk-check { position: absolute; top: 8px; right: 8px; z-index: 2; background: #fff; border: 1.5px solid #F39C12; border-radius: 18px; padding: 5px 9px; display: flex; align-items: center; gap: 5px; font-size: 12px; font-weight: bold; color: #7D4F00; box-shadow: 0 2px 8px rgba(0,0,0,.12); cursor: pointer; }
+.bulk-check input { width: 16px; height: 16px; accent-color: #F39C12; }
+.card.bulk-mode { position: relative; padding-top: 34px; }
+.card.bulk-selected { border-color: #F39C12; box-shadow: 0 0 0 3px rgba(243,156,18,.25); }
+.fab-wrap { position: fixed; bottom: 20px; right: 16px; display: flex; flex-direction: column; gap: 10px; align-items: flex-end; z-index: 200; }
+.fab { border: none; border-radius: 50px; padding: 12px 18px; font-size: 14px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 14px rgba(0,0,0,.25); display: flex; align-items: center; gap: 8px; transition: transform .1s; }
+.fab:active { transform: scale(.95); }
+.fab-add { background: #1E3A5F; color: #fff; }
+.fab-import { background: #1E8449; color: #fff; }
+.overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 500; align-items: flex-end; }
+.overlay.open { display: flex; }
+.modal { background: #fff; border-radius: 20px 20px 0 0; width: 100%; max-height: 92vh; overflow-y: auto; padding: 20px 16px 32px; }
+.modal-title { font-size: 17px; font-weight: bold; margin-bottom: 16px; color: #1E3A5F; }
+.form-row { margin-bottom: 12px; }
+.form-row label { font-size: 12px; color: #555; font-weight: bold; display: block; margin-bottom: 4px; }
+.form-row input,.form-row select,.form-row textarea { width: 100%; border: 1.5px solid #ddd; border-radius: 10px; padding: 10px 12px; font-size: 14px; outline: none; background: #fafafa; color: #1a1a1a; }
+.form-row input:focus,.form-row select:focus { border-color: #1E3A5F; background: #fff; }
+.form-row textarea { resize: vertical; min-height: 60px; }
+.form-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.img-upload-row { display: flex; align-items: center; gap: 12px; }
+.img-preview { width: 64px; height: 64px; border-radius: 10px; object-fit: cover; border: 1.5px solid #ddd; flex-shrink: 0; }
+.img-preview-ph { display: flex; align-items: center; justify-content: center; font-size: 11px; color: #999; background: #fafafa; text-align: center; line-height: 1.2; }
+.img-upload-btns { display: flex; flex-direction: column; gap: 6px; }
+.btn-img-pick { background: #EBF5FB; color: #1A5276; border: none; border-radius: 8px; padding: 7px 14px; font-size: 12px; font-weight: bold; cursor: pointer; }
+.btn-img-remove { background: #FADBD8; color: #922B21; border: none; border-radius: 8px; padding: 7px 14px; font-size: 12px; font-weight: bold; cursor: pointer; }
+.btn-submit { width: 100%; background: #1E3A5F; color: #fff; border: none; border-radius: 12px; padding: 14px; font-size: 15px; font-weight: bold; cursor: pointer; margin-top: 8px; }
+.btn-cancel { width: 100%; background: #eee; color: #555; border: none; border-radius: 12px; padding: 12px; font-size: 14px; cursor: pointer; margin-top: 8px; }
+.import-zone { border: 2px dashed #bbb; border-radius: 12px; padding: 30px 16px; text-align: center; color: #888; font-size: 14px; cursor: pointer; background: #fafafa; margin-bottom: 12px; }
+.import-zone:hover { border-color: #1E3A5F; background: #EBF5FB; }
+.import-preview { max-height: 200px; overflow-y: auto; font-size: 12px; margin-bottom: 12px; }
+.import-preview table { width: 100%; border-collapse: collapse; }
+.import-preview th,.import-preview td { border: 1px solid #eee; padding: 4px 6px; text-align: left; }
+.import-preview th { background: #f0f4ff; font-weight: bold; }
+.import-guide { background: #FFF9E6; border: 1px solid #F39C12; border-radius: 10px; padding: 10px 12px; font-size: 12px; color: #7D4F00; margin-bottom: 12px; line-height: 1.6; }
+.import-guide b { color: #B7950B; }
+.toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); background: #333; color: #fff; padding: 10px 20px; border-radius: 20px; font-size: 13px; font-weight: bold; z-index: 999; opacity: 0; pointer-events: none; transition: opacity .3s; white-space: nowrap; }
+.toast.show { opacity: 1; }
+.admin-only { display: none!important; }
+body.admin-mode .admin-only { display: flex!important; }
+.admin-bar { display: flex; justify-content: flex-end; align-items: center; gap: 6px; margin-bottom: 6px; }
+.sync-badge { font-size: 10px; color: rgba(255,255,255,.75); margin-right: auto; display: flex; align-items: center; gap: 4px; }
+.admin-btn { background: rgba(255,255,255,.15); color: #fff; border: 1.5px solid rgba(255,255,255,.4); border-radius: 8px; padding: 4px 10px; font-size: 11px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 4px; opacity: 0; transition: opacity .3s; }
+#adminBtn { display: none; }
+body.admin-entry-visible #adminBtn, body.admin-mode #adminBtn { display: flex; }
+body.admin-entry-visible #adminBtn { opacity: 1; }
+.admin-bar:hover .admin-btn { opacity: 1; }
+body.admin-mode .admin-btn { background: #1E8449; border-color: #1E8449; opacity: 1; }
+.scroll-btns { position: fixed; right: 14px; bottom: 92px; display: flex; flex-direction: column; gap: 5px; z-index: 200; padding: 5px; border-radius: 14px; background: rgba(255,255,255,.94); border: 1px solid rgba(30,58,95,.18); box-shadow: 0 8px 22px rgba(17,34,51,.18); backdrop-filter: blur(10px); opacity: 1; transform: translateX(0); pointer-events: auto; transition: opacity .22s ease, transform .22s ease; }
+.scroll-btns.is-hidden { opacity: 0; transform: translateX(18px); pointer-events: none; }
+.price-row { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; margin-top: 3px; }
+.price-label { font-size: 10px; color: #888; }
+.admin-price { color: #1A5276!important; }
+.scroll-btn { width: 38px; height: 38px; border-radius: 10px; border: 1.5px solid rgba(30,58,95,.22); background: #fff; color: #1E3A5F; cursor: pointer; box-shadow: 0 2px 7px rgba(30,58,95,.12); display: flex; align-items: center; justify-content: center; transition: transform .16s ease, box-shadow .16s ease, background .16s ease, color .16s ease, border-color .16s ease; }
+.scroll-btn svg { width: 18px; height: 18px; stroke: currentColor; stroke-width: 2.6; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.scroll-btn:active { transform: scale(.92); background: #D6EAF8; box-shadow: inset 0 2px 8px rgba(30,58,95,.16); }
+.scroll-btn:hover { transform: translateY(-1px); color: #fff; background: #1E3A5F; border-color: #1E3A5F; box-shadow: 0 5px 13px rgba(30,58,95,.28); }
+.scroll-btn + .scroll-btn { border-top-color: rgba(30,58,95,.18); }
+.footer-credit { text-align: center; padding: 18px 0 24px; font-size: 12px; color: #5D6D7E; font-weight: 700; letter-spacing: .5px; line-height: 1.2; opacity: .6; animation: footerBlink 16s linear infinite; }
+@keyframes footerBlink { 0%, 37.499% { opacity: .6; } 37.5%, 99.999% { opacity: 0; } 100% { opacity: .6; } }
+.loading-wrap { text-align: center; padding: 60px 30px; }
+.loading-icon { font-size: 48px; margin-bottom: 16px; }
+.loading-title { font-size: 15px; font-weight: bold; color: #555; margin-bottom: 6px; }
+.loading-sub { font-size: 13px; color: #aaa; margin-bottom: 20px; }
+.progress-bar-wrap { background: #E8E8E8; border-radius: 20px; height: 10px; overflow: hidden; margin: 0 auto 8px; max-width: 260px; }
+.progress-bar-fill { height: 100%; border-radius: 20px; background: linear-gradient(90deg,#2E86C1,#1E8449); transition: width .25s ease; }
+.progress-pct { font-size: 20px; font-weight: bold; color: #1E3A5F; margin-bottom: 4px; }
+.progress-step { font-size: 12px; color: #888; }
+.cat-title { font-size: 15px; font-weight: bold; color: #fff; background: var(--c,#1E3A5F); padding: 10px 14px; border-radius: 10px; margin-bottom: 8px; }
+.quick-nav { display: flex; gap: 6px; flex-wrap: wrap; padding: 2px 0 10px; margin-bottom: 6px; border-bottom: 1.5px dashed #D7DBDD; }
+.quick-nav-btn { flex-shrink: 0; border: 1.5px solid rgba(0,0,0,.08); background: var(--c); color: #2C3E50; font-size: 11px; font-weight: bold; padding: 6px 11px; border-radius: 14px; cursor: pointer; white-space: nowrap; margin-bottom: 2px; box-shadow: inset 0 -2px 0 rgba(0,0,0,.08); }
+.prod-index-badge { font-size: 18px; font-weight: 900; color: #fff; display: flex; align-items: center; justify-content: center; background: var(--idx-c,#1E3A5F)!important; box-shadow: inset 0 -3px 0 rgba(0,0,0,.16), 0 3px 10px rgba(0,0,0,.12); }
+.group-section { margin: 30px -2px 18px; padding: 10px 8px 6px; border-radius: 12px; border: 2px solid rgba(0,0,0,.08); border-left: 8px solid var(--group-strong,#1E3A5F); background: linear-gradient(180deg, rgba(255,255,255,.82), rgba(248,249,249,.96)); box-shadow: 0 4px 14px rgba(0,0,0,.08); }
+.group-section:first-of-type { margin-top: 12px; }
+.group-section + .group-section { margin-top: 34px; }
+.group-header { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 15px; font-weight: 900; color: #17202A; padding: 8px 10px; border-radius: 9px; margin: 0 0 12px; border: 1.5px solid rgba(0,0,0,.1); border-top: 4px solid var(--group-strong,#1E3A5F); background: var(--group-bg,#D6EAF8); box-shadow: 0 3px 10px rgba(0,0,0,.13); }
+.group-header-main { display: flex; align-items: center; min-width: 0; flex: 1; }
+.group-header-label { flex: 1; min-width: 0; overflow-wrap: anywhere; line-height: 1.25; background: rgba(255,255,255,.88); border: 2px solid var(--group-strong,#1E3A5F); border-radius: 8px; padding: 9px 12px; box-shadow: inset 0 0 0 1px rgba(255,255,255,.8); }
+.group-header-count { flex-shrink: 0; font-size: 11px; font-weight: 900; color: #fff; background: var(--group-strong,#1E3A5F); padding: 6px 10px; border-radius: 999px; white-space: nowrap; box-shadow: 0 2px 6px rgba(0,0,0,.18); }
+.group-header.jump-alert { animation: groupJumpAlert 1.15s ease-out; }
+@keyframes groupJumpAlert {
+  0%, 100% { background: var(--group-bg, #FADBD8); color: #333; box-shadow: none; }
+  18%, 58% { background: #E74C3C; color: #fff; box-shadow: 0 0 0 4px rgba(231,76,60,.25), 0 0 24px rgba(231,76,60,.8); }
+  38%, 78% { background: #FFEBEE; color: #B71C1C; box-shadow: 0 0 0 2px rgba(231,76,60,.25); }
+}
+.header-collapsible { overflow: hidden; transition: max-height .35s ease, opacity .3s ease; max-height: 400px; opacity: 1; }
+.sticky.collapsed .header-collapsible { max-height: 74px !important; opacity: 1; pointer-events: auto; }
+.sticky.collapsed .admin-bar,
+.sticky.collapsed .title,
+.sticky.collapsed .kpi-row,
+.sticky.collapsed .tabs,
+.sticky.collapsed .filters { display: none; }
+.sticky.collapsed .header { padding: 8px 10px; box-shadow: 0 2px 7px rgba(0,0,0,.18); }
+.sticky.collapsed .search-box { padding: 7px 8px; border-width: 2px; }
+#headerToggleBtn { border: 1px solid rgba(255,255,255,.28); background: #1E3A5F; color: #fff; border-radius: 999px; padding: 4px 9px 4px 5px; min-height: 30px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; font-size: 12px; font-weight: 800; line-height: 1; white-space: nowrap; box-shadow: 0 3px 10px rgba(30,58,95,.22); transition: background-color .18s ease, box-shadow .18s ease, transform .18s ease; user-select: none; }
+#headerToggleBtn:hover { background: #24476F; box-shadow: 0 5px 14px rgba(30,58,95,.26); transform: translateY(-1px); }
+#headerToggleBtn:active { transform: scale(.96); box-shadow: 0 2px 6px rgba(30,58,95,.18); }
+#headerToggleIcon { width: 21px; height: 21px; border-radius: 50%; background: #F39C12; color: #fff; display: inline-flex; align-items: center; justify-content: center; font-size: 10px; line-height: 1; box-shadow: inset 0 -1px 0 rgba(0,0,0,.16); flex-shrink: 0; }
+#headerToggleText { line-height: 1; }
+.sticky.collapsed #headerToggleBtn { background: #F39C12; color: #17202A; border-color: rgba(30,58,95,.14); box-shadow: 0 3px 10px rgba(243,156,18,.24); }
+.sticky.collapsed #headerToggleBtn:hover { background: #E8910F; }
+.sticky.collapsed #headerToggleIcon { background: #1E3A5F; color: #fff; }
+@media (max-width: 420px) {
+  #headerToggleBtn { padding: 7px 9px; font-size: 11px; }
+  .filters { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+  .filters::-webkit-scrollbar { display: none; }
+  .count-badge { margin-left: 0; }
+  .search-box.is-fixed { left: 10px; right: 10px; top: 8px; }
+  .tx-summary { grid-template-columns: 1fr; }
+  .tx-filter { grid-template-columns: 1fr; }
+  .tx-time { white-space: normal; }
+}
+
+/* Hover glow: chuot vao thi sang, roi chuot thi tat. */
+.title,
+.tab-btn,
+.filter-btn,
+.kpi,
+.card,
+.quick-nav-btn,
+.group-header,
+.fab,
+.admin-btn,
+.scroll-btn,
+.btn-edit,
+.btn-delete,
+.bulk-btn,
+.nguoi-ban-row,
+.product-name,
+.brand-tag,
+.price,
+.ma-code,
+.sheet-badge,
+.status-badge {
+  transition: color .22s ease, background-color .22s ease, border-color .22s ease, box-shadow .22s ease, text-shadow .22s ease, transform .22s ease, filter .22s ease;
+}
+
+.title:hover,
+.tab-btn:hover,
+.filter-btn:hover,
+.quick-nav-btn:hover,
+.group-header:hover,
+.fab:hover,
+.admin-btn:hover,
+.scroll-btn:hover,
+.btn-edit:hover,
+.btn-delete:hover,
+.bulk-btn:hover {
+  filter: brightness(1.08);
+  text-shadow: 0 0 6px rgba(255,255,255,.95), 0 0 14px rgba(243,156,18,.85);
+  box-shadow: 0 0 0 2px rgba(243,156,18,.25), 0 0 18px rgba(243,156,18,.55);
+  transform: translateY(-1px);
+}
+
+.kpi:hover,
+.card:hover,
+.nguoi-ban-row:hover {
+  box-shadow: 0 0 0 2px rgba(243,156,18,.25), 0 8px 24px rgba(243,156,18,.28);
+  transform: translateY(-1px);
+}
+
+.product-name:hover,
+.brand-tag:hover,
+.price:hover,
+.ma-code:hover,
+.sheet-badge:hover,
+.status-badge:hover {
+  text-shadow: 0 0 5px rgba(255,255,255,.9), 0 0 12px rgba(46,134,193,.55);
+  filter: brightness(1.08);
+}
+
+@media (hover: none) {
+  .title:hover,
+  .tab-btn:hover,
+  .filter-btn:hover,
+  .kpi:hover,
+  .card:hover,
+  .quick-nav-btn:hover,
+  .group-header:hover,
+  .fab:hover,
+  .admin-btn:hover,
+  .scroll-btn:hover,
+  .btn-edit:hover,
+  .btn-delete:hover,
+  .bulk-btn:hover,
+  .nguoi-ban-row:hover,
+  .product-name:hover,
+  .brand-tag:hover,
+  .price:hover,
+  .ma-code:hover,
+  .sheet-badge:hover,
+  .status-badge:hover {
+    filter: none;
+    text-shadow: none;
+    transform: none;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="sticky" style="position: relative;">
+<div class="header-collapsible">
+  <div class="header">
+    <div class="admin-bar">
+      <span class="sync-badge" id="syncBadge">💾 Lưu trên máy</span>
+      <button class="admin-btn admin-only" id="syncBtn" onclick="manualSync()">🔄 Đẩy lên Sheet</button>
+      <button class="admin-btn" id="adminBtn" onclick="onAdminBtnClick()">🔒 Admin</button>
+    </div>
+    <div class="title"><span class="title-icon">🏪</span><span class="title-text"><span class="title-base">KHO Q2 (HOÀNG GIA COMPUTER)</span><span class="title-shine" aria-hidden="true">KHO Q2 (HOÀNG GIA COMPUTER)</span></span></div>
+    <div class="kpi-row">
+      <div class="kpi" style="background: #2E86C1;" onclick="showKpiDetail('all')"><div class="kpi-v" id="kpi-mh">0</div><div class="kpi-l">mặt hàng <span class="kpi-hint">▼</span></div></div>
+      <div class="kpi" style="background: #1E8449;" onclick="showKpiDetail('ton')"><div class="kpi-v" id="kpi-ton">0</div><div class="kpi-l">tổng tồn <span class="kpi-hint">▼</span></div></div>
+     <div class="kpi" style="background: #C0392B;" onclick="showKpiDetail('het')">
+    <div class="kpi-v" id="kpi-het">0</div>
+    <div class="kpi-l">hết hàng <span class="kpi-hint">▼</span></div>
+</div>
+      <div class="kpi" style="background: #B7950B;" onclick="showKpiDetail('sap')"><div class="kpi-v" id="kpi-sap">0</div><div class="kpi-l">sắp hết <span class="kpi-hint">▼</span></div></div>
+    </div>
+    <div class="search-box">
+      <span style="font-size: 20px;">🔎</span>
+      <input id="search" type="search" placeholder="Gõ tên, mã hàng, thương hiệu..." autocomplete="off" autocorrect="off" spellcheck="false">
+      <button class="clear-btn" id="clear-btn" onclick="clearSearch()">✕</button>
+      <button id="headerToggleBtn" onclick="toggleHeader()" type="button" aria-expanded="true" title="Thu gọn menu">
+        <span id="headerToggleIcon">▲</span>
+        <span id="headerToggleText">Thu gọn</span>
+      </button>
+</div>
+    <div id="searchSpacer" class="search-spacer" aria-hidden="true"></div>
+  </div>
+  </div>
+  <div class="tabs" id="tabs">
+    <button class="tab-btn active" style="--c:#1E3A5F" data-tab="ALL" onclick="setTab(this)">🔍 Tất cả</button>
+    <button class="tab-btn" style="--c:#1A5276" data-tab="MT" onclick="setTab(this)">💻 Máy Tính</button>
+    <button class="tab-btn" style="--c:#784212" data-tab="MI" onclick="setTab(this)">🖨️ Máy In</button>
+    <button class="tab-btn" style="--c:#641E16" data-tab="CAM" onclick="setTab(this)">📷 Camera</button>
+    <button class="tab-btn" style="--c:#0B5345" data-tab="INT" onclick="setTab(this)">🌐 Internet</button>
+  </div>
+  <div class="filters">
+    <button class="filter-btn active" style="background:#1E3A5F;color:#fff" data-status="ALL" onclick="setStatus(this)">Tất cả</button>
+    <button class="filter-btn" data-status="CON" onclick="setStatus(this)">✅ Còn hàng</button>
+    <button class="filter-btn" data-status="SAP" onclick="setStatus(this)">⚠️ Sắp hết</button>
+    <button class="filter-btn" data-status="HET" onclick="setStatus(this)">❌ Hết hàng</button>
+    <button class="bulk-btn bulk-btn-select admin-only" id="bulkModeBtn" onclick="toggleBulkSelectMode()">☑️ Chọn nhiều</button>
+    <button class="bulk-btn bulk-btn-delete admin-only" id="bulkDeleteBtn" onclick="deleteSelectedItems()" disabled>🗑️ Xóa đã chọn</button>
+    <button class="bulk-btn bulk-btn-all admin-only" onclick="deleteAllItems()">🔥 Xóa tất cả</button>
+    <span class="count-badge" id="count">0 kết quả</span>
+  </div>
+</div>
+
+<div id="results"></div>
+
+<div class="fab-wrap">
+  <div id="fabMenuItems" style="display:flex;flex-direction:column;gap:10px;align-items:flex-end;overflow:hidden;max-height:0;opacity:0;transition:max-height .35s ease,opacity .3s ease;">
+    <button class="fab fab-add admin-only" onclick="openAddModal()">➕ Thêm thiết bị</button>
+    <button class="fab fab-import admin-only" onclick="openImportModal()">📤 Tải File lên</button>
+    <button class="fab admin-only" style="background:#8E44AD;color:#fff" onclick="openNVModal()">👥 Nhân viên</button>
+    <button class="fab admin-only" style="background:#B7950B;color:#fff" onclick="resetToDefault()">🔄 Khôi phục dữ liệu mẫu</button>
+  </div>
+  <button class="fab admin-only" id="fabToggleBtn" style="background:#1E3A5F;color:#fff;" onclick="toggleFabMenu()">⚙️ Quản trị</button>
+</div>
+
+<div class="overlay" id="editOverlay" onclick="overlayClose(event,'editOverlay')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-title" id="editTitle">➕ Thêm thiết bị mới</div>
+    <input type="hidden" id="editIdx" value="">
+    <div class="form-2col">
+      <div class="form-row">
+        <label>Danh mục *</label>
+        <select id="fSheet" onchange="updateGroupOptions()">
+          <option value="MT">💻 Máy Tính</option>
+          <option value="MI">🖨️ Máy In</option>
+          <option value="CAM">📷 Camera</option>
+          <option value="INT">🌐 Internet</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <label>Mã hàng *</label>
+      <input type="text" id="fMa" placeholder="VD: CPU001">
+      </div>
+    </div>
+    <div class="form-row">
+      <label>Nhóm sản phẩm</label>
+      <select id="fGroup"></select>
+    </div>
+    <div class="form-row">
+      <label>Tên sản phẩm *</label>
+      <input type="text" id="fTen" placeholder="VD: Intel Core i5-12400F">
+    </div>
+    <div class="form-2col">
+      <div class="form-row">
+        <label>Thương hiệu</label>
+        <input type="text" id="fTH" placeholder="VD: Intel">
+      </div>
+      <div class="form-row">
+        <label>Giá nhập (đ)</label>
+        <input type="number" id="fGia" placeholder="0" min="0">
+      </div>
+      <div class="form-row">
+        <label>Giá bán (đ)</label>
+        <input type="number" id="fGiaBan" placeholder="0" min="0">
+      </div>
+    </div>
+    <div class="form-2col">
+      <div class="form-row">
+        <label>Số lượng tồn *</label>
+        <input type="number" id="fTon" placeholder="0" min="0">
+      </div>
+      <div class="form-row">
+        <label>Tình trạng</label>
+        <select id="fTT">
+          <option value="CÒN HÀNG">✅ Còn hàng</option>
+          <option value="SẮP HẾT">⚠️ Sắp hết</option>
+          <option value="HẾT HÀNG">❌ Hết hàng</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <label>Ghi chú</label>
+      <textarea id="fGhi" placeholder="Ghi chú thêm (nếu có)"></textarea>
+    </div>
+    <div class="form-row">
+      <label>Vị trí trong kho</label>
+      <input type="text" id="fVitri" placeholder="VD: Kệ A1 - Tầng 2">
+    </div>
+    <div class="form-row">
+      <label>Ảnh sản phẩm</label>
+      <div class="img-upload-row">
+        <img id="fImgPreview" class="img-preview" style="display: none;" src="" alt="" />
+        <div id="fImgPlaceholder" class="img-preview img-preview-ph">📷 Chưa có ảnh</div>
+        <div class="img-upload-btns">
+          <button type="button" class="btn-img-pick" onclick="document.getElementById('fImgFile').click()">📤 Chọn ảnh</button>
+          <button type="button" class="btn-img-remove" id="fImgRemoveBtn" style="display:none" onclick="removeImage()">🗑️ Xóa ảnh</button>
+        </div>
+      </div>
+      <input type="file" id="fImgFile" accept="image/*" style="display:none" onchange="handleImagePick(this)">
+      <input type="hidden" id="fImg" value="">
+    </div>
+    <button class="btn-submit" onclick="saveItem()">💾 Lưu</button>
+    <button class="btn-cancel" onclick="closeOverlay('editOverlay')">Huỷ</button>
+  </div>
+</div>
+
+<div class="overlay" id="importOverlay" onclick="overlayClose(event,'importOverlay')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-title">📤 Tải File lên (Excel)</div>
+    <div class="import-guide">
+      <b>Định dạng cột Excel (theo thứ tự):</b><br />
+      A: Danh mục (MT/MI/CAM/INT) &nbsp;|&nbsp; B: Mã hàng<br />
+      C: Tên sản phẩm &nbsp;|&nbsp; D: Thương hiệu<br />
+      E: Giá (số) &nbsp;|&nbsp; F: Tồn kho (số)<br />
+      G: Tình trạng (CÒN HÀNG / SẮP HẾT / HẾT HÀNG) &nbsp;|&nbsp; H: Ghi chú<br />
+      <b>Hàng đầu tiên là tiêu đề, dữ liệu từ hàng 2.</b>
+    </div>
+    <div class="import-zone" id="importZone" onclick="document.getElementById('fileInput').click()">
+      <div style="font-size: 36px; margin-bottom: 8px;">📂</div>
+      <div style="font-weight: bold; color: #555;">Nhấn để chọn file Excel</div>
+      <div style="font-size: 12px; margin-top: 4px;">.xlsx / .xls</div>
+    </div>
+    <input type="file" id="fileInput" accept=".xlsx,.xls" style="display:none" onchange="handleFile(this)">
+    <div id="importPreview" class="import-preview"></div>
+    <div id="importInfo" style="font-size: 13px; color: #1E8449; font-weight: bold; margin-bottom: 8px;"></div>
+    <div id="importMode" style="display: none; margin-bottom: 10px;">
+      <label style="font-size:13px;font-weight:bold;color:#555;display:block;margin-bottom:6px">Chế độ import:</label>
+      <label style="display:flex;align-items:center;gap:8px;font-size:13px;margin-bottom:4px;cursor:pointer">
+        <input type="radio" name="importMode" value="add" checked> ➕ Thêm vào danh sách hiện có
+      </label>
+      <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer">
+        <input type="radio" name="importMode" value="replace"> 🔄 Thay thế toàn bộ dữ liệu
+      </label>
+    </div>
+    <button class="btn-submit" id="btnImport" style="display:none" onclick="doImport()">📤 Tải lên ngay</button>
+    <button class="btn-cancel" onclick="closeOverlay('importOverlay')">Huỷ</button>
+  </div>
+</div>
+
+<div class="overlay" id="nvOverlay" onclick="overlayClose(event,'nvOverlay')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-title">👥 Quản lý nhân viên</div>
+    <div class="form-row" style="flex-direction: row; gap: 8px;">
+      <input type="text" id="nvInput" placeholder="Tên nhân viên mới..." style="flex:1">
+      <button class="btn-submit" style="padding:8px 14px;margin:0" onclick="addNV()">➕ Thêm</button>
+    </div>
+    <div id="nvList" style="margin-top: 10px;"></div>
+    <button class="btn-cancel" onclick="closeOverlay('nvOverlay')">Đóng</button>
+  </div>
+</div>
+
+<div class="overlay" id="saleOverlay" onclick="overlayClose(event,'saleOverlay')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-title">🛒 Ghi nhận giao dịch</div>
+    <input type="hidden" id="saleIdx">
+    <div class="form-row">
+      <label>Nhân viên bán</label>
+      <select id="saleNV" style="width:100%;padding:9px;border-radius:8px;border:1.5px solid #ddd;font-size:14px">
+        <option value="">-- Chọn nhân viên --</option>
+      </select>
+    </div>
+    <div class="form-row"><label>Số lượng xuất</label><input type="number" id="saleQty" value="1" min="1"></div>
+    <div class="form-row"><label>Giá bán (đ)</label><input type="number" id="saleGia" placeholder="VD: 3500000"></div>
+    <div class="form-row"><label>Ghi chú</label><input type="text" id="saleGhi" placeholder="VD: Khách lẻ, bảo hành 12 tháng..."></div>
+    <button class="btn-submit" onclick="saveSale()">💾 Lưu giao dịch</button>
+    <button class="btn-cancel" onclick="closeOverlay('saleOverlay')">Huỷ</button>
+  </div>
+</div>
+
+<div class="overlay" id="txOverlay" onclick="overlayClose(event,'txOverlay')">
+  <div class="modal" onclick="event.stopPropagation()" style="max-height: 80vh; overflow-y: auto;">
+    <div class="modal-title" id="txModalTitle">📋 Lịch sử giao dịch</div>
+    <div id="txModalBody"></div>
+    <button class="btn-cancel" onclick="closeOverlay('txOverlay')">Đóng</button>
+  </div>
+</div>
+
+<div class="overlay" id="kpiOverlay" onclick="overlayClose(event,'kpiOverlay')">
+  <div class="modal" onclick="event.stopPropagation()" style="max-height: 80vh; overflow-y: auto;">
+    <div class="modal-title" id="kpiModalTitle">Chi tiết</div>
+    <div id="kpiModalBody"></div>
+    <button class="btn-cancel" onclick="closeOverlay('kpiOverlay')">Đóng</button>
+  </div>
+</div>
+
+<div class="overlay" id="adminOverlay" onclick="overlayClose(event,'adminOverlay')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-title">🔐 Mở khóa Admin</div>
+    <div class="form-row">
+      <label>Mật khẩu</label>
+      <input type="password" id="adminPass" placeholder="Nhập mật khẩu admin" autocomplete="off">
+    </div>
+    <button class="btn-submit" onclick="submitAdminPass()">🔓 Mở khóa</button>
+    <button class="btn-cancel" onclick="closeOverlay('adminOverlay')">Huỷ</button>
+  </div>
+</div>
+
+<div class="scroll-btns">
+  <button class="scroll-btn" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Lên đầu trang" aria-label="Lên đầu trang">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5"></path><path d="M6 11l6-6 6 6"></path></svg>
+  </button>
+  <button class="scroll-btn" onclick="window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'})" title="Xuống cuối trang" aria-label="Xuống cuối trang">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14"></path><path d="M18 13l-6 6-6-6"></path></svg>
+  </button>
+</div>
+
+<div class="footer-credit">✦ Design by : Pham Van Chuong ✦</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+
+// ====== Tự động dọn banner/overlay lạ do hosting chèn vào ======
+(function(){
+  const APP_IDS = new Set(["results","editOverlay","importOverlay","adminOverlay","toast"]);
+  const APP_CLASSES = ["sticky","fab-wrap","overlay","toast"];
+  function isAppEl(el){
+    if(el.id && APP_IDS.has(el.id)) return true;
+    if(el.classList){
+      for(const c of APP_CLASSES) if(el.classList.contains(c)) return true;
+    }
+    return false;
+  }
+  function cleanup(){
+    [document.body, document.documentElement].forEach(parent=>{
+      Array.from(parent.children||[]).forEach(el=>{
+        if(parent===document.documentElement && (el.tagName==="HEAD"||el.tagName==="BODY")) return;
+        if(["SCRIPT","STYLE","LINK","NOSCRIPT","META","TITLE"].includes(el.tagName)) return;
+        if(isAppEl(el)) return;
+        let rect, style;
+        try{ rect = el.getBoundingClientRect(); style = window.getComputedStyle(el); }catch(e){ return; }
+        const big = rect.width >= window.innerWidth*0.6 || rect.height >= window.innerHeight*0.4;
+        const overlayLike = (style.position==="fixed"||style.position==="absolute") && big;
+        const highZ = (parseInt(style.zIndex)||0) > 500;
+        const looksAd = /ad|banner|popup|sponsor|quangcao|xt_|interstitial/i.test((el.id||"")+" "+(el.className||""));
+        if(el.tagName==="IFRAME" || overlayLike || highZ || looksAd){
+          el.remove();
+        }
+      });
+    });
+  }
+  setInterval(cleanup, 1000);
+  document.addEventListener("click", ()=>setTimeout(cleanup,50), true);
+  cleanup();
+})();
+
+const SHEET_CFG = {
+  MT:  {label:"💻 MÁY TÍNH", c:"#1A5276", light:"#D6EAF8"},
+  MI:  {label:"🖨️ MÁY IN",   c:"#784212", light:"#FDEBD0"},
+  CAM: {label:"📷 CAMERA",   c:"#641E16", light:"#FADBD8"},
+  INT: {label:"🌐 INTERNET", c:"#0B5345", light:"#D5F5E3"},
+};
+
+const DEFAULT_DATA = [
+["MT","CPU001","Intel Core i5-12400F","Intel",3500000,3,"CÒN HÀNG","","🧠  CPU — Bộ vi xử lý","",0],
+["MT","CPU002","Intel Core i7-12700F","Intel",6200000,1,"CÒN HÀNG","","🧠  CPU — Bộ vi xử lý","",0],
+["MT","CPU003","Intel Core i9-13900K","Intel",13500000,0,"HẾT HÀNG","","🧠  CPU — Bộ vi xử lý","",0],
+["MT","CPU004","AMD Ryzen 5 5600X","AMD",3200000,2,"CÒN HÀNG","","🧠  CPU — Bộ vi xử lý","",0],
+["MT","CPU005","AMD Ryzen 7 5800X","AMD",5500000,1,"CÒN HÀNG","","🧠  CPU — Bộ vi xử lý","",0],
+["MT","MB001","ASUS B660M-A D4","ASUS",3200000,2,"CÒN HÀNG","","🔌  Mainboard","",0],
+["MT","MB002","MSI B550M PRO-VDH","MSI",2800000,3,"CÒN HÀNG","","🔌  Mainboard","",0],
+["MT","MB003","Gigabyte H610M S2H","Gigabyte",1900000,1,"CÒN HÀNG","","🔌  Mainboard","",0],
+["MT","RAM001","Kingston 8GB DDR4 3200","Kingston",350000,8,"CÒN HÀNG","","💾  RAM — Bộ nhớ","",0],
+["MT","RAM002","Kingston 16GB DDR4 3200","Kingston",680000,5,"CÒN HÀNG","","💾  RAM — Bộ nhớ","",0],
+["MT","RAM003","Samsung 8GB DDR4 3200","Samsung",360000,6,"CÒN HÀNG","","💾  RAM — Bộ nhớ","",0],
+["MT","RAM004","Samsung 16GB DDR5 4800","Samsung",850000,2,"CÒN HÀNG","","💾  RAM — Bộ nhớ","",0],
+["MT","RAM005","Corsair 32GB DDR4 3200","Corsair",1350000,0,"HẾT HÀNG","","💾  RAM — Bộ nhớ","",0],
+["MT","SSD001","Samsung 870 EVO 500GB","Samsung",1200000,4,"CÒN HÀNG","","⚡  SSD — Ổ cứng thể rắn","",0],
+["MT","SSD002","Samsung 870 EVO 1TB","Samsung",2100000,2,"CÒN HÀNG","","⚡  SSD — Ổ cứng thể rắn","",0],
+["MT","SSD003","WD Blue SA510 500GB","WD",1100000,3,"CÒN HÀNG","","⚡  SSD — Ổ cứng thể rắn","",0],
+["MT","SSD004","WD Blue SA510 1TB","WD",1950000,1,"CÒN HÀNG","","⚡  SSD — Ổ cứng thể rắn","",0],
+["MT","SSD005","Kingston NV2 500GB M.2","Kingston",780000,5,"CÒN HÀNG","","⚡  SSD — Ổ cứng thể rắn","",0],
+["MT","HDD001","Seagate Barracuda 1TB","Seagate",950000,6,"CÒN HÀNG","","🗄️  HDD — Ổ cứng cơ","",0],
+["MT","HDD002","Seagate Barracuda 2TB","Seagate",1650000,3,"CÒN HÀNG","","🗄️  HDD — Ổ cứng cơ","",0],
+["MT","HDD003","WD Blue 1TB","WD",980000,4,"CÒN HÀNG","","🗄️  HDD — Ổ cứng cơ","",0],
+["MT","VGA001","NVIDIA GTX 1650 4GB","NVIDIA",3200000,1,"CÒN HÀNG","","🎮  VGA — Card màn hình","",0],
+["MT","VGA002","NVIDIA RTX 3060 12GB","NVIDIA",8500000,0,"HẾT HÀNG","","🎮  VGA — Card màn hình","",0],
+["MT","VGA003","AMD RX 6600 8GB","AMD",5800000,1,"CÒN HÀNG","","🎮  VGA — Card màn hình","",0],
+["MT","PSU001","Corsair CV550 550W","Corsair",1350000,3,"CÒN HÀNG","","🔋  Nguồn — PSU","",0],
+["MT","PSU002","CoolerMaster 650W","CoolerMaster",1500000,2,"CÒN HÀNG","","🔋  Nguồn — PSU","",0],
+["MT","PSU003","Seasonic Focus 750W","Seasonic",2800000,1,"CÒN HÀNG","","🔋  Nguồn — PSU","",0],
+["MT","CASE001","NZXT H510 Mid Tower","NZXT",2200000,2,"CÒN HÀNG","","🖥️  Case — Vỏ máy tính","",0],
+["MT","CASE002","Lian Li PC-O11","Lian Li",3500000,1,"CÒN HÀNG","","🖥️  Case — Vỏ máy tính","",0],
+["MT","CASE003","CoolerMaster Q300L","CoolerMaster",950000,4,"CÒN HÀNG","","🖥️  Case — Vỏ máy tính","",0],
+["MT","FAN001","CoolerMaster Hyper 212","CoolerMaster",450000,5,"CÒN HÀNG","","❄️  Tản nhiệt — Cooling","",0],
+["MT","FAN002","Noctua NH-D15","Noctua",1850000,1,"CÒN HÀNG","","❄️  Tản nhiệt — Cooling","",0],
+["MT","FAN003","ID-Cooling SE-224-XT","ID-Cooling",380000,3,"CÒN HÀNG","","❄️  Tản nhiệt — Cooling","",0],
+["MT","MBP001","Chuột Logitech M330 Silent","Logitech",285000,5,"CÒN HÀNG","","🖱️  Chuột & Bàn phím","",0],
+["MT","MBP002","Chuột Logitech M185 Wireless","Logitech",220000,8,"CÒN HÀNG","","🖱️  Chuột & Bàn phím","",0],
+["MT","MBP003","Chuột gaming Dare-U EM908","Dare-U",350000,4,"CÒN HÀNG","","🖱️  Chuột & Bàn phím","",0],
+["MT","MBP004","Chuột có dây Logitech B100","Logitech",85000,12,"CÒN HÀNG","","🖱️  Chuột & Bàn phím","",0],
+["MT","MBP005","Bàn phím Logitech K380 Wireless","Logitech",780000,3,"CÒN HÀNG","Bluetooth","🖱️  Chuột & Bàn phím","",0],
+["MT","MBP006","Bàn phím cơ AKKO 3087","AKKO",950000,2,"CÒN HÀNG","","🖱️  Chuột & Bàn phím","",0],
+["MT","MBP007","Bàn phím có dây Logitech K120","Logitech",165000,10,"CÒN HÀNG","","🖱️  Chuột & Bàn phím","",0],
+["MT","MBP008","Combo Logitech MK235 KB+Mouse","Logitech",420000,5,"CÒN HÀNG","Không dây","🖱️  Chuột & Bàn phím","",0],
+["MT","MBP009","Combo Rapoo X1800S KB+Mouse","Rapoo",320000,4,"CÒN HÀNG","Không dây","🖱️  Chuột & Bàn phím","",0],
+["MT","CAP001","Cáp HDMI 2.0 1.5m","Generic",45000,20,"CÒN HÀNG","","🔌  Dây cáp chuyển","",0],
+["MT","CAP002","Cáp HDMI 2.0 3m","Generic",65000,15,"CÒN HÀNG","","🔌  Dây cáp chuyển","",0],
+["MT","CAP003","Cáp DisplayPort 1.4 2m","Generic",75000,10,"CÒN HÀNG","","🔌  Dây cáp chuyển","",0],
+["MT","CAP004","Cáp VGA to HDMI","Generic",55000,8,"CÒN HÀNG","","🔌  Dây cáp chuyển","",0],
+["MT","CAP005","Cáp USB-C to HDMI","Generic",85000,6,"CÒN HÀNG","","🔌  Dây cáp chuyển","",0],
+["MT","CAP006","Cáp USB 3.0 Type-A 1m","Generic",35000,25,"CÒN HÀNG","","🔌  Dây cáp chuyển","",0],
+["MT","CAP007","Cáp SATA 3 dữ liệu","Generic",25000,30,"CÒN HÀNG","","🔌  Dây cáp chuyển","",0],
+["MT","LAP001","Pin Laptop HP 4 cell","HP",450000,4,"CÒN HÀNG","","💻  Laptop linh kiện","",0],
+["MT","LAP002","Pin Laptop Dell 6 cell","Dell",550000,2,"CÒN HÀNG","","💻  Laptop linh kiện","",0],
+["MT","LAP003","Bàn phím HP 15s","HP",280000,5,"CÒN HÀNG","","💻  Laptop linh kiện","",0],
+["MT","LAP004","Màn hình laptop 15.6 inch","Generic",1200000,1,"CÒN HÀNG","","💻  Laptop linh kiện","",0],
+["MT","MH001","Samsung 24\" FHD IPS","Samsung",2800000,2,"CÒN HÀNG","","🖥️  Màn hình","",0],
+["MT","MH002","Samsung 27\" QHD","Samsung",5500000,1,"CÒN HÀNG","","🖥️  Màn hình","",0],
+["MT","MH003","LG 24\" FHD IPS","LG",2600000,3,"CÒN HÀNG","","🖥️  Màn hình","",0],
+["MT","MH004","LG 27\" 4K","LG",8900000,1,"CÒN HÀNG","","🖥️  Màn hình","",0],
+["MT","MH005","AOC 24\" FHD","AOC",2200000,2,"CÒN HÀNG","","🖥️  Màn hình","",0],
+["MT","MH006","ASUS 24\" FHD 144Hz","ASUS",3800000,1,"CÒN HÀNG","","🖥️  Màn hình","",0],
+["MT","MH007","ViewSonic 27\" FHD","ViewSonic",3200000,0,"HẾT HÀNG","","🖥️  Màn hình","",0],
+["MT","LK001","Keo tản nhiệt Arctic MX-4","Arctic",85000,12,"CÒN HÀNG","","🛠️  Linh kiện khác","",0],
+["MT","LK002","Pin CMOS CR2032 (vỉ 5)","Generic",25000,15,"CÒN HÀNG","","🛠️  Linh kiện khác","",0],
+["MT","LK003","Hub USB 3.0 4 cổng","Generic",95000,8,"CÒN HÀNG","","🛠️  Linh kiện khác","",0],
+["MT","LK004","Vít máy tính M3 (bộ 50)","Generic",25000,20,"CÒN HÀNG","","🛠️  Linh kiện khác","",0],
+["MI","ML001","HP LaserJet Pro M15w","HP",2800000,2,"CÒN HÀNG","","🖨️  Máy in Laser","",0],
+["MI","ML002","HP LaserJet Pro M404n","HP",6500000,1,"CÒN HÀNG","","🖨️  Máy in Laser","",0],
+["MI","ML003","Canon LBP6030","Canon",2600000,3,"CÒN HÀNG","","🖨️  Máy in Laser","",0],
+["MI","ML004","Canon LBP2900+","Canon",3200000,2,"CÒN HÀNG","","🖨️  Máy in Laser","",0],
+["MI","ML005","Brother HL-1210W","Brother",2900000,1,"CÒN HÀNG","WiFi","🖨️  Máy in Laser","",0],
+["MI","ML006","Ricoh SP210","Ricoh",3100000,0,"HẾT HÀNG","","🖨️  Máy in Laser","",0],
+["MI","MC001","Epson L3150 Wifi","Epson",4200000,3,"CÒN HÀNG","In/Scan/Copy","🎨  Máy in phun màu","",0],
+["MI","MC002","Epson L5190 Wifi","Epson",5800000,2,"CÒN HÀNG","Fax","🎨  Máy in phun màu","",0],
+["MI","MC003","Canon G2010","Canon",3800000,4,"CÒN HÀNG","","🎨  Máy in phun màu","",0],
+["MI","MC004","Canon G3010 Wifi","Canon",4500000,1,"CÒN HÀNG","","🎨  Máy in phun màu","",0],
+["MI","MC005","HP DeskJet 2775","HP",2200000,2,"CÒN HÀNG","","🎨  Máy in phun màu","",0],
+["MI","MA001","Epson L6580 A3 Wifi","Epson",9500000,1,"CÒN HÀNG","","📐  Máy in A3","",0],
+["MI","MA002","Canon MAXIFY GX7070 A3","Canon",11000000,1,"CÒN HÀNG","","📐  Máy in A3","",0],
+["MI","MA003","HP OfficeJet Pro 7740 A3","HP",8500000,0,"HẾT HÀNG","","📐  Máy in A3","",0],
+["MI","PC001","Canon iR2520 25ppm","Canon",18000000,1,"CÒN HÀNG","","📠  Máy photocopy","",0],
+["MI","PC002","Canon iR2625 25ppm","Canon",22000000,1,"CÒN HÀNG","","📠  Máy photocopy","",0],
+["MI","PC003","Ricoh MP2014 20ppm","Ricoh",15000000,2,"CÒN HÀNG","","📠  Máy photocopy","",0],
+["MI","PC004","Toshiba e-STUDIO2523A","Toshiba",19000000,0,"HẾT HÀNG","","📠  Máy photocopy","",0],
+["MI","PC005","Xerox DC S2320","Xerox",17000000,1,"CÒN HÀNG","","📠  Máy photocopy","",0],
+["MI","MUC001","Mực HP 85A CE285A","HP",180000,0,"HẾT HÀNG","","🖨️  Mực in — Cartridge","",0],
+["MI","MUC002","Mực HP 26A CF226A","HP",320000,3,"CÒN HÀNG","","🖨️  Mực in — Cartridge","",0],
+["MI","MUC003","Mực Canon CRG325","Canon",190000,2,"CÒN HÀNG","","🖨️  Mực in — Cartridge","",0],
+["MI","MUC004","Mực Canon CRG056","Canon",580000,1,"CÒN HÀNG","","🖨️  Mực in — Cartridge","",0],
+["MI","MUC005","Mực Brother TN2385","Brother",210000,4,"CÒN HÀNG","","🖨️  Mực in — Cartridge","",0],
+["MI","MUC006","Mực Ricoh SP210","Ricoh",150000,5,"CÒN HÀNG","","🖨️  Mực in — Cartridge","",0],
+["MI","DRM001","Drum Canon iR2520","Canon",850000,2,"CÒN HÀNG","","🥁  Drum — Trống in","",0],
+["MI","DRM002","Drum HP M402","HP",920000,0,"HẾT HÀNG","","🥁  Drum — Trống in","",0],
+["MI","DRM003","Drum Brother DR2385","Brother",680000,3,"CÒN HÀNG","","🥁  Drum — Trống in","",0],
+["MI","DRM004","Drum Ricoh SP210","Ricoh",480000,1,"CÒN HÀNG","","🥁  Drum — Trống in","",0],
+["MI","GAT001","Gạt từ HP 1010/1020","HP",45000,8,"CÒN HÀNG","","🔧  Gạt từ / Gạt mực / Trục","",0],
+["MI","GAT002","Gạt mực HP LJ 1010","HP",35000,10,"CÒN HÀNG","","🔧  Gạt từ / Gạt mực / Trục","",0],
+["MI","GAT003","Gạt từ Canon LBP2900","Canon",48000,6,"CÒN HÀNG","","🔧  Gạt từ / Gạt mực / Trục","",0],
+["MI","TRU001","Trục từ HP 1010","HP",120000,4,"CÒN HÀNG","","🔧  Gạt từ / Gạt mực / Trục","",0],
+["MI","TRU002","Trục ép HP P1102","HP",180000,3,"CÒN HÀNG","","🔧  Gạt từ / Gạt mực / Trục","",0],
+["MI","TRU003","Lô ép Canon MF3010","Canon",220000,2,"CÒN HÀNG","","🔧  Gạt từ / Gạt mực / Trục","",0],
+["MI","BAO001","Bao lụa HP 1010/1020","HP",85000,6,"CÒN HÀNG","","🔩  Bao lụa / Formatter / Main","",0],
+["MI","BAO002","Bao lụa Canon LBP2900","Canon",90000,4,"CÒN HÀNG","","🔩  Bao lụa / Formatter / Main","",0],
+["MI","FMT001","Formatter HP M1005","HP",350000,2,"CÒN HÀNG","","🔩  Bao lụa / Formatter / Main","",0],
+["MI","MNP001","Main nguồn HP M1005","HP",480000,2,"CÒN HÀNG","","🔩  Bao lụa / Formatter / Main","",0],
+["MI","MNP002","Main nguồn Canon MF3010","Canon",520000,1,"CÒN HÀNG","","🔩  Bao lụa / Formatter / Main","",0],
+["MI","MOT001","Motor HP LJ 1010","HP",320000,3,"CÒN HÀNG","","🛠️  Các linh kiện khác","",0],
+["MI","MOT002","Motor Canon LBP2900","Canon",350000,2,"CÒN HÀNG","","🛠️  Các linh kiện khác","",0],
+["MI","SEN001","Sensor giấy HP P1102","HP",95000,5,"CÒN HÀNG","","🛠️  Các linh kiện khác","",0],
+["MI","SEN002","Sensor mực HP M402","HP",110000,3,"CÒN HÀNG","","🛠️  Các linh kiện khác","",0],
+["MI","KHC001","Cụm sấy HP M1005","HP",650000,1,"CÒN HÀNG","","🛠️  Các linh kiện khác","",0],
+["MI","KHC002","Bánh răng HP 1010","HP",45000,8,"CÒN HÀNG","","🛠️  Các linh kiện khác","",0],
+["MI","KHC003","Cáp nguồn máy in","Generic",35000,15,"CÒN HÀNG","","🛠️  Các linh kiện khác","",0],
+["CAM","CAM001","Hikvision DS-2CD1023G2 2MP","Hikvision",450000,6,"CÒN HÀNG","","📷  Camera IP & Analog","",0],
+["CAM","CAM002","Hikvision DS-2CD2143G2 4MP","Hikvision",780000,3,"CÒN HÀNG","","📷  Camera IP & Analog","",0],
+["CAM","CAM003","Dahua IPC-HDW2831T 8MP","Dahua",950000,2,"CÒN HÀNG","","📷  Camera IP & Analog","",0],
+["CAM","CAM004","Kbvision KX-C2012S2 2MP","Kbvision",380000,5,"CÒN HÀNG","","📷  Camera IP & Analog","",0],
+["CAM","WIFI001","TP-Link Tapo C200 1080p","TP-Link",380000,5,"CÒN HÀNG","Xoay 360","📡  Camera Wifi — Không dây","",0],
+["CAM","WIFI002","TP-Link Tapo C310 3MP Ngoài trời","TP-Link",520000,3,"CÒN HÀNG","","📡  Camera Wifi — Không dây","",0],
+["CAM","WIFI003","Ezviz C6N 1080p Trong nhà","Ezviz",420000,4,"CÒN HÀNG","","📡  Camera Wifi — Không dây","",0],
+["CAM","WIFI004","Ezviz H3C 2K Wifi","Ezviz",650000,2,"CÒN HÀNG","","📡  Camera Wifi — Không dây","",0],
+["CAM","WIFI005","Hikvision DS-2CD2143G2 Wifi","Hikvision",980000,1,"CÒN HÀNG","","📡  Camera Wifi — Không dây","",0],
+["CAM","WIFI006","Imou Ranger 2 1080p","Imou",350000,6,"CÒN HÀNG","","📡  Camera Wifi — Không dây","",0],
+["CAM","WIFI007","Xiaomi Mi Outdoor 2K","Xiaomi",480000,3,"CÒN HÀNG","","📡  Camera Wifi — Không dây","",0],
+["CAM","DOM001","Tên miền .com 1 năm","Generic",350000,10,"CÒN HÀNG","Đăng ký mới","🌐  Tên miền / Domain / DDNS","",0],
+["CAM","DOM002","Tên miền .vn 1 năm","Generic",450000,8,"CÒN HÀNG","","🌐  Tên miền / Domain / DDNS","",0],
+["CAM","DOM003","Tên miền .net 1 năm","Generic",320000,6,"CÒN HÀNG","","🌐  Tên miền / Domain / DDNS","",0],
+["CAM","DOM004","DDNS Hikvision HiDDNS","Hikvision",0,99,"CÒN HÀNG","Miễn phí","🌐  Tên miền / Domain / DDNS","",0],
+["CAM","DOM005","DDNS Dahua (dịch vụ)","Dahua",0,99,"CÒN HÀNG","Miễn phí","🌐  Tên miền / Domain / DDNS","",0],
+["CAM","DOM006","No-IP DDNS 1 năm","Generic",180000,5,"CÒN HÀNG","","🌐  Tên miền / Domain / DDNS","",0],
+["CAM","DOM007","DynDNS Pro 1 năm","Generic",450000,3,"CÒN HÀNG","","🌐  Tên miền / Domain / DDNS","",0],
+["CAM","DOM008","Cloudflare DNS","Generic",0,99,"CÒN HÀNG","Miễn phí","🌐  Tên miền / Domain / DDNS","",0],
+["CAM","DVR001","Hikvision DS-7208HQHI 8 kênh","Hikvision",1800000,2,"CÒN HÀNG","","📼  Đầu ghi — DVR/NVR","",0],
+["CAM","DVR002","Hikvision DS-7216HQHI 16 kênh","Hikvision",2800000,1,"CÒN HÀNG","","📼  Đầu ghi — DVR/NVR","",0],
+["CAM","NVR001","Dahua NVR2108HS 8 kênh","Dahua",1600000,3,"CÒN HÀNG","","📼  Đầu ghi — DVR/NVR","",0],
+["CAM","NVR002","Kbvision KX-8108H2 8 kênh","Kbvision",1200000,2,"CÒN HÀNG","","📼  Đầu ghi — DVR/NVR","",0],
+["CAM","HDD_C1","WD Purple 1TB WD10PURZ","WD",950000,5,"CÒN HÀNG","Chuyên camera","💿  Ổ cứng Camera","",0],
+["CAM","HDD_C2","WD Purple 2TB WD20PURZ","WD",1650000,3,"CÒN HÀNG","","💿  Ổ cứng Camera","",0],
+["CAM","HDD_C3","Seagate SkyHawk 1TB","Seagate",980000,4,"CÒN HÀNG","","💿  Ổ cứng Camera","",0],
+["CAM","HDD_C4","Seagate SkyHawk 2TB","Seagate",1700000,1,"CÒN HÀNG","","💿  Ổ cứng Camera","",0],
+["CAM","POE001","Ruijie RG-ES208GC-P 8 cổng","Ruijie",1200000,2,"CÒN HÀNG","","🔌  Switch PoE","",0],
+["CAM","POE002","TP-Link TL-SF1008P 8 cổng","TP-Link",850000,3,"CÒN HÀNG","","🔌  Switch PoE","",0],
+["CAM","POE003","Cisco SB SG110D-08HP","Cisco",2800000,0,"HẾT HÀNG","","🔌  Switch PoE","",0],
+["CAM","ADP001","Adapter 12V 2A","Generic",55000,15,"CÒN HÀNG","","🔋  Adapter / Nguồn / Jack","",0],
+["CAM","ADP002","Adapter 12V 3A","Generic",75000,10,"CÒN HÀNG","","🔋  Adapter / Nguồn / Jack","",0],
+["CAM","NGU001","UPS 650VA","APC",1200000,2,"CÒN HÀNG","","🔋  Adapter / Nguồn / Jack","",0],
+["CAM","JCK001","Jack BNC nén (bộ 100)","Generic",85000,12,"CÒN HÀNG","","🔋  Adapter / Nguồn / Jack","",0],
+["CAM","JCK002","Jack RJ45 Cat5e (bộ 100)","Generic",45000,20,"CÒN HÀNG","","🔋  Adapter / Nguồn / Jack","",0],
+["INT","RT001","TP-Link Archer C6 AC1200","TP-Link",650000,5,"CÒN HÀNG","","📡  Router — Bộ định tuyến","",0],
+["INT","RT002","TP-Link Archer AX55 AX3000","TP-Link",1350000,2,"CÒN HÀNG","","📡  Router — Bộ định tuyến","",0],
+["INT","RT003","Mikrotik hAP ac2","Mikrotik",1850000,1,"CÒN HÀNG","","📡  Router — Bộ định tuyến","",0],
+["INT","RT004","Cisco RV340 Dual WAN","Cisco",4500000,0,"HẾT HÀNG","","📡  Router — Bộ định tuyến","",0],
+["INT","SW001","TP-Link TL-SG108 8 cổng","TP-Link",320000,8,"CÒN HÀNG","","🔀  Switch — Bộ chuyển mạch","",0],
+["INT","SW002","TP-Link TL-SG1016D 16 cổng","TP-Link",780000,3,"CÒN HÀNG","","🔀  Switch — Bộ chuyển mạch","",0],
+["INT","SW003","TP-Link TL-SG1024 24 cổng","TP-Link",2200000,0,"HẾT HÀNG","","🔀  Switch — Bộ chuyển mạch","",0],
+["INT","SW004","Cisco SG110-16","Cisco",3500000,1,"CÒN HÀNG","","🔀  Switch — Bộ chuyển mạch","",0],
+["INT","SW005","Ruijie RG-ES216GC 16 cổng","Ruijie",1200000,2,"CÒN HÀNG","","🔀  Switch — Bộ chuyển mạch","",0],
+["INT","MDM001","TP-Link TD-W8961N ADSL2","TP-Link",380000,4,"CÒN HÀNG","","📟  Modem","",0],
+["INT","MDM002","Draytek Vigor130 VDSL","Draytek",950000,2,"CÒN HÀNG","","📟  Modem","",0],
+["INT","AP001","TP-Link EAP245 AC1750","TP-Link",850000,3,"CÒN HÀNG","","📶  Access Point — Wifi","",0],
+["INT","AP002","TP-Link EAP670 AX5400","TP-Link",1950000,1,"CÒN HÀNG","","📶  Access Point — Wifi","",0],
+["INT","AP003","Ubiquiti UniFi U6 Lite","Ubiquiti",2200000,0,"HẾT HÀNG","","📶  Access Point — Wifi","",0],
+["INT","AP004","Reyee RG-RAP2260 AX1800","Ruijie",750000,4,"CÒN HÀNG","","📶  Access Point — Wifi","",0],
+["INT","CVQ001","D-Link DMC-1910T 1000Mbps","D-Link",380000,2,"CÒN HÀNG","","🔭  Converter quang","",0],
+["INT","CVQ002","TP-Link MC220L Gigabit","TP-Link",350000,3,"CÒN HÀNG","","🔭  Converter quang","",0],
+["INT","CVQ003","Kbvision KX-C1202S2 1G","Kbvision",290000,5,"CÒN HÀNG","","🔭  Converter quang","",0],
+["INT","SFP001","Module SFP 1G Single-mode","Generic",320000,6,"CÒN HÀNG","","💡  Module SFP / Quang","",0],
+["INT","SFP002","Module SFP 1G Multi-mode","Generic",280000,4,"CÒN HÀNG","","💡  Module SFP / Quang","",0],
+["INT","SFP003","Dây quang LC-LC 5m","Generic",120000,10,"CÒN HÀNG","","💡  Module SFP / Quang","",0],
+["INT","DAY001","Dây mạng Cat6 UTP (mét)","Commscope",5000,500,"CÒN HÀNG","Bán theo mét","🔗  Dây mạng & Đầu bấm","",0],
+["INT","DAY002","Dây mạng Cat6A UTP (mét)","Commscope",8000,200,"CÒN HÀNG","","🔗  Dây mạng & Đầu bấm","",0],
+["INT","DB001","Đầu bấm RJ45 Cat6 (bộ 100)","Generic",45000,20,"CÒN HÀNG","","🔗  Dây mạng & Đầu bấm","",0],
+["INT","BM001","Bộ bấm mạng RJ45","Generic",180000,5,"CÒN HÀNG","","🔗  Dây mạng & Đầu bấm","",0],
+["INT","PHK001","Hộp nối mạng Cat6","Generic",35000,30,"CÒN HÀNG","","🧰  Phụ kiện mạng","",0],
+["INT","PHK002","Patch Panel 24 cổng","Generic",850000,3,"CÒN HÀNG","","🧰  Phụ kiện mạng","",0],
+["INT","PHK003","Rack 6U treo tường","Generic",1200000,2,"CÒN HÀNG","","🧰  Phụ kiện mạng","",0],
+["INT","PHK004","Dây patch cord Cat6 0.5m","Ugreen",45000,25,"CÒN HÀNG","","🧰  Phụ kiện mạng","",0],
+["INT","USBWF001","USB Wifi TP-Link TL-WN823N 300Mbps","TP-Link",120000,5,"CÒN HÀNG","","📶  USB Wifi","",0],
+["INT","USBWF002","USB Wifi TP-Link Archer T3U 1300Mbps","TP-Link",280000,3,"CÒN HÀNG","","📶  USB Wifi","",0],
+["INT","USBWF003","USB Wifi Totolink N300UA 300Mbps","Totolink",95000,4,"CÒN HÀNG","","📶  USB Wifi","",0],
+];
+
+let DATA = [];
+let currentTab = "ALL";
+let currentStatus = "ALL";
+let searchQ = "";
+let importRows = [];
+let bulkSelectMode = false;
+const selectedItems = new Set();
+const ADMIN_PASSWORD_HASH = "63497c5b989530569d4c448692340a135021a377c5fa128aacdab44c529eed20";
+let ownerTapCount = 0;
+let ownerTapTimer = null;
+
+function isAdminMode(){
+  return document.body.classList.contains("admin-mode");
+}
+
+function requireAdmin(){
+  if(isAdminMode()) return true;
+  showToast("Chi Admin moi duoc chinh sua");
+  return false;
+}
+
+function revealAdminEntry(openLogin){
+  document.body.classList.add("admin-entry-visible");
+  if(openLogin && !isAdminMode()) onAdminBtnClick();
+}
+
+function handleOwnerTap(){
+  ownerTapCount++;
+  clearTimeout(ownerTapTimer);
+  ownerTapTimer = setTimeout(()=>ownerTapCount=0, 1800);
+  if(ownerTapCount >= 7){
+    ownerTapCount = 0;
+    revealAdminEntry(true);
+  }
+}
+
+function setupAdminEntry(){
+  if(new URLSearchParams(location.search).get("admin")==="1"){
+    revealAdminEntry(false);
+  }
+}
+
+function setAdminMode(on){
+  if(on){
+    sessionStorage.setItem("kho_cntt_admin","1");
+    document.body.classList.add("admin-entry-visible");
+    document.body.classList.add("admin-mode");
+    document.getElementById("adminBtn").textContent = "🔓 Admin (đang mở)";
+  } else {
+    sessionStorage.removeItem("kho_cntt_admin");
+    document.body.classList.remove("admin-mode");
+    if(new URLSearchParams(location.search).get("admin")!=="1"){
+      document.body.classList.remove("admin-entry-visible");
+    }
+    document.getElementById("adminBtn").textContent = "🔒 Admin";
+    bulkSelectMode = false;
+    selectedItems.clear();
+    updateBulkControls();
+    render();
+  }
+}
+function onAdminBtnClick(){
+  if(document.body.classList.contains("admin-mode")){
+    if(confirm("Khóa lại quyền Admin?")) {
+      setAdminMode(false);
+      showToast("Đã khóa quyền chỉnh sửa");
+    }
+  } else {
+    document.getElementById("adminPass").value="";
+    document.getElementById("adminOverlay").classList.add("open");
+    setTimeout(()=>document.getElementById("adminPass").focus(),100);
+  }
+}
+async function submitAdminPass(){
+  const val = document.getElementById("adminPass").value;
+  const msgBuffer = new TextEncoder().encode(val);
+  const hashBuffer = await crypto.subtle.digest("SHA-256", msgBuffer);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  const hashHex = hashArray.map(b => b.toString(16).padStart(2,"0")).join("");
+  if(hashHex === ADMIN_PASSWORD_HASH){
+    setAdminMode(true);
+    closeOverlay("adminOverlay");
+    showToast("✅ Đã mở quyền chỉnh sửa");
+  } else {
+    alert("Sai mật khẩu!");
+  }
+}
+function checkAdminSession(){
+  if(sessionStorage.getItem("kho_cntt_admin")==="1"){
+    setAdminMode(true);
+  }
+}
+
+// Dòng URL duy nhất
+const SHEET_API_URL = "https://script.google.com/macros/s/AKfycbzGzP5Fkd9dYEYFrB7AcIeQSR3xJYTbJMadZHKMYVJmS6w0IcUEQbkIPSxNDzt_ge4o8Q/exec";
+const SHEET_TIMEOUT_MS = 12000;
+const PENDING_SYNC_KEY = "kho_cntt_pending_sync";
+let dataSaveChain = Promise.resolve();
+let dataSaveSeq = 0;
+
+function setSyncBadge(state, detail){
+  const el = document.getElementById("syncBadge");
+  el.title = detail || "";
+  if(!SHEET_API_URL){ el.textContent = "💾 Lưu trên máy này"; return; }
+  switch(state){
+case "loading":
+    el.textContent = "⏳ Đang tải...";
+    break;
+
+case "syncing":
+    el.textContent = "🔄 Đang đồng bộ...";
+    break;
+
+case "synced":
+    el.textContent = "☁️ Đã lưu lên máy chủ";
+    break;
+
+case "empty":
+    el.textContent = detail
+        ? "☁️ Dữ liệu trống, dùng dữ liệu máy"
+        : "☁️ Đã kết nối máy chủ (Dữ liệu trống)";
+    break;
+
+case "pending":
+    el.textContent = "⏳ Đang chờ đồng bộ";
+    break;
+
+case "error":
+    el.textContent = "❌ Lỗi kết nối máy chủ";
+    break;
+
+default:
+    el.textContent = "☁️ Máy chủ";
+  }
+}
+
+function setPendingSync(on, reason){
+  try{
+    if(on){
+      localStorage.setItem(PENDING_SYNC_KEY, JSON.stringify({time: Date.now(), reason: reason || ""}));
+      setSyncBadge("pending", reason || "Có thay đổi chỉ mới lưu trên máy này");
+    }else{
+      localStorage.removeItem(PENDING_SYNC_KEY);
+    }
+  }catch(e){}
+}
+
+function hasPendingSync(){
+  return localStorage.getItem(PENDING_SYNC_KEY) !== null;
+}
+
+function flushDataSaveQueue(){
+  return dataSaveChain.catch(()=>{});
+}
+
+function normalizeSheetRows(rows){
+  if(!Array.isArray(rows)) return [];
+  return rows.filter(Array.isArray).map(r=>{
+    const row = Array.from({length:11}, (_,i) => r[i] !== undefined ? r[i] : "");
+    row[4] = Number(row[4]) || 0;
+    row[5] = Number(row[5]) || 0;
+    row[10] = Number(row[10]) || 0;
+    row[0] = (row[0] || "MT").toString().trim().toUpperCase();
+    row[1] = (row[1] || "").toString().trim();
+    row[2] = (row[2] || "").toString().trim();
+    row[3] = (row[3] || "").toString().trim();
+    row[6] = getStockStatusValue(row[5]);
+    row[7] = (row[7] || "").toString();
+    row[8] = (row[8] || "").toString();
+    row[9] = (row[9] || "").toString();
+    return row;
+  }).filter(r=>r[1] && r[2]);
+}
+
+async function fetchSheetJson(url, options={}, timeoutMs=SHEET_TIMEOUT_MS){
+  const ctrl = new AbortController();
+  const timer = setTimeout(()=>ctrl.abort(), timeoutMs);
+  try{
+    const res = await fetch(url, {...options, cache: "no-store", signal: ctrl.signal});
+    if(!res.ok) throw new Error("HTTP "+res.status);
+    const text = await res.text();
+    let json;
+    try{ json = JSON.parse(text); }
+    catch(e){ throw new Error("Sheet trả về không phải JSON"); }
+    if(!json || json.ok !== true) throw new Error((json&&json.error)||"Phản hồi Sheet không hợp lệ");
+    return json;
+  }catch(e){
+    if(e.name==="AbortError") throw new Error("Google Sheet phản hồi quá lâu");
+    throw e;
+  }finally{
+    clearTimeout(timer);
+  }
+}
+
+function sheetUrl(params){
+  if(!params) return SHEET_API_URL;
+  return SHEET_API_URL + "?" + new URLSearchParams(params).toString();
+}
+
+async function postSheet(action, data){
+  return fetchSheetJson(SHEET_API_URL, {
+    method: "POST",
+    headers: {"Content-Type": "text/plain;charset=utf-8"},
+    body: JSON.stringify({action, data})
+  });
+}
+
+async function loadData(){
+  loadLocal();
+  const localSnapshot = JSON.parse(JSON.stringify(DATA));
+  const localHasPending = hasPendingSync();
+  if(SHEET_API_URL){
+    setSyncBadge(localHasPending ? "pending" : "loading");
+    try{
+      const json = await fetchSheetJson(sheetUrl({type:"data", _ts: Date.now()}));
+      if(!Array.isArray(json.data)) throw new Error("Sheet không có mảng dữ liệu sản phẩm");
+      const sheetRows = normalizeSheetRows(json.data);
+      if(localHasPending){
+        DATA = localSnapshot;
+        setSyncBadge("pending", "Dữ liệu mới trên máy đang chờ đồng bộ lại lên Google Sheet");
+        return;
+      }
+      if(!sheetRows.length){
+        try{
+          const savedRows = JSON.parse(localStorage.getItem("kho_cntt_data")||"[]");
+          if(Array.isArray(savedRows) && savedRows.length){
+            DATA = localSnapshot;
+            setSyncBadge("empty", "Google Sheet đang trống, app đang dùng dữ liệu lưu trên máy này");
+            return;
+          }
+        }catch(e){}
+      }
+      DATA = sheetRows;
+
+      const GROUP_MIGRATE = {
+        "🖥️  Màn hình":"🖵  Màn hình"
+      };
+
+      DATA.forEach(r=>{
+        if(r[8] && GROUP_MIGRATE[r[8]]){
+          r[8] = GROUP_MIGRATE[r[8]];
+        }
+      });
+
+      if(DATA.length){
+        setSyncBadge("synced");
+      }else{
+        setSyncBadge("empty");
+      }
+      try{ localStorage.setItem("kho_cntt_data", JSON.stringify(DATA)); }catch(e){}
+      return;
+    }catch(e){
+      console.error("Lỗi tải từ Google Sheet:", e);
+      DATA = localSnapshot;
+      setSyncBadge(localHasPending ? "pending" : "error", String(e));
+      return;
+    }
+  }
+  setSyncBadge();
+}
+function loadLocal(){
+  try {
+    const saved = localStorage.getItem("kho_cntt_data");
+    DATA = saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(DEFAULT_DATA));
+  } catch(e){
+    DATA = JSON.parse(JSON.stringify(DEFAULT_DATA));
+  }
+}
+
+async function pushToSheet(){
+  if(!SHEET_API_URL) return;
+  const safeData = normalizeSheetRows(DATA);
+  await postSheet("replace_all", safeData);
+}
+
+async function saveData(){
+  const snapshot = normalizeSheetRows(JSON.parse(JSON.stringify(DATA)));
+  try { localStorage.setItem("kho_cntt_data", JSON.stringify(snapshot)); } catch(e){}
+  if(!SHEET_API_URL){
+    setPendingSync(false);
+    return true;
+  }
+  setPendingSync(true, "Đang chờ đồng bộ lên Google Sheet");
+  const seq = ++dataSaveSeq;
+  dataSaveChain = dataSaveChain.then(async ()=>{
+    setSyncBadge("syncing");
+    try{
+      await postSheet("replace_all", snapshot);
+      if(seq === dataSaveSeq){
+        setSyncBadge("synced");
+        setPendingSync(false);
+      }
+      return true;
+    }catch(e){
+      if(seq === dataSaveSeq){
+        console.error("Lỗi đồng bộ lên Google Sheet:", e);
+        setSyncBadge("error", String(e));
+        showToast("⚠️ Lỗi đồng bộ lên Sheet: "+String(e));
+      }
+      return false;
+    }
+  }, async ()=>{
+    setSyncBadge("syncing");
+    try{
+      await postSheet("replace_all", snapshot);
+      if(seq === dataSaveSeq){
+        setSyncBadge("synced");
+        setPendingSync(false);
+      }
+      return true;
+    }catch(e){
+      if(seq === dataSaveSeq){
+        console.error("Lỗi đồng bộ lên Google Sheet:", e);
+        setSyncBadge("error", String(e));
+        showToast("⚠️ Lỗi đồng bộ lên Sheet: "+String(e));
+      }
+      return false;
+    }
+  });
+  return dataSaveChain;
+}
+
+async function manualSync(){
+  if(!requireAdmin()) return;
+  if(!SHEET_API_URL){ showToast("Đang lưu trên máy này"); return; }
+  await flushDataSaveQueue();
+  setSyncBadge("syncing");
+  try{
+    await Promise.all([
+      pushToSheet(),
+      postSheet("save_nv", NV_LIST),
+      postSheet("save_tx", TX_DATA)
+    ]);
+    setSyncBadge("synced");
+    showToast("✅ Đã đẩy dữ liệu hiện tại lên Google Sheet");
+  }catch(e){
+    console.error("Lỗi đồng bộ thủ công:", e);
+    setSyncBadge("error", String(e));
+    showToast("⚠️ Lỗi đồng bộ: "+String(e));
+  }
+}
+
+function showKpiDetail(type){
+  const cfg = SHEET_CFG;
+  const titles = {
+    all: "📦 Chi tiết mặt hàng theo danh mục",
+    ton: "📊 Tổng tồn kho theo danh mục",
+    het: "🔴 Danh sách hết hàng",
+    sap: "🟡 Danh sách sắp hết hàng"
+  };
+  document.getElementById("kpiModalTitle").textContent = titles[type];
+
+  let html = "";
+  if(type==="all"){
+    const shOrder = ["MT","MI","CAM","INT"];
+    html = shOrder.map(sh=>{
+      const items = DATA.filter(r=>r[0]===sh);
+      const c = cfg[sh];
+      return `<div class="kpi-detail-row">
+        <div class="kpi-detail-sh"><span class="kpi-detail-badge" style="background: ${c.c};">${c.label}</span></div>
+        <div class="kpi-detail-count">${items.length} mặt hàng</div>
+      </div>`;
+    }).join("");
+    html += `<div class="kpi-detail-row" style="font-weight: bold; background: #f8f8f8; border-radius: 6px; padding: 8px;">
+      <span>Tổng cộng</span><span>${DATA.length} mặt hàng</span></div>`;
+
+  } else if(type==="ton"){
+    const shOrder = ["MT","MI","CAM","INT"];
+    html = shOrder.map(sh=>{
+      const ton = DATA.filter(r=>r[0]===sh).reduce((s,r)=>s+r[5],0);
+      const c = cfg[sh];
+      return `<div class="kpi-detail-row">
+        <div class="kpi-detail-sh"><span class="kpi-detail-badge" style="background: ${c.c};">${c.label}</span></div>
+        <div class="kpi-detail-count" style="color: #1E8449;">${ton.toLocaleString("vi-VN")}</div>
+      </div>`;
+    }).join("");
+    const total = DATA.reduce((s,r)=>s+r[5],0);
+    html += `<div class="kpi-detail-row" style="font-weight: bold; background: #f8f8f8; border-radius: 6px; padding: 8px;">
+      <span>Tổng cộng</span><span style="color: #1E8449;">${total.toLocaleString("vi-VN")}</span></div>`;
+
+  } else if(type==="het"){
+    const items = DATA.filter(r=>getStockState(r[5])==="HET");
+    if(!items.length){ html = `<div style="text-align: center; padding: 20px; color: #888;">✅ Không có mặt hàng nào hết hàng</div>`; }
+    else html = items.map(r=>{
+      const c = cfg[r[0]]||cfg.MT;
+      return `<div class="kpi-detail-row">
+        <div class="kpi-detail-sh">
+          <span class="kpi-detail-badge" style="background: ${c.c};">${r[1]}</span>
+          <span style="font-size: 12px;">${r[2]}</span>
+        </div>
+        <span style="color: #C0392B; font-weight: bold; font-size: 12px;">Hết hàng</span>
+      </div>`;
+    }).join("");
+
+  } else if(type==="sap"){
+    const items = DATA.filter(r=>r[5]>0&&r[5]<=2);
+    if(!items.length){ html = `<div style="text-align: center; padding: 20px; color: #888;">✅ Không có mặt hàng nào sắp hết</div>`; }
+    else html = items.map(r=>{
+      const c = cfg[r[0]]||cfg.MT;
+      return `<div class="kpi-detail-row">
+        <div class="kpi-detail-sh">
+          <span class="kpi-detail-badge" style="background: ${c.c};">${r[1]}</span>
+          <span style="font-size: 12px;">${r[2]}</span>
+        </div>
+        <span style="color: #B7950B; font-weight: bold;">SL: ${r[5]}</span>
+      </div>`;
+    }).join("");
+  }
+
+  document.getElementById("kpiModalBody").innerHTML = html;
+  document.getElementById("kpiOverlay").classList.add("open");
+}
+
+function initKPI(){
+  document.getElementById("kpi-mh").textContent = "📦 " + DATA.length;
+  document.getElementById("kpi-ton").textContent = "📊 " + DATA.reduce((s,r)=>s+r[5],0).toLocaleString("vi-VN");
+  document.getElementById("kpi-het").textContent = "🔴 " + DATA.filter(r=>getStockState(r[5])==="HET").length;
+  document.getElementById("kpi-sap").textContent = "🟡 " + DATA.filter(r=>r[5]>0&&r[5]<=2).length;
+}
+
+function fmt(n){ return n>0 ? n.toLocaleString("vi-VN")+"đ" : "Miễn phí"; }
+function removeAccents(s){ return s.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase(); }
+function escapeHtml(s){
+  return String(s ?? "")
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#39;");
+}
+async function copyTextValue(text, label, btn){
+  const code = (text || "").toString();
+  const copyLabel = label || "nội dung";
+  if(!code) return;
+  try{
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      await navigator.clipboard.writeText(code);
+    } else {
+      const ta = document.createElement("textarea");
+      ta.value = code;
+      ta.style.position = "fixed";
+      ta.style.left = "-9999px";
+      document.body.appendChild(ta);
+      ta.focus();
+      ta.select();
+      document.execCommand("copy");
+      ta.remove();
+    }
+    if(btn){
+      btn.classList.add("copied");
+      setTimeout(()=>{ btn.classList.remove("copied"); }, 700);
+    }
+    showToast("Đã copy " + copyLabel);
+  }catch(e){
+    showToast("Không copy được " + copyLabel);
+  }
+}
+function copyProductCode(btn){
+  const code = btn && btn.dataset ? (btn.dataset.code || "") : "";
+  const label = btn && btn.dataset ? (btn.dataset.copyLabel || "nội dung") : "nội dung";
+  return copyTextValue(code, label, btn);
+}
+function copyFromElement(el){
+  const text = el && el.dataset ? (el.dataset.copyText || "") : "";
+  const label = el && el.dataset.copyLabel ? el.dataset.copyLabel : "nội dung";
+  return copyTextValue(text, label);
+}
+function splitNoteLocation(raw){
+  const text = (raw || "").toString().trim();
+  if(!text) return { note: "", location: "" };
+  const lines = text.split(/\r?\n/);
+  const firstLine = (lines[0] || "").trim();
+  const m = firstLine.match(/^Vị trí (?:trong kho|kho)\s*:\s*(.*)$/i);
+  if(m){
+    return {
+      location: (m[1] || "").trim(),
+      note: lines.slice(1).join("\n").trim()
+    };
+  }
+  return { note: text, location: "" };
+}
+function mergeNoteLocation(note, location){
+  const cleanNote = (note || "").trim();
+  const cleanLocation = (location || "").trim();
+  if(cleanLocation && cleanNote) return `Vị trí kho: ${cleanLocation}\n${cleanNote}`;
+  if(cleanLocation) return `Vị trí kho: ${cleanLocation}`;
+  return cleanNote;
+}
+function showWarehouseLocation(idx){
+  const r = DATA[idx];
+  if(!r) return;
+  const { location } = splitNoteLocation(r[7] || "");
+  if(location){
+    showToast(`📍 ${r[2]}: ${location}`);
+  } else {
+    showToast("📍 Chưa có vị trí trong kho");
+  }
+}
+
+function renderCard(r,i,displayNo){
+  const [sh,ma,ten,th,giaNhap,ton,tt,ghi,,img,giaBan]=r;
+  const cfg=SHEET_CFG[sh]||SHEET_CFG.MT;
+  const no = displayNo || (i+1);
+  const noColor = GROUP_STRONG_COLORS[(no-1)%GROUP_STRONG_COLORS.length];
+  const stockState = getStockState(ton);
+  const isHet = stockState === "HET";
+  const isSap = stockState === "SAP";
+  const { note, location } = splitNoteLocation(ghi || "");
+  const stBg=isHet?"#FADBD8":isSap?"#FEF9E7":"#D5F5E3";
+  const stFg=isHet?"#922B21":isSap?"#7D6608":"#1E8449";
+  const stTxt=getStockStatusLabel(ton);
+  const imgHtml = img
+    ? `<img class="prod-img" src="${img}" alt="${ten}" />`
+    : `<div class="prod-img prod-img-ph prod-index-badge" style="--idx-c:${noColor};">${no}</div>`;
+  const isAdmin = document.body.classList.contains("admin-mode");
+  const isSelected = selectedItems.has(i);
+  const selectHtml = isAdmin && bulkSelectMode
+    ? `<label class="bulk-check" onclick="event.stopPropagation()"><input type="checkbox" ${isSelected?"checked":""} onchange="toggleItemSelected(${i},this.checked)"> Chọn</label>`
+    : "";
+  const priceHtml = isAdmin
+    ? `<div class="price-row">
+        <span class="price-label">Nhập:</span><span class="price admin-price">${fmt(giaNhap)}</span>
+        <span class="price-label" style="margin-left: 8px;">Bán:</span><span class="price ${giaBan>0?"price-sale-on":""}" style="color: ${giaBan>0?"#D50000":"#aaa"};font-size:15px;font-weight:900">${giaBan>0?fmt(giaBan):"Chưa set"}</span>
+       </div>`
+    : `<div class="price-row">
+        <span class="price-label">Giá bán:</span>
+        <span class="price ${giaBan>0?"price-sale-on":""}" style="color: ${giaBan>0?"#D50000":"#aaa"};font-size:15px;font-weight:900">${giaBan>0?fmt(giaBan):"Liên hệ"}</span>
+       </div>`;
+  return `<div class="card${isHet?" het":isSap?" sap":" con"}${bulkSelectMode?" bulk-mode":""}${isSelected?" bulk-selected":""}" data-ma="${ma}">
+    ${selectHtml}
+      <div class="card-top" style="--c: ${cfg.c}; background: ${cfg.light};">
+      <div class="card-top-left">
+        <span class="sheet-badge" style="--c: ${cfg.c};">${cfg.label}</span>
+        <span class="ma-code">${ma}</span>
+        <button class="btn-copy-code" type="button" data-code="${escapeHtml(ma)}" title="Copy mã hàng" aria-label="Copy mã hàng" onclick="copyProductCode(this)"><span>⧉</span></button>
+      </div>
+      <span class="status-badge" style="background: ${stBg}; color: ${stFg};">${stTxt}</span>
+    </div>
+      <div class="card-body card-body-flex">
+      ${imgHtml}
+      <div class="card-main">
+      <div class="product-name-row" data-copy-text="${escapeHtml(ten)}" data-copy-label="tiêu đề" title="Nhấp đúp để copy tiêu đề" ondblclick="copyFromElement(this)">
+        <div class="product-name">${ten}</div>
+      </div>
+      <div class="card-footer">
+        <span class="brand-tag">🏷️ ${th}</span>
+        ${priceHtml}
+      </div>
+      ${note?`<div class="note">📝 ${note}</div>`:""}
+      <div class="ton-ctrl">
+        <span class="ton-label">📦 Tồn kho:</span>
+        <span class="ton-val" style="color: ${isHet?"#C0392B":"#1a1a1a"};">${ton}</span>
+        <button class="btn-location" type="button" title="${escapeHtml(location ? location : "Chưa có vị trí trong kho")}" onclick="showWarehouseLocation(${i})">📍 Vị trí trong kho${location ? `: ${escapeHtml(location)}` : ""}</button>
+        <button class="btn-ton btn-minus admin-only" onclick="openSaleModal(${i})">−</button>
+        <button class="btn-ton btn-plus admin-only" onclick="changeTon(${i},1)">+</button>
+      </div>
+      <div class="nguoi-ban-row" onclick="showTxHistory(${i})">
+        👤 <span class="nguoi-ban-label">Người bán</span>
+        <span class="nguoi-ban-count">${TX_DATA.filter(t=>t.ma===ma).length > 0 ? TX_DATA.filter(t=>t.ma===ma).length+" giao dịch ›" : "Xem lịch sử ›"}</span>
+      </div>
+      <div class="card-actions admin-only">
+        <button class="btn-edit" onclick="openEditModal(${i})">✏️ Sửa</button>
+        <button class="btn-delete" onclick="deleteItem(${i})">🗑️ Xóa</button>
+      </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+const NO_GROUP = "🆕 Khác";
+function jumpToGroup(id){
+  const target = document.getElementById(id);
+  if(!target) return;
+  const sticky = document.querySelector(".sticky");
+  const stickyHeight = sticky ? sticky.getBoundingClientRect().height : 0;
+  const top = target.getBoundingClientRect().top + window.pageYOffset - stickyHeight - 10;
+  window.scrollTo({top: Math.max(0, top), behavior: "smooth"});
+  target.classList.remove("jump-alert");
+  void target.offsetWidth;
+  setTimeout(()=>{
+    target.classList.add("jump-alert");
+    setTimeout(()=>target.classList.remove("jump-alert"), 1200);
+  }, 320);
+}
+
+const GROUP_COLORS = ["#D6EAF8","#FDEBD0","#D5F5E3","#FADBD8","#E8DAEF","#FCF3CF","#D1F2EB","#F5CBA7","#D7DBFD","#F9E0F2","#D4EFDF","#FAE3D9","#CFF4FC","#EAEDED"];
+const GROUP_STRONG_COLORS = ["#1A5276","#B7950B","#1E8449","#C0392B","#8E44AD","#B9770E","#117864","#CA6F1E","#566573","#AF7AC5","#239B56","#D35400","#117A8B","#5D6D7E"];
+function render(){
+  initKPI();
+  selectedItems.forEach(i=>{ if(i<0 || i>=DATA.length) selectedItems.delete(i); });
+  updateBulkControls();
+  const kw = removeAccents(searchQ.trim());
+  const results = DATA.map((r,i)=>({r,i})).filter(({r})=>{
+    const [sh,,ten,th,,,tt,ghi] = r;
+    if(currentTab!=="ALL" && sh!==currentTab) return false;
+    const stockState = getStockState(r[5]);
+    if(currentStatus==="CON" && stockState!=="CON") return false;
+    if(currentStatus==="SAP" && stockState!=="SAP") return false;
+    if(currentStatus==="HET" && stockState!=="HET") return false;
+    if(!kw) return true;
+    const hay = removeAccents(r[1]+" "+ten+" "+th+" "+(ghi||""));
+    return hay.includes(kw);
+  });
+  if(currentStatus==="CON" || currentStatus==="SAP" || currentStatus==="HET"){
+    const txCount = TX_DATA.reduce((m,t)=>{ m[t.ma] = (m[t.ma]||0) + 1; return m; }, {});
+    results.sort((a,b)=>{
+      if(currentStatus==="CON" || currentStatus==="SAP"){
+        const tonDiff = (a.r[5]||0) - (b.r[5]||0);
+        if(tonDiff) return tonDiff;
+      }
+      const txDiff = (txCount[b.r[1]]||0) - (txCount[a.r[1]]||0);
+      if(txDiff) return txDiff;
+      return String(a.r[2]||"").localeCompare(String(b.r[2]||""), "vi");
+    });
+  }
+
+  document.getElementById("count").textContent = results.length + " kết quả";
+  const el = document.getElementById("results");
+
+  if(!bulkSelectMode && !kw && currentTab==="ALL" && currentStatus==="ALL"){
+    el.innerHTML = `<div class="empty"><div class="empty-icon">🔍</div><div class="empty-title">Gõ từ khóa để tìm kiếm</div><div class="empty-sub">VD: "SSD", "HP", "Camera wifi", "Canon"...</div></div>`;
+    return;
+  }
+  if(results.length===0){
+    el.innerHTML = `<div class="empty"><div class="empty-icon">😕</div><div class="empty-title">Không tìm thấy kết quả</div><div class="empty-sub">Thử từ khóa khác</div></div>`;
+    return;
+  }
+
+  if(currentTab!=="ALL" && !kw){
+    const FIXED_ORDER = {
+      MT: [
+        "🧠  CPU — Bộ vi xử lý", "🔌  Mainboard", "💾  RAM — Bộ nhớ", "⚡  SSD — Ổ cứng thể rắn", "🗄️  HDD — Ổ cứng cơ",
+        "🎮  VGA — Card màn hình", "🔋  Nguồn — PSU", "🖥️  Case — Vỏ máy tính", "❄️  Tản nhiệt — Cooling",
+        "🖱️  Chuột & Bàn phím", "🔌  Dây cáp chuyển", "💻  Laptop linh kiện", "🖵  Màn hình", "🛠️  Linh kiện khác"
+      ],
+      MI: null, CAM: null, INT: null
+    };
+    let order;
+    if(FIXED_ORDER[currentTab]){
+      const fromData = new Set();
+      DATA.forEach(r=>{ if(r[0]===currentTab && r[8]) fromData.add(r[8]); });
+      const fixed = FIXED_ORDER[currentTab].filter(g=>fromData.has(g));
+      const extra = [...fromData].filter(g=>!FIXED_ORDER[currentTab].includes(g));
+      order = [...fixed, ...extra];
+    } else {
+      order = [];
+      const seen = new Set();
+      DATA.forEach(r=>{
+        if(r[0]===currentTab){ const g=r[8]||""; if(g&&!seen.has(g)){seen.add(g);order.push(g);} }
+      });
+    }
+    order.push(NO_GROUP);
+    const buckets = {};
+    results.forEach(({r,i})=>{
+      const g = r[8]||NO_GROUP;
+      (buckets[g] = buckets[g]||[]).push({r,i});
+    });
+    const cfg = SHEET_CFG[currentTab]||SHEET_CFG.MT;
+    const visibleGroups = order.filter(g=>buckets[g]&&buckets[g].length);
+    let html = `<div class="cat-title" style="--c: ${cfg.c};">${cfg.label}</div>`;
+    if(visibleGroups.length>1){
+      html += `<div class="quick-nav">` + visibleGroups.map((g,idx)=>
+        `<button class="quick-nav-btn" style="--c:${GROUP_COLORS[idx%GROUP_COLORS.length]}" onclick="jumpToGroup('grp-${idx}')">${g}</button>`
+      ).join("") + `</div>`;
+    }
+    html += visibleGroups.map((g,idx)=>{
+      const groupColor = GROUP_COLORS[idx%GROUP_COLORS.length];
+      const strongColor = GROUP_STRONG_COLORS[idx%GROUP_STRONG_COLORS.length];
+      const itemCount = buckets[g].length;
+      return `<section class="group-section" style="--group-strong: ${strongColor};">
+        <div class="group-header" id="grp-${idx}" style="--group-bg: ${groupColor}; --group-strong: ${strongColor}; background: ${groupColor};">
+          <div class="group-header-main">
+            <span class="group-header-label">${g}</span>
+          </div>
+          <span class="group-header-count">${itemCount} mục</span>
+        </div>
+        ${buckets[g].map((item,itemIdx)=>renderCard(item.r,item.i,itemIdx+1)).join("")}
+      </section>`;
+    }).join("");
+    el.innerHTML = html;
+    return;
+  }
+  el.innerHTML = results.map(({r,i},idx)=>renderCard(r,i,idx+1)).join("");
+}
+
+function updateBulkControls(){
+  const modeBtn = document.getElementById("bulkModeBtn");
+  const deleteBtn = document.getElementById("bulkDeleteBtn");
+  if(!modeBtn || !deleteBtn) return;
+  const count = selectedItems.size;
+  modeBtn.textContent = bulkSelectMode ? "☑️ Đang chọn" : "☑️ Chọn nhiều";
+  modeBtn.style.background = bulkSelectMode ? "#F39C12" : "#EBF5FB";
+  modeBtn.style.color = bulkSelectMode ? "#fff" : "#1A5276";
+  deleteBtn.textContent = count ? `🗑️ Xóa ${count} mục` : "🗑️ Xóa đã chọn";
+  deleteBtn.disabled = count === 0;
+}
+
+function toggleBulkSelectMode(){
+  if(!requireAdmin()) return;
+  bulkSelectMode = !bulkSelectMode;
+  if(!bulkSelectMode) selectedItems.clear();
+  render();
+}
+
+function toggleItemSelected(idx, checked){
+  if(checked) selectedItems.add(idx);
+  else selectedItems.delete(idx);
+  updateBulkControls();
+  render();
+}
+
+async function deleteSelectedItems(){
+  if(!requireAdmin()) return;
+  const indexes = [...selectedItems].filter(i=>i>=0 && i<DATA.length).sort((a,b)=>b-a);
+  if(!indexes.length){ showToast("Chưa chọn sản phẩm nào"); return; }
+  if(!confirm(`Xóa ${indexes.length} sản phẩm đã chọn?`)) return;
+  indexes.forEach(i=>DATA.splice(i,1));
+  selectedItems.clear();
+  bulkSelectMode = false;
+  await saveData();
+  render();
+  showToast(`Đã xóa ${indexes.length} sản phẩm`);
+}
+
+async function deleteAllItems(){
+  if(!requireAdmin()) return;
+  if(!DATA.length){ showToast("Kho đang trống"); return; }
+  if(!confirm(`⚠️ Xóa TẤT CẢ ${DATA.length} sản phẩm trong kho? Không thể hoàn tác.`)) return;
+  DATA = [];
+  selectedItems.clear();
+  bulkSelectMode = false;
+  await saveData();
+  render();
+  showToast("Đã xóa tất cả sản phẩm");
+}
+
+function changeTon(idx, delta){
+  if(!requireAdmin()) return;
+  const r = DATA[idx];
+  const newTon = Math.max(0, r[5] + delta);
+  DATA[idx][5] = newTon;
+  DATA[idx][6] = getStockStatusValue(newTon);
+  saveData();
+  render();
+  showToast(delta > 0 ? `+1 tồn kho: ${r[2]}` : `-1 tồn kho: ${r[2]}`);
+}
+
+function deleteItem(idx){
+  if(!requireAdmin()) return;
+  if(!confirm(`Xóa "${DATA[idx][2]}"?`)) return;
+  DATA.splice(idx,1);
+  selectedItems.clear();
+  bulkSelectMode = false;
+  saveData();
+  render();
+  showToast("Đã xóa thiết bị");
+}
+
+async function resetToDefault(){
+  if(!requireAdmin()) return;
+  if(!confirm("⚠️ Toàn bộ dữ liệu hiện tại sẽ bị XÓA và thay bằng dữ liệu mẫu. Tiếp tục?")) return;
+  DATA = JSON.parse(JSON.stringify(DEFAULT_DATA));
+  render();
+  const synced = await saveData();
+  if(SHEET_API_URL){
+    if(synced) showToast("✅ Đã khôi phục và đồng bộ lên Google Sheet");
+  } else { showToast("✅ Đã khôi phục dữ liệu mẫu"); }
+}
+
+let NV_LIST = [];
+function loadNV(){ try{ NV_LIST = JSON.parse(localStorage.getItem("kho_cntt_nv")||"[]"); }catch(e){ NV_LIST=[]; } }
+async function saveNV(){
+  try{ localStorage.setItem("kho_cntt_nv", JSON.stringify(NV_LIST)); }catch(e){}
+  if(!SHEET_API_URL) return true;
+  try{
+    await postSheet("save_nv", NV_LIST);
+    return true;
+  }catch(e){
+    console.warn("Lỗi lưu NV lên Sheet:", e);
+    setSyncBadge("error", String(e));
+    showToast("⚠️ Lỗi lưu nhân viên lên Sheet: "+String(e));
+    return false;
+  }
+}
+async function loadNVFromSheet(){
+  if(!SHEET_API_URL) return;
+  try{
+    const json = await fetchSheetJson(sheetUrl({type:"nv", _ts: Date.now()}));
+    if(Array.isArray(json.nv)){
+      const sheetNV = json.nv.filter(Boolean);
+      if(sheetNV.length || !NV_LIST.length){
+        NV_LIST = sheetNV;
+        localStorage.setItem("kho_cntt_nv", JSON.stringify(NV_LIST));
+      }
+    }
+  }catch(e){ console.warn("Lỗi tải NV:", e); setSyncBadge("error", String(e)); }
+}
+
+function openNVModal(){ if(!requireAdmin()) return; renderNVList(); document.getElementById("nvOverlay").classList.add("open"); document.getElementById("nvInput").value=""; }
+function renderNVList(){
+  const el = document.getElementById("nvList");
+  if(!NV_LIST.length){ el.innerHTML=`<div style="text-align: center; color: #aaa; padding: 10px;">Chưa có nhân viên nào</div>`; return; }
+  el.innerHTML = NV_LIST.map((nv,i)=>`
+    <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 4px; border-bottom: 1px solid #f0f0f0;">
+      <span style="font-size: 13px;">👤 ${nv}</span>
+      <button onclick="removeNV(${i})" style="background:#FADBD8;border:none;border-radius:6px;padding:3px 10px;color:#C0392B;cursor:pointer;font-size:12px">Xóa</button>
+    </div>`).join("");
+}
+function addNV(){ if(!requireAdmin()) return;
+  const val = document.getElementById("nvInput").value.trim();
+  if(!val){ alert("Nhập tên nhân viên!"); return; }
+  if(NV_LIST.includes(val)){ alert("Nhân viên này đã có trong danh sách!"); return; }
+  NV_LIST.push(val); saveNV(); document.getElementById("nvInput").value=""; renderNVList(); showToast("Đã thêm: "+val);
+}
+function removeNV(i){ if(!requireAdmin()) return;
+  if(!confirm(`Xóa nhân viên "${NV_LIST[i]}"?`)) return;
+  NV_LIST.splice(i,1); saveNV(); renderNVList();
+}
+function refreshNVSelect(){
+  const sel = document.getElementById("saleNV");
+  if(!sel) return;
+  sel.innerHTML = `<option value="">-- Chọn nhân viên --</option>` + NV_LIST.map(nv=>`<option value="${nv}">${nv}</option>`).join("");
+}
+
+let TX_DATA = [];
+function loadTX(){ try{ TX_DATA = JSON.parse(localStorage.getItem("kho_cntt_tx")||"[]"); }catch(e){ TX_DATA=[]; } }
+async function saveTX(){
+  try{ localStorage.setItem("kho_cntt_tx", JSON.stringify(TX_DATA)); }catch(e){}
+  if(!SHEET_API_URL) return true;
+  try{
+    await postSheet("save_tx", TX_DATA);
+    return true;
+  }catch(e){
+    console.warn("Lỗi lưu TX lên Sheet:", e);
+    setSyncBadge("error", String(e));
+    showToast("⚠️ Lỗi lưu giao dịch lên Sheet: "+String(e));
+    return false;
+  }
+}
+async function loadTXFromSheet(){
+  if(!SHEET_API_URL) return;
+  try{
+    const json = await fetchSheetJson(sheetUrl({type:"tx", _ts: Date.now()}));
+    if(Array.isArray(json.tx)){
+      if(json.tx.length || !TX_DATA.length){
+        TX_DATA = json.tx;
+        localStorage.setItem("kho_cntt_tx", JSON.stringify(TX_DATA));
+      }
+    }
+  }catch(e){ console.warn("Lỗi tải TX:", e); setSyncBadge("error", String(e)); }
+}
+
+function openSaleModal(idx){ if(!requireAdmin()) return;
+  const r = DATA[idx];
+  document.getElementById("saleIdx").value = idx; refreshNVSelect(); document.getElementById("saleQty").value = "1"; document.getElementById("saleGia").value = r[4]||""; document.getElementById("saleGhi").value = ""; document.getElementById("saleOverlay").classList.add("open");
+}
+async function saveSale(){ if(!requireAdmin()) return;
+  const idx = parseInt(document.getElementById("saleIdx").value);
+  const nv  = document.getElementById("saleNV").value.trim();
+  const qty = parseInt(document.getElementById("saleQty").value)||1;
+  const gia = parseInt(document.getElementById("saleGia").value)||0;
+  const ghi = document.getElementById("saleGhi").value.trim();
+  if(!nv){ alert("Vui lòng nhập tên nhân viên!"); return; }
+  const r = DATA[idx];
+  if(r[5] < qty){ alert(`Tồn kho chỉ còn ${r[5]}, không đủ xuất ${qty}!`); return; }
+  DATA[idx][5] = r[5] - qty;
+  DATA[idx][6] = getStockStatusValue(DATA[idx][5]);
+  TX_DATA.unshift({ id: Date.now(), ma: r[1], ten: r[2], sh: r[0], nv, qty, gia, ghi, time: formatTxTime(new Date()) });
+  closeOverlay("saleOverlay");
+  await saveData(); await saveTX(); render(); showToast(`✅ Đã ghi giao dịch: ${r[2]} x${qty}`);
+}
+
+function formatTxTime(value){
+  if(value == null || value === "") return "";
+  if(value instanceof Date){
+    const d = value;
+    const pad = n => String(n).padStart(2, "0");
+    return `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+  }
+  if(typeof value === "string"){
+    const text = value.trim();
+    const m = text.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})(?:,?\s*(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?)?/);
+    if(m){
+      const pad = n => String(n || 0).padStart(2, "0");
+      return `${pad(m[1])}/${pad(m[2])}/${m[3]} ${pad(m[4])}:${pad(m[5])}:${pad(m[6])}`;
+    }
+  }
+  const d = new Date(value);
+  if(isNaN(d.getTime())) return value || "";
+  const pad = n => String(n).padStart(2, "0");
+  return `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+}
+
+function getStockState(ton){
+  ton = Number(ton) || 0;
+  if(ton <= 0) return "HET";
+  if(ton <= 2) return "SAP";
+  return "CON";
+}
+
+function getStockStatusValue(ton){
+  const state = getStockState(ton);
+  if(state === "HET") return "HẾT HÀNG";
+  if(state === "SAP") return "SẮP HẾT";
+  return "CÒN HÀNG";
+}
+
+function getStockStatusLabel(ton){
+  const state = getStockState(ton);
+  if(state === "HET") return "❌ Hết hàng";
+  if(state === "SAP") return "⚠️ Sắp hết";
+  return "✅ Còn hàng";
+}
+
+let TX_HISTORY_STATE = { idx: -1, date: "", nv: "" };
+
+function parseTxDateKey(value){
+  if(value == null || value === "") return "";
+  if(value instanceof Date && !isNaN(value.getTime())){
+    const pad = n => String(n).padStart(2, "0");
+    return `${value.getFullYear()}-${pad(value.getMonth()+1)}-${pad(value.getDate())}`;
+  }
+  if(typeof value === "string"){
+    const text = value.trim();
+    const m = text.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+    if(m){
+      const pad = n => String(n).padStart(2, "0");
+      return `${m[3]}-${pad(m[2])}-${pad(m[1])}`;
+    }
+    const d = new Date(text);
+    if(!isNaN(d.getTime())){
+      const pad = n => String(n).padStart(2, "0");
+      return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+    }
+  }
+  const d = new Date(value);
+  if(isNaN(d.getTime())) return "";
+  const pad = n => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+}
+
+function txHistoryFilteredRows(txs){
+  return txs.filter(t=>{
+    const okDate = !TX_HISTORY_STATE.date || parseTxDateKey(t.time) === TX_HISTORY_STATE.date;
+    const okNV = !TX_HISTORY_STATE.nv || t.nv === TX_HISTORY_STATE.nv;
+    return okDate && okNV;
+  });
+}
+
+function renderTxHistory(){
+  const idx = TX_HISTORY_STATE.idx;
+  if(idx < 0 || !DATA[idx]) return;
+  const r = DATA[idx];
+  const txs = TX_DATA.filter(t=>t.ma===r[1]);
+  const filtered = txHistoryFilteredRows(txs);
+  const nvOptions = [...new Set(txs.map(t=>t.nv).filter(Boolean))];
+  document.getElementById("txModalTitle").textContent = `📋 ${r[2]}`;
+  const dateVal = TX_HISTORY_STATE.date || "";
+  const nvVal = TX_HISTORY_STATE.nv || "";
+  const filterBar = `<div class="tx-filter">
+    <input type="date" id="txFilterDate" value="${dateVal}" onchange="applyTxHistoryFilters()">
+    <select id="txFilterNV" onchange="applyTxHistoryFilters()">
+      <option value="">Tất cả nhân viên</option>
+      ${nvOptions.map(nv=>`<option value="${nv}" ${nv===nvVal?"selected":""}>${nv}</option>`).join("")}
+    </select>
+    <button type="button" onclick="clearTxHistoryFilters()">Xoá lọc</button>
+  </div>`;
+  if(!txs.length){
+    document.getElementById("txModalBody").innerHTML = filterBar + `<div style="text-align: center; padding: 20px; color: #888;">Chưa có giao dịch nào</div>`;
+    return;
+  }
+  const totalQty = filtered.reduce((s,t)=>s+t.qty,0);
+  const totalGia = filtered.reduce((s,t)=>s+t.gia*t.qty,0);
+  const summary = `<div class="tx-summary">
+      <div class="tx-summary-item"><span class="tx-summary-label">Hiển thị</span><span class="tx-summary-value">${filtered.length}</span></div>
+      <div class="tx-summary-item"><span class="tx-summary-label">Đã xuất</span><span class="tx-summary-value">${totalQty}</span></div>
+      <div class="tx-summary-item"><span class="tx-summary-label">Doanh thu</span><span class="tx-summary-value revenue">${totalGia.toLocaleString("vi-VN")}đ</span></div>
+    </div>`;
+  const rows = filtered.length ? filtered.map(t=>`
+        <div class="tx-row">
+          <div class="tx-header">
+            <span class="tx-nv">👤 ${t.nv}</span>
+            <div class="tx-head-right">
+              <span class="tx-time">${formatTxTime(t.time)}</span>
+              ${document.body.classList.contains("admin-mode")?`<button class="tx-delete" onclick="deleteTX(${t.id})">🗑️</button>`:""}
+            </div>
+          </div>
+          <div class="tx-meta">
+            <span class="tx-pill">SL: <b>${t.qty}</b></span>
+            <span class="tx-pill tx-price-pill">${t.gia>0?t.gia.toLocaleString("vi-VN")+"đ/cái":"Không ghi giá"}</span>
+          </div>
+          ${t.ghi?`<span class="tx-note">📝 ${t.ghi}</span>`:""}
+        </div>`).join("") : `<div style="text-align: center; padding: 20px; color: #888;">Không có giao dịch phù hợp bộ lọc</div>`;
+  document.getElementById("txModalBody").innerHTML = filterBar + summary + rows;
+}
+
+function applyTxHistoryFilters(){
+  const dateEl = document.getElementById("txFilterDate");
+  const nvEl = document.getElementById("txFilterNV");
+  if(dateEl) TX_HISTORY_STATE.date = dateEl.value || "";
+  if(nvEl) TX_HISTORY_STATE.nv = nvEl.value || "";
+  renderTxHistory();
+}
+
+function clearTxHistoryFilters(){
+  TX_HISTORY_STATE.date = "";
+  TX_HISTORY_STATE.nv = "";
+  renderTxHistory();
+}
+
+function showTxHistory(idx){
+  TX_HISTORY_STATE.idx = idx;
+  TX_HISTORY_STATE.date = "";
+  TX_HISTORY_STATE.nv = "";
+  renderTxHistory();
+  document.getElementById("txOverlay").classList.add("open");
+}
+async function deleteTX(id){ if(!requireAdmin()) return;
+  if(!confirm("Xóa giao dịch này?")) return;
+  TX_DATA = TX_DATA.filter(t=>t.id!==id);
+  await saveTX();
+  renderTxHistory();
+  showToast("Đã xóa giao dịch");
+}
+function setImagePreview(dataUrl){
+  document.getElementById("fImg").value = dataUrl || "";
+  const img = document.getElementById("fImgPreview");
+  const ph = document.getElementById("fImgPlaceholder");
+  const rmBtn = document.getElementById("fImgRemoveBtn");
+  if(dataUrl){ img.src = dataUrl; img.style.display="block"; ph.style.display="none"; rmBtn.style.display="block"; }
+  else { img.style.display="none"; ph.style.display="flex"; rmBtn.style.display="none"; }
+}
+function removeImage(){ setImagePreview(""); document.getElementById("fImgFile").value=""; }
+function handleImagePick(input){
+  const file = input.files[0];
+  if(!file) return;
+  if(!file.type.startsWith("image/")){ alert("Vui lòng chọn 1 file ảnh!"); return; }
+  const reader = new FileReader();
+  reader.onload = function(e){
+    const img = new Image();
+    img.onload = function(){
+      const MAX = 400; let w = img.width, h = img.height;
+      if(w>MAX || h>MAX){ if(w>h){ h = Math.round(h*MAX/w); w = MAX; } else { w = Math.round(w*MAX/h); h = MAX; } }
+      const canvas = document.createElement("canvas"); canvas.width = w; canvas.height = h; canvas.getContext("2d").drawImage(img,0,0,w,h);
+      setImagePreview(canvas.toDataURL("image/jpeg", 0.7));
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+const GROUP_OPTIONS = {
+  MT: ["🧠  CPU — Bộ vi xử lý","🔌  Mainboard","💾  RAM — Bộ nhớ","⚡  SSD — Ổ cứng thể rắn","🗄️  HDD — Ổ cứng cơ","🎮  VGA — Card màn hình","🔋  Nguồn — PSU","🖥️  Case — Vỏ máy tính","❄️  Tản nhiệt — Cooling","🖱️  Chuột & Bàn phím","🔌  Dây cáp chuyển","💻  Laptop linh kiện","🖵  Màn hình","🛠️  Linh kiện khác"],
+MI: ["🖨️  Máy in Laser","🎨  Máy in phun màu","📐  Máy in A3","📠  Máy photocopy","🖨️  Mực in — Cartridge","🥁  Drum — Trống in","🔧  Gạt từ / Gạt mực / Trục","🔩  Bao lụa / Formatter / Main","🛠️  Các linh kiện khác"],
+  CAM: ["📷  Camera IP & Analog","📡  Camera Wifi — Không dây","🌐  Tên miền / Domain / DDNS","📼  Đầu ghi — DVR/NVR","💿  Ổ cứng Camera","🔌  Switch PoE","🔋  Adapter / Nguồn / Jack"],
+INT: ["📡  Router — Bộ định tuyến","🔀  Switch — Bộ chuyển mạch","📟  Modem","📶  Access Point — Wifi","📶  USB Wifi","🔭  Converter quang","💡  Module SFP / Quang","🔗  Dây mạng & Đầu bấm","🧰  Phụ kiện mạng"],
+};
+
+function updateGroupOptions(selectedGroup){
+  const sh = document.getElementById("fSheet").value;
+  const groups = GROUP_OPTIONS[sh] || [];
+  const sel = document.getElementById("fGroup");
+  sel.innerHTML = '<option value="">-- Chọn nhóm --</option>' + groups.map(g=>`<option value="${g}"${selectedGroup===g?' selected':''}>${g}</option>`).join("");
+}
+
+function openAddModal(){ if(!requireAdmin()) return;
+  document.getElementById("editTitle").textContent = "➕ Thêm thiết bị mới"; document.getElementById("editIdx").value = "";
+  document.getElementById("fSheet").value = "MT"; document.getElementById("fMa").value = ""; document.getElementById("fTen").value = "";
+  document.getElementById("fTH").value = ""; document.getElementById("fGia").value = ""; document.getElementById("fGiaBan").value = "";
+  document.getElementById("fTon").value = "0"; document.getElementById("fTT").value = "HẾT HÀNG";
+  document.getElementById("fGhi").value = ""; document.getElementById("fVitri").value = ""; document.getElementById("fImgFile").value = ""; setImagePreview(""); updateGroupOptions("");
+  document.getElementById("editOverlay").classList.add("open");
+}
+function openEditModal(idx){ if(!requireAdmin()) return;
+  const r = DATA[idx];
+  const parts = splitNoteLocation(r[7]||"");
+  document.getElementById("editTitle").textContent = "✏️ Sửa thiết bị"; document.getElementById("editIdx").value = idx;
+  document.getElementById("fSheet").value = r[0]; document.getElementById("fMa").value = r[1];
+  document.getElementById("fTen").value = r[2]; document.getElementById("fTH").value = r[3];
+  document.getElementById("fGia").value = r[4]; document.getElementById("fGiaBan").value = r[10]||0;
+  document.getElementById("fTon").value = r[5]; document.getElementById("fTT").value = getStockStatusValue(r[5]);
+  document.getElementById("fGhi").value = parts.note || ""; document.getElementById("fVitri").value = parts.location || ""; document.getElementById("fImgFile").value = "";
+  setImagePreview(r[9]||""); updateGroupOptions(r[8]||""); document.getElementById("editOverlay").classList.add("open");
+}
+async function saveItem(){ if(!requireAdmin()) return;
+  const sh = document.getElementById("fSheet").value.trim(), ma = document.getElementById("fMa").value.trim(), ten = document.getElementById("fTen").value.trim(), th = document.getElementById("fTH").value.trim(), gia = parseInt(document.getElementById("fGia").value)||0, giaBan = parseInt(document.getElementById("fGiaBan").value)||0, ton = parseInt(document.getElementById("fTon").value)||0, tt = document.getElementById("fTT").value, ghiNote = document.getElementById("fGhi").value.trim(), vitri = document.getElementById("fVitri").value.trim(), img = document.getElementById("fImg").value || "", idx = document.getElementById("editIdx").value, grp = document.getElementById("fGroup").value || "";
+  if(!ma||!ten){alert("Vui lòng nhập Mã hàng và Tên sản phẩm!"); return;}
+  const row = [sh,ma,ten,th,gia,ton,getStockStatusValue(ton),mergeNoteLocation(ghiNote, vitri),grp,img,giaBan];
+if(idx===""){
+  DATA.unshift(row);
+  showToast("Đã thêm: "+ten);
+} else {
+  DATA[parseInt(idx)] = row;
+  showToast("Đã lưu: "+ten);
+}
+
+await saveData();
+
+closeOverlay("editOverlay");
+goToTab(sh);
+render(); 
+}
+function openImportModal(){ if(!requireAdmin()) return; document.getElementById("importPreview").innerHTML=""; document.getElementById("importInfo").textContent=""; document.getElementById("importMode").style.display="none"; document.getElementById("btnImport").style.display="none"; document.getElementById("fileInput").value=""; importRows=[]; document.getElementById("importOverlay").classList.add("open"); }
+function handleFile(input){ if(!requireAdmin()) return;
+  const file = input.files[0]; if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e){
+    try{
+      const wb = XLSX.read(e.target.result, {type:"array"}), ws = wb.Sheets[wb.SheetNames[0]], json = XLSX.utils.sheet_to_json(ws, {header:1, defval:""});
+      if(json.length<2){alert("File không có dữ liệu!"); return;}
+      importRows = json.slice(1).filter(r=>r[2]).map(r=>[(r[0]||"MT").toString().trim().toUpperCase(),(r[1]||"").toString().trim(),(r[2]||"").toString().trim(),(r[3]||"").toString().trim(),parseInt(r[4])||0,parseInt(r[5])||0,(r[6]||"CÒN HÀNG").toString().trim(),(r[7]||"").toString().trim(),"", "", parseInt(r[10])||0]);
+      document.getElementById("importPreview").innerHTML = `<table><tr><th>Danh mục</th><th>Mã</th><th>Tên</th><th>Tồn</th></tr>${importRows.slice(0,5).map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[5]}</td></tr>`).join("")}</table>`;
+      document.getElementById("importInfo").textContent = `✅ Đọc được ${importRows.length} sản phẩm`;
+      document.getElementById("importMode").style.display="block"; document.getElementById("btnImport").style.display="block";
+    }catch(err){alert("Lỗi đọc file: "+err.message);}
+  };
+  reader.readAsArrayBuffer(file);
+}
+async function doImport(){ if(!requireAdmin()) return;
+  const mode = document.querySelector('input[name="importMode"]:checked').value;
+  if(mode==="replace"){ if(!confirm(`Thay thế toàn bộ ${DATA.length} sản phẩm hiện có?`)) return; DATA = importRows; } else { DATA = DATA.concat(importRows); }
+  await saveData();
+closeOverlay("importOverlay");
+render();
+showToast("Import thành công!");
+}
+function goToTab(tabCode){
+  document.querySelectorAll(".tab-btn").forEach(
+    b=>b.classList.toggle("active", b.dataset.tab===tabCode)
+  );
+
+  currentTab = tabCode;
+  searchQ = "";
+
+  document.getElementById("search").value="";
+  document.getElementById("clear-btn").style.display="none";
+
+  render();
+}
+function setTab(btn){ document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active")); btn.classList.add("active"); currentTab = btn.dataset.tab; render(); }
+function setStatus(btn){
+  document.querySelectorAll(".filter-btn").forEach(b=>{ b.classList.remove("active"); b.style.background="#fff"; b.style.color="#666"; });
+  btn.classList.add("active"); const map={ALL:["#1E3A5F","#fff"],CON:["#D5F5E3","#1E8449"],SAP:["#FEF9E7","#7D6608"],HET:["#FADBD8","#922B21"]}; const [bg,fg]=map[btn.dataset.status]; btn.style.background=bg; btn.style.color=fg; currentStatus=btn.dataset.status; render();
+}
+function clearSearch(){ document.getElementById("search").value=""; searchQ=""; document.getElementById("clear-btn").style.display="none"; render(); document.getElementById("search").focus(); }
+function closeOverlay(id){ document.getElementById(id).classList.remove("open"); }
+function overlayClose(e,id){ if(e.target===document.getElementById(id)) closeOverlay(id); }
+let toastTimer;
+function showToast(msg){ const t=document.getElementById("toast"); t.textContent=msg; t.classList.add("show"); clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove("show"),2200); }
+document.getElementById("search").addEventListener("input", function(){ searchQ = this.value; document.getElementById("clear-btn").style.display = searchQ ? "flex" : "none"; render(); });
+document.getElementById("adminPass").addEventListener("keydown", function(e){ if(e.key==="Enter") submitAdminPass(); });
+document.querySelector(".title").addEventListener("click", handleOwnerTap);
+setupAdminEntry();
+checkAdminSession();
+document.getElementById("headerToggleBtn").addEventListener("click", ()=>setTimeout(updateSearchFixedState, 0));
+function toggleFabMenu(){
+  const menu = document.getElementById("fabMenuItems");
+  const btn = document.getElementById("fabToggleBtn");
+  const isOpen = menu.style.maxHeight !== "0px" && menu.style.maxHeight !== "";
+  if(isOpen){
+    menu.style.maxHeight = "0";
+    menu.style.opacity = "0";
+    btn.textContent = "⚙️ Phạm Văn Chương";
+  } else {
+    menu.style.maxHeight = "400px";
+    menu.style.opacity = "1";
+    btn.textContent = "✖️ Đóng";
+  }
+}
+function toggleHeader(){
+  const sticky = document.querySelector('.sticky');
+  const isCollapsed = sticky.classList.toggle('collapsed');
+  const btn = document.getElementById('headerToggleBtn');
+  document.getElementById('headerToggleIcon').textContent = isCollapsed ? '▼' : '▲';
+  document.getElementById('headerToggleText').textContent = isCollapsed ? 'Mở rộng' : 'Thu gọn';
+  btn.setAttribute('aria-expanded', String(!isCollapsed));
+  btn.title = isCollapsed ? 'Mở rộng menu' : 'Thu gọn menu';
+  document.getElementById('results').style.paddingTop = isCollapsed ? '6px' : '';
+}
+
+let scrollBtnsTimer;
+function setupScrollButtonsAutoHide(){
+  const nav = document.querySelector(".scroll-btns");
+  if(!nav) return;
+  window.addEventListener("scroll", ()=>{
+    nav.classList.add("is-hidden");
+    clearTimeout(scrollBtnsTimer);
+    scrollBtnsTimer = setTimeout(()=>nav.classList.remove("is-hidden"), 520);
+  }, {passive: true});
+}
+setupScrollButtonsAutoHide();
+
+const autoScrollBars = {};
+function setupSlowAutoScroll(selector){
+  const el = document.querySelector(selector);
+  if(!el) return;
+  if(autoScrollBars[selector] && autoScrollBars[selector].timer){
+    clearInterval(autoScrollBars[selector].timer);
+  }
+  const state = { dir: 1, pauseUntil: 0, hovering: false, timer: null };
+  autoScrollBars[selector] = state;
+  const pause = (ms=3500) => {
+    state.pauseUntil = Date.now() + ms;
+  };
+  el.addEventListener("mouseenter", ()=>{ state.hovering = true; });
+  el.addEventListener("mouseleave", ()=>{ state.hovering = false; pause(1200); });
+  ["touchstart","pointerdown","wheel"].forEach(evt=>{
+    el.addEventListener(evt, ()=>pause(), {passive:true});
+  });
+  state.timer = setInterval(()=>{
+    const max = el.scrollWidth - el.clientWidth;
+    if(max > 2 && window.innerWidth <= 420){
+      const isHovering = state.hovering || el.matches(":hover");
+      if(!isHovering && Date.now() >= state.pauseUntil){
+        el.scrollLeft += state.dir * 0.55;
+        if(el.scrollLeft >= max - 1) state.dir = -1;
+        if(el.scrollLeft <= 1) state.dir = 1;
+      }
+    } else {
+      el.scrollLeft = 0;
+      state.dir = 1;
+    }
+  }, 80);
+}
+function setupHeaderAutoScroll(){
+  setupSlowAutoScroll(".tabs");
+  setupSlowAutoScroll(".filters");
+}
+setupHeaderAutoScroll();
+
+// MỚI — thay bằng đoạn này:
+function updateSearchFixedState(){
+  const box = document.querySelector(".search-box");
+  const spacer = document.getElementById("searchSpacer");
+  if(!box || !spacer) return;
+  const shouldFix = window.scrollY > 0;
+  box.classList.toggle("is-fixed", shouldFix);
+  spacer.classList.toggle("on", shouldFix);
+  spacer.style.height = shouldFix ? box.getBoundingClientRect().height + "px" : "0px";
+}
+window.addEventListener("scroll", updateSearchFixedState, {passive: true});
+window.addEventListener("resize", updateSearchFixedState, {passive: true});
+window.addEventListener("load", updateSearchFixedState);
+
+function setLoadingUI(pct, step){
+  document.getElementById("results").innerHTML = `
+    <div class="loading-wrap">
+      <div class="loading-icon">
+        <svg width="52" height="52" viewBox="0 0 52 52" style="display:block;margin:0 auto 16px">
+          <circle cx="26" cy="26" r="22" fill="none" stroke="#E0E0E0" stroke-width="4"/>
+          <circle cx="26" cy="26" r="22" fill="none" stroke="#2E86C1" stroke-width="4"
+            stroke-dasharray="${2*Math.PI*22}" stroke-dashoffset="${2*Math.PI*22*(1-pct/100)}"
+            stroke-linecap="round" transform="rotate(-90 26 26)"
+            style="transition:stroke-dashoffset .3s ease"/>
+          <text x="26" y="31" text-anchor="middle" font-size="12" font-weight="bold" fill="#1E3A5F">${pct}%</text>
+        </svg>
+      </div>
+      <div class="loading-title">Đang tải dữ liệu...</div>
+      <div class="progress-step" style="margin-top:6px;font-size:13px;color:#888;">${step}</div>
+    </div>`;
+}
+
+(async function init(){
+  setLoadingUI(5, "Đang khởi động kho hàng...");
+  await loadTX();
+  await loadNV();
+  setLoadingUI(20, "Đang đọc dữ liệu lưu trên máy...");
+  await loadData();
+  setLoadingUI(65, "Đang đồng bộ giao dịch từ máy chủ...");
+  await loadTXFromSheet();
+  setLoadingUI(85, "Đang đồng bộ nhân viên từ máy chủ...");
+  await loadNVFromSheet();
+  setLoadingUI(100, "Hoàn tất! Đang hiển thị kho hàng...");
+  await new Promise(r => setTimeout(r, 400));
+  render();
+})();
+</script>
+</body>
+</html>
