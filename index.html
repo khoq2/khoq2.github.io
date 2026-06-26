@@ -76,9 +76,9 @@ body { font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif
 .card-tag { font-size: 10px; font-weight: 800; color: #1E3A5F; background: #EBF5FB; border: 1px solid rgba(30,58,95,.12); padding: 2px 7px; border-radius: 999px; line-height: 1.3; }
 .price { font-size: 15px; font-weight: bold; }
 .price-sale-on { color: #D50000 !important; font-weight: 900 !important; }
-.price-contact-btn { border: none; background: linear-gradient(180deg, #00A3FF 0%, #0068FF 100%); color: #fff; font: inherit; font-weight: 900; cursor: pointer; padding: 4px 10px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,104,255,.22), inset 0 -2px 0 rgba(0,0,0,.12); letter-spacing: .1px; }
-.price-contact-btn:hover { filter: brightness(1.03); transform: translateY(-1px); }
-.price-contact-btn:active { transform: translateY(0); box-shadow: 0 2px 6px rgba(0,104,255,.18), inset 0 -1px 0 rgba(0,0,0,.12); }
+.price-contact-btn { border: 1px solid #008CEB; background: linear-gradient(180deg, #12B7FF 0%, #008CEB 100%); color: #fff; font: inherit; font-size: 12px; font-weight: 900; cursor: pointer; padding: 3px 9px; border-radius: 999px; box-shadow: 0 3px 8px rgba(0,140,235,.24), inset 0 -1px 0 rgba(0,0,0,.15); letter-spacing: 0; line-height: 1.25; text-shadow: 0 1px 1px rgba(0,0,0,.14); }
+.price-contact-btn:hover { background: linear-gradient(180deg, #22C1FF 0%, #007DDA 100%); border-color: #007DDA; transform: translateY(-1px); box-shadow: 0 5px 12px rgba(0,140,235,.30), inset 0 -1px 0 rgba(0,0,0,.15); }
+.price-contact-btn:active { transform: translateY(0); background: #007DDA; box-shadow: inset 0 2px 4px rgba(0,0,0,.18); }
 .nguoi-ban-row { display: flex; align-items: center; gap: 6px; margin-top: 6px; padding: 5px 8px; background: #F4F6F9; border-radius: 8px; cursor: pointer; font-size: 12px; color: #555; }
 .nguoi-ban-row:active { background: #E8ECF1; }
 .nguoi-ban-label { font-weight: bold; color: #1E3A5F; flex: 1; }
@@ -464,12 +464,12 @@ body.admin-mode .admin-btn { background: #1E8449; border-color: #1E8449; opacity
         <input type="text" id="fTH" placeholder="VD: Intel">
       </div>
       <div class="form-row">
-        <label>Giá nhập (đ)</label>
-        <input type="number" id="fGia" placeholder="0" min="0">
+        <label>Giá nhập (Vnd)</label>
+        <input type="text" id="fGia" inputmode="numeric" placeholder="VD: 500.000">
       </div>
       <div class="form-row">
-        <label>Giá bán (đ)</label>
-        <input type="number" id="fGiaBan" placeholder="0" min="0">
+        <label>Giá bán (Vnd)</label>
+        <input type="text" id="fGiaBan" inputmode="numeric" placeholder="VD: 500.000">
       </div>
     </div>
     <div class="form-2col">
@@ -568,7 +568,7 @@ body.admin-mode .admin-btn { background: #1E8449; border-color: #1E8449; opacity
       </select>
     </div>
     <div class="form-row"><label>Số lượng xuất</label><input type="number" id="saleQty" value="1" min="1"></div>
-    <div class="form-row"><label>Giá bán (đ)</label><input type="number" id="saleGia" placeholder="VD: 3500000"></div>
+    <div class="form-row"><label>Giá bán (Vnd)</label><input type="text" id="saleGia" inputmode="numeric" placeholder="VD: 3.500.000"></div>
     <div class="form-row"><label>Ghi chú</label><input type="text" id="saleGhi" placeholder="VD: Khách lẻ, bảo hành 12 tháng..."></div>
     <button class="btn-submit" onclick="saveSale()">💾 Lưu giao dịch</button>
     <button class="btn-cancel" onclick="closeOverlay('saleOverlay')">Huỷ</button>
@@ -1261,7 +1261,35 @@ function initKPI(){
   document.getElementById("kpi-sap").textContent = "🟡 " + DATA.filter(r=>r[5]>0&&r[5]<=2).length;
 }
 
-function fmt(n){ return n>0 ? n.toLocaleString("vi-VN")+"đ" : "Miễn phí"; }
+function formatVndNumber(n){
+  const num = Math.max(0, Math.round(Number(n) || 0));
+  return String(num).replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+}
+function fmt(n){ return Number(n)>0 ? formatVndNumber(n)+"Vnd" : "Miễn phí"; }
+function parseVndInput(value){
+  const digits = String(value ?? "").replace(/[^\d]/g, "");
+  return digits ? Number(digits) : 0;
+}
+function formatVndInputValue(value){
+  const n = parseVndInput(value);
+  return n ? formatVndNumber(n) : "";
+}
+function setVndInputValue(id, value){
+  const el = document.getElementById(id);
+  if(el) el.value = Number(value)>0 ? formatVndNumber(value) : "";
+}
+function setupVndInputs(){
+  ["fGia","fGiaBan","saleGia"].forEach(id=>{
+    const el = document.getElementById(id);
+    if(!el) return;
+    el.addEventListener("input", function(){
+      this.value = formatVndInputValue(this.value);
+    });
+    el.addEventListener("blur", function(){
+      this.value = formatVndInputValue(this.value);
+    });
+  });
+}
 function removeAccents(s){ return s.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase(); }
 function escapeHtml(s){
   return String(s ?? "")
@@ -2038,11 +2066,22 @@ function renderQuickSummary(items, groupLabel){
 }
 
 let quickFocusTimer = null;
-function openZaloContact(title){
+async function openZaloContact(title){
   const cleanTitle = String(title || "").trim() || "Sản phẩm";
-  const message = `${cleanTitle}\nLoại này giá sao anh chị.?`;
+  const message = `Xin chào anh/chị, em muốn hỏi sản phẩm:\n${cleanTitle}\nLoại này giá sao anh chị?`;
   const url = `https://zalo.me/0375111112?text=${encodeURIComponent(message)}`;
-  const win = window.open(url, "_blank", "noopener,noreferrer");
+  try{
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      await navigator.clipboard.writeText(message);
+      showToast("Đã copy lời nhắn, đang mở Zalo");
+    }
+  }catch(e){}
+  const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent || "");
+  if(isMobile){
+    window.location.href = url;
+    return;
+  }
+  const win = window.open(url, "_blank");
   if(!win) window.location.href = url;
 }
 
@@ -2423,13 +2462,13 @@ async function loadTXFromSheet(){
 
 function openSaleModal(idx){ if(!requireAdmin()) return;
   const r = DATA[idx];
-  document.getElementById("saleIdx").value = idx; refreshNVSelect(); document.getElementById("saleQty").value = "1"; document.getElementById("saleGia").value = r[4]||""; document.getElementById("saleGhi").value = ""; document.getElementById("saleOverlay").classList.add("open");
+  document.getElementById("saleIdx").value = idx; refreshNVSelect(); document.getElementById("saleQty").value = "1"; setVndInputValue("saleGia", r[10] || r[4] || 0); document.getElementById("saleGhi").value = ""; document.getElementById("saleOverlay").classList.add("open");
 }
 async function saveSale(){ if(!requireAdmin()) return;
   const idx = parseInt(document.getElementById("saleIdx").value);
   const nv  = document.getElementById("saleNV").value.trim();
   const qty = parseInt(document.getElementById("saleQty").value)||1;
-  const gia = parseInt(document.getElementById("saleGia").value)||0;
+  const gia = parseVndInput(document.getElementById("saleGia").value);
   const ghi = document.getElementById("saleGhi").value.trim();
   if(!nv){ alert("Vui lòng nhập tên nhân viên!"); return; }
   const r = DATA[idx];
@@ -2545,7 +2584,7 @@ function renderTxHistory(){
   const summary = `<div class="tx-summary">
       <div class="tx-summary-item"><span class="tx-summary-label">Hiển thị</span><span class="tx-summary-value">${filtered.length}</span></div>
       <div class="tx-summary-item"><span class="tx-summary-label">Đã xuất</span><span class="tx-summary-value">${totalQty}</span></div>
-      <div class="tx-summary-item"><span class="tx-summary-label">Doanh thu</span><span class="tx-summary-value revenue">${totalGia.toLocaleString("vi-VN")}đ</span></div>
+      <div class="tx-summary-item"><span class="tx-summary-label">Doanh thu</span><span class="tx-summary-value revenue">${fmt(totalGia)}</span></div>
     </div>`;
   const rows = filtered.length ? filtered.map(t=>`
         <div class="tx-row">
@@ -2558,7 +2597,7 @@ function renderTxHistory(){
           </div>
           <div class="tx-meta">
             <span class="tx-pill">SL: <b>${t.qty}</b></span>
-            <span class="tx-pill tx-price-pill">${t.gia>0?t.gia.toLocaleString("vi-VN")+"đ/cái":"Không ghi giá"}</span>
+            <span class="tx-pill tx-price-pill">${t.gia>0?fmt(t.gia)+"/cái":"Không ghi giá"}</span>
           </div>
           ${t.ghi?`<span class="tx-note">📝 ${t.ghi}</span>`:""}
         </div>`).join("") : `<div style="text-align: center; padding: 20px; color: #888;">Không có giao dịch phù hợp bộ lọc</div>`;
@@ -2636,7 +2675,7 @@ function updateGroupOptions(selectedGroup){
 function openAddModal(){ if(!requireAdmin()) return;
   document.getElementById("editTitle").textContent = "➕ Thêm thiết bị mới"; document.getElementById("editIdx").value = "";
   document.getElementById("fSheet").value = "MT"; document.getElementById("fMa").value = ""; document.getElementById("fTen").value = "";
-  document.getElementById("fTH").value = ""; document.getElementById("fGia").value = ""; document.getElementById("fGiaBan").value = "";
+  document.getElementById("fTH").value = ""; setVndInputValue("fGia", 0); setVndInputValue("fGiaBan", 0);
   document.getElementById("fTon").value = "0"; document.getElementById("fTT").value = "HẾT HÀNG";
   document.getElementById("fGhi").value = ""; document.getElementById("fVitri").value = ""; document.getElementById("fImgFile").value = ""; setImagePreview(""); updateGroupOptions("");
   document.getElementById("editOverlay").classList.add("open");
@@ -2647,13 +2686,13 @@ function openEditModal(idx){ if(!requireAdmin()) return;
   document.getElementById("editTitle").textContent = "✏️ Sửa thiết bị"; document.getElementById("editIdx").value = idx;
   document.getElementById("fSheet").value = r[0]; document.getElementById("fMa").value = r[1];
   document.getElementById("fTen").value = r[2]; document.getElementById("fTH").value = r[3];
-  document.getElementById("fGia").value = r[4]; document.getElementById("fGiaBan").value = r[10]||0;
+  setVndInputValue("fGia", r[4]); setVndInputValue("fGiaBan", r[10]||0);
   document.getElementById("fTon").value = r[5]; document.getElementById("fTT").value = getStockStatusValue(r[5]);
   document.getElementById("fGhi").value = parts.note || ""; document.getElementById("fVitri").value = parts.location || ""; document.getElementById("fImgFile").value = "";
   setImagePreview(r[9]||""); updateGroupOptions(r[8]||""); document.getElementById("editOverlay").classList.add("open");
 }
 async function saveItem(){ if(!requireAdmin()) return;
-  const sh = document.getElementById("fSheet").value.trim(), ma = document.getElementById("fMa").value.trim(), ten = document.getElementById("fTen").value.trim(), th = document.getElementById("fTH").value.trim(), gia = parseInt(document.getElementById("fGia").value)||0, giaBan = parseInt(document.getElementById("fGiaBan").value)||0, ton = parseInt(document.getElementById("fTon").value)||0, tt = document.getElementById("fTT").value, ghiNote = document.getElementById("fGhi").value.trim(), vitri = document.getElementById("fVitri").value.trim(), img = document.getElementById("fImg").value || "", idx = document.getElementById("editIdx").value, grp = document.getElementById("fGroup").value || "";
+  const sh = document.getElementById("fSheet").value.trim(), ma = document.getElementById("fMa").value.trim(), ten = document.getElementById("fTen").value.trim(), th = document.getElementById("fTH").value.trim(), gia = parseVndInput(document.getElementById("fGia").value), giaBan = parseVndInput(document.getElementById("fGiaBan").value), ton = parseInt(document.getElementById("fTon").value)||0, tt = document.getElementById("fTT").value, ghiNote = document.getElementById("fGhi").value.trim(), vitri = document.getElementById("fVitri").value.trim(), img = document.getElementById("fImg").value || "", idx = document.getElementById("editIdx").value, grp = document.getElementById("fGroup").value || "";
   if(!ma||!ten){alert("Vui lòng nhập Mã hàng và Tên sản phẩm!"); return;}
   const row = [sh,ma,ten,th,gia,ton,getStockStatusValue(ton),mergeNoteLocation(ghiNote, vitri),grp,img,giaBan];
 if(idx===""){
@@ -2721,6 +2760,7 @@ function showToast(msg){ const t=document.getElementById("toast"); t.textContent
 document.getElementById("search").addEventListener("input", function(){ searchQ = this.value; if(searchQ) quickGroupFilter = null; document.getElementById("clear-btn").style.display = searchQ ? "flex" : "none"; render(); });
 document.getElementById("adminPass").addEventListener("keydown", function(e){ if(e.key==="Enter") submitAdminPass(); });
 document.querySelector(".title").addEventListener("click", handleOwnerTap);
+setupVndInputs();
 setupAdminEntry();
 checkAdminSession();
 document.getElementById("headerToggleBtn").addEventListener("click", ()=>setTimeout(updateSearchFixedState, 0));
