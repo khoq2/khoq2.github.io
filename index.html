@@ -1349,6 +1349,7 @@ function clearQuickGroupFilter(){
 
 function setQuickGroupFilter(next){
   const same = quickGroupFilter
+    && String(quickGroupFilter.scope || "group") === String(next.scope || "group")
     && quickGroupFilter.groupLabel === next.groupLabel
     && quickGroupFilter.family === next.family
     && quickGroupFilter.primary === next.primary
@@ -1369,6 +1370,7 @@ function setQuickGroupFilter(next){
 function toggleQuickGroupFilter(btn){
   if(!btn || !btn.dataset) return;
   setQuickGroupFilter({
+    scope: btn.dataset.scope || "group",
     groupLabel: btn.dataset.group || "",
     family: btn.dataset.family || "",
     primary: btn.dataset.primary || "",
@@ -1499,6 +1501,26 @@ function detectNetworkType(text){
   return "Khác";
 }
 
+function detectPrinterPartLabel(text){
+  const t = normalizeQuickText(text);
+  const rules = [
+    [/\b(muc|cartridge|toner)\b/i, "Mực in"],
+    [/\b(drum)\b/i, "Drum"],
+    [/\b(gat tu|gat muc|gat)\b/i, "Gạt từ / Gạt mực"],
+    [/\b(truc ep|truc tu|truc)\b/i, "Trục"],
+    [/\b(bao lua)\b/i, "Bao lụa"],
+    [/\b(formatter)\b/i, "Formatter"],
+    [/\b(main nguon|power)\b/i, "Main nguồn"],
+    [/\b(motor)\b/i, "Motor"],
+    [/\b(sensor)\b/i, "Sensor"],
+    [/\b(cum say|fuser)\b/i, "Cụm sấy"],
+  ];
+  for(const [re, label] of rules){
+    if(re.test(t)) return label;
+  }
+  return "";
+}
+
 function detectLaptopPartLabel(text){
   const t = normalizeQuickText(text);
   const rules = [
@@ -1530,9 +1552,8 @@ function getStorageLabel(text){
   return kind !== "Khác" ? kind : cap;
 }
 
-function getSectionSummaryMeta(r, groupLabel){
-  const groupNorm = normalizeQuickText(groupLabel);
-  const text = normalizeQuickText([r[1], r[2], r[3], r[7], groupLabel].filter(Boolean).join(" "));
+function getAutoSummaryMetaFromTitle(title){
+  const text = normalizeQuickText(title);
   const brand = detectBrandLabel(text);
   const cpuBrand = detectCpuBrand(text);
   const cpuSeries = detectCpuSeries(text);
@@ -1542,55 +1563,41 @@ function getSectionSummaryMeta(r, groupLabel){
   const storageCap = detectStorageCapacity(text);
   const cameraType = detectCameraType(text);
   const networkType = detectNetworkType(text);
-  const laptopPart = detectLaptopPartLabel(text);
-
-  if(groupNorm.includes("cpu")){
-    const primary = cpuSeries !== "Khác" ? cpuSeries : cpuBrand !== "Khác" ? cpuBrand : brand;
-    return { family: "cpu", primary, secondary: cpuBrand !== "Khác" && primary !== cpuBrand ? cpuBrand : "" };
-  }
-  if(groupNorm.includes("ram")){
-    const primary = ramType !== "Khác" ? ramType : ramSize;
-    return { family: "ram", primary, secondary: ramSize !== "Khác" && primary !== ramSize ? ramSize : "" };
-  }
-  if(groupNorm.includes("ssd") || groupNorm.includes("hdd")){
-    const primary = storageKind !== "Khác" ? storageKind : storageCap;
-    return { family: "storage", primary, secondary: storageCap !== "Khác" && primary !== storageCap ? storageCap : "" };
-  }
-  if(groupNorm.includes("laptop linh kien")){
-    const primary = brand !== "Khác" ? brand : laptopPart || "Khác";
-    return { family: "brand", primary, secondary: laptopPart && primary !== laptopPart ? laptopPart : "" };
-  }
-  if(groupNorm.includes("camera")){
-    const primary = cameraType !== "Khác" ? cameraType : brand;
-    return { family: "network", primary, secondary: brand !== "Khác" && primary !== brand ? brand : "" };
-  }
-  if(groupNorm.includes("internet")){
-    const primary = networkType !== "Khác" ? networkType : brand;
-    return { family: "network", primary, secondary: brand !== "Khác" && primary !== brand ? brand : "" };
-  }
+  const printerPart = detectPrinterPartLabel(text);
+  const printerBrand = brand !== "Khác" ? brand : detectBrandLabel(text);
 
   if(cpuSeries !== "Khác" || cpuBrand !== "Khác"){
     const primary = cpuSeries !== "Khác" ? cpuSeries : cpuBrand;
-    return { family: "cpu", primary, secondary: cpuBrand !== "Khác" && primary !== cpuBrand ? cpuBrand : "" };
+    return { family: "cpu", kind: "cpu", primary, secondary: cpuBrand !== "Khác" && primary !== cpuBrand ? cpuBrand : "" };
   }
   if(ramType !== "Khác" || ramSize !== "Khác"){
     const primary = ramType !== "Khác" ? ramType : ramSize;
-    return { family: "ram", primary, secondary: ramSize !== "Khác" && primary !== ramSize ? ramSize : "" };
+    return { family: "ram", kind: "ram", primary, secondary: ramSize !== "Khác" && primary !== ramSize ? ramSize : "" };
   }
-  if(storageCap !== "Khác" || storageKind !== "Khác"){
+  if(storageKind !== "Khác" || storageCap !== "Khác"){
     const primary = storageKind !== "Khác" ? storageKind : storageCap;
-    return { family: "storage", primary, secondary: storageCap !== "Khác" && primary !== storageCap ? storageCap : "" };
+    return { family: "storage", kind: "storage", primary, secondary: storageCap !== "Khác" && primary !== storageCap ? storageCap : "" };
+  }
+  if(cameraType !== "Khác"){
+    return { family: "network", kind: "camera", primary: cameraType, secondary: brand !== "Khác" ? brand : "" };
   }
   if(networkType !== "Khác"){
-    return { family: "network", primary: networkType, secondary: brand !== "Khác" ? brand : "" };
+    return { family: "network", kind: "internet", primary: networkType, secondary: brand !== "Khác" ? brand : "" };
+  }
+  if(printerPart){
+    return { family: "printer", kind: "printer", primary: printerPart, secondary: printerBrand !== "Khác" && printerBrand !== printerPart ? printerBrand : "" };
+  }
+  if(printerBrand !== "Khác"){
+    return { family: "printer", kind: "printer", primary: printerBrand, secondary: "" };
   }
   if(brand !== "Khác"){
-    return { family: "brand", primary: brand, secondary: "" };
+    return { family: "brand", kind: "brand", primary: brand, secondary: "" };
   }
-  if(laptopPart){
-    return { family: "brand", primary: laptopPart, secondary: "" };
-  }
-  return { family: "other", primary: "Khác", secondary: "" };
+  return { family: "other", kind: "other", primary: "Khác", secondary: "" };
+}
+
+function getSectionSummaryMeta(r, groupLabel){
+  return getAutoSummaryMetaFromTitle(r[2] || "");
 }
 
 function buildSectionSummaryBuckets(items, groupLabel){
@@ -1989,6 +1996,7 @@ function sumQuickStock(items){
 
 function isQuickChipActive(groupLabel, family, primary, secondary){
   if(!quickGroupFilter) return false;
+  if(String(quickGroupFilter.scope || "group") !== "group") return false;
   return quickGroupFilter.groupLabel === groupLabel
     && quickGroupFilter.family === family
     && quickGroupFilter.primary === primary
@@ -1998,13 +2006,16 @@ function isQuickChipActive(groupLabel, family, primary, secondary){
 function renderQuickChip(groupLabel, family, bucket, primary, secondary){
   const active = isQuickChipActive(groupLabel, family, primary, secondary);
   const detail = `${bucket.count} mục · ${bucket.stock.toLocaleString("vi-VN")} tồn`;
-  return `<button type="button" class="smart-chip${active ? " active" : ""}" data-group="${escapeHtml(groupLabel)}" data-family="${escapeHtml(family)}" data-primary="${escapeHtml(primary)}" data-secondary="${escapeHtml(secondary || "")}" onclick="toggleQuickGroupFilter(this)"><span class="smart-chip-name">${escapeHtml(bucket.label)}</span><span class="smart-chip-detail">${detail}</span></button>`;
+  return `<button type="button" class="smart-chip${active ? " active" : ""}" data-scope="group" data-group="${escapeHtml(groupLabel)}" data-family="${escapeHtml(family)}" data-primary="${escapeHtml(primary)}" data-secondary="${escapeHtml(secondary || "")}" onclick="toggleQuickGroupFilter(this)"><span class="smart-chip-name">${escapeHtml(bucket.label)}</span><span class="smart-chip-detail">${detail}</span></button>`;
 }
 
 function matchesQuickGroupFilter(r, groupLabel){
   if(!quickGroupFilter) return true;
-  if((groupLabel || "") !== quickGroupFilter.groupLabel) return false;
-  const meta = getSectionSummaryMeta(r, groupLabel);
+  const scope = String(quickGroupFilter.scope || "group");
+  if(scope === "group" && (groupLabel || "") !== quickGroupFilter.groupLabel) return false;
+  const meta = scope === "group"
+    ? getSectionSummaryMeta(r, groupLabel)
+    : getAutoSummaryMetaFromTitle(r[2] || "");
   if(!meta || meta.family !== quickGroupFilter.family) return false;
   const metaKey = meta.family === "storage" || meta.family === "ram"
     ? `${meta.primary || "Khác"}|${meta.secondary || ""}`
