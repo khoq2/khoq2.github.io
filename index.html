@@ -72,8 +72,13 @@ body { font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif
 .product-name { font-size: 14px; font-weight: bold; line-height: 1.35; margin-bottom: 0; display: inline; }
 .card-footer { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px; }
 .brand-tag { font-size: 12px; color: #666; background: #F4F4F4; padding: 2px 8px; border-radius: 6px; }
+.card-tags { display: flex; flex-wrap: wrap; gap: 4px; margin: 2px 0 6px; }
+.card-tag { font-size: 10px; font-weight: 800; color: #1E3A5F; background: #EBF5FB; border: 1px solid rgba(30,58,95,.12); padding: 2px 7px; border-radius: 999px; line-height: 1.3; }
 .price { font-size: 15px; font-weight: bold; }
 .price-sale-on { color: #D50000 !important; font-weight: 900 !important; }
+.price-contact-btn { border: none; background: linear-gradient(180deg, #00A3FF 0%, #0068FF 100%); color: #fff; font: inherit; font-weight: 900; cursor: pointer; padding: 4px 10px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,104,255,.22), inset 0 -2px 0 rgba(0,0,0,.12); letter-spacing: .1px; }
+.price-contact-btn:hover { filter: brightness(1.03); transform: translateY(-1px); }
+.price-contact-btn:active { transform: translateY(0); box-shadow: 0 2px 6px rgba(0,104,255,.18), inset 0 -1px 0 rgba(0,0,0,.12); }
 .nguoi-ban-row { display: flex; align-items: center; gap: 6px; margin-top: 6px; padding: 5px 8px; background: #F4F6F9; border-radius: 8px; cursor: pointer; font-size: 12px; color: #555; }
 .nguoi-ban-row:active { background: #E8ECF1; }
 .nguoi-ban-label { font-weight: bold; color: #1E3A5F; flex: 1; }
@@ -202,6 +207,51 @@ body.admin-mode .admin-btn { background: #1E8449; border-color: #1E8449; opacity
   18%, 58% { background: #E74C3C; color: #fff; box-shadow: 0 0 0 4px rgba(231,76,60,.25), 0 0 24px rgba(231,76,60,.8); }
   38%, 78% { background: #FFEBEE; color: #B71C1C; box-shadow: 0 0 0 2px rgba(231,76,60,.25); }
 }
+.smart-summary { margin: 0 0 16px; padding: 10px 10px 8px; border-radius: 12px; border: 1.5px solid rgba(30,58,95,.12); background: linear-gradient(180deg, rgba(235,245,251,.96), rgba(255,255,255,.96)); box-shadow: 0 3px 12px rgba(30,58,95,.08); }
+.smart-summary-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
+.smart-summary-title { font-size: 12px; font-weight: 900; color: #1E3A5F; }
+.smart-summary-meta { display: flex; flex-wrap: wrap; gap: 6px; font-size: 11px; color: #5D6D7E; }
+.smart-summary-badges { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.smart-summary-clear { border: none; background: #F4F6F9; color: #1E3A5F; font-size: 11px; font-weight: 800; padding: 5px 10px; border-radius: 999px; cursor: pointer; box-shadow: inset 0 -1px 0 rgba(0,0,0,.08); }
+.smart-summary-clear:active { transform: scale(.97); }
+.smart-chip { min-width: 132px; flex: 1 1 132px; border: 1.5px solid rgba(0,0,0,.08); background: #fff; color: #2C3E50; border-radius: 12px; padding: 8px 10px; cursor: pointer; text-align: left; display: flex; flex-direction: column; gap: 2px; box-shadow: inset 0 -2px 0 rgba(0,0,0,.08); }
+.smart-chip.active { background: #1E3A5F; color: #fff; border-color: #1E3A5F; box-shadow: inset 0 -2px 0 rgba(0,0,0,.18), 0 4px 10px rgba(30,58,95,.18); }
+.smart-chip-name { font-size: 12px; font-weight: 900; line-height: 1.2; }
+.smart-chip-detail { font-size: 10px; line-height: 1.2; color: rgba(44,62,80,.78); }
+.smart-chip.active .smart-chip-detail { color: rgba(255,255,255,.88); }
+.smart-summary-subtitle { margin-top: 10px; font-size: 11px; font-weight: 800; color: #7D4F00; }
+.smart-summary-empty { font-size: 11px; color: #7B7D7D; margin-top: 6px; }
+.group-summary-row { display: flex; gap: 6px; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; padding: 2px 0 8px; margin: 2px 0 8px; }
+.group-summary-row::-webkit-scrollbar { display: none; }
+.group-summary-chip { flex: 0 0 auto; border: 1.5px solid rgba(0,0,0,.08); background: #fff; color: #2C3E50; border-radius: 999px; padding: 7px 12px; font-size: 11px; font-weight: 800; cursor: pointer; box-shadow: inset 0 -2px 0 rgba(0,0,0,.08); white-space: nowrap; }
+.group-summary-chip.active { background: #1E3A5F; color: #fff; border-color: #1E3A5F; box-shadow: inset 0 -2px 0 rgba(0,0,0,.18), 0 4px 10px rgba(30,58,95,.18); }
+.group-summary-chip:active { transform: scale(.98); }
+.item-cond-badge { display: inline-flex; align-items: center; font-size: 10px; font-weight: 900; line-height: 1; padding: 4px 7px; border-radius: 999px; margin-right: 6px; vertical-align: middle; }
+.item-cond-old { background: #FADBD8; color: #922B21; border: 1px solid rgba(146,43,33,.14); }
+.card.quick-match { border-color: rgba(231,76,60,.42); background: linear-gradient(180deg, #fff 0%, #FFF9F8 100%); box-shadow: 0 0 0 3px rgba(231,76,60,.18), 0 10px 24px rgba(231,76,60,.12); animation: quickMatchFlash 1.2s ease; }
+.card.match-focus { outline: 4px solid #E74C3C; outline-offset: 2px; transform: translateY(-1px); }
+@keyframes quickMatchFlash {
+  0% { transform: translateY(0); }
+  35% { transform: translateY(-1px); }
+  70% { transform: translateY(0); }
+  100% { transform: translateY(0); }
+}
+.overview-panel { position: relative; z-index: 45; margin: 0 0 14px; padding: 12px 10px 10px; border-radius: 14px; border: 1.5px solid rgba(30,58,95,.12); background: linear-gradient(180deg, rgba(255,255,255,.98), rgba(235,245,251,.95)); box-shadow: 0 6px 18px rgba(30,58,95,.10); }
+.overview-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
+.overview-title { font-size: 13px; font-weight: 900; color: #1E3A5F; }
+.overview-sub { font-size: 11px; color: #5D6D7E; line-height: 1.35; }
+.overview-meta { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.overview-pill { font-size: 10px; font-weight: 800; color: #1E3A5F; background: #EBF5FB; border: 1px solid rgba(30,58,95,.12); padding: 4px 8px; border-radius: 999px; }
+.overview-sect { margin-top: 10px; }
+.overview-sect-title { font-size: 11px; font-weight: 900; color: #7D4F00; margin: 0 0 6px; }
+.overview-grid { display: flex; flex-wrap: wrap; gap: 6px; }
+.overview-chip { min-width: 124px; flex: 1 1 124px; border: 1.5px solid rgba(0,0,0,.08); background: #fff; color: #2C3E50; border-radius: 12px; padding: 8px 10px; cursor: pointer; text-align: left; display: flex; flex-direction: column; gap: 2px; box-shadow: inset 0 -2px 0 rgba(0,0,0,.08); }
+.overview-chip.active { background: #1E3A5F; color: #fff; border-color: #1E3A5F; box-shadow: inset 0 -2px 0 rgba(0,0,0,.18), 0 4px 10px rgba(30,58,95,.18); }
+.overview-chip-top { display: flex; justify-content: space-between; gap: 6px; align-items: center; }
+.overview-chip-title { font-size: 12px; font-weight: 900; line-height: 1.2; }
+.overview-chip-sub { font-size: 10px; line-height: 1.25; color: rgba(44,62,80,.78); }
+.overview-chip.active .overview-chip-sub { color: rgba(255,255,255,.88); }
+.overview-chip-count { font-size: 11px; font-weight: 900; white-space: nowrap; }
 .header-collapsible { overflow: hidden; transition: max-height .35s ease, opacity .3s ease; max-height: 400px; opacity: 1; }
 .sticky.collapsed .header-collapsible { max-height: 74px !important; opacity: 1; pointer-events: auto; }
 .sticky.collapsed .admin-bar,
@@ -228,6 +278,8 @@ body.admin-mode .admin-btn { background: #1E8449; border-color: #1E8449; opacity
   .tx-summary { grid-template-columns: 1fr; }
   .tx-filter { grid-template-columns: 1fr; }
   .tx-time { white-space: normal; }
+  .smart-chip { min-width: calc(50% - 3px); flex-basis: calc(50% - 3px); }
+  .overview-chip { min-width: calc(50% - 3px); flex-basis: calc(50% - 3px); }
 }
 
 /* Hover glow: chuot vao thi sang, roi chuot thi tat. */
@@ -792,6 +844,7 @@ let DATA = [];
 let currentTab = "ALL";
 let currentStatus = "ALL";
 let searchQ = "";
+let quickGroupFilter = null;
 let importRows = [];
 let bulkSelectMode = false;
 const selectedItems = new Set();
@@ -1287,6 +1340,712 @@ function showWarehouseLocation(idx){
   }
 }
 
+function clearQuickGroupFilter(){
+  if(quickGroupFilter){
+    quickGroupFilter = null;
+    render();
+  }
+}
+
+function setQuickGroupFilter(next){
+  const same = quickGroupFilter
+    && quickGroupFilter.groupLabel === next.groupLabel
+    && quickGroupFilter.family === next.family
+    && quickGroupFilter.primary === next.primary
+    && String(quickGroupFilter.secondary || "") === String(next.secondary || "");
+  quickGroupFilter = same ? null : next;
+  const searchEl = document.getElementById("search");
+  const clearBtn = document.getElementById("clear-btn");
+  if(searchEl){
+    searchEl.value = "";
+  }
+  if(clearBtn){
+    clearBtn.style.display = "none";
+  }
+  searchQ = "";
+  render();
+}
+
+function toggleQuickGroupFilter(btn){
+  if(!btn || !btn.dataset) return;
+  setQuickGroupFilter({
+    groupLabel: btn.dataset.group || "",
+    family: btn.dataset.family || "",
+    primary: btn.dataset.primary || "",
+    secondary: btn.dataset.secondary || ""
+  });
+}
+
+function normalizeQuickText(text){
+  return removeAccents(String(text ?? "")).toLowerCase().replace(/\s+/g, " ").trim();
+}
+
+const RAM_TYPE_ORDER = ["LPDDR5", "LPDDR4", "LPDDR3", "DDR5", "DDR4", "DDR3", "DDR2", "Khác"];
+const RAM_SIZE_ORDER = ["1GB", "2GB", "4GB", "8GB", "16GB", "32GB", "64GB", "128GB", "Khác"];
+const CPU_BRAND_ORDER = ["Intel", "AMD", "Apple", "Khác"];
+const CPU_SERIES_ORDER = ["i9", "i7", "i5", "i3", "Ryzen 9", "Ryzen 7", "Ryzen 5", "Ryzen 3", "Xeon", "Pentium", "Celeron", "M1", "M2", "M3", "Khác"];
+const STORAGE_KIND_ORDER = ["NVMe", "M.2", "SATA", "SSD", "HDD", "Khác"];
+const STORAGE_CAP_ORDER = ["120GB", "240GB", "250GB", "480GB", "500GB", "1TB", "2TB", "4TB", "Khác"];
+const NETWORK_KIND_ORDER = ["Router", "Switch", "Modem", "Access Point", "USB Wifi", "Converter", "SFP", "Cáp mạng", "Khác"];
+const BRAND_ORDER = ["Dell", "HP", "Lenovo", "Acer", "Asus", "MacBook", "MSI", "Apple", "Samsung", "LG", "Sony", "Toshiba", "Fujitsu", "Generic", "Khác"];
+
+function detectRamType(text){
+  const t = normalizeQuickText(text);
+  const m = t.match(/\b(lpddr[345]|ddr[2345])\b/i);
+  return m ? m[1].toUpperCase() : "Khác";
+}
+
+function detectRamSize(text){
+  const t = normalizeQuickText(text);
+  const m = t.match(/\b(1|2|4|8|16|32|64|128)\s*gb\b/i);
+  return m ? `${m[1]}GB` : "Khác";
+}
+
+function detectCpuBrand(text){
+  const t = normalizeQuickText(text);
+  if(/\bintel\b/i.test(t)) return "Intel";
+  if(/\bamd\b/i.test(t)) return "AMD";
+  if(/\bapple\b/i.test(t) || /\bm[123]\b/i.test(t)) return "Apple";
+  return "Khác";
+}
+
+function detectCpuSeries(text){
+  const t = normalizeQuickText(text);
+  const rules = [
+    [/\b(ryzen\s*9)\b/i, "Ryzen 9"],
+    [/\b(ryzen\s*7)\b/i, "Ryzen 7"],
+    [/\b(ryzen\s*5)\b/i, "Ryzen 5"],
+    [/\b(ryzen\s*3)\b/i, "Ryzen 3"],
+    [/\b(i9)\b/i, "i9"],
+    [/\b(i7)\b/i, "i7"],
+    [/\b(i5)\b/i, "i5"],
+    [/\b(i3)\b/i, "i3"],
+    [/\b(xeon)\b/i, "Xeon"],
+    [/\b(pentium)\b/i, "Pentium"],
+    [/\b(celeron)\b/i, "Celeron"],
+    [/\b(m1)\b/i, "M1"],
+    [/\b(m2)\b/i, "M2"],
+    [/\b(m3)\b/i, "M3"],
+  ];
+  for(const [re, label] of rules){
+    if(re.test(t)) return label;
+  }
+  return "Khác";
+}
+
+function detectBrandLabel(text){
+  const t = normalizeQuickText(text);
+  const rules = [
+    [/\bmac\s*book\b/i, "MacBook"],
+    [/\bapple\b/i, "Apple"],
+    [/\bdell\b/i, "Dell"],
+    [/\bhp\b/i, "HP"],
+    [/\blenovo\b/i, "Lenovo"],
+    [/\bacer\b/i, "Acer"],
+    [/\basus\b/i, "Asus"],
+    [/\bmsi\b/i, "MSI"],
+    [/\bsamsung\b/i, "Samsung"],
+    [/\blg\b/i, "LG"],
+    [/\bsony\b/i, "Sony"],
+    [/\btoshiba\b/i, "Toshiba"],
+    [/\bfujitsu\b/i, "Fujitsu"],
+    [/\bgeneric\b/i, "Generic"],
+  ];
+  for(const [re, label] of rules){
+    if(re.test(t)) return label;
+  }
+  return "Khác";
+}
+
+function detectStorageKind(text){
+  const t = normalizeQuickText(text);
+  if(/\bnvme\b/i.test(t)) return "NVMe";
+  if(/\bm\.?2\b/i.test(t) || /\bm2\b/i.test(t)) return "M.2";
+  if(/\bsata\b/i.test(t)) return "SATA";
+  if(/\bssd\b/i.test(t)) return "SSD";
+  if(/\bhdd\b/i.test(t)) return "HDD";
+  return "Khác";
+}
+
+function detectStorageCapacity(text){
+  const t = normalizeQuickText(text);
+  const m = t.match(/\b(\d+(?:\.\d+)?)\s*(tb|gb)\b/i);
+  if(!m) return "Khác";
+  const unit = m[2].toUpperCase();
+  return `${m[1]}${unit}`;
+}
+
+function detectCameraType(text){
+  const t = normalizeQuickText(text);
+  if(/\bwifi\b/i.test(t)) return "Camera Wifi";
+  if(/\bip\b/i.test(t)) return "Camera IP";
+  if(/\bdvr\b/i.test(t)) return "DVR";
+  if(/\bnvr\b/i.test(t)) return "NVR";
+  if(/\banalog\b/i.test(t)) return "Analog";
+  if(/\bpoe\b/i.test(t)) return "PoE";
+  return "Khác";
+}
+
+function detectNetworkType(text){
+  const t = normalizeQuickText(text);
+  if(/\brouter\b/i.test(t)) return "Router";
+  if(/\bswitch\b/i.test(t)) return "Switch";
+  if(/\bmodem\b/i.test(t)) return "Modem";
+  if(/\baccess point\b/i.test(t) || /\bap\b/i.test(t)) return "Access Point";
+  if(/\busb wifi\b/i.test(t)) return "USB Wifi";
+  if(/\bconverter\b/i.test(t)) return "Converter";
+  if(/\bsfp\b/i.test(t)) return "SFP";
+  if(/\bcat6a?\b/i.test(t) || /\bdây mạng\b/i.test(t) || /\bpatch cord\b/i.test(t) || /\brj45\b/i.test(t)) return "Cáp mạng";
+  return "Khác";
+}
+
+function detectLaptopPartLabel(text){
+  const t = normalizeQuickText(text);
+  const rules = [
+    [/\b(sac|adapter|nguon)\b/i, "Sạc / Adapter"],
+    [/\b(pin|battery)\b/i, "Pin"],
+    [/\b(ban phim|keyboard)\b/i, "Bàn phím"],
+    [/\b(man hinh|lcd|panel)\b/i, "Màn hình"],
+    [/\b(tan nhiet|tản nhiệt|fan|quat)\b/i, "Tản nhiệt"],
+    [/\b(day|cap|cable)\b/i, "Dây / Cáp"],
+    [/\b(main|mainboard)\b/i, "Main"],
+  ];
+  for(const [re, label] of rules){
+    if(re.test(t)) return label;
+  }
+  return "";
+}
+
+function detectConditionLabel(text){
+  const t = normalizeQuickText(text);
+  if(/\b(cu|used|da qua su dung|second hand|like new)\b/i.test(t)) return "Cũ";
+  return "";
+}
+
+function getStorageLabel(text){
+  const kind = detectStorageKind(text);
+  const cap = detectStorageCapacity(text);
+  if(kind === "Khác" && cap === "Khác") return "Khác";
+  if(kind !== "Khác" && cap !== "Khác") return `${kind} · ${cap}`;
+  return kind !== "Khác" ? kind : cap;
+}
+
+function getSectionSummaryMeta(r, groupLabel){
+  const groupNorm = normalizeQuickText(groupLabel);
+  const text = normalizeQuickText([r[1], r[2], r[3], r[7], groupLabel].filter(Boolean).join(" "));
+  const brand = detectBrandLabel(text);
+  const cpuBrand = detectCpuBrand(text);
+  const cpuSeries = detectCpuSeries(text);
+  const ramType = detectRamType(text);
+  const ramSize = detectRamSize(text);
+  const storageKind = detectStorageKind(text);
+  const storageCap = detectStorageCapacity(text);
+  const cameraType = detectCameraType(text);
+  const networkType = detectNetworkType(text);
+  const laptopPart = detectLaptopPartLabel(text);
+
+  if(groupNorm.includes("cpu")){
+    const primary = cpuSeries !== "Khác" ? cpuSeries : cpuBrand !== "Khác" ? cpuBrand : brand;
+    return { family: "cpu", primary, secondary: cpuBrand !== "Khác" && primary !== cpuBrand ? cpuBrand : "" };
+  }
+  if(groupNorm.includes("ram")){
+    const primary = ramType !== "Khác" ? ramType : ramSize;
+    return { family: "ram", primary, secondary: ramSize !== "Khác" && primary !== ramSize ? ramSize : "" };
+  }
+  if(groupNorm.includes("ssd") || groupNorm.includes("hdd")){
+    const primary = storageKind !== "Khác" ? storageKind : storageCap;
+    return { family: "storage", primary, secondary: storageCap !== "Khác" && primary !== storageCap ? storageCap : "" };
+  }
+  if(groupNorm.includes("laptop linh kien")){
+    const primary = brand !== "Khác" ? brand : laptopPart || "Khác";
+    return { family: "brand", primary, secondary: laptopPart && primary !== laptopPart ? laptopPart : "" };
+  }
+  if(groupNorm.includes("camera")){
+    const primary = cameraType !== "Khác" ? cameraType : brand;
+    return { family: "network", primary, secondary: brand !== "Khác" && primary !== brand ? brand : "" };
+  }
+  if(groupNorm.includes("internet")){
+    const primary = networkType !== "Khác" ? networkType : brand;
+    return { family: "network", primary, secondary: brand !== "Khác" && primary !== brand ? brand : "" };
+  }
+
+  if(cpuSeries !== "Khác" || cpuBrand !== "Khác"){
+    const primary = cpuSeries !== "Khác" ? cpuSeries : cpuBrand;
+    return { family: "cpu", primary, secondary: cpuBrand !== "Khác" && primary !== cpuBrand ? cpuBrand : "" };
+  }
+  if(ramType !== "Khác" || ramSize !== "Khác"){
+    const primary = ramType !== "Khác" ? ramType : ramSize;
+    return { family: "ram", primary, secondary: ramSize !== "Khác" && primary !== ramSize ? ramSize : "" };
+  }
+  if(storageCap !== "Khác" || storageKind !== "Khác"){
+    const primary = storageKind !== "Khác" ? storageKind : storageCap;
+    return { family: "storage", primary, secondary: storageCap !== "Khác" && primary !== storageCap ? storageCap : "" };
+  }
+  if(networkType !== "Khác"){
+    return { family: "network", primary: networkType, secondary: brand !== "Khác" ? brand : "" };
+  }
+  if(brand !== "Khác"){
+    return { family: "brand", primary: brand, secondary: "" };
+  }
+  if(laptopPart){
+    return { family: "brand", primary: laptopPart, secondary: "" };
+  }
+  return { family: "other", primary: "Khác", secondary: "" };
+}
+
+function buildSectionSummaryBuckets(items, groupLabel){
+  const map = new Map();
+  let family = "other";
+  items.forEach(({r})=>{
+    const meta = getSectionSummaryMeta(r, groupLabel);
+    if(!meta || meta.family === "other") return;
+    if(family === "other") family = meta.family;
+    const key = meta.family === "storage" || meta.family === "ram"
+      ? `${meta.primary || "Khác"}|${meta.secondary || ""}`
+      : (meta.primary || "Khác");
+    const label = meta.family === "storage"
+      ? `${meta.primary && meta.primary !== "Khác" ? meta.primary : ""}${meta.secondary ? (meta.primary && meta.primary !== "Khác" ? " " : "") + meta.secondary : ""}`.trim() || "Khác"
+      : meta.family === "ram"
+        ? `RAM · ${`${meta.primary && meta.primary !== "Khác" ? meta.primary : ""}${meta.secondary ? " " + meta.secondary : ""}`.trim() || "Khác"}`
+        : (meta.primary || "Khác");
+    const current = map.get(key) || { key, label, count: 0, stock: 0 };
+    current.count++;
+    current.stock += Number(r[5]) || 0;
+    map.set(key, current);
+  });
+  const orderMap = {
+    cpu: [...CPU_SERIES_ORDER, ...CPU_BRAND_ORDER],
+    ram: RAM_TYPE_ORDER,
+    storage: STORAGE_KIND_ORDER,
+    brand: BRAND_ORDER,
+    network: NETWORK_KIND_ORDER,
+    other: []
+  };
+  const order = orderMap[family] || [];
+  const orderIndex = new Map(order.map((key, idx)=>[key, idx]));
+  const ramSizeIndex = new Map(RAM_SIZE_ORDER.map((key, idx)=>[key, idx]));
+  const result = [...map.values()].sort((a, b)=>{
+    if(family === "ram"){
+      const [ak, ac] = a.key.split("|");
+      const [bk, bc] = b.key.split("|");
+      const ki = orderIndex.has(ak) ? orderIndex.get(ak) : 999;
+      const kj = orderIndex.has(bk) ? orderIndex.get(bk) : 999;
+      if(ki !== kj) return ki - kj;
+      const ai = ramSizeIndex.has(ac || "") ? ramSizeIndex.get(ac || "") : 999;
+      const bi = ramSizeIndex.has(bc || "") ? ramSizeIndex.get(bc || "") : 999;
+      if(ai !== bi) return ai - bi;
+      if(b.count !== a.count) return b.count - a.count;
+      return String(a.label).localeCompare(String(b.label), "vi");
+    }
+    if(family === "storage"){
+      const [ak, ac] = a.key.split("|");
+      const [bk, bc] = b.key.split("|");
+      const ki = orderIndex.has(ak) ? orderIndex.get(ak) : 999;
+      const kj = orderIndex.has(bk) ? orderIndex.get(bk) : 999;
+      if(ki !== kj) return ki - kj;
+      const capIndex = new Map(STORAGE_CAP_ORDER.map((key, idx)=>[key, idx]));
+      const ai = capIndex.has(ac || "") ? capIndex.get(ac || "") : 999;
+      const bi = capIndex.has(bc || "") ? capIndex.get(bc || "") : 999;
+      if(ai !== bi) return ai - bi;
+      if(b.count !== a.count) return b.count - a.count;
+      return String(a.label).localeCompare(String(b.label), "vi");
+    }
+    const ai = orderIndex.has(a.key) ? orderIndex.get(a.key) : 999;
+    const bi = orderIndex.has(b.key) ? orderIndex.get(b.key) : 999;
+    if(ai !== bi) return ai - bi;
+    if(b.count !== a.count) return b.count - a.count;
+    return String(a.label).localeCompare(String(b.label), "vi");
+  });
+  result.family = family;
+  return result;
+}
+
+function detectLaptopPartLabel(text){
+  const t = normalizeQuickText(text);
+  const rules = [
+    [/\b(sac|adapter|nguon)\b/i, "Sạc / Adapter"],
+    [/\b(pin|battery)\b/i, "Pin"],
+    [/\b(ban phim|keyboard)\b/i, "Bàn phím"],
+    [/\b(man hinh|lcd|panel)\b/i, "Màn hình"],
+    [/\b(tu nguon|power)\b/i, "Nguồn"],
+    [/\b(quat|fan|tản nhiệt|tan nhiet)\b/i, "Tản nhiệt"],
+    [/\b(day|cap|cable)\b/i, "Dây / Cáp"],
+    [/\b(main|mainboard)\b/i, "Main"],
+  ];
+  for(const [re, label] of rules){
+    if(re.test(t)) return label;
+  }
+  return "";
+}
+
+function getCardInsightTags(r){
+  const groupLabel = r[8] || "";
+  const groupNorm = normalizeQuickText(groupLabel);
+  const text = normalizeQuickText([r[1], r[2], r[3], r[7], groupLabel].filter(Boolean).join(" "));
+  const tags = [];
+  const add = (value) => {
+    const v = (value || "").toString().trim();
+    if(!v) return;
+    if(tags.includes(v)) return;
+    tags.push(v);
+  };
+
+  if(groupNorm.includes("ram")){
+    add(detectRamType(text));
+    add(detectRamSize(text));
+    const brand = detectBrandLabel(text);
+    if(brand !== "Khác") add(brand);
+  } else if(groupNorm.includes("cpu")){
+    add(detectCpuBrand(text));
+    add(detectCpuSeries(text));
+    const brand = detectBrandLabel(text);
+    if(brand !== "Khác" && brand !== "Intel" && brand !== "AMD") add(brand);
+  } else if(groupNorm.includes("ssd") || groupNorm.includes("hdd")){
+    add(getStorageLabel(text));
+    const brand = detectBrandLabel(text);
+    if(brand !== "Khác") add(brand);
+  } else if(groupNorm.includes("camera")){
+    add(detectCameraType(text));
+    const brand = detectBrandLabel(text);
+    if(brand !== "Khác") add(brand);
+    const mp = text.match(/\b(\d+(?:\.\d+)?)\s*mp\b/i);
+    if(mp) add(`${mp[1]}MP`);
+    if(/\b1080p\b/i.test(text)) add("1080p");
+    if(/\b2k\b/i.test(text)) add("2K");
+    if(/\b4k\b/i.test(text)) add("4K");
+  } else if(groupNorm.includes("internet")){
+    add(detectNetworkType(text));
+    const brand = detectBrandLabel(text);
+    if(brand !== "Khác") add(brand);
+    const speed = text.match(/\b(\d{3,4})\s*mbps\b/i);
+    if(speed) add(`${speed[1]}Mbps`);
+  } else if(groupNorm.includes("laptop linh kien")){
+    add(detectLaptopPartLabel(text));
+    add(detectBrandLabel(text));
+  } else {
+    const brand = detectBrandLabel(text);
+    if(brand !== "Khác") add(brand);
+    const ramType = detectRamType(text);
+    if(ramType !== "Khác") add(ramType);
+    const ramSize = detectRamSize(text);
+    if(ramSize !== "Khác") add(ramSize);
+    const storage = getStorageLabel(text);
+    if(storage !== "Khác") add(storage);
+    const network = detectNetworkType(text);
+    if(network !== "Khác") add(network);
+    const part = detectLaptopPartLabel(text);
+    if(part) add(part);
+  }
+
+  return tags.filter(Boolean).slice(0, 3);
+}
+
+function getOverviewBucket(r){
+  const groupLabel = r[8] || "";
+  const groupNorm = normalizeQuickText(groupLabel);
+  const text = normalizeQuickText([r[1], r[2], r[3], r[7], groupLabel].filter(Boolean).join(" "));
+  const brand = detectBrandLabel(text);
+  const ramType = detectRamType(text);
+  const ramSize = detectRamSize(text);
+  const cpuBrand = detectCpuBrand(text);
+  const cpuSeries = detectCpuSeries(text);
+  const storageLabel = getStorageLabel(text);
+  const cameraType = detectCameraType(text);
+  const networkType = detectNetworkType(text);
+  const laptopPart = detectLaptopPartLabel(text);
+
+  if(groupNorm.includes("cpu")){
+    return { group: groupLabel, family: "cpu", primary: cpuBrand, secondary: cpuSeries, label: `CPU · ${cpuBrand}${cpuSeries !== "Khác" ? " · " + cpuSeries : ""}` };
+  }
+  if(groupNorm.includes("ram")){
+    return { group: groupLabel, family: "ram", primary: ramType, secondary: ramSize, label: `RAM · ${ramType}${ramSize !== "Khác" ? " · " + ramSize : ""}` };
+  }
+  if(groupNorm.includes("ssd") || groupNorm.includes("hdd")){
+    return { group: groupLabel, family: "storage", primary: detectStorageKind(text), secondary: detectStorageCapacity(text), label: `${groupNorm.includes("ssd") ? "SSD" : "HDD"} · ${storageLabel}` };
+  }
+  if(groupNorm.includes("laptop linh kien")){
+    return { group: groupLabel, family: "brand", primary: brand, secondary: laptopPart, label: `Laptop · ${laptopPart || brand}` };
+  }
+  if(groupNorm.includes("camera")){
+    return { group: groupLabel, family: "network", primary: cameraType, secondary: brand, label: `Camera · ${cameraType}${brand !== "Khác" ? " · " + brand : ""}` };
+  }
+  if(groupNorm.includes("internet")){
+    return { group: groupLabel, family: "network", primary: networkType, secondary: brand, label: `Internet · ${networkType}${brand !== "Khác" ? " · " + brand : ""}` };
+  }
+
+  if(ramType !== "Khác" || ramSize !== "Khác"){
+    return { group: groupLabel, family: "ram", primary: ramType, secondary: ramSize, label: `RAM · ${ramType}${ramSize !== "Khác" ? " · " + ramSize : ""}` };
+  }
+  if(cpuBrand !== "Khác" || cpuSeries !== "Khác"){
+    return { group: groupLabel, family: "cpu", primary: cpuBrand, secondary: cpuSeries, label: `CPU · ${cpuBrand}${cpuSeries !== "Khác" ? " · " + cpuSeries : ""}` };
+  }
+  if(storageLabel !== "Khác"){
+    return { group: groupLabel, family: "storage", primary: detectStorageKind(text), secondary: detectStorageCapacity(text), label: storageLabel };
+  }
+  if(networkType !== "Khác"){
+    return { group: groupLabel, family: "network", primary: networkType, secondary: brand, label: `${networkType}${brand !== "Khác" ? " · " + brand : ""}` };
+  }
+  if(brand !== "Khác"){
+    return { group: groupLabel, family: "brand", primary: brand, secondary: "", label: `Hãng · ${brand}` };
+  }
+  return { group: groupLabel, family: "other", primary: "Khác", secondary: "", label: groupLabel || "Khác" };
+}
+
+function buildOverviewBuckets(items){
+  const map = new Map();
+  items.forEach(({r})=>{
+    const bucket = getOverviewBucket(r);
+    const key = `${bucket.group}|${bucket.family}|${bucket.primary}|${bucket.secondary}`;
+    const current = map.get(key) || { ...bucket, count: 0, stock: 0 };
+    current.count++;
+    current.stock += Number(r[5]) || 0;
+    map.set(key, current);
+  });
+  return [...map.values()].sort((a,b)=>{
+    if(b.count !== a.count) return b.count - a.count;
+    if(b.stock !== a.stock) return b.stock - a.stock;
+    return String(a.label).localeCompare(String(b.label), "vi");
+  });
+}
+
+function renderOverviewChip(bucket){
+  const active = isQuickChipActive(bucket.group, bucket.family, bucket.primary, bucket.secondary);
+  if(bucket.family === "other"){
+    return `<div class="overview-chip${active ? " active" : ""}" aria-disabled="true"><span class="overview-chip-top"><span class="overview-chip-title">${escapeHtml(bucket.label)}</span><span class="overview-chip-count">${bucket.count}</span></span><span class="overview-chip-sub">${bucket.stock.toLocaleString("vi-VN")} tồn</span></div>`;
+  }
+  return `<button type="button" class="overview-chip${active ? " active" : ""}" data-group="${escapeHtml(bucket.group)}" data-family="${escapeHtml(bucket.family)}" data-primary="${escapeHtml(bucket.primary)}" data-secondary="${escapeHtml(bucket.secondary || "")}" onclick="toggleQuickGroupFilter(this)"><span class="overview-chip-top"><span class="overview-chip-title">${escapeHtml(bucket.label)}</span><span class="overview-chip-count">${bucket.count}</span></span><span class="overview-chip-sub">${bucket.stock.toLocaleString("vi-VN")} tồn</span></button>`;
+}
+
+function renderMainTabChip(tabCode, label, color, count, stock, active){
+  return `<button type="button" class="overview-chip${active ? " active" : ""}" onclick="goToTab('${tabCode}')"><span class="overview-chip-top"><span class="overview-chip-title">${label}</span><span class="overview-chip-count">${count}</span></span><span class="overview-chip-sub">${stock.toLocaleString("vi-VN")} tồn</span></button>`;
+}
+
+function renderOverviewPanel(results){
+  if(currentTab === "ALL") return "";
+  const totalCount = results.length;
+  const totalStock = results.reduce((s, item)=>s + (Number(item.r[5]) || 0), 0);
+  const lowStock = results.filter(item=>{
+    const ton = Number(item.r[5]) || 0;
+    return ton > 0 && ton <= 2;
+  }).length;
+  const outStock = results.filter(item=>(Number(item.r[5]) || 0) <= 0).length;
+  const title = currentTab === "ALL" ? "Tổng quan kho nhanh" : `Tổng quan nhanh: ${SHEET_CFG[currentTab]?.label || currentTab}`;
+  const subtitle = quickGroupFilter
+    ? `Đang lọc sâu: ${quickGroupFilter.primary}${quickGroupFilter.secondary ? " · " + quickGroupFilter.secondary : ""}`
+    : "Bấm vào chip để chuyển tab hoặc lọc sâu ngay";
+  const pills = [
+    `${totalCount} mục`,
+    `${totalStock.toLocaleString("vi-VN")} tồn`,
+    `${lowStock} sắp hết`,
+    `${outStock} hết`
+  ];
+
+  let html = `<div class="overview-panel">`;
+  html += `<div class="overview-head"><div><div class="overview-title">${title}</div><div class="overview-sub">${subtitle}</div></div>${quickGroupFilter ? `<button type="button" class="smart-summary-clear" onclick="clearQuickGroupFilter()">Bỏ lọc</button>` : ""}</div>`;
+  html += `<div class="overview-meta">${pills.map(p=>`<span class="overview-pill">${p}</span>`).join("")}</div>`;
+
+  if(currentTab === "ALL"){
+    const tabStats = ["MT","MI","CAM","INT"].map(code=>{
+      const items = results.filter(({r})=>r[0] === code);
+      return {
+        tabCode: code,
+        label: SHEET_CFG[code]?.label || code,
+        count: items.length,
+        stock: items.reduce((s, item)=>s + (Number(item.r[5]) || 0), 0)
+      };
+    });
+    html += `<div class="overview-sect"><div class="overview-sect-title">Theo danh mục</div><div class="overview-grid">` + tabStats.map(t=>renderMainTabChip(t.tabCode, t.label, "", t.count, t.stock, currentTab===t.tabCode)).join("") + `</div></div>`;
+  }
+
+  const buckets = buildOverviewBuckets(results).slice(0, currentTab === "ALL" ? 8 : 10);
+  if(buckets.length){
+    html += `<div class="overview-sect"><div class="overview-sect-title">Nhóm nổi bật</div><div class="overview-grid">${buckets.map(renderOverviewChip).join("")}</div></div>`;
+  }
+
+  html += `</div>`;
+  return html;
+}
+
+function getQuickMeta(r, groupLabel){
+  const groupNorm = normalizeQuickText(groupLabel);
+  const text = normalizeQuickText([r[2], r[3], r[7], r[8]].filter(Boolean).join(" "));
+  const ramType = detectRamType(text);
+  const ramSize = detectRamSize(text);
+  const cpuBrand = detectCpuBrand(text);
+  const cpuSeries = detectCpuSeries(text);
+  const brand = detectBrandLabel(text);
+  const storageKind = detectStorageKind(text);
+  const storageCap = detectStorageCapacity(text);
+  const cameraType = detectCameraType(text);
+  const networkType = detectNetworkType(text);
+
+  if(groupNorm.includes("laptop linh kien")){
+    return { family: "brand", primary: brand, secondary: "" };
+  }
+
+  if(groupNorm.includes("ram")){
+    return { family: "ram", primary: ramType, secondary: ramSize };
+  }
+
+  if(groupNorm.includes("ssd") || groupNorm.includes("hdd")){
+    return { family: "storage", primary: storageKind, secondary: storageCap };
+  }
+
+  if(groupNorm.includes("cpu")){
+    if(ramType !== "Khác" || ramSize !== "Khác"){
+      return { family: "ram", primary: ramType, secondary: ramSize };
+    }
+    if(cpuBrand !== "Khác" || cpuSeries !== "Khác"){
+      return { family: "cpu", primary: cpuBrand, secondary: cpuSeries };
+    }
+    if(brand !== "Khác"){
+      return { family: "brand", primary: brand, secondary: "" };
+    }
+    return null;
+  }
+
+  if(groupNorm.includes("camera")){
+    return { family: "network", primary: cameraType, secondary: brand };
+  }
+
+  if(groupNorm.includes("internet")){
+    return { family: "network", primary: networkType, secondary: brand };
+  }
+
+  if(ramType !== "Khác" || ramSize !== "Khác"){
+    return { family: "ram", primary: ramType, secondary: ramSize };
+  }
+  if(cpuBrand !== "Khác" || cpuSeries !== "Khác"){
+    return { family: "cpu", primary: cpuBrand, secondary: cpuSeries };
+  }
+  if(storageKind !== "Khác" || storageCap !== "Khác"){
+    return { family: "storage", primary: storageKind, secondary: storageCap };
+  }
+  if(networkType !== "Khác"){
+    return { family: "network", primary: networkType, secondary: brand };
+  }
+  if(brand !== "Khác"){
+    return { family: "brand", primary: brand, secondary: "" };
+  }
+  return null;
+}
+
+function getQuickFamilyForGroup(items, groupLabel){
+  const groupNorm = normalizeQuickText(groupLabel);
+  const stats = { ram: 0, cpu: 0, brand: 0, storage: 0, network: 0 };
+  items.slice(0, 60).forEach(({r})=>{
+    const meta = getQuickMeta(r, groupLabel);
+    if(meta && stats[meta.family] !== undefined){
+      stats[meta.family]++;
+    }
+  });
+  if(groupNorm.includes("laptop linh kien")) return "brand";
+  if(groupNorm.includes("ram")) return "ram";
+  if(groupNorm.includes("ssd") || groupNorm.includes("hdd")) return "storage";
+  if(groupNorm.includes("camera") || groupNorm.includes("internet")) return "network";
+  if(stats.ram > stats.cpu && stats.ram >= stats.brand && stats.ram > 0) return "ram";
+  if(groupNorm.includes("cpu") && stats.cpu >= stats.ram && stats.cpu > 0) return "cpu";
+  if(stats.storage > 0) return "storage";
+  if(stats.network > 0) return "network";
+  if(stats.brand >= stats.ram && stats.brand >= stats.cpu && stats.brand > 0) return "brand";
+  if(stats.cpu > 0) return "cpu";
+  if(stats.ram > 0) return "ram";
+  if(stats.brand > 0) return "brand";
+  return null;
+}
+
+function buildQuickBuckets(items, groupLabel, family, keyGetter, labelGetter, order){
+  const map = new Map();
+  items.forEach(({r,i})=>{
+    const meta = getQuickMeta(r, groupLabel);
+    if(!meta || meta.family !== family) return;
+    const key = keyGetter(meta, r, i);
+    if(!key) return;
+    const label = labelGetter ? labelGetter(meta, r, i) : key;
+    const bucket = map.get(key) || { key, label, count: 0, stock: 0 };
+    bucket.count++;
+    bucket.stock += Number(r[5]) || 0;
+    map.set(key, bucket);
+  });
+  const list = [...map.values()];
+  if(order && order.length){
+    const orderMap = new Map(order.map((key, idx)=>[key, idx]));
+    list.sort((a, b)=>{
+      const ai = orderMap.has(a.key) ? orderMap.get(a.key) : 999;
+      const bi = orderMap.has(b.key) ? orderMap.get(b.key) : 999;
+      if(ai !== bi) return ai - bi;
+      if(b.count !== a.count) return b.count - a.count;
+      return String(a.label).localeCompare(String(b.label), "vi");
+    });
+  } else {
+    list.sort((a, b)=> b.count - a.count || String(a.label).localeCompare(String(b.label), "vi"));
+  }
+  return list;
+}
+
+function sumQuickStock(items){
+  return items.reduce((sum, {r})=>sum + (Number(r[5]) || 0), 0);
+}
+
+function isQuickChipActive(groupLabel, family, primary, secondary){
+  if(!quickGroupFilter) return false;
+  return quickGroupFilter.groupLabel === groupLabel
+    && quickGroupFilter.family === family
+    && quickGroupFilter.primary === primary
+    && String(quickGroupFilter.secondary || "") === String(secondary || "");
+}
+
+function renderQuickChip(groupLabel, family, bucket, primary, secondary){
+  const active = isQuickChipActive(groupLabel, family, primary, secondary);
+  const detail = `${bucket.count} mục · ${bucket.stock.toLocaleString("vi-VN")} tồn`;
+  return `<button type="button" class="smart-chip${active ? " active" : ""}" data-group="${escapeHtml(groupLabel)}" data-family="${escapeHtml(family)}" data-primary="${escapeHtml(primary)}" data-secondary="${escapeHtml(secondary || "")}" onclick="toggleQuickGroupFilter(this)"><span class="smart-chip-name">${escapeHtml(bucket.label)}</span><span class="smart-chip-detail">${detail}</span></button>`;
+}
+
+function matchesQuickGroupFilter(r, groupLabel){
+  if(!quickGroupFilter) return true;
+  if((groupLabel || "") !== quickGroupFilter.groupLabel) return false;
+  const meta = getSectionSummaryMeta(r, groupLabel);
+  if(!meta || meta.family !== quickGroupFilter.family) return false;
+  const metaKey = meta.family === "storage" || meta.family === "ram"
+    ? `${meta.primary || "Khác"}|${meta.secondary || ""}`
+    : meta.primary;
+  if(metaKey !== quickGroupFilter.primary) return false;
+  return true;
+}
+
+function renderQuickSummary(items, groupLabel){
+  const buckets = buildSectionSummaryBuckets(items, groupLabel);
+  if(!buckets.length) return "";
+  const family = buckets.family || "other";
+  return `<div class="group-summary-row">${buckets.map(bucket=>{
+    const isActive = quickGroupFilter
+      && quickGroupFilter.groupLabel === groupLabel
+      && quickGroupFilter.primary === bucket.key;
+    const detail = `${bucket.count} mục · ${bucket.stock.toLocaleString("vi-VN")} tồn`;
+    return `<button type="button" class="smart-chip${isActive ? " active" : ""}" data-group="${escapeHtml(groupLabel)}" data-family="${escapeHtml(family)}" data-primary="${escapeHtml(bucket.key)}" data-secondary="" onclick="toggleQuickGroupFilter(this)"><span class="smart-chip-name">${escapeHtml(bucket.label)}</span><span class="smart-chip-detail">${detail}</span></button>`;
+  }).join("")}</div>`;
+}
+
+let quickFocusTimer = null;
+function openZaloContact(title){
+  const cleanTitle = String(title || "").trim() || "Sản phẩm";
+  const message = `${cleanTitle}\nLoại này giá sao anh chị.?`;
+  const url = `https://zalo.me/0375111112?text=${encodeURIComponent(message)}`;
+  const win = window.open(url, "_blank", "noopener,noreferrer");
+  if(!win) window.location.href = url;
+}
+
+function focusFirstQuickMatch(){
+  clearTimeout(quickFocusTimer);
+  quickFocusTimer = setTimeout(()=>{
+    const first = document.querySelector("#results .card.quick-match");
+    if(!first) return;
+    first.scrollIntoView({behavior: "smooth", block: "center"});
+    first.classList.add("match-focus");
+    setTimeout(()=>first.classList.remove("match-focus"), 1200);
+  }, 40);
+}
+
 function renderCard(r,i,displayNo){
   const [sh,ma,ten,th,giaNhap,ton,tt,ghi,,img,giaBan]=r;
   const cfg=SHEET_CFG[sh]||SHEET_CFG.MT;
@@ -1299,6 +2058,7 @@ function renderCard(r,i,displayNo){
   const stBg=isHet?"#FADBD8":isSap?"#FEF9E7":"#D5F5E3";
   const stFg=isHet?"#922B21":isSap?"#7D6608":"#1E8449";
   const stTxt=getStockStatusLabel(ton);
+  const condition = detectConditionLabel([ten, th, ghi].filter(Boolean).join(" "));
   const imgHtml = img
     ? `<img class="prod-img" src="${img}" alt="${ten}" />`
     : `<div class="prod-img prod-img-ph prod-index-badge" style="--idx-c:${noColor};">${no}</div>`;
@@ -1307,6 +2067,7 @@ function renderCard(r,i,displayNo){
   const selectHtml = isAdmin && bulkSelectMode
     ? `<label class="bulk-check" onclick="event.stopPropagation()"><input type="checkbox" ${isSelected?"checked":""} onchange="toggleItemSelected(${i},this.checked)"> Chọn</label>`
     : "";
+  const quickClass = quickGroupFilter ? " quick-match" : "";
   const priceHtml = isAdmin
     ? `<div class="price-row">
         <span class="price-label">Nhập:</span><span class="price admin-price">${fmt(giaNhap)}</span>
@@ -1314,9 +2075,12 @@ function renderCard(r,i,displayNo){
        </div>`
     : `<div class="price-row">
         <span class="price-label">Giá bán:</span>
-        <span class="price ${giaBan>0?"price-sale-on":""}" style="color: ${giaBan>0?"#D50000":"#aaa"};font-size:15px;font-weight:900">${giaBan>0?fmt(giaBan):"Liên hệ"}</span>
+        ${giaBan>0
+          ? `<span class="price price-sale-on" style="color: #D50000;font-size:15px;font-weight:900">${fmt(giaBan)}</span>`
+          : `<button type="button" class="price price-contact-btn" data-title="${escapeHtml([ten, th].filter(Boolean).join(" "))}" aria-label="Liên hệ qua Zalo" onclick="openZaloContact(this.dataset.title)">Liên hệ</button>`
+        }
        </div>`;
-  return `<div class="card${isHet?" het":isSap?" sap":" con"}${bulkSelectMode?" bulk-mode":""}${isSelected?" bulk-selected":""}" data-ma="${ma}">
+  return `<div class="card${isHet?" het":isSap?" sap":" con"}${bulkSelectMode?" bulk-mode":""}${isSelected?" bulk-selected":""}${quickClass}" data-ma="${ma}">
     ${selectHtml}
       <div class="card-top" style="--c: ${cfg.c}; background: ${cfg.light};">
       <div class="card-top-left">
@@ -1330,6 +2094,7 @@ function renderCard(r,i,displayNo){
       ${imgHtml}
       <div class="card-main">
       <div class="product-name-row" data-copy-text="${escapeHtml(ten)}" data-copy-label="tiêu đề" title="Nhấp đúp để copy tiêu đề" ondblclick="copyFromElement(this)">
+        ${condition ? `<span class="item-cond-badge item-cond-old">${condition}</span>` : ""}
         <div class="product-name">${ten}</div>
       </div>
       <div class="card-footer">
@@ -1387,6 +2152,7 @@ function render(){
     if(currentStatus==="CON" && stockState!=="CON") return false;
     if(currentStatus==="SAP" && stockState!=="SAP") return false;
     if(currentStatus==="HET" && stockState!=="HET") return false;
+    if(!matchesQuickGroupFilter(r, r[8] || "")) return false;
     if(!kw) return true;
     const hay = removeAccents(r[1]+" "+ten+" "+th+" "+(ghi||""));
     return hay.includes(kw);
@@ -1407,10 +2173,6 @@ function render(){
   document.getElementById("count").textContent = results.length + " kết quả";
   const el = document.getElementById("results");
 
-  if(!bulkSelectMode && !kw && currentTab==="ALL" && currentStatus==="ALL"){
-    el.innerHTML = `<div class="empty"><div class="empty-icon">🔍</div><div class="empty-title">Gõ từ khóa để tìm kiếm</div><div class="empty-sub">VD: "SSD", "HP", "Camera wifi", "Canon"...</div></div>`;
-    return;
-  }
   if(results.length===0){
     el.innerHTML = `<div class="empty"><div class="empty-icon">😕</div><div class="empty-title">Không tìm thấy kết quả</div><div class="empty-sub">Thử từ khóa khác</div></div>`;
     return;
@@ -1447,7 +2209,8 @@ function render(){
     });
     const cfg = SHEET_CFG[currentTab]||SHEET_CFG.MT;
     const visibleGroups = order.filter(g=>buckets[g]&&buckets[g].length);
-    let html = `<div class="cat-title" style="--c: ${cfg.c};">${cfg.label}</div>`;
+    let html = "";
+    html += `<div class="cat-title" style="--c: ${cfg.c};">${cfg.label}</div>`;
     if(visibleGroups.length>1){
       html += `<div class="quick-nav">` + visibleGroups.map((g,idx)=>
         `<button class="quick-nav-btn" style="--c:${GROUP_COLORS[idx%GROUP_COLORS.length]}" onclick="jumpToGroup('grp-${idx}')">${g}</button>`
@@ -1460,17 +2223,24 @@ function render(){
       return `<section class="group-section" style="--group-strong: ${strongColor};">
         <div class="group-header" id="grp-${idx}" style="--group-bg: ${groupColor}; --group-strong: ${strongColor}; background: ${groupColor};">
           <div class="group-header-main">
-            <span class="group-header-label">${g}</span>
+            <span class="group-header-label">${g} (${itemCount})</span>
           </div>
-          <span class="group-header-count">${itemCount} mục</span>
+          <span class="group-header-count">${itemCount}</span>
         </div>
+        ${renderQuickSummary(buckets[g], g)}
         ${buckets[g].map((item,itemIdx)=>renderCard(item.r,item.i,itemIdx+1)).join("")}
       </section>`;
     }).join("");
     el.innerHTML = html;
+    if(quickGroupFilter) focusFirstQuickMatch();
+    return;
+  }
+  if(!bulkSelectMode && !kw && currentTab==="ALL" && currentStatus==="ALL"){
+    el.innerHTML = `<div class="empty"><div class="empty-icon">🔎</div><div class="empty-title">Gõ từ khóa để tìm kiếm</div><div class="empty-sub">VD: "SSD", "HP", "Camera wifi", "Canon"...</div></div>`;
     return;
   }
   el.innerHTML = results.map(({r,i},idx)=>renderCard(r,i,idx+1)).join("");
+  if(quickGroupFilter) focusFirstQuickMatch();
 }
 
 function updateBulkControls(){
@@ -1920,23 +2690,24 @@ function goToTab(tabCode){
 
   currentTab = tabCode;
   searchQ = "";
+  quickGroupFilter = null;
 
   document.getElementById("search").value="";
   document.getElementById("clear-btn").style.display="none";
 
   render();
 }
-function setTab(btn){ document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active")); btn.classList.add("active"); currentTab = btn.dataset.tab; render(); }
+function setTab(btn){ document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active")); btn.classList.add("active"); currentTab = btn.dataset.tab; quickGroupFilter = null; render(); }
 function setStatus(btn){
   document.querySelectorAll(".filter-btn").forEach(b=>{ b.classList.remove("active"); b.style.background="#fff"; b.style.color="#666"; });
   btn.classList.add("active"); const map={ALL:["#1E3A5F","#fff"],CON:["#D5F5E3","#1E8449"],SAP:["#FEF9E7","#7D6608"],HET:["#FADBD8","#922B21"]}; const [bg,fg]=map[btn.dataset.status]; btn.style.background=bg; btn.style.color=fg; currentStatus=btn.dataset.status; render();
 }
-function clearSearch(){ document.getElementById("search").value=""; searchQ=""; document.getElementById("clear-btn").style.display="none"; render(); document.getElementById("search").focus(); }
+function clearSearch(){ document.getElementById("search").value=""; searchQ=""; quickGroupFilter = null; document.getElementById("clear-btn").style.display="none"; render(); document.getElementById("search").focus(); }
 function closeOverlay(id){ document.getElementById(id).classList.remove("open"); }
 function overlayClose(e,id){ if(e.target===document.getElementById(id)) closeOverlay(id); }
 let toastTimer;
 function showToast(msg){ const t=document.getElementById("toast"); t.textContent=msg; t.classList.add("show"); clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove("show"),2200); }
-document.getElementById("search").addEventListener("input", function(){ searchQ = this.value; document.getElementById("clear-btn").style.display = searchQ ? "flex" : "none"; render(); });
+document.getElementById("search").addEventListener("input", function(){ searchQ = this.value; if(searchQ) quickGroupFilter = null; document.getElementById("clear-btn").style.display = searchQ ? "flex" : "none"; render(); });
 document.getElementById("adminPass").addEventListener("keydown", function(e){ if(e.key==="Enter") submitAdminPass(); });
 document.querySelector(".title").addEventListener("click", handleOwnerTap);
 setupAdminEntry();
