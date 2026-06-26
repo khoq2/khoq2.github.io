@@ -102,8 +102,11 @@ body { font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif
 .tx-pill { display: inline-flex; align-items: center; min-height: 24px; padding: 2px 8px; border-radius: 999px; background: #F4F6F9; color: #34495E; font-size: 11px; font-weight: 600; line-height: 1.2; }
 .tx-price-pill { background: #EAF7EE; color: #1E8449; }
 .tx-note { display: block; margin-top: 6px; color: #7B7D7D; font-size: 11px; line-height: 1.4; word-break: break-word; }
-.tx-delete { background: none; border: none; color: #C0392B; font-size: 12px; cursor: pointer; padding: 2px 6px; }
-.tx-delete:active { transform: scale(.96); }
+.tx-img { display: block; width: 74px; height: 74px; object-fit: cover; border-radius: 8px; border: 1px solid #E5E8E8; margin-top: 8px; background: #fafafa; cursor: zoom-in; }
+.tx-action { background: none; border: none; font-size: 12px; cursor: pointer; padding: 2px 6px; border-radius: 6px; }
+.tx-edit { color: #1A5276; }
+.tx-delete { color: #C0392B; }
+.tx-action:active { transform: scale(.96); }
 .card.highlight { box-shadow: 0 0 0 3px #F39C12; animation: flash 1.6s ease; }
 @keyframes flash { from { background: #FFF9E6; } to { background: #fff; } }
 .ton-ctrl { display: flex; align-items: center; gap: 6px; margin-top: 8px; border-top: 1px solid #eee; padding-top: 8px; flex-wrap: wrap; }
@@ -559,8 +562,9 @@ body.admin-mode .admin-btn { background: #1E8449; border-color: #1E8449; opacity
 
 <div class="overlay" id="saleOverlay" onclick="overlayClose(event,'saleOverlay')">
   <div class="modal" onclick="event.stopPropagation()">
-    <div class="modal-title">🛒 Ghi nhận giao dịch</div>
+    <div class="modal-title" id="saleModalTitle">🛒 Ghi nhận giao dịch</div>
     <input type="hidden" id="saleIdx">
+    <input type="hidden" id="saleTxId">
     <div class="form-row">
       <label>Nhân viên bán</label>
       <select id="saleNV" style="width:100%;padding:9px;border-radius:8px;border:1.5px solid #ddd;font-size:14px">
@@ -570,6 +574,19 @@ body.admin-mode .admin-btn { background: #1E8449; border-color: #1E8449; opacity
     <div class="form-row"><label>Số lượng xuất</label><input type="number" id="saleQty" value="1" min="1"></div>
     <div class="form-row"><label>Giá bán (Vnd)</label><input type="text" id="saleGia" inputmode="numeric" placeholder="VD: 3.500.000"></div>
     <div class="form-row"><label>Ghi chú</label><input type="text" id="saleGhi" placeholder="VD: Khách lẻ, bảo hành 12 tháng..."></div>
+    <div class="form-row">
+      <label>Ảnh giao dịch</label>
+      <div class="img-upload-row">
+        <img id="saleImgPreview" class="img-preview" style="display: none;" src="" alt="" />
+        <div id="saleImgPlaceholder" class="img-preview img-preview-ph">📷 Chưa có ảnh</div>
+        <div class="img-upload-btns">
+          <button type="button" class="btn-img-pick" onclick="document.getElementById('saleImgFile').click()">📷 Chọn ảnh</button>
+          <button type="button" class="btn-img-remove" id="saleImgRemoveBtn" style="display:none" onclick="removeTxImage()">Xoá ảnh</button>
+        </div>
+      </div>
+      <input type="file" id="saleImgFile" accept="image/*" style="display:none" onchange="handleTxImagePick(this)">
+      <input type="hidden" id="saleImg" value="">
+    </div>
     <button class="btn-submit" onclick="saveSale()">💾 Lưu giao dịch</button>
     <button class="btn-cancel" onclick="closeOverlay('saleOverlay')">Huỷ</button>
   </div>
@@ -1000,9 +1017,9 @@ function normalizeSheetRows(rows){
   if(!Array.isArray(rows)) return [];
   return rows.filter(Array.isArray).map(r=>{
     const row = Array.from({length:11}, (_,i) => r[i] !== undefined ? r[i] : "");
-    row[4] = Number(row[4]) || 0;
+    row[4] = parseVndInput(row[4]);
     row[5] = Number(row[5]) || 0;
-    row[10] = Number(row[10]) || 0;
+    row[10] = parseVndInput(row[10]);
     row[0] = (row[0] || "MT").toString().trim().toUpperCase();
     row[1] = (row[1] || "").toString().trim();
     row[2] = (row[2] || "").toString().trim();
@@ -1267,6 +1284,7 @@ function formatVndNumber(n){
 }
 function fmt(n){ return Number(n)>0 ? formatVndNumber(n)+"Vnd" : "Miễn phí"; }
 function parseVndInput(value){
+  if(typeof value === "number") return Math.max(0, Math.round(Number.isFinite(value) ? value : 0));
   const digits = String(value ?? "").replace(/[^\d]/g, "");
   return digits ? Number(digits) : 0;
 }
@@ -1408,6 +1426,14 @@ function toggleQuickGroupFilter(btn){
 
 function normalizeQuickText(text){
   return removeAccents(String(text ?? "")).toLowerCase().replace(/\s+/g, " ").trim();
+}
+
+function isRamGroupLabel(groupNorm){
+  return /\bram\b/i.test(groupNorm) || groupNorm.includes("bo nho");
+}
+
+function isStorageGroupLabel(groupNorm){
+  return /\b(ssd|hdd)\b/i.test(groupNorm) || groupNorm.includes("o cung");
 }
 
 const RAM_TYPE_ORDER = ["LPDDR5", "LPDDR4", "LPDDR3", "DDR5", "DDR4", "DDR3", "DDR2", "Khác"];
@@ -1598,13 +1624,13 @@ function getAutoSummaryMetaFromTitle(title){
     const primary = cpuSeries !== "Khác" ? cpuSeries : cpuBrand;
     return { family: "cpu", kind: "cpu", primary, secondary: cpuBrand !== "Khác" && primary !== cpuBrand ? cpuBrand : "" };
   }
-  if(ramType !== "Khác" || ramSize !== "Khác"){
-    const primary = ramType !== "Khác" ? ramType : ramSize;
-    return { family: "ram", kind: "ram", primary, secondary: ramSize !== "Khác" && primary !== ramSize ? ramSize : "" };
-  }
   if(storageKind !== "Khác" || storageCap !== "Khác"){
     const primary = storageKind !== "Khác" ? storageKind : storageCap;
     return { family: "storage", kind: "storage", primary, secondary: storageCap !== "Khác" && primary !== storageCap ? storageCap : "" };
+  }
+  if(ramType !== "Khác" || ramSize !== "Khác"){
+    const primary = ramType !== "Khác" ? ramType : ramSize;
+    return { family: "ram", kind: "ram", primary, secondary: ramSize !== "Khác" && primary !== ramSize ? ramSize : "" };
   }
   if(cameraType !== "Khác"){
     return { family: "network", kind: "camera", primary: cameraType, secondary: brand !== "Khác" ? brand : "" };
@@ -1625,7 +1651,21 @@ function getAutoSummaryMetaFromTitle(title){
 }
 
 function getSectionSummaryMeta(r, groupLabel){
-  return getAutoSummaryMetaFromTitle(r[2] || "");
+  const groupNorm = normalizeQuickText(groupLabel || r[8] || "");
+  const text = [r[1], r[2], r[3], r[7], groupLabel || r[8]].filter(Boolean).join(" ");
+  if(isRamGroupLabel(groupNorm)){
+    const ramType = detectRamType(text);
+    const ramSize = detectRamSize(text);
+    const primary = ramType !== "Khác" ? ramType : ramSize;
+    return { family: "ram", kind: "ram", primary, secondary: ramSize !== "Khác" && primary !== ramSize ? ramSize : "" };
+  }
+  if(isStorageGroupLabel(groupNorm)){
+    const storageKind = detectStorageKind(text);
+    const storageCap = detectStorageCapacity(text);
+    const primary = storageKind !== "Khác" ? storageKind : storageCap;
+    return { family: "storage", kind: "storage", primary, secondary: storageCap !== "Khác" && primary !== storageCap ? storageCap : "" };
+  }
+  return getAutoSummaryMetaFromTitle(text);
 }
 
 function buildSectionSummaryBuckets(items, groupLabel){
@@ -1725,7 +1765,7 @@ function getCardInsightTags(r){
     tags.push(v);
   };
 
-  if(groupNorm.includes("ram")){
+  if(isRamGroupLabel(groupNorm)){
     add(detectRamType(text));
     add(detectRamSize(text));
     const brand = detectBrandLabel(text);
@@ -1735,7 +1775,7 @@ function getCardInsightTags(r){
     add(detectCpuSeries(text));
     const brand = detectBrandLabel(text);
     if(brand !== "Khác" && brand !== "Intel" && brand !== "AMD") add(brand);
-  } else if(groupNorm.includes("ssd") || groupNorm.includes("hdd")){
+  } else if(isStorageGroupLabel(groupNorm)){
     add(getStorageLabel(text));
     const brand = detectBrandLabel(text);
     if(brand !== "Khác") add(brand);
@@ -1792,11 +1832,14 @@ function getOverviewBucket(r){
   if(groupNorm.includes("cpu")){
     return { group: groupLabel, family: "cpu", primary: cpuBrand, secondary: cpuSeries, label: `CPU · ${cpuBrand}${cpuSeries !== "Khác" ? " · " + cpuSeries : ""}` };
   }
-  if(groupNorm.includes("ram")){
+  if(isRamGroupLabel(groupNorm)){
     return { group: groupLabel, family: "ram", primary: ramType, secondary: ramSize, label: `RAM · ${ramType}${ramSize !== "Khác" ? " · " + ramSize : ""}` };
   }
-  if(groupNorm.includes("ssd") || groupNorm.includes("hdd")){
-    return { group: groupLabel, family: "storage", primary: detectStorageKind(text), secondary: detectStorageCapacity(text), label: `${groupNorm.includes("ssd") ? "SSD" : "HDD"} · ${storageLabel}` };
+  if(isStorageGroupLabel(groupNorm)){
+    const storageKind = detectStorageKind(text);
+    const storageCap = detectStorageCapacity(text);
+    const label = storageKind !== "Khác" && storageCap !== "Khác" ? `${storageKind} ${storageCap}` : storageLabel;
+    return { group: groupLabel, family: "storage", primary: storageKind, secondary: storageCap, label: label || "Ổ cứng" };
   }
   if(groupNorm.includes("laptop linh kien")){
     return { group: groupLabel, family: "brand", primary: brand, secondary: laptopPart, label: `Laptop · ${laptopPart || brand}` };
@@ -1918,11 +1961,11 @@ function getQuickMeta(r, groupLabel){
     return { family: "brand", primary: brand, secondary: "" };
   }
 
-  if(groupNorm.includes("ram")){
+  if(isRamGroupLabel(groupNorm)){
     return { family: "ram", primary: ramType, secondary: ramSize };
   }
 
-  if(groupNorm.includes("ssd") || groupNorm.includes("hdd")){
+  if(isStorageGroupLabel(groupNorm)){
     return { family: "storage", primary: storageKind, secondary: storageCap };
   }
 
@@ -1975,8 +2018,8 @@ function getQuickFamilyForGroup(items, groupLabel){
     }
   });
   if(groupNorm.includes("laptop linh kien")) return "brand";
-  if(groupNorm.includes("ram")) return "ram";
-  if(groupNorm.includes("ssd") || groupNorm.includes("hdd")) return "storage";
+  if(isRamGroupLabel(groupNorm)) return "ram";
+  if(isStorageGroupLabel(groupNorm)) return "storage";
   if(groupNorm.includes("camera") || groupNorm.includes("internet")) return "network";
   if(stats.ram > stats.cpu && stats.ram >= stats.brand && stats.ram > 0) return "ram";
   if(groupNorm.includes("cpu") && stats.cpu >= stats.ram && stats.cpu > 0) return "cpu";
@@ -2111,7 +2154,7 @@ function renderCard(r,i,displayNo){
   const condition = detectConditionLabel([ten, th, ghi].filter(Boolean).join(" "));
   const imgHtml = img
     ? `<img class="prod-img" src="${img}" alt="${ten}" />`
-    : `<div class="prod-img prod-img-ph prod-index-badge" style="--idx-c:${noColor};">${no}</div>`;
+    : `<div class="prod-img prod-img-ph" title="Chưa có ảnh sản phẩm">💻</div>`;
   const isAdmin = document.body.classList.contains("admin-mode");
   const isSelected = selectedItems.has(i);
   const selectHtml = isAdmin && bulkSelectMode
@@ -2462,20 +2505,46 @@ async function loadTXFromSheet(){
 
 function openSaleModal(idx){ if(!requireAdmin()) return;
   const r = DATA[idx];
-  document.getElementById("saleIdx").value = idx; refreshNVSelect(); document.getElementById("saleQty").value = "1"; setVndInputValue("saleGia", r[10] || r[4] || 0); document.getElementById("saleGhi").value = ""; document.getElementById("saleOverlay").classList.add("open");
+  document.getElementById("saleModalTitle").textContent = "🛒 Ghi nhận giao dịch";
+  document.getElementById("saleIdx").value = idx;
+  document.getElementById("saleTxId").value = "";
+  refreshNVSelect();
+  document.getElementById("saleQty").value = "1";
+  document.getElementById("saleQty").disabled = false;
+  setVndInputValue("saleGia", r[10] || r[4] || 0);
+  document.getElementById("saleGhi").value = "";
+  setTxImagePreview("");
+  document.getElementById("saleImgFile").value = "";
+  document.getElementById("saleOverlay").classList.add("open");
 }
 async function saveSale(){ if(!requireAdmin()) return;
   const idx = parseInt(document.getElementById("saleIdx").value);
+  const txId = document.getElementById("saleTxId").value;
   const nv  = document.getElementById("saleNV").value.trim();
   const qty = parseInt(document.getElementById("saleQty").value)||1;
   const gia = parseVndInput(document.getElementById("saleGia").value);
   const ghi = document.getElementById("saleGhi").value.trim();
+  const img = document.getElementById("saleImg").value || "";
   if(!nv){ alert("Vui lòng nhập tên nhân viên!"); return; }
+  if(txId){
+    const tx = TX_DATA.find(t=>String(t.id)===String(txId));
+    if(!tx){ alert("Không tìm thấy giao dịch cần sửa!"); return; }
+    tx.nv = nv;
+    tx.gia = gia;
+    tx.ghi = ghi;
+    tx.img = img;
+    closeOverlay("saleOverlay");
+    await saveTX();
+    renderTxHistory();
+    render();
+    showToast("✅ Đã sửa giao dịch");
+    return;
+  }
   const r = DATA[idx];
   if(r[5] < qty){ alert(`Tồn kho chỉ còn ${r[5]}, không đủ xuất ${qty}!`); return; }
   DATA[idx][5] = r[5] - qty;
   DATA[idx][6] = getStockStatusValue(DATA[idx][5]);
-  TX_DATA.unshift({ id: Date.now(), ma: r[1], ten: r[2], sh: r[0], nv, qty, gia, ghi, time: formatTxTime(new Date()) });
+  TX_DATA.unshift({ id: Date.now(), ma: r[1], ten: r[2], sh: r[0], nv, qty, gia, ghi, img, time: formatTxTime(new Date()) });
   closeOverlay("saleOverlay");
   await saveData(); await saveTX(); render(); showToast(`✅ Đã ghi giao dịch: ${r[2]} x${qty}`);
 }
@@ -2592,7 +2661,7 @@ function renderTxHistory(){
             <span class="tx-nv">👤 ${t.nv}</span>
             <div class="tx-head-right">
               <span class="tx-time">${formatTxTime(t.time)}</span>
-              ${document.body.classList.contains("admin-mode")?`<button class="tx-delete" onclick="deleteTX(${t.id})">🗑️</button>`:""}
+              ${document.body.classList.contains("admin-mode")?`<button class="tx-action tx-edit" title="Sửa giao dịch" onclick="editTX('${escapeHtml(t.id)}')">✏️</button><button class="tx-action tx-delete" title="Xóa giao dịch" onclick="deleteTX('${escapeHtml(t.id)}')">🗑️</button>`:""}
             </div>
           </div>
           <div class="tx-meta">
@@ -2600,6 +2669,7 @@ function renderTxHistory(){
             <span class="tx-pill tx-price-pill">${t.gia>0?fmt(t.gia)+"/cái":"Không ghi giá"}</span>
           </div>
           ${t.ghi?`<span class="tx-note">📝 ${t.ghi}</span>`:""}
+          ${t.img?`<img class="tx-img" src="${t.img}" alt="Ảnh giao dịch" onclick="openImageViewer('${t.id}')">`:""}
         </div>`).join("") : `<div style="text-align: center; padding: 20px; color: #888;">Không có giao dịch phù hợp bộ lọc</div>`;
   document.getElementById("txModalBody").innerHTML = filterBar + summary + rows;
 }
@@ -2625,9 +2695,34 @@ function showTxHistory(idx){
   renderTxHistory();
   document.getElementById("txOverlay").classList.add("open");
 }
+function editTX(id){ if(!requireAdmin()) return;
+  const tx = TX_DATA.find(t=>String(t.id)===String(id));
+  if(!tx){ alert("Không tìm thấy giao dịch cần sửa!"); return; }
+  const idx = DATA.findIndex(r=>r[1]===tx.ma);
+  document.getElementById("saleModalTitle").textContent = "✏️ Sửa giao dịch";
+  document.getElementById("saleIdx").value = idx >= 0 ? idx : "";
+  document.getElementById("saleTxId").value = tx.id;
+  refreshNVSelect();
+  const nvSel = document.getElementById("saleNV");
+  if(tx.nv && !NV_LIST.includes(tx.nv)){
+    nvSel.innerHTML += `<option value="${escapeHtml(tx.nv)}">${escapeHtml(tx.nv)}</option>`;
+  }
+  nvSel.value = tx.nv || "";
+  document.getElementById("saleQty").value = tx.qty || 1;
+  document.getElementById("saleQty").disabled = true;
+  setVndInputValue("saleGia", tx.gia || 0);
+  document.getElementById("saleGhi").value = tx.ghi || "";
+  setTxImagePreview(tx.img || "");
+  document.getElementById("saleImgFile").value = "";
+  document.getElementById("saleOverlay").classList.add("open");
+}
+function openImageViewer(id){
+  const tx = TX_DATA.find(t=>String(t.id)===String(id));
+  if(tx && tx.img) window.open(tx.img, "_blank");
+}
 async function deleteTX(id){ if(!requireAdmin()) return;
   if(!confirm("Xóa giao dịch này?")) return;
-  TX_DATA = TX_DATA.filter(t=>t.id!==id);
+  TX_DATA = TX_DATA.filter(t=>String(t.id)!==String(id));
   await saveTX();
   renderTxHistory();
   showToast("Đã xóa giao dịch");
@@ -2641,6 +2736,32 @@ function setImagePreview(dataUrl){
   else { img.style.display="none"; ph.style.display="flex"; rmBtn.style.display="none"; }
 }
 function removeImage(){ setImagePreview(""); document.getElementById("fImgFile").value=""; }
+function setTxImagePreview(dataUrl){
+  document.getElementById("saleImg").value = dataUrl || "";
+  const img = document.getElementById("saleImgPreview");
+  const ph = document.getElementById("saleImgPlaceholder");
+  const rmBtn = document.getElementById("saleImgRemoveBtn");
+  if(dataUrl){ img.src = dataUrl; img.style.display="block"; ph.style.display="none"; rmBtn.style.display="block"; }
+  else { img.style.display="none"; ph.style.display="flex"; rmBtn.style.display="none"; }
+}
+function removeTxImage(){ setTxImagePreview(""); document.getElementById("saleImgFile").value=""; }
+function handleTxImagePick(input){
+  const file = input.files[0];
+  if(!file) return;
+  if(!file.type.startsWith("image/")){ alert("Vui lòng chọn 1 file ảnh!"); return; }
+  const reader = new FileReader();
+  reader.onload = function(e){
+    const img = new Image();
+    img.onload = function(){
+      const MAX = 360; let w = img.width, h = img.height;
+      if(w>MAX || h>MAX){ if(w>h){ h = Math.round(h*MAX/w); w = MAX; } else { w = Math.round(w*MAX/h); h = MAX; } }
+      const canvas = document.createElement("canvas"); canvas.width = w; canvas.height = h; canvas.getContext("2d").drawImage(img,0,0,w,h);
+      setTxImagePreview(canvas.toDataURL("image/jpeg", 0.65));
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
 function handleImagePick(input){
   const file = input.files[0];
   if(!file) return;
@@ -2717,7 +2838,7 @@ function handleFile(input){ if(!requireAdmin()) return;
     try{
       const wb = XLSX.read(e.target.result, {type:"array"}), ws = wb.Sheets[wb.SheetNames[0]], json = XLSX.utils.sheet_to_json(ws, {header:1, defval:""});
       if(json.length<2){alert("File không có dữ liệu!"); return;}
-      importRows = json.slice(1).filter(r=>r[2]).map(r=>[(r[0]||"MT").toString().trim().toUpperCase(),(r[1]||"").toString().trim(),(r[2]||"").toString().trim(),(r[3]||"").toString().trim(),parseInt(r[4])||0,parseInt(r[5])||0,(r[6]||"CÒN HÀNG").toString().trim(),(r[7]||"").toString().trim(),"", "", parseInt(r[10])||0]);
+      importRows = json.slice(1).filter(r=>r[2]).map(r=>[(r[0]||"MT").toString().trim().toUpperCase(),(r[1]||"").toString().trim(),(r[2]||"").toString().trim(),(r[3]||"").toString().trim(),parseVndInput(r[4]),parseInt(r[5])||0,(r[6]||"CÒN HÀNG").toString().trim(),(r[7]||"").toString().trim(),"", "", parseVndInput(r[10])]);
       document.getElementById("importPreview").innerHTML = `<table><tr><th>Danh mục</th><th>Mã</th><th>Tên</th><th>Tồn</th></tr>${importRows.slice(0,5).map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[5]}</td></tr>`).join("")}</table>`;
       document.getElementById("importInfo").textContent = `✅ Đọc được ${importRows.length} sản phẩm`;
       document.getElementById("importMode").style.display="block"; document.getElementById("btnImport").style.display="block";
