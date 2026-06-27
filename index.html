@@ -151,6 +151,14 @@ body { font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif
 .img-upload-btns { display: flex; flex-direction: column; gap: 6px; }
 .btn-img-pick { background: #EBF5FB; color: #1A5276; border: none; border-radius: 8px; padding: 7px 14px; font-size: 12px; font-weight: bold; cursor: pointer; }
 .btn-img-remove { background: #FADBD8; color: #922B21; border: none; border-radius: 8px; padding: 7px 14px; font-size: 12px; font-weight: bold; cursor: pointer; }
+.nv-add-row { display: grid; grid-template-columns: 52px 1fr auto; gap: 8px; align-items: center; }
+.nv-avatar-box { width: 48px; height: 48px; border-radius: 50%; overflow: hidden; border: 1.5px solid #D5DBDB; background: #F4F6F9; display: flex; align-items: center; justify-content: center; color: #8A98A8; font-size: 18px; cursor: pointer; flex-shrink: 0; }
+.nv-avatar-box img, .nv-avatar { width: 100%; height: 100%; object-fit: cover; display: block; }
+.nv-avatar { width: 34px; height: 34px; border-radius: 50%; border: 1px solid #E1E7ED; background: #F4F6F9; color: #8A98A8; display: inline-flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; overflow: hidden; }
+.nv-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.nv-row-main { display: flex; align-items: center; gap: 9px; min-width: 0; }
+.tx-nv { display: inline-flex; align-items: center; gap: 6px; }
+.tx-nv .nv-avatar { width: 24px; height: 24px; font-size: 11px; }
 .btn-submit { width: 100%; background: #1E3A5F; color: #fff; border: none; border-radius: 12px; padding: 14px; font-size: 15px; font-weight: bold; cursor: pointer; margin-top: 8px; }
 .btn-cancel { width: 100%; background: #eee; color: #555; border: none; border-radius: 12px; padding: 12px; font-size: 14px; cursor: pointer; margin-top: 8px; }
 .import-zone { border: 2px dashed #bbb; border-radius: 12px; padding: 30px 16px; text-align: center; color: #888; font-size: 14px; cursor: pointer; background: #fafafa; margin-bottom: 12px; }
@@ -281,6 +289,9 @@ body.admin-mode .admin-btn { background: #1E8449; border-color: #1E8449; opacity
   .tx-summary { grid-template-columns: 1fr; }
   .tx-filter { grid-template-columns: 1fr; }
   .tx-time { white-space: normal; }
+  .nv-add-row { grid-template-columns: 44px 1fr; }
+  .nv-add-row .btn-submit { grid-column: 1 / -1; }
+  .nv-avatar-box { width: 42px; height: 42px; }
   .smart-chip { min-width: calc(50% - 3px); flex-basis: calc(50% - 3px); }
   .overview-chip { min-width: calc(50% - 3px); flex-basis: calc(50% - 3px); }
 }
@@ -551,7 +562,10 @@ body.admin-mode .admin-btn { background: #1E8449; border-color: #1E8449; opacity
 <div class="overlay" id="nvOverlay" onclick="overlayClose(event,'nvOverlay')">
   <div class="modal" onclick="event.stopPropagation()">
     <div class="modal-title">👥 Quản lý nhân viên</div>
-    <div class="form-row" style="flex-direction: row; gap: 8px;">
+    <div class="form-row nv-add-row">
+      <div class="nv-avatar-box" onclick="document.getElementById('nvAvatarFile').click()" title="Chọn avatar nhân viên" id="nvAvatarPreview">👤</div>
+      <input type="file" id="nvAvatarFile" accept="image/*" style="display:none" onchange="handleNVAvatarPick(this)">
+      <input type="hidden" id="nvAvatar" value="">
       <input type="text" id="nvInput" placeholder="Tên nhân viên mới..." style="flex:1">
       <button class="btn-submit" style="padding:8px 14px;margin:0" onclick="addNV()">➕ Thêm</button>
     </div>
@@ -1438,10 +1452,11 @@ function isStorageGroupLabel(groupNorm){
 
 const RAM_TYPE_ORDER = ["LPDDR5", "LPDDR4", "LPDDR3", "DDR5", "DDR4", "DDR3", "DDR2", "Khác"];
 const RAM_SIZE_ORDER = ["1GB", "2GB", "4GB", "8GB", "16GB", "32GB", "64GB", "128GB", "Khác"];
+const RAM_FORM_ORDER = ["RAM PC", "RAM LT", "Khác"];
 const CPU_BRAND_ORDER = ["Intel", "AMD", "Apple", "Khác"];
 const CPU_SERIES_ORDER = ["i9", "i7", "i5", "i3", "Ryzen 9", "Ryzen 7", "Ryzen 5", "Ryzen 3", "Xeon", "Pentium", "Celeron", "M1", "M2", "M3", "Khác"];
 const STORAGE_KIND_ORDER = ["NVMe", "M.2", "SATA", "SSD", "HDD", "Khác"];
-const STORAGE_CAP_ORDER = ["120GB", "240GB", "250GB", "480GB", "500GB", "1TB", "2TB", "4TB", "Khác"];
+const STORAGE_CAP_ORDER = ["120GB", "128GB", "240GB", "250GB", "256GB", "480GB", "500GB", "512GB", "1TB", "2TB", "4TB", "Khác"];
 const NETWORK_KIND_ORDER = ["Router", "Switch", "Modem", "Access Point", "USB Wifi", "Converter", "SFP", "Cáp mạng", "Khác"];
 const BRAND_ORDER = ["Dell", "HP", "Lenovo", "Acer", "Asus", "MacBook", "MSI", "Apple", "Samsung", "LG", "Sony", "Toshiba", "Fujitsu", "Generic", "Khác"];
 
@@ -1455,6 +1470,15 @@ function detectRamSize(text){
   const t = normalizeQuickText(text);
   const m = t.match(/\b(1|2|4|8|16|32|64|128)\s*gb\b/i);
   return m ? `${m[1]}GB` : "Khác";
+}
+
+function detectRamForm(text){
+  const t = normalizeQuickText(text);
+  if(/\bso\s*-?\s*dimm\b/i.test(t) || /\bsodimm\b/i.test(t)) return "RAM LT";
+  if(/\bram\s*(lt|laptop|notebook)\b/i.test(t) || /\b(lt|laptop|notebook)\s*ram\b/i.test(t)) return "RAM LT";
+  if(/\bram\s*(pc|desktop|may ban|may tinh ban)\b/i.test(t) || /\b(pc|desktop)\s*ram\b/i.test(t)) return "RAM PC";
+  if(/\budimm\b/i.test(t) || /\bdimm\b/i.test(t)) return "RAM PC";
+  return "Khác";
 }
 
 function detectCpuBrand(text){
@@ -1511,6 +1535,21 @@ function detectBrandLabel(text){
     if(re.test(t)) return label;
   }
   return "Khác";
+}
+
+function cleanQuickLabel(value){
+  return String(value ?? "").replace(/\s+/g, " ").trim();
+}
+
+function isKnownQuickValue(value){
+  const v = cleanQuickLabel(value);
+  return v && v !== "Khác";
+}
+
+function detectBrandFromRow(r, text){
+  const brandCell = cleanQuickLabel(r && r[3]);
+  if(brandCell) return brandCell;
+  return detectBrandLabel(text || "");
 }
 
 function detectStorageKind(text){
@@ -1606,6 +1645,112 @@ function getStorageLabel(text){
   return kind !== "Khác" ? kind : cap;
 }
 
+function makeQuickMeta(family, primary, secondary="", label=""){
+  primary = cleanQuickLabel(primary);
+  secondary = cleanQuickLabel(secondary);
+  if(!isKnownQuickValue(primary)) return null;
+  return {
+    family,
+    kind: family,
+    primary,
+    secondary: secondary !== "Khác" ? secondary : "",
+    label: cleanQuickLabel(label) || primary
+  };
+}
+
+function quickMetaKey(meta){
+  if(!meta) return "";
+  return meta.family === "storage" || meta.family === "ram" || meta.secondary
+    ? `${meta.primary || "Khác"}|${meta.secondary || ""}`
+    : (meta.primary || "Khác");
+}
+
+function quickMetaLabel(meta){
+  if(!meta) return "Khác";
+  if(meta.label) return meta.label;
+  if(meta.family === "storage") return `${meta.primary || ""}${meta.secondary ? " " + meta.secondary : ""}`.trim() || "Khác";
+  if(meta.family === "ram") return `RAM · ${`${meta.primary || ""}${meta.secondary ? " " + meta.secondary : ""}`.trim() || "Khác"}`;
+  if(meta.family === "ramform") return meta.primary || "RAM";
+  if(meta.family === "brand") return `Hãng · ${meta.primary}`;
+  return meta.primary || "Khác";
+}
+
+function getQuickMetaCandidates(r, groupLabel){
+  const groupNorm = normalizeQuickText(groupLabel || r?.[8] || "");
+  const text = [r?.[1], r?.[2], r?.[3], r?.[7], groupLabel || r?.[8]].filter(Boolean).join(" ");
+  const metas = [];
+  const add = meta => {
+    if(!meta) return;
+    const key = `${meta.family}|${quickMetaKey(meta)}`;
+    if(metas.some(x=>`${x.family}|${quickMetaKey(x)}` === key)) return;
+    metas.push(meta);
+  };
+
+  const brand = detectBrandFromRow(r, text);
+  const ramType = detectRamType(text);
+  const ramSize = detectRamSize(text);
+  const ramForm = detectRamForm(text);
+  const cpuBrand = detectCpuBrand(text);
+  const cpuSeries = detectCpuSeries(text);
+  const storageKind = detectStorageKind(text);
+  const storageCap = detectStorageCapacity(text);
+  const cameraType = detectCameraType(text);
+  const networkType = detectNetworkType(text);
+  const printerPart = detectPrinterPartLabel(text);
+  const laptopPart = detectLaptopPartLabel(text);
+
+  if(isStorageGroupLabel(groupNorm) || isKnownQuickValue(storageKind) || isKnownQuickValue(storageCap)){
+    const primary = isKnownQuickValue(storageKind) ? storageKind : storageCap;
+    const secondary = isKnownQuickValue(storageKind) && isKnownQuickValue(storageCap) && primary !== storageCap ? storageCap : "";
+    add(makeQuickMeta("storage", primary, secondary, `${primary}${secondary ? " " + secondary : ""}`));
+  }
+  if(isRamGroupLabel(groupNorm) && isKnownQuickValue(ramForm)){
+    add(makeQuickMeta("ramform", ramForm, "", ramForm));
+  }
+  if(isRamGroupLabel(groupNorm) || isKnownQuickValue(ramType) || isKnownQuickValue(ramSize)){
+    const primary = isKnownQuickValue(ramType) ? ramType : ramSize;
+    const secondary = isKnownQuickValue(ramType) && isKnownQuickValue(ramSize) && primary !== ramSize ? ramSize : "";
+    add(makeQuickMeta("ram", primary, secondary, `RAM · ${primary}${secondary ? " " + secondary : ""}`));
+  }
+  if(groupNorm.includes("cpu") || isKnownQuickValue(cpuSeries) || isKnownQuickValue(cpuBrand)){
+    const primary = isKnownQuickValue(cpuSeries) ? cpuSeries : cpuBrand;
+    const secondary = isKnownQuickValue(cpuBrand) && primary !== cpuBrand ? cpuBrand : "";
+    add(makeQuickMeta("cpu", primary, secondary, `CPU · ${primary}${secondary ? " · " + secondary : ""}`));
+  }
+  if(groupNorm.includes("camera") && isKnownQuickValue(cameraType)){
+    add(makeQuickMeta("network", cameraType, isKnownQuickValue(brand) ? brand : "", `Camera · ${cameraType}${isKnownQuickValue(brand) ? " · " + brand : ""}`));
+  }
+  if(groupNorm.includes("internet") && isKnownQuickValue(networkType)){
+    add(makeQuickMeta("network", networkType, isKnownQuickValue(brand) ? brand : "", `Internet · ${networkType}${isKnownQuickValue(brand) ? " · " + brand : ""}`));
+  }
+  if(groupNorm.includes("laptop linh kien") && laptopPart){
+    add(makeQuickMeta("part", laptopPart, isKnownQuickValue(brand) ? brand : "", `Laptop · ${laptopPart}`));
+  }
+  if(printerPart){
+    add(makeQuickMeta("printer", printerPart, isKnownQuickValue(brand) ? brand : "", printerPart));
+  }
+  if(isKnownQuickValue(brand)){
+    add(makeQuickMeta("brand", brand, "", `Hãng · ${brand}`));
+  }
+  return metas;
+}
+
+function pickBestQuickMeta(r, groupLabel){
+  const groupNorm = normalizeQuickText(groupLabel || r?.[8] || "");
+  const metas = getQuickMetaCandidates(r, groupLabel);
+  const preference = isStorageGroupLabel(groupNorm) ? ["storage", "brand"]
+    : isRamGroupLabel(groupNorm) ? ["ramform", "ram", "brand"]
+    : groupNorm.includes("cpu") ? ["cpu", "brand", "ram", "storage"]
+    : groupNorm.includes("camera") || groupNorm.includes("internet") ? ["network", "brand"]
+    : groupNorm.includes("laptop linh kien") ? ["part", "brand"]
+    : ["printer", "part", "network", "storage", "ramform", "ram", "cpu", "brand"];
+  for(const family of preference){
+    const found = metas.find(meta=>meta.family === family);
+    if(found) return found;
+  }
+  return metas[0] || { family: "other", kind: "other", primary: "Khác", secondary: "", label: "Khác" };
+}
+
 function getAutoSummaryMetaFromTitle(title){
   const text = normalizeQuickText(title);
   const brand = detectBrandLabel(text);
@@ -1651,21 +1796,7 @@ function getAutoSummaryMetaFromTitle(title){
 }
 
 function getSectionSummaryMeta(r, groupLabel){
-  const groupNorm = normalizeQuickText(groupLabel || r[8] || "");
-  const text = [r[1], r[2], r[3], r[7], groupLabel || r[8]].filter(Boolean).join(" ");
-  if(isRamGroupLabel(groupNorm)){
-    const ramType = detectRamType(text);
-    const ramSize = detectRamSize(text);
-    const primary = ramType !== "Khác" ? ramType : ramSize;
-    return { family: "ram", kind: "ram", primary, secondary: ramSize !== "Khác" && primary !== ramSize ? ramSize : "" };
-  }
-  if(isStorageGroupLabel(groupNorm)){
-    const storageKind = detectStorageKind(text);
-    const storageCap = detectStorageCapacity(text);
-    const primary = storageKind !== "Khác" ? storageKind : storageCap;
-    return { family: "storage", kind: "storage", primary, secondary: storageCap !== "Khác" && primary !== storageCap ? storageCap : "" };
-  }
-  return getAutoSummaryMetaFromTitle(text);
+  return pickBestQuickMeta(r, groupLabel);
 }
 
 function buildSectionSummaryBuckets(items, groupLabel){
@@ -1675,15 +1806,16 @@ function buildSectionSummaryBuckets(items, groupLabel){
     const meta = getSectionSummaryMeta(r, groupLabel);
     if(!meta || meta.family === "other") return;
     if(family === "other") family = meta.family;
-    const key = meta.family === "storage" || meta.family === "ram"
-      ? `${meta.primary || "Khác"}|${meta.secondary || ""}`
-      : (meta.primary || "Khác");
-    const label = meta.family === "storage"
-      ? `${meta.primary && meta.primary !== "Khác" ? meta.primary : ""}${meta.secondary ? (meta.primary && meta.primary !== "Khác" ? " " : "") + meta.secondary : ""}`.trim() || "Khác"
-      : meta.family === "ram"
-        ? `RAM · ${`${meta.primary && meta.primary !== "Khác" ? meta.primary : ""}${meta.secondary ? " " + meta.secondary : ""}`.trim() || "Khác"}`
-        : (meta.primary || "Khác");
-    const current = map.get(key) || { key, label, count: 0, stock: 0 };
+    const key = `${meta.family}|${quickMetaKey(meta)}`;
+    const current = map.get(key) || {
+      key,
+      family: meta.family,
+      primary: meta.primary || "Khác",
+      secondary: meta.secondary || "",
+      label: quickMetaLabel(meta),
+      count: 0,
+      stock: 0
+    };
     current.count++;
     current.stock += Number(r[5]) || 0;
     map.set(key, current);
@@ -1701,8 +1833,8 @@ function buildSectionSummaryBuckets(items, groupLabel){
   const ramSizeIndex = new Map(RAM_SIZE_ORDER.map((key, idx)=>[key, idx]));
   const result = [...map.values()].sort((a, b)=>{
     if(family === "ram"){
-      const [ak, ac] = a.key.split("|");
-      const [bk, bc] = b.key.split("|");
+      const ak = a.primary, ac = a.secondary;
+      const bk = b.primary, bc = b.secondary;
       const ki = orderIndex.has(ak) ? orderIndex.get(ak) : 999;
       const kj = orderIndex.has(bk) ? orderIndex.get(bk) : 999;
       if(ki !== kj) return ki - kj;
@@ -1713,8 +1845,8 @@ function buildSectionSummaryBuckets(items, groupLabel){
       return String(a.label).localeCompare(String(b.label), "vi");
     }
     if(family === "storage"){
-      const [ak, ac] = a.key.split("|");
-      const [bk, bc] = b.key.split("|");
+      const ak = a.primary, ac = a.secondary;
+      const bk = b.primary, bc = b.secondary;
       const ki = orderIndex.has(ak) ? orderIndex.get(ak) : 999;
       const kj = orderIndex.has(bk) ? orderIndex.get(bk) : 999;
       if(ki !== kj) return ki - kj;
@@ -1725,8 +1857,8 @@ function buildSectionSummaryBuckets(items, groupLabel){
       if(b.count !== a.count) return b.count - a.count;
       return String(a.label).localeCompare(String(b.label), "vi");
     }
-    const ai = orderIndex.has(a.key) ? orderIndex.get(a.key) : 999;
-    const bi = orderIndex.has(b.key) ? orderIndex.get(b.key) : 999;
+    const ai = orderIndex.has(a.primary) ? orderIndex.get(a.primary) : 999;
+    const bi = orderIndex.has(b.primary) ? orderIndex.get(b.primary) : 999;
     if(ai !== bi) return ai - bi;
     if(b.count !== a.count) return b.count - a.count;
     return String(a.label).localeCompare(String(b.label), "vi");
@@ -1817,56 +1949,14 @@ function getCardInsightTags(r){
 
 function getOverviewBucket(r){
   const groupLabel = r[8] || "";
-  const groupNorm = normalizeQuickText(groupLabel);
-  const text = normalizeQuickText([r[1], r[2], r[3], r[7], groupLabel].filter(Boolean).join(" "));
-  const brand = detectBrandLabel(text);
-  const ramType = detectRamType(text);
-  const ramSize = detectRamSize(text);
-  const cpuBrand = detectCpuBrand(text);
-  const cpuSeries = detectCpuSeries(text);
-  const storageLabel = getStorageLabel(text);
-  const cameraType = detectCameraType(text);
-  const networkType = detectNetworkType(text);
-  const laptopPart = detectLaptopPartLabel(text);
-
-  if(groupNorm.includes("cpu")){
-    return { group: groupLabel, family: "cpu", primary: cpuBrand, secondary: cpuSeries, label: `CPU · ${cpuBrand}${cpuSeries !== "Khác" ? " · " + cpuSeries : ""}` };
-  }
-  if(isRamGroupLabel(groupNorm)){
-    return { group: groupLabel, family: "ram", primary: ramType, secondary: ramSize, label: `RAM · ${ramType}${ramSize !== "Khác" ? " · " + ramSize : ""}` };
-  }
-  if(isStorageGroupLabel(groupNorm)){
-    const storageKind = detectStorageKind(text);
-    const storageCap = detectStorageCapacity(text);
-    const label = storageKind !== "Khác" && storageCap !== "Khác" ? `${storageKind} ${storageCap}` : storageLabel;
-    return { group: groupLabel, family: "storage", primary: storageKind, secondary: storageCap, label: label || "Ổ cứng" };
-  }
-  if(groupNorm.includes("laptop linh kien")){
-    return { group: groupLabel, family: "brand", primary: brand, secondary: laptopPart, label: `Laptop · ${laptopPart || brand}` };
-  }
-  if(groupNorm.includes("camera")){
-    return { group: groupLabel, family: "network", primary: cameraType, secondary: brand, label: `Camera · ${cameraType}${brand !== "Khác" ? " · " + brand : ""}` };
-  }
-  if(groupNorm.includes("internet")){
-    return { group: groupLabel, family: "network", primary: networkType, secondary: brand, label: `Internet · ${networkType}${brand !== "Khác" ? " · " + brand : ""}` };
-  }
-
-  if(ramType !== "Khác" || ramSize !== "Khác"){
-    return { group: groupLabel, family: "ram", primary: ramType, secondary: ramSize, label: `RAM · ${ramType}${ramSize !== "Khác" ? " · " + ramSize : ""}` };
-  }
-  if(cpuBrand !== "Khác" || cpuSeries !== "Khác"){
-    return { group: groupLabel, family: "cpu", primary: cpuBrand, secondary: cpuSeries, label: `CPU · ${cpuBrand}${cpuSeries !== "Khác" ? " · " + cpuSeries : ""}` };
-  }
-  if(storageLabel !== "Khác"){
-    return { group: groupLabel, family: "storage", primary: detectStorageKind(text), secondary: detectStorageCapacity(text), label: storageLabel };
-  }
-  if(networkType !== "Khác"){
-    return { group: groupLabel, family: "network", primary: networkType, secondary: brand, label: `${networkType}${brand !== "Khác" ? " · " + brand : ""}` };
-  }
-  if(brand !== "Khác"){
-    return { group: groupLabel, family: "brand", primary: brand, secondary: "", label: `Hãng · ${brand}` };
-  }
-  return { group: groupLabel, family: "other", primary: "Khác", secondary: "", label: groupLabel || "Khác" };
+  const meta = pickBestQuickMeta(r, groupLabel);
+  return {
+    group: groupLabel,
+    family: meta.family || "other",
+    primary: meta.primary || "Khác",
+    secondary: meta.secondary || "",
+    label: quickMetaLabel(meta) || groupLabel || "Khác"
+  };
 }
 
 function buildOverviewBuckets(items){
@@ -2084,27 +2174,34 @@ function matchesQuickGroupFilter(r, groupLabel){
   if(!quickGroupFilter) return true;
   const scope = String(quickGroupFilter.scope || "group");
   if(scope === "group" && (groupLabel || "") !== quickGroupFilter.groupLabel) return false;
-  const meta = scope === "group"
-    ? getSectionSummaryMeta(r, groupLabel)
-    : getAutoSummaryMetaFromTitle(r[2] || "");
-  if(!meta || meta.family !== quickGroupFilter.family) return false;
-  const metaKey = meta.family === "storage" || meta.family === "ram"
-    ? `${meta.primary || "Khác"}|${meta.secondary || ""}`
-    : meta.primary;
-  if(metaKey !== quickGroupFilter.primary) return false;
-  return true;
+  const filterPrimary = String(quickGroupFilter.primary || "");
+  const filterSecondary = String(quickGroupFilter.secondary || "");
+  const candidates = scope === "group"
+    ? getQuickMetaCandidates(r, groupLabel)
+    : [getAutoSummaryMetaFromTitle(r[2] || "")];
+  return candidates.some(meta=>{
+    if(!meta || meta.family !== quickGroupFilter.family) return false;
+    const metaPrimary = String(meta.primary || "Khác");
+    const metaSecondary = String(meta.secondary || "");
+    const metaKey = quickMetaKey(meta);
+    if(filterSecondary){
+      return metaPrimary === filterPrimary && metaSecondary === filterSecondary;
+    }
+    return metaPrimary === filterPrimary || metaKey === filterPrimary;
+  });
 }
 
 function renderQuickSummary(items, groupLabel){
   const buckets = buildSectionSummaryBuckets(items, groupLabel);
   if(!buckets.length) return "";
-  const family = buckets.family || "other";
   return `<div class="group-summary-row">${buckets.map(bucket=>{
     const isActive = quickGroupFilter
       && quickGroupFilter.groupLabel === groupLabel
-      && quickGroupFilter.primary === bucket.key;
+      && quickGroupFilter.family === bucket.family
+      && quickGroupFilter.primary === bucket.primary
+      && String(quickGroupFilter.secondary || "") === String(bucket.secondary || "");
     const detail = `${bucket.count} mục · ${bucket.stock.toLocaleString("vi-VN")} tồn`;
-    return `<button type="button" class="smart-chip${isActive ? " active" : ""}" data-group="${escapeHtml(groupLabel)}" data-family="${escapeHtml(family)}" data-primary="${escapeHtml(bucket.key)}" data-secondary="" onclick="toggleQuickGroupFilter(this)"><span class="smart-chip-name">${escapeHtml(bucket.label)}</span><span class="smart-chip-detail">${detail}</span></button>`;
+    return `<button type="button" class="smart-chip${isActive ? " active" : ""}" data-scope="group" data-group="${escapeHtml(groupLabel)}" data-family="${escapeHtml(bucket.family)}" data-primary="${escapeHtml(bucket.primary)}" data-secondary="${escapeHtml(bucket.secondary || "")}" onclick="toggleQuickGroupFilter(this)"><span class="smart-chip-name">${escapeHtml(bucket.label)}</span><span class="smart-chip-detail">${detail}</span></button>`;
   }).join("")}</div>`;
 }
 
@@ -2421,8 +2518,59 @@ async function resetToDefault(){
 }
 
 let NV_LIST = [];
-function loadNV(){ try{ NV_LIST = JSON.parse(localStorage.getItem("kho_cntt_nv")||"[]"); }catch(e){ NV_LIST=[]; } }
+function normalizeNVItem(nv){
+  if(typeof nv === "string"){
+    const raw = nv.trim();
+    if(raw.startsWith("{") && raw.endsWith("}")){
+      try{ return normalizeNVItem(JSON.parse(raw)); }catch(e){}
+    }
+    const name = raw;
+    return name ? { name, avatar: "" } : null;
+  }
+  if(nv && typeof nv === "object"){
+    const name = String(nv.name || nv.ten || nv.nv || "").trim();
+    if(!name) return null;
+    return { name, avatar: String(nv.avatar || nv.img || "") };
+  }
+  return null;
+}
+function normalizeNVList(list){
+  if(!Array.isArray(list)) return [];
+  const seen = new Set();
+  const out = [];
+  list.forEach(item=>{
+    const nv = normalizeNVItem(item);
+    if(!nv) return;
+    const key = removeAccents(nv.name).toLowerCase();
+    if(seen.has(key)) return;
+    seen.add(key);
+    out.push(nv);
+  });
+  return out;
+}
+function getNVName(nv){ return normalizeNVItem(nv)?.name || ""; }
+function findNVByName(name){
+  const key = removeAccents(String(name || "")).trim().toLowerCase();
+  return normalizeNVList(NV_LIST).find(nv=>removeAccents(nv.name).toLowerCase() === key) || null;
+}
+function renderNVAvatar(name, extraClass=""){
+  const nv = findNVByName(name);
+  const avatar = nv && nv.avatar ? nv.avatar : "";
+  const label = String(name || "").trim();
+  if(avatar) return `<span class="nv-avatar ${extraClass}"><img src="${avatar}" alt="${escapeHtml(label)}"></span>`;
+  const initial = label ? escapeHtml(label.charAt(0).toUpperCase()) : "👤";
+  return `<span class="nv-avatar ${extraClass}" title="${escapeHtml(label)}">${initial}</span>`;
+}
+function setNVAvatarPreview(dataUrl){
+  const input = document.getElementById("nvAvatar");
+  const preview = document.getElementById("nvAvatarPreview");
+  if(input) input.value = dataUrl || "";
+  if(!preview) return;
+  preview.innerHTML = dataUrl ? `<img src="${dataUrl}" alt="Avatar nhân viên">` : "👤";
+}
+function loadNV(){ try{ NV_LIST = normalizeNVList(JSON.parse(localStorage.getItem("kho_cntt_nv")||"[]")); }catch(e){ NV_LIST=[]; } }
 async function saveNV(){
+  NV_LIST = normalizeNVList(NV_LIST);
   try{ localStorage.setItem("kho_cntt_nv", JSON.stringify(NV_LIST)); }catch(e){}
   if(!SHEET_API_URL) return true;
   try{
@@ -2440,7 +2588,7 @@ async function loadNVFromSheet(){
   try{
     const json = await fetchSheetJson(sheetUrl({type:"nv", _ts: Date.now()}));
     if(Array.isArray(json.nv)){
-      const sheetNV = json.nv.filter(Boolean);
+      const sheetNV = normalizeNVList(json.nv);
       if(sheetNV.length || !NV_LIST.length){
         NV_LIST = sheetNV;
         localStorage.setItem("kho_cntt_nv", JSON.stringify(NV_LIST));
@@ -2449,30 +2597,34 @@ async function loadNVFromSheet(){
   }catch(e){ console.warn("Lỗi tải NV:", e); setSyncBadge("error", String(e)); }
 }
 
-function openNVModal(){ if(!requireAdmin()) return; renderNVList(); document.getElementById("nvOverlay").classList.add("open"); document.getElementById("nvInput").value=""; }
+function openNVModal(){ if(!requireAdmin()) return; renderNVList(); document.getElementById("nvOverlay").classList.add("open"); document.getElementById("nvInput").value=""; document.getElementById("nvAvatarFile").value=""; setNVAvatarPreview(""); }
 function renderNVList(){
+  NV_LIST = normalizeNVList(NV_LIST);
   const el = document.getElementById("nvList");
   if(!NV_LIST.length){ el.innerHTML=`<div style="text-align: center; color: #aaa; padding: 10px;">Chưa có nhân viên nào</div>`; return; }
   el.innerHTML = NV_LIST.map((nv,i)=>`
     <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 4px; border-bottom: 1px solid #f0f0f0;">
-      <span style="font-size: 13px;">👤 ${nv}</span>
+      <span class="nv-row-main" style="font-size: 13px;">${renderNVAvatar(nv.name)} <span>${escapeHtml(nv.name)}</span></span>
       <button onclick="removeNV(${i})" style="background:#FADBD8;border:none;border-radius:6px;padding:3px 10px;color:#C0392B;cursor:pointer;font-size:12px">Xóa</button>
     </div>`).join("");
 }
 function addNV(){ if(!requireAdmin()) return;
   const val = document.getElementById("nvInput").value.trim();
+  const avatar = document.getElementById("nvAvatar").value || "";
   if(!val){ alert("Nhập tên nhân viên!"); return; }
-  if(NV_LIST.includes(val)){ alert("Nhân viên này đã có trong danh sách!"); return; }
-  NV_LIST.push(val); saveNV(); document.getElementById("nvInput").value=""; renderNVList(); showToast("Đã thêm: "+val);
+  if(findNVByName(val)){ alert("Nhân viên này đã có trong danh sách!"); return; }
+  NV_LIST.push({ name: val, avatar }); saveNV(); document.getElementById("nvInput").value=""; document.getElementById("nvAvatarFile").value=""; setNVAvatarPreview(""); renderNVList(); showToast("Đã thêm: "+val);
 }
 function removeNV(i){ if(!requireAdmin()) return;
-  if(!confirm(`Xóa nhân viên "${NV_LIST[i]}"?`)) return;
+  NV_LIST = normalizeNVList(NV_LIST);
+  if(!confirm(`Xóa nhân viên "${NV_LIST[i]?.name || ""}"?`)) return;
   NV_LIST.splice(i,1); saveNV(); renderNVList();
 }
 function refreshNVSelect(){
   const sel = document.getElementById("saleNV");
   if(!sel) return;
-  sel.innerHTML = `<option value="">-- Chọn nhân viên --</option>` + NV_LIST.map(nv=>`<option value="${nv}">${nv}</option>`).join("");
+  NV_LIST = normalizeNVList(NV_LIST);
+  sel.innerHTML = `<option value="">-- Chọn nhân viên --</option>` + NV_LIST.map(nv=>`<option value="${escapeHtml(nv.name)}">${escapeHtml(nv.name)}</option>`).join("");
 }
 
 let TX_DATA = [];
@@ -2658,7 +2810,7 @@ function renderTxHistory(){
   const rows = filtered.length ? filtered.map(t=>`
         <div class="tx-row">
           <div class="tx-header">
-            <span class="tx-nv">👤 ${t.nv}</span>
+            <span class="tx-nv">${renderNVAvatar(t.nv)} ${escapeHtml(t.nv || "")}</span>
             <div class="tx-head-right">
               <span class="tx-time">${formatTxTime(t.time)}</span>
               ${document.body.classList.contains("admin-mode")?`<button class="tx-action tx-edit" title="Sửa giao dịch" onclick="editTX('${escapeHtml(t.id)}')">✏️</button><button class="tx-action tx-delete" title="Xóa giao dịch" onclick="deleteTX('${escapeHtml(t.id)}')">🗑️</button>`:""}
@@ -2704,7 +2856,7 @@ function editTX(id){ if(!requireAdmin()) return;
   document.getElementById("saleTxId").value = tx.id;
   refreshNVSelect();
   const nvSel = document.getElementById("saleNV");
-  if(tx.nv && !NV_LIST.includes(tx.nv)){
+  if(tx.nv && !findNVByName(tx.nv)){
     nvSel.innerHTML += `<option value="${escapeHtml(tx.nv)}">${escapeHtml(tx.nv)}</option>`;
   }
   nvSel.value = tx.nv || "";
@@ -2745,6 +2897,23 @@ function setTxImagePreview(dataUrl){
   else { img.style.display="none"; ph.style.display="flex"; rmBtn.style.display="none"; }
 }
 function removeTxImage(){ setTxImagePreview(""); document.getElementById("saleImgFile").value=""; }
+function handleNVAvatarPick(input){
+  const file = input.files[0];
+  if(!file) return;
+  if(!file.type.startsWith("image/")){ alert("Vui lòng chọn 1 file ảnh!"); return; }
+  const reader = new FileReader();
+  reader.onload = function(e){
+    const img = new Image();
+    img.onload = function(){
+      const MAX = 160; let w = img.width, h = img.height;
+      if(w>MAX || h>MAX){ if(w>h){ h = Math.round(h*MAX/w); w = MAX; } else { w = Math.round(w*MAX/h); h = MAX; } }
+      const canvas = document.createElement("canvas"); canvas.width = w; canvas.height = h; canvas.getContext("2d").drawImage(img,0,0,w,h);
+      setNVAvatarPreview(canvas.toDataURL("image/jpeg", 0.72));
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
 function handleTxImagePick(input){
   const file = input.files[0];
   if(!file) return;
