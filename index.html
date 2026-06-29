@@ -392,7 +392,7 @@ body.admin-mode .admin-btn { background: #1E8449; border-color: #1E8449; opacity
       <button class="admin-btn admin-only" id="syncBtn" onclick="manualSync()">🔄 Đẩy lên Sheet</button>
       <button class="admin-btn" id="adminBtn" onclick="onAdminBtnClick()">🔒 Admin</button>
     </div>
-    <div class="title"><span class="title-icon">🏪</span><span class="title-text"><span class="title-base">KHO Q2 (HOÀNG GIA COMPUTER)</span><span class="title-shine" aria-hidden="true">KHO Q2 (HOÀNG GIA COMPUTER)</span></span></div>
+    <div class="title"><span class="title-icon">🏪</span><span class="title-text"><span class="title-base">KHO Q2 (HOÀNG GIA COMPUTER)</span><span class="title-shine" aria-hidden="true"></span></span></div>
     <div class="kpi-row">
       <div class="kpi" style="background: #2E86C1;" onclick="showKpiDetail('all')"><div class="kpi-v" id="kpi-mh">0</div><div class="kpi-l">mặt hàng <span class="kpi-hint">▼</span></div></div>
       <div class="kpi" style="background: #1E8449;" onclick="showKpiDetail('ton')"><div class="kpi-v" id="kpi-ton">0</div><div class="kpi-l">tổng tồn <span class="kpi-hint">▼</span></div></div>
@@ -1614,6 +1614,199 @@ function detectPrinterPartLabel(text){
   return "";
 }
 
+function buildSectionSummaryBucketsV2(items, groupLabel){
+  const map = new Map();
+  const family = getQuickGroupKind(groupLabel);
+  const addBucket = (meta, countDelta=0, stockDelta=0) => {
+    if(!meta || meta.family === "other") return;
+    const key = `${meta.family}|${quickMetaKey(meta)}`;
+    const current = map.get(key) || {
+      key,
+      family: meta.family,
+      primary: meta.primary || "Khác",
+      secondary: meta.secondary || "",
+      label: quickMetaLabel(meta),
+      count: 0,
+      stock: 0
+    };
+    current.count += countDelta;
+    current.stock += stockDelta;
+    map.set(key, current);
+  };
+  getQuickFixedCatalog(groupLabel).forEach(meta=>addBucket(meta, 0, 0));
+  items.forEach(({r})=>{
+    const stock = Number(r[5]) || 0;
+    const metas = getQuickMetaCandidates(r, groupLabel);
+    metas.forEach(meta=>addBucket(meta, 1, stock));
+  });
+  const orderMap = {
+    cpu: ["Intel", "AMD", "Apple", ...CPU_SERIES_ORDER, "1700", "1200", "1151", "1150", "2066", "2011", "AM5", "AM4", "TR4", "TRX4"],
+    ram: ["RAM PC", "RAM LT", ...RAM_TYPE_ORDER, ...RAM_SIZE_ORDER, "LED RGB", "KHÔNG LED"],
+    storage: [...STORAGE_KIND_ORDER, ...STORAGE_CAP_ORDER],
+    printer: ["Mực in", "Drum", "Gạt từ / Gạt mực", "Trục", "Bao lụa", "Formatter", "Main nguồn", "Motor", "Sensor", "Cụm sấy"],
+    camera: ["Camera Wifi", "Camera IP", "DVR", "NVR", "Analog", "PoE", "8MP", "6MP", "5MP", "4MP", "3MP", "2MP", "1080p", "2K", "4K"],
+    internet: ["Router", "Switch", "Modem", "Access Point", "USB Wifi", "Converter", "SFP", "Cáp mạng"],
+    part: ["Sạc / Adapter", "Pin", "Bàn phím", "Màn hình", "Tản nhiệt", "Dây / Cáp", "Main"],
+    brand: BRAND_ORDER,
+    other: []
+  };
+  const order = orderMap[family] || [];
+  const orderIndex = new Map(order.map((key, idx)=>[key, idx]));
+  const result = [...map.values()].sort((a, b)=>{
+    const ai = orderIndex.has(a.primary) ? orderIndex.get(a.primary) : 999;
+    const bi = orderIndex.has(b.primary) ? orderIndex.get(b.primary) : 999;
+    if(ai !== bi) return ai - bi;
+    if(b.count !== a.count) return b.count - a.count;
+    return String(a.label).localeCompare(String(b.label), "vi");
+  });
+  result.family = family;
+  return result;
+}
+
+function buildOverviewBucketsV2(items){
+  const map = new Map();
+  items.forEach(({r})=>{
+    const group = r[8] || "";
+    const metas = getQuickMetaCandidates(r, group);
+    const stock = Number(r[5]) || 0;
+    const fallback = pickBestQuickMeta(r, group);
+    const list = metas.length ? metas : (fallback ? [fallback] : []);
+    list.forEach(meta=>{
+      if(!meta || meta.family === "other") return;
+      const key = `${group}|${meta.family}|${quickMetaKey(meta)}`;
+      const current = map.get(key) || {
+        group,
+        family: meta.family,
+        primary: meta.primary || "Khác",
+        secondary: meta.secondary || "",
+        label: quickMetaLabel(meta),
+        count: 0,
+        stock: 0
+      };
+      current.count++;
+      current.stock += stock;
+      map.set(key, current);
+    });
+  });
+  return [...map.values()].sort((a,b)=>{
+    if(b.count !== a.count) return b.count - a.count;
+    if(b.stock !== a.stock) return b.stock - a.stock;
+    return String(a.label).localeCompare(String(b.label), "vi");
+  });
+}
+
+function getAutoSummaryMetaFromTitle(title){
+  const text = normalizeQuickText(title);
+  const brand = detectBrandLabel(text);
+  const cpuBrand = detectCpuBrand(text);
+  const cpuSeries = detectCpuSeries(text);
+  const cpuSocket = detectCpuSocket(text);
+  const ramType = detectRamType(text);
+  const ramSize = detectRamSize(text);
+  const ramFeature = detectRamFeature(text);
+  const storageKind = detectStorageKind(text);
+  const storageCap = detectStorageCapacity(text);
+  const cameraType = detectCameraType(text);
+  const cameraDetail = detectCameraDetail(text);
+  const networkType = detectNetworkType(text);
+  const networkDetail = detectNetworkDetail(text);
+  const printerPart = detectPrinterPartLabel(text);
+  const printerBrand = brand !== "Khác" ? brand : detectBrandLabel(text);
+
+  if(cpuSeries !== "Khác" || cpuBrand !== "Khác" || cpuSocket){
+    const primary = cpuSeries !== "Khác" ? cpuSeries : (cpuBrand !== "Khác" ? cpuBrand : cpuSocket);
+    return { family: "cpu", kind: "cpu", primary, secondary: cpuBrand !== "Khác" && primary !== cpuBrand ? cpuBrand : "" };
+  }
+  if(storageKind !== "Khác" || storageCap !== "Khác"){
+    const primary = storageKind !== "Khác" ? storageKind : storageCap;
+    return { family: "storage", kind: "storage", primary, secondary: storageCap !== "Khác" && primary !== storageCap ? storageCap : "" };
+  }
+  if(ramType !== "Khác" || ramSize !== "Khác" || ramFeature){
+    const primary = ramType !== "Khác" ? ramType : (ramSize !== "Khác" ? ramSize : ramFeature);
+    return { family: "ram", kind: "ram", primary, secondary: ramSize !== "Khác" && primary !== ramSize ? ramSize : "" };
+  }
+  if(cameraType !== "Khác" || cameraDetail !== "Khác"){
+    const primary = cameraType !== "Khác" ? cameraType : cameraDetail;
+    return { family: "camera", kind: "camera", primary, secondary: brand !== "Khác" ? brand : "" };
+  }
+  if(networkType !== "Khác" || networkDetail !== "Khác"){
+    const primary = networkType !== "Khác" ? networkType : networkDetail;
+    return { family: "internet", kind: "internet", primary, secondary: brand !== "Khác" ? brand : "" };
+  }
+  if(printerPart){
+    return { family: "printer", kind: "printer", primary: printerPart, secondary: printerBrand !== "Khác" && printerBrand !== printerPart ? printerBrand : "" };
+  }
+  if(printerBrand !== "Khác"){
+    return { family: "printer", kind: "printer", primary: printerBrand, secondary: "" };
+  }
+  if(brand !== "Khác"){
+    return { family: "brand", kind: "brand", primary: brand, secondary: "" };
+  }
+  return { family: "other", kind: "other", primary: "Khác", secondary: "" };
+}
+
+function getSectionSummaryMeta(r, groupLabel){
+  return pickBestQuickMeta(r, groupLabel);
+}
+
+function buildSectionSummaryBuckets(items, groupLabel){
+  return buildSectionSummaryBucketsV2(items, groupLabel);
+}
+
+function getOverviewBucket(r){
+  const groupLabel = r[8] || "";
+  const meta = pickBestQuickMeta(r, groupLabel);
+  return {
+    group: groupLabel,
+    family: meta.family || "other",
+    primary: meta.primary || "Khác",
+    secondary: meta.secondary || "",
+    label: quickMetaLabel(meta) || groupLabel || "Khác"
+  };
+}
+
+function buildOverviewBuckets(items){
+  return buildOverviewBucketsV2(items);
+}
+
+function getQuickMeta(r, groupLabel){
+  return pickBestQuickMeta(r, groupLabel);
+}
+
+function getQuickFamilyForGroup(items, groupLabel){
+  return getQuickGroupKind(groupLabel);
+}
+
+function buildQuickBuckets(items, groupLabel, family, keyGetter, labelGetter, order){
+  const map = new Map();
+  items.forEach(({r,i})=>{
+    const metas = getQuickMetaCandidates(r, groupLabel).filter(meta=>meta.family === family);
+    metas.forEach(meta=>{
+      const key = keyGetter(meta, r, i);
+      if(!key) return;
+      const label = labelGetter ? labelGetter(meta, r, i) : key;
+      const bucket = map.get(key) || { key, label, count: 0, stock: 0 };
+      bucket.count++;
+      bucket.stock += Number(r[5]) || 0;
+      map.set(key, bucket);
+    });
+  });
+  const list = [...map.values()];
+  if(order && order.length){
+    const orderMap = new Map(order.map((key, idx)=>[key, idx]));
+    list.sort((a, b)=>{
+      const ai = orderMap.has(a.key) ? orderMap.get(a.key) : 999;
+      const bi = orderMap.has(b.key) ? orderMap.get(b.key) : 999;
+      if(ai !== bi) return ai - bi;
+      if(b.count !== a.count) return b.count - a.count;
+      return String(a.label).localeCompare(String(b.label), "vi");
+    });
+  } else {
+    list.sort((a, b)=> b.count - a.count || String(a.label).localeCompare(String(b.label), "vi"));
+  }
+  return list;
+}
+
 function detectLaptopPartLabel(text){
   const t = normalizeQuickText(text);
   const rules = [
@@ -1658,6 +1851,94 @@ function makeQuickMeta(family, primary, secondary="", label=""){
   };
 }
 
+function isPrinterGroupLabel(groupNorm){
+  return /\b(may in|printer)\b/i.test(groupNorm);
+}
+
+function isCameraGroupLabel(groupNorm){
+  return /\bcamera\b/i.test(groupNorm);
+}
+
+function isInternetGroupLabel(groupNorm){
+  return /\binternet\b/i.test(groupNorm);
+}
+
+function getQuickGroupKind(groupLabel){
+  const groupNorm = normalizeQuickText(groupLabel || "");
+  if(isRamGroupLabel(groupNorm)) return "ram";
+  if(isStorageGroupLabel(groupNorm)) return "storage";
+  if(/\bcpu\b/i.test(groupNorm)) return "cpu";
+  if(isPrinterGroupLabel(groupNorm)) return "printer";
+  if(isCameraGroupLabel(groupNorm)) return "camera";
+  if(isInternetGroupLabel(groupNorm)) return "internet";
+  if(groupNorm.includes("laptop linh kien")) return "part";
+  return "brand";
+}
+
+function detectCpuSocket(text){
+  const t = normalizeQuickText(text);
+  const lga = t.match(/\blga\s*[- ]?(1151|1150|1200|1700|2011|2066)\b/i);
+  if(lga) return lga[1];
+  const socket = t.match(/\b(am4|am5|tr4|trx4)\b/i);
+  if(socket) return socket[1].toUpperCase();
+  const paren = t.match(/\((1151|1150|1200|1700|2011|2066)\)/);
+  if(paren) return paren[1];
+  return "";
+}
+
+function detectRamFeature(text){
+  const t = normalizeQuickText(text);
+  if(/\b(khong led|không led|no led|non[- ]?led|without led)\b/i.test(t)) return "KHÔNG LED";
+  if(/\brgb\b/i.test(t) || /\bled\b/i.test(t)) return "LED RGB";
+  return "";
+}
+
+function detectCameraDetail(text){
+  const t = normalizeQuickText(text);
+  const mp = t.match(/\b(\d+(?:\.\d+)?)\s*mp\b/i);
+  if(mp) return `${mp[1]}MP`;
+  if(/\b1080p\b/i.test(t)) return "1080p";
+  if(/\b2k\b/i.test(t)) return "2K";
+  if(/\b4k\b/i.test(t)) return "4K";
+  return "";
+}
+
+function detectNetworkDetail(text){
+  const t = normalizeQuickText(text);
+  const speed = t.match(/\b(\d{3,5})\s*mbps\b/i);
+  if(speed) return `${speed[1]}Mbps`;
+  if(/\b1\s*gbps\b/i.test(t) || /\bgigabit\b/i.test(t) || /\b1000base[-\s]?t\b/i.test(t)) return "1000Mbps";
+  if(/\b100\s*mbps\b/i.test(t) || /\b10\/100\b/i.test(t)) return "100Mbps";
+  return "";
+}
+
+function getQuickFixedCatalog(groupLabel){
+  const kind = getQuickGroupKind(groupLabel);
+  const makeList = (family, values)=>values.map(v=>makeQuickMeta(family, v, "", v)).filter(Boolean);
+  if(kind === "cpu"){
+    return makeList("cpu", ["Intel", "AMD", "Apple", "i9", "i7", "i5", "i3", "Ryzen 9", "Ryzen 7", "Ryzen 5", "Ryzen 3", "Xeon", "Pentium", "Celeron", "M1", "M2", "M3", "1700", "1200", "1151", "1150", "2066", "2011", "AM5", "AM4", "TR4", "TRX4"]);
+  }
+  if(kind === "ram"){
+    return makeList("ram", ["RAM PC", "RAM LT", "LPDDR5", "LPDDR4", "LPDDR3", "DDR5", "DDR4", "DDR3", "DDR2", "1GB", "2GB", "4GB", "8GB", "16GB", "32GB", "64GB", "128GB", "LED RGB", "KHÔNG LED"]);
+  }
+  if(kind === "storage"){
+    return makeList("storage", ["NVMe", "M.2", "SATA", "SSD", "HDD", "120GB", "128GB", "240GB", "250GB", "256GB", "480GB", "500GB", "512GB", "1TB", "2TB", "4TB"]);
+  }
+  if(kind === "printer"){
+    return makeList("printer", ["Mực in", "Drum", "Gạt từ / Gạt mực", "Trục", "Bao lụa", "Formatter", "Main nguồn", "Motor", "Sensor", "Cụm sấy"]);
+  }
+  if(kind === "camera"){
+    return makeList("camera", ["Camera Wifi", "Camera IP", "DVR", "NVR", "Analog", "PoE", "8MP", "6MP", "5MP", "4MP", "3MP", "2MP", "1080p", "2K", "4K"]);
+  }
+  if(kind === "internet"){
+    return makeList("internet", ["Router", "Switch", "Modem", "Access Point", "USB Wifi", "Converter", "SFP", "Cáp mạng"]);
+  }
+  if(kind === "part"){
+    return makeList("part", ["Sạc / Adapter", "Pin", "Bàn phím", "Màn hình", "Tản nhiệt", "Dây / Cáp", "Main"]);
+  }
+  return [];
+}
+
 function quickMetaKey(meta){
   if(!meta) return "";
   return meta.family === "storage" || meta.family === "ram" || meta.secondary
@@ -1677,6 +1958,7 @@ function quickMetaLabel(meta){
 
 function getQuickMetaCandidates(r, groupLabel){
   const groupNorm = normalizeQuickText(groupLabel || r?.[8] || "");
+  const groupKind = getQuickGroupKind(groupLabel || r?.[8] || "");
   const text = [r?.[1], r?.[2], r?.[3], r?.[7], groupLabel || r?.[8]].filter(Boolean).join(" ");
   const metas = [];
   const add = meta => {
@@ -1685,65 +1967,74 @@ function getQuickMetaCandidates(r, groupLabel){
     if(metas.some(x=>`${x.family}|${quickMetaKey(x)}` === key)) return;
     metas.push(meta);
   };
+  const addValue = (family, value, label=value) => {
+    if(isKnownQuickValue(value)) add(makeQuickMeta(family, value, "", label || value));
+  };
 
   const brand = detectBrandFromRow(r, text);
   const ramType = detectRamType(text);
   const ramSize = detectRamSize(text);
   const ramForm = detectRamForm(text);
+  const ramFeature = detectRamFeature(text);
   const cpuBrand = detectCpuBrand(text);
   const cpuSeries = detectCpuSeries(text);
+  const cpuSocket = detectCpuSocket(text);
   const storageKind = detectStorageKind(text);
   const storageCap = detectStorageCapacity(text);
   const cameraType = detectCameraType(text);
+  const cameraDetail = detectCameraDetail(text);
   const networkType = detectNetworkType(text);
+  const networkDetail = detectNetworkDetail(text);
   const printerPart = detectPrinterPartLabel(text);
   const laptopPart = detectLaptopPartLabel(text);
 
-  if(isStorageGroupLabel(groupNorm) || isKnownQuickValue(storageKind) || isKnownQuickValue(storageCap)){
-    const primary = isKnownQuickValue(storageKind) ? storageKind : storageCap;
-    const secondary = isKnownQuickValue(storageKind) && isKnownQuickValue(storageCap) && primary !== storageCap ? storageCap : "";
-    add(makeQuickMeta("storage", primary, secondary, `${primary}${secondary ? " " + secondary : ""}`));
+  if(groupKind === "storage" || isKnownQuickValue(storageKind) || isKnownQuickValue(storageCap)){
+    addValue("storage", storageKind, storageKind);
+    addValue("storage", storageCap, storageCap);
   }
-  if(isRamGroupLabel(groupNorm) && isKnownQuickValue(ramForm)){
-    add(makeQuickMeta("ramform", ramForm, "", ramForm));
+  if(groupKind === "ram" || isKnownQuickValue(ramType) || isKnownQuickValue(ramSize) || isKnownQuickValue(ramForm) || isKnownQuickValue(ramFeature)){
+    addValue("ram", ramForm, ramForm);
+    addValue("ram", ramType, ramType);
+    addValue("ram", ramSize, ramSize);
+    addValue("ram", ramFeature, ramFeature);
   }
-  if(isRamGroupLabel(groupNorm) || isKnownQuickValue(ramType) || isKnownQuickValue(ramSize)){
-    const primary = isKnownQuickValue(ramType) ? ramType : ramSize;
-    const secondary = isKnownQuickValue(ramType) && isKnownQuickValue(ramSize) && primary !== ramSize ? ramSize : "";
-    add(makeQuickMeta("ram", primary, secondary, `RAM · ${primary}${secondary ? " " + secondary : ""}`));
+  if(groupKind === "cpu" || isKnownQuickValue(cpuSeries) || isKnownQuickValue(cpuBrand) || isKnownQuickValue(cpuSocket)){
+    addValue("cpu", cpuBrand, cpuBrand);
+    addValue("cpu", cpuSeries, cpuSeries);
+    addValue("cpu", cpuSocket, cpuSocket);
   }
-  if(groupNorm.includes("cpu") || isKnownQuickValue(cpuSeries) || isKnownQuickValue(cpuBrand)){
-    const primary = isKnownQuickValue(cpuSeries) ? cpuSeries : cpuBrand;
-    const secondary = isKnownQuickValue(cpuBrand) && primary !== cpuBrand ? cpuBrand : "";
-    add(makeQuickMeta("cpu", primary, secondary, `CPU · ${primary}${secondary ? " · " + secondary : ""}`));
+  if(groupKind === "camera" || isKnownQuickValue(cameraType) || isKnownQuickValue(cameraDetail)){
+    addValue("camera", cameraType, cameraType);
+    addValue("camera", cameraDetail, cameraDetail);
   }
-  if(groupNorm.includes("camera") && isKnownQuickValue(cameraType)){
-    add(makeQuickMeta("network", cameraType, isKnownQuickValue(brand) ? brand : "", `Camera · ${cameraType}${isKnownQuickValue(brand) ? " · " + brand : ""}`));
+  if(groupKind === "internet" || isKnownQuickValue(networkType) || isKnownQuickValue(networkDetail)){
+    addValue("internet", networkType, networkType);
+    addValue("internet", networkDetail, networkDetail);
   }
-  if(groupNorm.includes("internet") && isKnownQuickValue(networkType)){
-    add(makeQuickMeta("network", networkType, isKnownQuickValue(brand) ? brand : "", `Internet · ${networkType}${isKnownQuickValue(brand) ? " · " + brand : ""}`));
+  if(groupKind === "part" && laptopPart){
+    addValue("part", laptopPart, laptopPart);
   }
-  if(groupNorm.includes("laptop linh kien") && laptopPart){
-    add(makeQuickMeta("part", laptopPart, isKnownQuickValue(brand) ? brand : "", `Laptop · ${laptopPart}`));
+  if(groupKind === "printer" || printerPart){
+    addValue("printer", printerPart, printerPart);
   }
-  if(printerPart){
-    add(makeQuickMeta("printer", printerPart, isKnownQuickValue(brand) ? brand : "", printerPart));
-  }
-  if(isKnownQuickValue(brand)){
-    add(makeQuickMeta("brand", brand, "", `Hãng · ${brand}`));
+  if(metas.length===0 && isKnownQuickValue(brand)){
+    addValue("brand", brand, brand);
   }
   return metas;
 }
 
 function pickBestQuickMeta(r, groupLabel){
   const groupNorm = normalizeQuickText(groupLabel || r?.[8] || "");
+  const groupKind = getQuickGroupKind(groupLabel || r?.[8] || "");
   const metas = getQuickMetaCandidates(r, groupLabel);
-  const preference = isStorageGroupLabel(groupNorm) ? ["storage", "brand"]
-    : isRamGroupLabel(groupNorm) ? ["ramform", "ram", "brand"]
-    : groupNorm.includes("cpu") ? ["cpu", "brand", "ram", "storage"]
-    : groupNorm.includes("camera") || groupNorm.includes("internet") ? ["network", "brand"]
-    : groupNorm.includes("laptop linh kien") ? ["part", "brand"]
-    : ["printer", "part", "network", "storage", "ramform", "ram", "cpu", "brand"];
+  const preference = groupKind === "storage" ? ["storage", "brand"]
+    : groupKind === "ram" ? ["ram", "brand"]
+    : groupKind === "cpu" ? ["cpu", "ram", "storage", "brand"]
+    : groupKind === "camera" ? ["camera", "brand"]
+    : groupKind === "internet" ? ["internet", "brand"]
+    : groupKind === "part" ? ["part", "brand"]
+    : groupKind === "printer" ? ["printer", "brand"]
+    : ["brand", "printer", "part", "internet", "camera", "storage", "ram", "cpu"];
   for(const family of preference){
     const found = metas.find(meta=>meta.family === family);
     if(found) return found;
@@ -2025,7 +2316,7 @@ function renderOverviewPanel(results){
     html += `<div class="overview-sect"><div class="overview-sect-title">Theo danh mục</div><div class="overview-grid">` + tabStats.map(t=>renderMainTabChip(t.tabCode, t.label, "", t.count, t.stock, currentTab===t.tabCode)).join("") + `</div></div>`;
   }
 
-  const buckets = buildOverviewBuckets(results).slice(0, currentTab === "ALL" ? 8 : 10);
+  const buckets = buildOverviewBucketsV2(results).slice(0, currentTab === "ALL" ? 8 : 10);
   if(buckets.length){
     html += `<div class="overview-sect"><div class="overview-sect-title">Nhóm nổi bật</div><div class="overview-grid">${buckets.map(renderOverviewChip).join("")}</div></div>`;
   }
@@ -2192,7 +2483,7 @@ function matchesQuickGroupFilter(r, groupLabel){
 }
 
 function renderQuickSummary(items, groupLabel){
-  const buckets = buildSectionSummaryBuckets(items, groupLabel);
+  const buckets = buildSectionSummaryBucketsV2(items, groupLabel);
   if(!buckets.length) return "";
   return `<div class="group-summary-row">${buckets.map(bucket=>{
     const isActive = quickGroupFilter
@@ -2375,7 +2666,9 @@ function render(){
         "🎮  VGA — Card màn hình", "🔋  Nguồn — PSU", "🖥️  Case — Vỏ máy tính", "❄️  Tản nhiệt — Cooling",
         "🖱️  Chuột & Bàn phím", "🔌  Dây cáp chuyển", "💻  Laptop linh kiện", "🖵  Màn hình", "🛠️  Linh kiện khác"
       ],
-      MI: null, CAM: null, INT: null
+      MI: ["Máy in Laser","Máy in phun màu","Máy in A3","Máy photocopy","Mực in — Cartridge","Drum — Trống in","Gạt từ / Gạt mực / Trục","Bao lụa / Formatter / Main","Các linh kiện khác"],
+      CAM: ["Camera IP & Analog","Camera Wifi — Không dây","Tên miền / Domain / DDNS","Đầu ghi — DVR/NVR","Ổ cứng Camera","Switch PoE","Adapter / Nguồn / Jack"],
+      INT: ["Router — Bộ định tuyến","Switch — Bộ chuyển mạch","Modem","Access Point — Wifi","USB Wifi","Converter quang","Module SFP / Quang","Dây mạng & Đầu bấm","Phụ kiện mạng"]
     };
     let order;
     if(FIXED_ORDER[currentTab]){
@@ -2527,6 +2820,11 @@ function normalizeNVItem(nv){
     const name = raw;
     return name ? { name, avatar: "" } : null;
   }
+  if(Array.isArray(nv)){
+    const name = String(nv[0] || nv[1] || nv.ten || nv.nv || "").trim();
+    if(!name) return null;
+    return { name, avatar: String(nv[1] || nv[2] || nv.avatar || nv.img || "") };
+  }
   if(nv && typeof nv === "object"){
     const name = String(nv.name || nv.ten || nv.nv || "").trim();
     if(!name) return null;
@@ -2628,8 +2926,56 @@ function refreshNVSelect(){
 }
 
 let TX_DATA = [];
-function loadTX(){ try{ TX_DATA = JSON.parse(localStorage.getItem("kho_cntt_tx")||"[]"); }catch(e){ TX_DATA=[]; } }
+function normalizeTxItem(tx){
+  if(typeof tx === "string"){
+    const raw = tx.trim();
+    if(raw.startsWith("{") && raw.endsWith("}")){
+      try{ return normalizeTxItem(JSON.parse(raw)); }catch(e){}
+    }
+    return null;
+  }
+  if(Array.isArray(tx)){
+    return {
+      id: tx[0] ?? Date.now(),
+      ma: String(tx[1] || "").trim(),
+      ten: String(tx[2] || "").trim(),
+      sh: String(tx[3] || "").trim(),
+      nv: String(tx[4] || "").trim(),
+      qty: Number(tx[5]) || 1,
+      gia: Number(tx[6]) || 0,
+      ghi: String(tx[7] || "").trim(),
+      img: String(tx[8] || ""),
+      time: String(tx[9] || "")
+    };
+  }
+  if(tx && typeof tx === "object"){
+    return {
+      id: tx.id ?? Date.now(),
+      ma: String(tx.ma || tx.code || "").trim(),
+      ten: String(tx.ten || tx.name || "").trim(),
+      sh: String(tx.sh || tx.sheet || "").trim(),
+      nv: String(tx.nv || tx.employee || "").trim(),
+      qty: Number(tx.qty || tx.sl || 1) || 1,
+      gia: Number(tx.gia || tx.price || 0) || 0,
+      ghi: String(tx.ghi || tx.note || "").trim(),
+      img: String(tx.img || tx.image || ""),
+      time: String(tx.time || tx.createdAt || "")
+    };
+  }
+  return null;
+}
+function normalizeTxList(list){
+  if(!Array.isArray(list)) return [];
+  const out = [];
+  list.forEach(item=>{
+    const tx = normalizeTxItem(item);
+    if(tx) out.push(tx);
+  });
+  return out;
+}
+function loadTX(){ try{ TX_DATA = normalizeTxList(JSON.parse(localStorage.getItem("kho_cntt_tx")||"[]")); }catch(e){ TX_DATA=[]; } }
 async function saveTX(){
+  TX_DATA = normalizeTxList(TX_DATA);
   try{ localStorage.setItem("kho_cntt_tx", JSON.stringify(TX_DATA)); }catch(e){}
   if(!SHEET_API_URL) return true;
   try{
@@ -2653,6 +2999,23 @@ async function loadTXFromSheet(){
       }
     }
   }catch(e){ console.warn("Lỗi tải TX:", e); setSyncBadge("error", String(e)); }
+}
+
+function loadTXFromSheet(){
+  if(!SHEET_API_URL) return Promise.resolve();
+  return fetchSheetJson(sheetUrl({type:"tx", _ts: Date.now()}))
+    .then(json=>{
+      if(!Array.isArray(json.tx)) return;
+      const sheetTX = normalizeTxList(json.tx);
+      if(sheetTX.length || !TX_DATA.length){
+        TX_DATA = sheetTX;
+        localStorage.setItem("kho_cntt_tx", JSON.stringify(TX_DATA));
+      }
+    })
+    .catch(e=>{
+      console.warn("Lỗi tải TX:", e);
+      setSyncBadge("error", String(e));
+    });
 }
 
 function openSaleModal(idx){ if(!requireAdmin()) return;
@@ -3098,20 +3461,23 @@ function setupSlowAutoScroll(selector){
   if(autoScrollBars[selector] && autoScrollBars[selector].timer){
     clearInterval(autoScrollBars[selector].timer);
   }
+  const touchLike = window.matchMedia("(hover: none), (pointer: coarse)").matches;
   const state = { dir: 1, pauseUntil: 0, hovering: false, timer: null };
   autoScrollBars[selector] = state;
   const pause = (ms=3500) => {
     state.pauseUntil = Date.now() + ms;
   };
-  el.addEventListener("mouseenter", ()=>{ state.hovering = true; });
-  el.addEventListener("mouseleave", ()=>{ state.hovering = false; pause(1200); });
+  if(!touchLike){
+    el.addEventListener("mouseenter", ()=>{ state.hovering = true; });
+    el.addEventListener("mouseleave", ()=>{ state.hovering = false; pause(1200); });
+  }
   ["touchstart","pointerdown","wheel"].forEach(evt=>{
-    el.addEventListener(evt, ()=>pause(), {passive:true});
+    el.addEventListener(evt, ()=>pause(touchLike ? 900 : 3500), {passive:true});
   });
   state.timer = setInterval(()=>{
     const max = el.scrollWidth - el.clientWidth;
     if(max > 2 && window.innerWidth <= 420){
-      const isHovering = state.hovering || el.matches(":hover");
+      const isHovering = touchLike ? false : (state.hovering || el.matches(":hover"));
       if(!isHovering && Date.now() >= state.pauseUntil){
         el.scrollLeft += state.dir * 0.55;
         if(el.scrollLeft >= max - 1) state.dir = -1;
