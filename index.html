@@ -32,6 +32,8 @@ body { font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif
 .kpi-v { font-size: 13px; font-weight: bold; color: #fff; }
 .kpi-l { font-size: 9px; color: rgba(255,255,255,.85); }
 .search-box { display: flex; align-items: center; background: #FFFDE7; border: 2.5px solid #F39C12; border-radius: 12px; padding: 8px 12px; gap: 8px; }
+.search-icon { display: inline-flex; align-items: center; justify-content: center; color: #1A237E; flex: 0 0 auto; }
+.search-icon svg { display: block; }
 .search-box.is-fixed { position: fixed; left: 12px; right: 12px; top: 10px; z-index: 220; box-shadow: 0 10px 26px rgba(0,0,0,.16); max-width: 920px; margin: 0 auto; }
 .search-spacer { display: none; height: 0; }
 .search-spacer.on { display: block; }
@@ -403,11 +405,16 @@ body.admin-mode .admin-btn { background: #1E8449; border-color: #1E8449; opacity
       <div class="kpi" style="background: #B7950B;" onclick="showKpiDetail('sap')"><div class="kpi-v" id="kpi-sap">0</div><div class="kpi-l">sắp hết <span class="kpi-hint">▼</span></div></div>
     </div>
     <div class="search-box">
-      <span style="font-size: 20px;">🔎</span>
+      <span class="search-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="20" height="20" focusable="false" aria-hidden="true">
+          <circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="2.2"></circle>
+          <path d="M16.2 16.2L21 21" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"></path>
+        </svg>
+      </span>
       <input id="search" type="search" placeholder="Gõ tên, mã hàng, thương hiệu..." autocomplete="off" autocorrect="off" spellcheck="false">
-      <button class="clear-btn" id="clear-btn" onclick="clearSearch()">âœ•</button>
+      <button class="clear-btn" id="clear-btn" onclick="clearSearch()">×</button>
       <button id="headerToggleBtn" onclick="toggleHeader()" type="button" aria-expanded="true" title="Thu gọn menu">
-        <span id="headerToggleIcon">â–²</span>
+        <span id="headerToggleIcon">▲</span>
         <span id="headerToggleText">Thu gọn</span>
       </button>
 </div>
@@ -643,7 +650,7 @@ body.admin-mode .admin-btn { background: #1E8449; border-color: #1E8449; opacity
   </button>
 </div>
 
-<div class="footer-credit">âœ¦ Design by : Pham Van Chuong âœ¦</div>
+<div class="footer-credit">✦ Design by : Pham Van Chuong ✦</div>
 
 <div class="toast" id="toast"></div>
 
@@ -1828,7 +1835,7 @@ function detectLaptopPartLabel(text){
 
 function detectConditionLabel(text){
   const t = normalizeQuickText(text);
-  if(/\b(cu|used|da qua su dung|second hand|like new)\b/i.test(t)) return "CÅ©";
+    if(/\b(cu|used|da qua su dung|second hand|like new)\b/i.test(t)) return "Cũ";
   return "";
 }
 
@@ -2069,7 +2076,7 @@ function getQuickMetaCandidates(r, groupLabel){
     addValue("printer", printerPart, printerPart);
   }
   const titleMeta = getAutoSummaryMetaFromTitle(r?.[2] || "");
-  if(titleMeta && titleMeta.family !== "other"){
+  if(titleMeta && titleMeta.family !== "other" && !(groupKind === "cpu" && metas.some(x=>x.family === "cpu"))){
     add(titleMeta);
   }
   if(metas.length===0 && isKnownQuickValue(brand)){
@@ -2113,8 +2120,9 @@ function getAutoSummaryMetaFromTitle(title){
   const printerBrand = brand !== "Khác" ? brand : detectBrandLabel(text);
 
   if(cpuSeries !== "Khác" || cpuBrand !== "Khác"){
-    const primary = cpuSeries !== "Khác" ? cpuSeries : cpuBrand;
-    return { family: "cpu", kind: "cpu", primary, secondary: cpuBrand !== "Khác" && primary !== cpuBrand ? cpuBrand : "" };
+    const primary = cpuBrand !== "Khác" ? cpuBrand : cpuSeries;
+    const secondary = cpuSeries !== "Khác" && primary !== cpuSeries ? cpuSeries : "";
+    return { family: "cpu", kind: "cpu", primary, secondary };
   }
   if(storageKind !== "Khác" || storageCap !== "Khác"){
     const primary = storageKind !== "Khác" ? storageKind : storageCap;
@@ -2335,6 +2343,20 @@ function renderMainTabChip(tabCode, label, color, count, stock, active){
   return `<button type="button" class="overview-chip${active ? " active" : ""}" onclick="goToTab('${tabCode}')"><span class="overview-chip-top"><span class="overview-chip-title">${label}</span><span class="overview-chip-count">${count}</span></span><span class="overview-chip-sub">${stock.toLocaleString("vi-VN")} tồn</span></button>`;
 }
 
+function rankMtOverviewBucket(bucket){
+  const label = normalizeQuickText([bucket?.label, bucket?.group, bucket?.primary].filter(Boolean).join(" "));
+  if(/\b(psu|nguon)\b/i.test(label)) return 0;
+  if(/\bmainboard\b/i.test(label)) return 1;
+  if(/\bcpu\b/i.test(label)) return 2;
+  if(/\bram\b/i.test(label)) return 3;
+  if(/\bssd\b/i.test(label)) return 4;
+  if(/\bhdd\b/i.test(label)) return 5;
+  if(/\bmàn hình\b/i.test(label) || /\bman hinh\b/i.test(label) || /\bmonitor\b/i.test(label)) return 6;
+  if(/\bchuot\b/i.test(label) || /\bbàn phím\b/i.test(label) || /\bban phim\b/i.test(label)) return 7;
+  if(/\blaptop linh kien\b/i.test(label)) return 8;
+  return 99;
+}
+
 function renderOverviewPanel(results){
   if(currentTab === "ALL") return "";
   const totalCount = results.length;
@@ -2372,7 +2394,18 @@ function renderOverviewPanel(results){
     html += `<div class="overview-sect"><div class="overview-sect-title">Theo danh mục</div><div class="overview-grid">` + tabStats.map(t=>renderMainTabChip(t.tabCode, t.label, "", t.count, t.stock, currentTab===t.tabCode)).join("") + `</div></div>`;
   }
 
-  const buckets = buildOverviewBucketsV2(results).slice(0, currentTab === "ALL" ? 8 : 10);
+  const buckets = buildOverviewBucketsV2(results)
+    .sort((a, b)=>{
+      if(currentTab === "MT"){
+        const ar = rankMtOverviewBucket(a);
+        const br = rankMtOverviewBucket(b);
+        if(ar !== br) return ar - br;
+      }
+      if(b.count !== a.count) return b.count - a.count;
+      if(b.stock !== a.stock) return b.stock - a.stock;
+      return String(a.label).localeCompare(String(b.label), "vi");
+    })
+    .slice(0, currentTab === "ALL" ? 8 : 10);
   if(buckets.length){
     html += `<div class="overview-sect"><div class="overview-sect-title">Theo thương hiệu / tiêu đề</div><div class="overview-grid">${buckets.map(renderOverviewChip).join("")}</div></div>`;
   }
@@ -2648,7 +2681,7 @@ function renderCard(r,i,displayNo){
         <span class="ton-label">📦 Tồn kho:</span>
         <span class="ton-val" style="color: ${isHet?"#C0392B":"#1a1a1a"};">${ton}</span>
         <button class="btn-location" type="button" title="${escapeHtml(location ? location : "Chưa có vị trí trong kho")}" onclick="showWarehouseLocation(${i})">📍 Vị trí trong kho${location ? `: ${escapeHtml(location)}` : ""}</button>
-        <button class="btn-ton btn-minus admin-only" onclick="openSaleModal(${i})">âˆ’</button>
+        <button class="btn-ton btn-minus admin-only" onclick="openSaleModal(${i})">−</button>
         <button class="btn-ton btn-plus admin-only" onclick="changeTon(${i},1)">+</button>
       </div>
       <div class="nguoi-ban-row" onclick="showTxHistory(${i})">
@@ -2724,9 +2757,9 @@ function render(){
   if(currentTab!=="ALL" && !kw){
     const FIXED_ORDER = {
       MT: [
-        "🧠  CPU — Bộ vi xử lý", "🔌  Mainboard", "💾  RAM — Bộ nhớ", "⚡  SSD — Ổ cứng thể rắn", "🗄️  HDD — Ổ cứng cơ",
-        "🎮  VGA — Card màn hình", "🔋  Nguồn — PSU", "🖥️  Case — Vỏ máy tính", "❄️  Tản nhiệt — Cooling",
-        "🖱️  Chuột & Bàn phím", "🔌  Dây cáp chuyển", "💻  Laptop linh kiện", "🖥  Màn hình", "🛠️  Linh kiện khác"
+        "🔋  Nguồn — PSU", "🔌  Mainboard", "🧠  CPU — Bộ vi xử lý", "💾  RAM — Bộ nhớ", "⚡  SSD — Ổ cứng thể rắn",
+        "🗄️  HDD — Ổ cứng cơ", "🖵  Màn hình", "🖱️  Chuột & Bàn phím", "💻  Laptop linh kiện", "🎮  VGA — Card màn hình",
+        "🖥️  Case — Vỏ máy tính", "❄️  Tản nhiệt — Cooling", "🔌  Dây cáp chuyển", "🛠️  Linh kiện khác"
       ],
       MI: ["Máy in Laser","Máy in phun màu","Máy in A3","Máy photocopy","Mực in — Cartridge","Drum — Trống in","Gạt từ / Gạt mực / Trục","Bao lụa / Formatter / Main","Các linh kiện khác"],
       CAM: ["Camera IP & Analog","Camera Wifi — Không dây","Tên miền / Domain / DDNS","Đầu ghi — DVR/NVR","Ổ cứng Camera","Switch PoE","Adapter / Nguồn / Jack"],
@@ -3376,7 +3409,7 @@ function handleImagePick(input){
   reader.readAsDataURL(file);
 }
 const GROUP_OPTIONS = {
-  MT: ["🧠  CPU — Bộ vi xử lý","🔌  Mainboard","💾  RAM — Bộ nhớ","⚡  SSD — Ổ cứng thể rắn","🗄️  HDD — Ổ cứng cơ","🎮  VGA — Card màn hình","🔋  Nguồn — PSU","🖥️  Case — Vỏ máy tính","❄️  Tản nhiệt — Cooling","🖱️  Chuột & Bàn phím","🔌  Dây cáp chuyển","💻  Laptop linh kiện","🖵  Màn hình","🛠️  Linh kiện khác"],
+  MT: ["🔋  Nguồn — PSU","🔌  Mainboard","🧠  CPU — Bộ vi xử lý","💾  RAM — Bộ nhớ","⚡  SSD — Ổ cứng thể rắn","🗄️  HDD — Ổ cứng cơ","🖵  Màn hình","🖱️  Chuột & Bàn phím","💻  Laptop linh kiện","🎮  VGA — Card màn hình","🖥️  Case — Vỏ máy tính","❄️  Tản nhiệt — Cooling","🔌  Dây cáp chuyển","🛠️  Linh kiện khác"],
 MI: ["🖨️  Máy in Laser","🎨  Máy in phun màu","📐  Máy in A3","📠  Máy photocopy","🖨️  Mực in — Cartridge","🥁  Drum — Trống in","🔧  Gạt từ / Gạt mực / Trục","🔩  Bao lụa / Formatter / Main","🛠️  Các linh kiện khác"],
   CAM: ["📷  Camera IP & Analog","📡  Camera Wifi — Không dây","🌐  Tên miền / Domain / DDNS","📼  Đầu ghi — DVR/NVR","💿  Ổ cứng Camera","🔌  Switch PoE","🔋  Adapter / Nguồn / Jack"],
 INT: ["📡  Router — Bộ định tuyến","🔀  Switch — Bộ chuyển mạch","📟  Modem","📶  Access Point — Wifi","📶  USB Wifi","🔭  Converter quang","💡  Module SFP / Quang","🔗  Dây mạng & Đầu bấm","🧰  Phụ kiện mạng"],
@@ -3458,16 +3491,36 @@ function goToTab(tabCode){
   currentTab = tabCode;
   searchQ = "";
   quickGroupFilter = null;
+  currentStatus = "ALL";
 
-  document.getElementById("search").value="";
-  document.getElementById("clear-btn").style.display="none";
+  const searchEl = document.getElementById("search");
+  const clearBtn = document.getElementById("clear-btn");
+  if(searchEl) searchEl.value = "";
+  if(clearBtn) clearBtn.style.display = "none";
+  syncStatusButtons(currentStatus);
 
   render();
 }
-function setTab(btn){ document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active")); btn.classList.add("active"); currentTab = btn.dataset.tab; quickGroupFilter = null; render(); }
+function syncStatusButtons(status){
+  const map={ALL:["#1E3A5F","#fff"],CON:["#D5F5E3","#1E8449"],SAP:["#FEF9E7","#7D6608"],HET:["#FADBD8","#922B21"]};
+  document.querySelectorAll(".filter-btn").forEach(b=>{
+    const isActive = b.dataset.status === status;
+    b.classList.toggle("active", isActive);
+    if(isActive){
+      const [bg,fg]=map[status] || ["#1E3A5F","#fff"];
+      b.style.background=bg;
+      b.style.color=fg;
+    } else {
+      b.style.background="#fff";
+      b.style.color="#666";
+    }
+  });
+}
+function setTab(btn){ goToTab(btn.dataset.tab); }
 function setStatus(btn){
-  document.querySelectorAll(".filter-btn").forEach(b=>{ b.classList.remove("active"); b.style.background="#fff"; b.style.color="#666"; });
-  btn.classList.add("active"); const map={ALL:["#1E3A5F","#fff"],CON:["#D5F5E3","#1E8449"],SAP:["#FEF9E7","#7D6608"],HET:["#FADBD8","#922B21"]}; const [bg,fg]=map[btn.dataset.status]; btn.style.background=bg; btn.style.color=fg; currentStatus=btn.dataset.status; render();
+  currentStatus = btn.dataset.status;
+  syncStatusButtons(currentStatus);
+  render();
 }
 function clearSearch(){ document.getElementById("search").value=""; searchQ=""; quickGroupFilter = null; document.getElementById("clear-btn").style.display="none"; render(); document.getElementById("search").focus(); }
 function closeOverlay(id){ document.getElementById(id).classList.remove("open"); }
@@ -3499,7 +3552,7 @@ function toggleHeader(){
   const sticky = document.querySelector('.sticky');
   const isCollapsed = sticky.classList.toggle('collapsed');
   const btn = document.getElementById('headerToggleBtn');
-  document.getElementById('headerToggleIcon').textContent = isCollapsed ? 'â–¼' : 'â–²';
+  document.getElementById('headerToggleIcon').textContent = isCollapsed ? '▼' : '▲';
   document.getElementById('headerToggleText').textContent = isCollapsed ? 'Mở rộng' : 'Thu gọn';
   btn.setAttribute('aria-expanded', String(!isCollapsed));
   btn.title = isCollapsed ? 'Mở rộng menu' : 'Thu gọn menu';
@@ -3603,6 +3656,7 @@ function setLoadingUI(pct, step){
   await loadNVFromSheet();
   setLoadingUI(100, "Hoàn tất! Đang hiển thị kho hàng...");
   await new Promise(r => setTimeout(r, 400));
+  syncStatusButtons(currentStatus);
   render();
 })();
 </script>
