@@ -1040,7 +1040,7 @@ function normalizeSheetRows(rows){
     row[3] = (row[3] || "").toString().trim();
     row[6] = getStockStatusValue(row[5]);
     row[7] = (row[7] || "").toString();
-    row[8] = (row[8] || "").toString();
+    row[8] = resolveQuickGroupLabelFromRow(row, row[8] || "");
     row[9] = (row[9] || "").toString();
     return row;
   }).filter(r=>r[1] && r[2]);
@@ -1616,7 +1616,8 @@ function detectPrinterPartLabel(text){
 
 function buildSectionSummaryBucketsV2(items, groupLabel){
   const map = new Map();
-  const family = getQuickGroupKind(groupLabel);
+  const resolvedGroupLabel = resolveQuickGroupLabelFromRow(items?.[0]?.r, groupLabel || "");
+  const family = getQuickGroupKind(resolvedGroupLabel);
   const addBucket = (meta, countDelta=0, stockDelta=0) => {
     if(!meta || meta.family === "other") return;
     const key = `${meta.family}|${quickMetaKey(meta)}`;
@@ -1633,10 +1634,10 @@ function buildSectionSummaryBucketsV2(items, groupLabel){
     current.stock += stockDelta;
     map.set(key, current);
   };
-  getQuickFixedCatalog(groupLabel).forEach(meta=>addBucket(meta, 0, 0));
+  getQuickFixedCatalog(resolvedGroupLabel).forEach(meta=>addBucket(meta, 0, 0));
   items.forEach(({r})=>{
     const stock = Number(r[5]) || 0;
-    const metas = getQuickMetaCandidates(r, groupLabel);
+    const metas = getQuickMetaCandidates(r, resolvedGroupLabel);
     metas.forEach(meta=>addBucket(meta, 1, stock));
   });
   const orderMap = {
@@ -1666,7 +1667,7 @@ function buildSectionSummaryBucketsV2(items, groupLabel){
 function buildOverviewBucketsV2(items){
   const map = new Map();
   items.forEach(({r})=>{
-    const group = r[8] || "";
+    const group = resolveQuickGroupLabelFromRow(r, r[8] || "");
     const metas = getQuickMetaCandidates(r, group);
     const stock = Number(r[5]) || 0;
     const fallback = pickBestQuickMeta(r, group);
@@ -1754,7 +1755,7 @@ function buildSectionSummaryBuckets(items, groupLabel){
 }
 
 function getOverviewBucket(r){
-  const groupLabel = r[8] || "";
+  const groupLabel = resolveQuickGroupLabelFromRow(r, r[8] || "");
   const meta = pickBestQuickMeta(r, groupLabel);
   return {
     group: groupLabel,
@@ -1852,15 +1853,15 @@ function makeQuickMeta(family, primary, secondary="", label=""){
 }
 
 function isPrinterGroupLabel(groupNorm){
-  return /\b(may in|printer)\b/i.test(groupNorm);
+  return /\b(may in|printer|muc in|drum|gat tu|gat muc|truc|bao lua|formatter|main nguon|motor|sensor|cum say|cac linh kien khac|linh kien khac)\b/i.test(groupNorm);
 }
 
 function isCameraGroupLabel(groupNorm){
-  return /\bcamera\b/i.test(groupNorm);
+  return /\bcamera\b/i.test(groupNorm) || /\b(dau ghi|o cung camera|switch poe|adapter|nguon|jack)\b/i.test(groupNorm);
 }
 
 function isInternetGroupLabel(groupNorm){
-  return /\binternet\b/i.test(groupNorm);
+  return /\binternet\b/i.test(groupNorm) || /\b(router|switch|modem|access point|usb wifi|converter quang|module sfp|day mang|phu kien mang)\b/i.test(groupNorm);
 }
 
 function getQuickGroupKind(groupLabel){
@@ -1939,6 +1940,52 @@ function getQuickFixedCatalog(groupLabel){
   return [];
 }
 
+function resolveQuickGroupLabelFromFamily(family, title){
+  const text = normalizeQuickText(title || "");
+  if(family === "cpu") return "🧠  CPU — Bộ vi xử lý";
+  if(family === "ram") return "💾  RAM — Bộ nhớ";
+  if(family === "storage"){
+    return detectStorageKind(text) === "HDD" ? "🗄️  HDD — Ổ cứng cơ" : "⚡  SSD — Ổ cứng thể rắn";
+  }
+  if(family === "camera"){
+    return /\bwifi\b/i.test(text) ? "📡  Camera Wifi — Không dây" : "📷  Camera IP & Analog";
+  }
+  if(family === "internet"){
+    const kind = detectNetworkType(text);
+    if(kind === "Router") return "📡  Router — Bộ định tuyến";
+    if(kind === "Switch") return "🔀  Switch — Bộ chuyển mạch";
+    if(kind === "Modem") return "📶  Modem";
+    if(kind === "Access Point") return "📶  Access Point — Wifi";
+    if(kind === "USB Wifi") return "📶  USB Wifi";
+    if(kind === "Converter") return "🔭  Converter quang";
+    if(kind === "SFP") return "💡  Module SFP / Quang";
+    if(kind === "Cáp mạng") return "🔗  Dây mạng & Đầu bấm";
+    return "🧰  Phụ kiện mạng";
+  }
+  if(family === "printer"){
+    const part = detectPrinterPartLabel(text);
+    if(part === "Mực in") return "🖨️  Mực in — Cartridge";
+    if(part === "Drum") return "🥁  Drum — Trống in";
+    if(part === "Gạt từ / Gạt mực / Trục") return "🔧  Gạt từ / Gạt mực / Trục";
+    if(part === "Bao lụa") return "🧩  Bao lụa / Formatter / Main";
+    if(part === "Formatter") return "🧩  Bao lụa / Formatter / Main";
+    if(part === "Main nguồn") return "🧩  Bao lụa / Formatter / Main";
+    return "🛠️  Các linh kiện khác";
+  }
+  if(family === "part") return "💻  Laptop linh kiện";
+  return "";
+}
+
+function resolveQuickGroupLabelFromRow(r, fallbackGroupLabel=""){
+  const fallback = cleanQuickLabel(fallbackGroupLabel || r?.[8] || "");
+  const fallbackNorm = normalizeQuickText(fallback);
+  if(fallback && fallbackNorm && fallbackNorm !== normalizeQuickText(NO_GROUP) && fallbackNorm !== "khac"){
+    return fallback;
+  }
+  const meta = getAutoSummaryMetaFromTitle(r?.[2] || "");
+  return resolveQuickGroupLabelFromFamily(meta.family, r?.[2] || "") || fallback || NO_GROUP;
+}
+
 function quickMetaKey(meta){
   if(!meta) return "";
   return meta.family === "storage" || meta.family === "ram" || meta.secondary
@@ -1957,9 +2004,10 @@ function quickMetaLabel(meta){
 }
 
 function getQuickMetaCandidates(r, groupLabel){
-  const groupNorm = normalizeQuickText(groupLabel || r?.[8] || "");
-  const groupKind = getQuickGroupKind(groupLabel || r?.[8] || "");
-  const text = [r?.[1], r?.[2], r?.[3], r?.[7], groupLabel || r?.[8]].filter(Boolean).join(" ");
+  const resolvedGroupLabel = resolveQuickGroupLabelFromRow(r, groupLabel || r?.[8] || "");
+  const groupNorm = normalizeQuickText(resolvedGroupLabel);
+  const groupKind = getQuickGroupKind(resolvedGroupLabel);
+  const text = [r?.[1], r?.[2], r?.[3], r?.[7], resolvedGroupLabel].filter(Boolean).join(" ");
   const metas = [];
   const add = meta => {
     if(!meta) return;
@@ -2017,6 +2065,10 @@ function getQuickMetaCandidates(r, groupLabel){
   if(groupKind === "printer" || printerPart){
     addValue("printer", printerPart, printerPart);
   }
+  const titleMeta = getAutoSummaryMetaFromTitle(r?.[2] || "");
+  if(titleMeta && titleMeta.family !== "other"){
+    add(titleMeta);
+  }
   if(metas.length===0 && isKnownQuickValue(brand)){
     addValue("brand", brand, brand);
   }
@@ -2024,9 +2076,10 @@ function getQuickMetaCandidates(r, groupLabel){
 }
 
 function pickBestQuickMeta(r, groupLabel){
-  const groupNorm = normalizeQuickText(groupLabel || r?.[8] || "");
-  const groupKind = getQuickGroupKind(groupLabel || r?.[8] || "");
-  const metas = getQuickMetaCandidates(r, groupLabel);
+  const resolvedGroupLabel = resolveQuickGroupLabelFromRow(r, groupLabel || r?.[8] || "");
+  const groupNorm = normalizeQuickText(resolvedGroupLabel);
+  const groupKind = getQuickGroupKind(resolvedGroupLabel);
+  const metas = getQuickMetaCandidates(r, resolvedGroupLabel);
   const preference = groupKind === "storage" ? ["storage", "brand"]
     : groupKind === "ram" ? ["ram", "brand"]
     : groupKind === "cpu" ? ["cpu", "ram", "storage", "brand"]
@@ -2390,10 +2443,10 @@ function getQuickMeta(r, groupLabel){
 }
 
 function getQuickFamilyForGroup(items, groupLabel){
-  const groupNorm = normalizeQuickText(groupLabel);
+  const groupNorm = normalizeQuickText(resolveQuickGroupLabelFromRow(items?.[0]?.r, groupLabel || ""));
   const stats = { ram: 0, cpu: 0, brand: 0, storage: 0, network: 0 };
   items.slice(0, 60).forEach(({r})=>{
-    const meta = getQuickMeta(r, groupLabel);
+    const meta = getQuickMeta(r, resolveQuickGroupLabelFromRow(r, groupLabel || r?.[8] || ""));
     if(meta && stats[meta.family] !== undefined){
       stats[meta.family]++;
     }
@@ -2413,10 +2466,15 @@ function getQuickFamilyForGroup(items, groupLabel){
   return null;
 }
 
+function getQuickMeta(r, groupLabel){
+  const resolvedGroupLabel = resolveQuickGroupLabelFromRow(r, groupLabel || r?.[8] || "");
+  return pickBestQuickMeta(r, resolvedGroupLabel);
+}
+
 function buildQuickBuckets(items, groupLabel, family, keyGetter, labelGetter, order){
   const map = new Map();
   items.forEach(({r,i})=>{
-    const meta = getQuickMeta(r, groupLabel);
+    const meta = getQuickMeta(r, resolveQuickGroupLabelFromRow(r, groupLabel || r?.[8] || ""));
     if(!meta || meta.family !== family) return;
     const key = keyGetter(meta, r, i);
     if(!key) return;
@@ -2464,11 +2522,12 @@ function renderQuickChip(groupLabel, family, bucket, primary, secondary){
 function matchesQuickGroupFilter(r, groupLabel){
   if(!quickGroupFilter) return true;
   const scope = String(quickGroupFilter.scope || "group");
-  if(scope === "group" && (groupLabel || "") !== quickGroupFilter.groupLabel) return false;
+  const resolvedGroupLabel = resolveQuickGroupLabelFromRow(r, groupLabel || r?.[8] || "");
+  if(scope === "group" && resolvedGroupLabel !== quickGroupFilter.groupLabel) return false;
   const filterPrimary = String(quickGroupFilter.primary || "");
   const filterSecondary = String(quickGroupFilter.secondary || "");
   const candidates = scope === "group"
-    ? getQuickMetaCandidates(r, groupLabel)
+    ? getQuickMetaCandidates(r, resolvedGroupLabel)
     : [getAutoSummaryMetaFromTitle(r[2] || "")];
   return candidates.some(meta=>{
     if(!meta || meta.family !== quickGroupFilter.family) return false;
@@ -2633,7 +2692,8 @@ function render(){
     if(currentStatus==="CON" && stockState!=="CON") return false;
     if(currentStatus==="SAP" && stockState!=="SAP") return false;
     if(currentStatus==="HET" && stockState!=="HET") return false;
-    if(!matchesQuickGroupFilter(r, r[8] || "")) return false;
+    const resolvedGroupLabel = resolveQuickGroupLabelFromRow(r, r[8] || "");
+    if(!matchesQuickGroupFilter(r, resolvedGroupLabel)) return false;
     if(!kw) return true;
     const hay = removeAccents(r[1]+" "+ten+" "+th+" "+(ghi||""));
     return hay.includes(kw);
@@ -2673,7 +2733,7 @@ function render(){
     let order;
     if(FIXED_ORDER[currentTab]){
       const fromData = new Set();
-      DATA.forEach(r=>{ if(r[0]===currentTab && r[8]) fromData.add(r[8]); });
+      DATA.forEach(r=>{ if(r[0]===currentTab){ const g = resolveQuickGroupLabelFromRow(r, r[8] || ""); if(g) fromData.add(g); } });
       const fixed = FIXED_ORDER[currentTab].filter(g=>fromData.has(g));
       const extra = [...fromData].filter(g=>!FIXED_ORDER[currentTab].includes(g));
       order = [...fixed, ...extra];
@@ -2681,13 +2741,13 @@ function render(){
       order = [];
       const seen = new Set();
       DATA.forEach(r=>{
-        if(r[0]===currentTab){ const g=r[8]||""; if(g&&!seen.has(g)){seen.add(g);order.push(g);} }
+        if(r[0]===currentTab){ const g=resolveQuickGroupLabelFromRow(r, r[8] || ""); if(g&&!seen.has(g)){seen.add(g);order.push(g);} }
       });
     }
     order.push(NO_GROUP);
     const buckets = {};
     results.forEach(({r,i})=>{
-      const g = r[8]||NO_GROUP;
+      const g = resolveQuickGroupLabelFromRow(r, r[8] || "") || NO_GROUP;
       (buckets[g] = buckets[g]||[]).push({r,i});
     });
     const cfg = SHEET_CFG[currentTab]||SHEET_CFG.MT;
