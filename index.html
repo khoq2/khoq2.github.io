@@ -405,9 +405,9 @@ body.admin-mode .admin-btn { background: #1E8449; border-color: #1E8449; opacity
     <div class="search-box">
       <span style="font-size: 20px;">🔎</span>
       <input id="search" type="search" placeholder="Gõ tên, mã hàng, thương hiệu..." autocomplete="off" autocorrect="off" spellcheck="false">
-      <button class="clear-btn" id="clear-btn" onclick="clearSearch()">✕</button>
+      <button class="clear-btn" id="clear-btn" onclick="clearSearch()">âœ•</button>
       <button id="headerToggleBtn" onclick="toggleHeader()" type="button" aria-expanded="true" title="Thu gọn menu">
-        <span id="headerToggleIcon">▲</span>
+        <span id="headerToggleIcon">â–²</span>
         <span id="headerToggleText">Thu gọn</span>
       </button>
 </div>
@@ -643,7 +643,7 @@ body.admin-mode .admin-btn { background: #1E8449; border-color: #1E8449; opacity
   </button>
 </div>
 
-<div class="footer-credit">✦ Design by : Pham Van Chuong ✦</div>
+<div class="footer-credit">âœ¦ Design by : Pham Van Chuong âœ¦</div>
 
 <div class="toast" id="toast"></div>
 
@@ -1660,8 +1660,9 @@ function buildSectionSummaryBucketsV2(items, groupLabel){
     if(b.count !== a.count) return b.count - a.count;
     return String(a.label).localeCompare(String(b.label), "vi");
   });
-  result.family = family;
-  return result;
+  const filtered = result.filter(bucket => (bucket.count || 0) > 0 || (bucket.stock || 0) > 0);
+  filtered.family = family;
+  return filtered;
 }
 
 function buildOverviewBucketsV2(items){
@@ -1689,7 +1690,7 @@ function buildOverviewBucketsV2(items){
       map.set(key, current);
     });
   });
-  return [...map.values()].sort((a,b)=>{
+  return [...map.values()].filter(bucket => (bucket.count || 0) > 0 || (bucket.stock || 0) > 0).sort((a,b)=>{
     if(b.count !== a.count) return b.count - a.count;
     if(b.stock !== a.stock) return b.stock - a.stock;
     return String(a.label).localeCompare(String(b.label), "vi");
@@ -1827,7 +1828,7 @@ function detectLaptopPartLabel(text){
 
 function detectConditionLabel(text){
   const t = normalizeQuickText(text);
-  if(/\b(cu|used|da qua su dung|second hand|like new)\b/i.test(t)) return "Cũ";
+  if(/\b(cu|used|da qua su dung|second hand|like new)\b/i.test(t)) return "CÅ©";
   return "";
 }
 
@@ -1998,6 +1999,8 @@ function quickMetaLabel(meta){
   if(meta.label) return meta.label;
   if(meta.family === "storage") return `${meta.primary || ""}${meta.secondary ? " " + meta.secondary : ""}`.trim() || "Khác";
   if(meta.family === "ram") return `RAM · ${`${meta.primary || ""}${meta.secondary ? " " + meta.secondary : ""}`.trim() || "Khác"}`;
+  if(meta.family === "cpu") return `${meta.primary || "Khác"}${meta.secondary ? " · " + meta.secondary : ""}`;
+  if(meta.family === "camera" || meta.family === "internet") return `${meta.primary || "Khác"}${meta.secondary ? " · " + meta.secondary : ""}`;
   if(meta.family === "ramform") return meta.primary || "RAM";
   if(meta.family === "brand") return `Hãng · ${meta.primary}`;
   return meta.primary || "Khác";
@@ -2125,7 +2128,7 @@ function getAutoSummaryMetaFromTitle(title){
     return { family: "network", kind: "camera", primary: cameraType, secondary: brand !== "Khác" ? brand : "" };
   }
   if(networkType !== "Khác"){
-    return { family: "network", kind: "internet", primary: networkType, secondary: brand !== "Khác" ? brand : "" };
+    return { family: "internet", kind: "internet", primary: networkType, secondary: brand !== "Khác" ? brand : "" };
   }
   if(printerPart){
     return { family: "printer", kind: "printer", primary: printerPart, secondary: printerBrand !== "Khác" && printerBrand !== printerPart ? printerBrand : "" };
@@ -2344,7 +2347,7 @@ function renderOverviewPanel(results){
   const title = currentTab === "ALL" ? "Tổng quan kho nhanh" : `Tổng quan nhanh: ${SHEET_CFG[currentTab]?.label || currentTab}`;
   const subtitle = quickGroupFilter
     ? `Đang lọc sâu: ${quickGroupFilter.primary}${quickGroupFilter.secondary ? " · " + quickGroupFilter.secondary : ""}`
-    : "Bấm vào chip để chuyển tab hoặc lọc sâu ngay";
+    : "Bấm chip để lọc theo thương hiệu hoặc tiêu đề, mỗi chip đều hiện số lượng và tồn kho";
   const pills = [
     `${totalCount} mục`,
     `${totalStock.toLocaleString("vi-VN")} tồn`,
@@ -2371,13 +2374,12 @@ function renderOverviewPanel(results){
 
   const buckets = buildOverviewBucketsV2(results).slice(0, currentTab === "ALL" ? 8 : 10);
   if(buckets.length){
-    html += `<div class="overview-sect"><div class="overview-sect-title">Nhóm nổi bật</div><div class="overview-grid">${buckets.map(renderOverviewChip).join("")}</div></div>`;
+    html += `<div class="overview-sect"><div class="overview-sect-title">Theo thương hiệu / tiêu đề</div><div class="overview-grid">${buckets.map(renderOverviewChip).join("")}</div></div>`;
   }
 
   html += `</div>`;
   return html;
 }
-
 function getQuickMeta(r, groupLabel){
   const groupNorm = normalizeQuickText(groupLabel);
   const text = normalizeQuickText([r[2], r[3], r[7], r[8]].filter(Boolean).join(" "));
@@ -2417,11 +2419,11 @@ function getQuickMeta(r, groupLabel){
   }
 
   if(groupNorm.includes("camera")){
-    return { family: "network", primary: cameraType, secondary: brand };
+    return { family: "camera", primary: cameraType, secondary: brand };
   }
 
   if(groupNorm.includes("internet")){
-    return { family: "network", primary: networkType, secondary: brand };
+    return { family: "internet", primary: networkType, secondary: brand };
   }
 
   if(ramType !== "Khác" || ramSize !== "Khác"){
@@ -2434,7 +2436,7 @@ function getQuickMeta(r, groupLabel){
     return { family: "storage", primary: storageKind, secondary: storageCap };
   }
   if(networkType !== "Khác"){
-    return { family: "network", primary: networkType, secondary: brand };
+    return { family: "internet", primary: networkType, secondary: brand };
   }
   if(brand !== "Khác"){
     return { family: "brand", primary: brand, secondary: "" };
@@ -2646,7 +2648,7 @@ function renderCard(r,i,displayNo){
         <span class="ton-label">📦 Tồn kho:</span>
         <span class="ton-val" style="color: ${isHet?"#C0392B":"#1a1a1a"};">${ton}</span>
         <button class="btn-location" type="button" title="${escapeHtml(location ? location : "Chưa có vị trí trong kho")}" onclick="showWarehouseLocation(${i})">📍 Vị trí trong kho${location ? `: ${escapeHtml(location)}` : ""}</button>
-        <button class="btn-ton btn-minus admin-only" onclick="openSaleModal(${i})">−</button>
+        <button class="btn-ton btn-minus admin-only" onclick="openSaleModal(${i})">âˆ’</button>
         <button class="btn-ton btn-plus admin-only" onclick="changeTon(${i},1)">+</button>
       </div>
       <div class="nguoi-ban-row" onclick="showTxHistory(${i})">
@@ -2724,7 +2726,7 @@ function render(){
       MT: [
         "🧠  CPU — Bộ vi xử lý", "🔌  Mainboard", "💾  RAM — Bộ nhớ", "⚡  SSD — Ổ cứng thể rắn", "🗄️  HDD — Ổ cứng cơ",
         "🎮  VGA — Card màn hình", "🔋  Nguồn — PSU", "🖥️  Case — Vỏ máy tính", "❄️  Tản nhiệt — Cooling",
-        "🖱️  Chuột & Bàn phím", "🔌  Dây cáp chuyển", "💻  Laptop linh kiện", "🖵  Màn hình", "🛠️  Linh kiện khác"
+        "🖱️  Chuột & Bàn phím", "🔌  Dây cáp chuyển", "💻  Laptop linh kiện", "🖥  Màn hình", "🛠️  Linh kiện khác"
       ],
       MI: ["Máy in Laser","Máy in phun màu","Máy in A3","Máy photocopy","Mực in — Cartridge","Drum — Trống in","Gạt từ / Gạt mực / Trục","Bao lụa / Formatter / Main","Các linh kiện khác"],
       CAM: ["Camera IP & Analog","Camera Wifi — Không dây","Tên miền / Domain / DDNS","Đầu ghi — DVR/NVR","Ổ cứng Camera","Switch PoE","Adapter / Nguồn / Jack"],
@@ -2755,20 +2757,23 @@ function render(){
     let html = "";
     html += `<div class="cat-title" style="--c: ${cfg.c};">${cfg.label}</div>`;
     if(visibleGroups.length>1){
-      html += `<div class="quick-nav">` + visibleGroups.map((g,idx)=>
-        `<button class="quick-nav-btn" style="--c:${GROUP_COLORS[idx%GROUP_COLORS.length]}" onclick="jumpToGroup('grp-${idx}')">${g}</button>`
-      ).join("") + `</div>`;
+      html += `<div class="quick-nav">` + visibleGroups.map((g,idx)=>{
+        const groupCount = buckets[g].length;
+        return `<button class="quick-nav-btn" style="--c:${GROUP_COLORS[idx%GROUP_COLORS.length]}" onclick="jumpToGroup('grp-${idx}')">${g} (${groupCount})</button>`;
+      }).join("") + `</div>`;
     }
     html += visibleGroups.map((g,idx)=>{
       const groupColor = GROUP_COLORS[idx%GROUP_COLORS.length];
       const strongColor = GROUP_STRONG_COLORS[idx%GROUP_STRONG_COLORS.length];
       const itemCount = buckets[g].length;
+      const groupStock = sumQuickStock(buckets[g]);
+      const groupSummary = `${itemCount} mục · ${groupStock.toLocaleString("vi-VN")} tồn`;
       return `<section class="group-section" style="--group-strong: ${strongColor};">
         <div class="group-header" id="grp-${idx}" style="--group-bg: ${groupColor}; --group-strong: ${strongColor}; background: ${groupColor};">
           <div class="group-header-main">
-            <span class="group-header-label">${g} (${itemCount})</span>
+            <span class="group-header-label">${g}</span>
           </div>
-          <span class="group-header-count">${itemCount}</span>
+          <span class="group-header-count">${groupSummary}</span>
         </div>
         ${renderQuickSummary(buckets[g], g)}
         ${buckets[g].map((item,itemIdx)=>renderCard(item.r,item.i,itemIdx+1)).join("")}
@@ -2785,7 +2790,6 @@ function render(){
   el.innerHTML = results.map(({r,i},idx)=>renderCard(r,i,idx+1)).join("");
   if(quickGroupFilter) focusFirstQuickMatch();
 }
-
 function updateBulkControls(){
   const modeBtn = document.getElementById("bulkModeBtn");
   const deleteBtn = document.getElementById("bulkDeleteBtn");
@@ -3495,7 +3499,7 @@ function toggleHeader(){
   const sticky = document.querySelector('.sticky');
   const isCollapsed = sticky.classList.toggle('collapsed');
   const btn = document.getElementById('headerToggleBtn');
-  document.getElementById('headerToggleIcon').textContent = isCollapsed ? '▼' : '▲';
+  document.getElementById('headerToggleIcon').textContent = isCollapsed ? 'â–¼' : 'â–²';
   document.getElementById('headerToggleText').textContent = isCollapsed ? 'Mở rộng' : 'Thu gọn';
   btn.setAttribute('aria-expanded', String(!isCollapsed));
   btn.title = isCollapsed ? 'Mở rộng menu' : 'Thu gọn menu';
@@ -3604,3 +3608,6 @@ function setLoadingUI(pct, step){
 </script>
 </body>
 </html>
+
+
+
