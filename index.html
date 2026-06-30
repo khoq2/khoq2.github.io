@@ -183,6 +183,7 @@ body.admin-entry-visible #adminBtn, body.admin-mode #adminBtn { display: flex; }
 body.admin-entry-visible #adminBtn { opacity: 1; }
 .admin-bar:hover .admin-btn { opacity: 1; }
 body.admin-mode .admin-btn { background: #1E8449; border-color: #1E8449; opacity: 1; }
+.is-dragging, .is-dragging * { user-select: none !important; -webkit-user-select: none !important; }
 .scroll-btns { position: fixed; right: 14px; bottom: 92px; display: flex; flex-direction: column; gap: 5px; z-index: 200; padding: 5px; border-radius: 14px; background: rgba(255,255,255,.94); border: 1px solid rgba(30,58,95,.18); box-shadow: 0 8px 22px rgba(17,34,51,.18); backdrop-filter: blur(10px); opacity: 1; transform: translateX(0); pointer-events: auto; transition: opacity .22s ease, transform .22s ease; }
 .scroll-btns.is-hidden { opacity: 0; transform: translateX(18px); pointer-events: none; }
 .price-row { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; margin-top: 3px; }
@@ -1529,6 +1530,22 @@ function detectCpuSeries(text){
   return "Khác";
 }
 
+function detectMonitorSize(text){
+  const t = normalizeQuickText(text);
+  const sizes = ["34", "32", "27", "24", "21.5", "19"];
+  for(const s of sizes){
+    const re = new RegExp(`\\b${s.replace(".", "\\.")}\\s*("|inch|in)\\b`, "i");
+    if(re.test(t)) return `${s}"`;
+  }
+  return "Khác";
+}
+
+function detectMonitorHz(text){
+  const t = normalizeQuickText(text);
+  const m = t.match(/\b(60|75|100|120|144|165|180|240)\s*hz\b/i);
+  return m ? `${m[1]}Hz` : "Khác";
+}
+
 function detectBrandLabel(text){
   const t = normalizeQuickText(text);
   const rules = [
@@ -1913,7 +1930,7 @@ function getQuickFixedCatalog(groupLabel){
     return makeList("cable", ["Cáp HDMI", "Cáp DisplayPort", "Cáp VGA", "Cáp USB-C", "Cáp USB 3.0", "Cáp SATA", "Cáp mạng"]);
   }
   if(kind === "monitor"){
-    return makeList("monitor", ["FHD", "QHD", "4K", "60Hz", "75Hz", "144Hz", "165Hz", "IPS", "Cong (Curved)", "19\"", "21.5\"", "24\"", "27\"", "32\""]);
+    return makeList("monitor", ["VTECK", "E-DRA", "DELL", "MSI", "19\"", "21.5\"", "24\"", "27\"", "32\"", "34\"", "60Hz", "75Hz", "100Hz", "120Hz", "144Hz", "165Hz", "180Hz", "240Hz"]);
   }
   return [];
 }
@@ -2020,6 +2037,8 @@ function getQuickMetaCandidates(r, groupLabel){
   const networkDetail = detectNetworkDetail(text);
   const printerPart = detectPrinterPartLabel(text);
   const laptopPart = detectLaptopPartLabel(text);
+  const monitorSize = detectMonitorSize(text);
+  const monitorHz = detectMonitorHz(text);
 
   if(groupKind === "storage" || (groupKind === "brand" && (isKnownQuickValue(storageKind) || isKnownQuickValue(storageCap)))){
     addValue("storage", storageKind, storageKind);
@@ -2050,11 +2069,17 @@ function getQuickMetaCandidates(r, groupLabel){
   if(groupKind === "printer" || (groupKind === "brand" && printerPart)){
     addValue("printer", printerPart, printerPart);
   }
+  const MONITOR_FIXED_VALUES = new Set(["VTECK", "E-DRA", "DELL", "MSI", "19\"", "21.5\"", "24\"", "27\"", "32\"", "34\"", "60Hz", "75Hz", "100Hz", "120Hz", "144Hz", "165Hz", "180Hz", "240Hz"]);
+  if(groupKind === "monitor" || (groupKind === "brand" && (MONITOR_FIXED_VALUES.has(monitorSize) || MONITOR_FIXED_VALUES.has(monitorHz)))){
+    if(MONITOR_FIXED_VALUES.has(brand)) addValue("monitor", brand, brand);
+    if(MONITOR_FIXED_VALUES.has(monitorSize)) addValue("monitor", monitorSize, monitorSize);
+    if(MONITOR_FIXED_VALUES.has(monitorHz)) addValue("monitor", monitorHz, monitorHz);
+  }
   const titleMeta = getAutoSummaryMetaFromTitle(r?.[2] || "");
   if(titleMeta && titleMeta.family !== "other" && (groupKind === "brand" || groupKind === titleMeta.family) && !(groupKind === "cpu" && metas.some(x=>x.family === "cpu")) && groupKind !== "storage"){
     add(titleMeta);
   }
-  if(metas.length===0 && isKnownQuickValue(brand)){
+  if(metas.length===0 && groupKind !== "monitor" && isKnownQuickValue(brand)){
     addValue("brand", brand, brand);
   }
   return metas;
@@ -3505,6 +3530,44 @@ function setupScrollButtonsAutoHide(){
 }
 setupScrollButtonsAutoHide();
 
+// Cho phép giữ chuột trái rồi kéo qua kéo lại để cuộn ngang (mặc định trình duyệt không hỗ trợ việc này,
+// chỉ có chạm tay/trackpad mới tự cuộn được). Chỉ bật trên máy có chuột thật (không phải cảm ứng).
+function enableMouseDragScroll(el, onUserScroll){
+  if(!el || el.dataset.dragScrollBound) return;
+  el.dataset.dragScrollBound = "1";
+  const touchLike = window.matchMedia("(hover: none), (pointer: coarse)").matches;
+  if(touchLike) return; // điện thoại/tablet đã tự kéo được bằng tay, không cần giả lập
+  let isDown = false, startX = 0, startScroll = 0, moved = false;
+  el.style.cursor = "grab";
+  el.addEventListener("mousedown", (e)=>{
+    isDown = true; moved = false;
+    el.classList.add("is-dragging");
+    el.style.cursor = "grabbing";
+    startX = e.pageX;
+    startScroll = el.scrollLeft;
+  });
+  const stop = ()=>{
+    if(!isDown) return;
+    isDown = false;
+    el.classList.remove("is-dragging");
+    el.style.cursor = "grab";
+  };
+  window.addEventListener("mouseup", stop);
+  el.addEventListener("mouseleave", stop);
+  el.addEventListener("mousemove", (e)=>{
+    if(!isDown) return;
+    e.preventDefault();
+    const dx = e.pageX - startX;
+    if(Math.abs(dx) > 3) moved = true;
+    el.scrollLeft = startScroll - dx;
+    if(typeof onUserScroll === "function") onUserScroll();
+  });
+  // Chặn click bị "ăn theo" khi vừa kéo xong (tránh bấm nhầm tab/filter khi chỉ định kéo)
+  el.addEventListener("click", (e)=>{
+    if(moved){ e.preventDefault(); e.stopPropagation(); moved = false; }
+  }, true);
+}
+
 const autoScrollBars = {};
 function setupSlowAutoScroll(selector){
   const el = document.querySelector(selector);
@@ -3525,6 +3588,10 @@ function setupSlowAutoScroll(selector){
   ["touchstart","pointerdown","wheel"].forEach(evt=>{
     el.addEventListener(evt, ()=>{ pause(touchLike ? 900 : 3500); state.pos = el.scrollLeft; }, {passive:true});
   });
+  // Lắng nghe scroll thực tế: mỗi lần có sự kiện (kể cả khi đang trôi theo đà sau khi thả tay)
+  // thì gia hạn thêm thời gian tạm dừng, để không bao giờ tự chạy lại khi người dùng còn đang kéo/trượt.
+  el.addEventListener("scroll", ()=>{ pause(touchLike ? 900 : 3500); state.pos = el.scrollLeft; }, {passive:true});
+  enableMouseDragScroll(el, ()=>{ pause(3500); state.pos = el.scrollLeft; });
   state.timer = setInterval(()=>{
     const max = el.scrollWidth - el.clientWidth;
     if(max > 2 && window.innerWidth <= 420){
@@ -3565,6 +3632,9 @@ function setupGroupChipsAutoScroll(){
     ["touchstart","pointerdown","wheel"].forEach(evt=>{
       el.addEventListener(evt, ()=>{ state.pauseUntil = Date.now() + (touchLike ? 900 : 3500); state.pos = el.scrollLeft; }, {passive:true});
     });
+    // Gia hạn pause theo sự kiện scroll thực tế (bao gồm cả lúc đang trôi theo đà trên iPhone)
+    el.addEventListener("scroll", ()=>{ state.pauseUntil = Date.now() + (touchLike ? 900 : 3500); state.pos = el.scrollLeft; }, {passive:true});
+    enableMouseDragScroll(el, ()=>{ state.pauseUntil = Date.now() + 3500; state.pos = el.scrollLeft; });
     const timer = setInterval(()=>{
       const max = el.scrollWidth - el.clientWidth;
       if(max > 2){
