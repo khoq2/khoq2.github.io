@@ -2742,6 +2742,7 @@ function render(){
     }).join("");
     el.innerHTML = html;
     if(quickGroupFilter) focusFirstQuickMatch();
+    setupGroupChipsAutoScroll();
     return;
   }
   if(!bulkSelectMode && !kw && currentTab==="ALL" && currentStatus==="ALL"){
@@ -3544,6 +3545,35 @@ function setupHeaderAutoScroll(){
   setupSlowAutoScroll(".filters");
 }
 setupHeaderAutoScroll();
+
+let groupChipsScrollTimers = [];
+function setupGroupChipsAutoScroll(){
+  groupChipsScrollTimers.forEach(t=>clearInterval(t));
+  groupChipsScrollTimers = [];
+  const touchLike = window.matchMedia("(hover: none), (pointer: coarse)").matches;
+  document.querySelectorAll(".group-summary-row").forEach(el=>{
+    const state = { dir: 1, pauseUntil: 0, hovering: false };
+    if(!touchLike){
+      el.addEventListener("mouseenter", ()=>{ state.hovering = true; });
+      el.addEventListener("mouseleave", ()=>{ state.hovering = false; state.pauseUntil = Date.now() + 1200; });
+    }
+    ["touchstart","pointerdown","wheel"].forEach(evt=>{
+      el.addEventListener(evt, ()=>{ state.pauseUntil = Date.now() + (touchLike ? 900 : 3500); }, {passive:true});
+    });
+    const timer = setInterval(()=>{
+      const max = el.scrollWidth - el.clientWidth;
+      if(max > 2){
+        const isHovering = touchLike ? false : (state.hovering || el.matches(":hover"));
+        if(!isHovering && Date.now() >= state.pauseUntil){
+          el.scrollLeft += state.dir * 0.5;
+          if(el.scrollLeft >= max - 1) state.dir = -1;
+          if(el.scrollLeft <= 1) state.dir = 1;
+        }
+      }
+    }, 80);
+    groupChipsScrollTimers.push(timer);
+  });
+}
 
 // MỚI — thay bằng đoạn này:
 function updateSearchFixedState(){
