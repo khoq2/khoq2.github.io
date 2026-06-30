@@ -3513,7 +3513,7 @@ function setupSlowAutoScroll(selector){
     clearInterval(autoScrollBars[selector].timer);
   }
   const touchLike = window.matchMedia("(hover: none), (pointer: coarse)").matches;
-  const state = { dir: 1, pauseUntil: 0, hovering: false, timer: null };
+  const state = { dir: 1, pauseUntil: 0, hovering: false, timer: null, pos: el.scrollLeft };
   autoScrollBars[selector] = state;
   const pause = (ms=3500) => {
     state.pauseUntil = Date.now() + ms;
@@ -3523,19 +3523,24 @@ function setupSlowAutoScroll(selector){
     el.addEventListener("mouseleave", ()=>{ state.hovering = false; pause(1200); });
   }
   ["touchstart","pointerdown","wheel"].forEach(evt=>{
-    el.addEventListener(evt, ()=>pause(touchLike ? 900 : 3500), {passive:true});
+    el.addEventListener(evt, ()=>{ pause(touchLike ? 900 : 3500); state.pos = el.scrollLeft; }, {passive:true});
   });
   state.timer = setInterval(()=>{
     const max = el.scrollWidth - el.clientWidth;
     if(max > 2 && window.innerWidth <= 420){
       const isHovering = touchLike ? false : (state.hovering || el.matches(":hover"));
       if(!isHovering && Date.now() >= state.pauseUntil){
-        el.scrollLeft += state.dir * 0.55;
-        if(el.scrollLeft >= max - 1) state.dir = -1;
-        if(el.scrollLeft <= 1) state.dir = 1;
+        // Dùng biến số thực riêng để tích lũy, tránh bị Safari/iOS làm tròn scrollLeft về số nguyên
+        state.pos += state.dir * 0.55;
+        if(state.pos >= max - 1){ state.pos = max - 1; state.dir = -1; }
+        if(state.pos <= 1){ state.pos = 1; state.dir = 1; }
+        el.scrollLeft = state.pos;
+      } else {
+        state.pos = el.scrollLeft;
       }
     } else {
       el.scrollLeft = 0;
+      state.pos = 0;
       state.dir = 1;
     }
   }, 80);
@@ -3552,22 +3557,26 @@ function setupGroupChipsAutoScroll(){
   groupChipsScrollTimers = [];
   const touchLike = window.matchMedia("(hover: none), (pointer: coarse)").matches;
   document.querySelectorAll(".group-summary-row").forEach(el=>{
-    const state = { dir: 1, pauseUntil: 0, hovering: false };
+    const state = { dir: 1, pauseUntil: 0, hovering: false, pos: el.scrollLeft };
     if(!touchLike){
       el.addEventListener("mouseenter", ()=>{ state.hovering = true; });
       el.addEventListener("mouseleave", ()=>{ state.hovering = false; state.pauseUntil = Date.now() + 1200; });
     }
     ["touchstart","pointerdown","wheel"].forEach(evt=>{
-      el.addEventListener(evt, ()=>{ state.pauseUntil = Date.now() + (touchLike ? 900 : 3500); }, {passive:true});
+      el.addEventListener(evt, ()=>{ state.pauseUntil = Date.now() + (touchLike ? 900 : 3500); state.pos = el.scrollLeft; }, {passive:true});
     });
     const timer = setInterval(()=>{
       const max = el.scrollWidth - el.clientWidth;
       if(max > 2){
         const isHovering = touchLike ? false : (state.hovering || el.matches(":hover"));
         if(!isHovering && Date.now() >= state.pauseUntil){
-          el.scrollLeft += state.dir * 0.5;
-          if(el.scrollLeft >= max - 1) state.dir = -1;
-          if(el.scrollLeft <= 1) state.dir = 1;
+          // Dùng biến số thực riêng để tích lũy, tránh bị Safari/iOS làm tròn scrollLeft về số nguyên
+          state.pos += state.dir * 0.5;
+          if(state.pos >= max - 1){ state.pos = max - 1; state.dir = -1; }
+          if(state.pos <= 1){ state.pos = 1; state.dir = 1; }
+          el.scrollLeft = state.pos;
+        } else {
+          state.pos = el.scrollLeft;
         }
       }
     }, 80);
