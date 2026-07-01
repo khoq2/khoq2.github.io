@@ -110,6 +110,7 @@ body { font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif
 .tx-delete { color: #C0392B; }
 .tx-action:active { transform: scale(.96); }
 .card.highlight { box-shadow: 0 0 0 3px #F39C12; animation: flash 1.6s ease; }
+mark.kw-hit { background: #FFEB3B; color: #1A1A1A; padding: 0 1px; border-radius: 3px; font-weight: 800; }
 @keyframes flash { from { background: #FFF9E6; } to { background: #fff; } }
 .ton-ctrl { display: flex; align-items: center; gap: 6px; margin-top: 8px; border-top: 1px solid #eee; padding-top: 8px; flex-wrap: wrap; }
 .ton-label { font-size: 11px; color: #666; flex: 0 0 auto; white-space: nowrap; }
@@ -501,11 +502,11 @@ body.admin-mode .admin-btn { background: #1E8449; border-color: #1E8449; opacity
     <div class="form-2col">
       <div class="form-row">
         <label>Số lượng tồn *</label>
-        <input type="number" id="fTon" placeholder="0" min="0">
+        <input type="number" id="fTon" placeholder="0" min="0" oninput="document.getElementById('fTT').value = getStockStatusValue(parseInt(this.value)||0);">
       </div>
       <div class="form-row">
-        <label>Tình trạng</label>
-        <select id="fTT">
+        <label>Tình trạng (tự tính theo tồn kho)</label>
+        <select id="fTT" disabled title="Tình trạng được tự động tính từ số lượng tồn, không thể sửa tay">
           <option value="CÒN HÀNG">✅ Còn hàng</option>
           <option value="SẮP HẾT">⚠️ Sắp hết</option>
           <option value="HẾT HÀNG">❌ Hết hàng</option>
@@ -893,6 +894,14 @@ const DEFAULT_DATA = [
 ];
 
 let DATA = [];
+// Bảng ánh xạ nhãn nhóm cũ -> nhãn nhóm chuẩn hiện tại (dùng chung cho mọi nơi
+// đọc/giải quyết nhãn nhóm, để tránh tạo 2 nhóm trùng nội dung khác nhãn).
+const GROUP_MIGRATE = {
+  "🖥️  Màn hình": "🖵  Màn hình"
+};
+function canonGroupLabel(label){
+  return (label && GROUP_MIGRATE[label]) || label;
+}
 let currentTab = "ALL";
 let currentStatus = "ALL";
 let searchQ = "";
@@ -1044,6 +1053,25 @@ function hasPendingSync(){
   return localStorage.getItem(PENDING_SYNC_KEY) !== null;
 }
 
+// Lưu vào localStorage một cách an toàn: nếu bộ nhớ máy đầy (thường do ảnh base64
+// của sản phẩm/giao dịch/nhân viên chiếm dung lượng), báo cho người dùng biết thay vì
+// âm thầm bỏ qua lỗi — để tránh hiểu lầm là dữ liệu đã lưu cục bộ trong khi thực ra chưa.
+let localStorageWarnShown = false;
+function safeLocalStorageSet(key, value){
+  try{
+    localStorage.setItem(key, value);
+    return true;
+  }catch(e){
+    console.error("Lỗi lưu cục bộ (localStorage đầy hoặc bị chặn):", key, e);
+    if(!localStorageWarnShown){
+      localStorageWarnShown = true;
+      showToast("⚠️ Bộ nhớ máy này đã đầy, không lưu được bản sao cục bộ (ảnh sản phẩm/giao dịch có thể chiếm nhiều dung lượng). Dữ liệu vẫn đang đồng bộ lên Google Sheet khi có mạng.", 5000);
+      setTimeout(()=>{ localStorageWarnShown = false; }, 60000);
+    }
+    return false;
+  }
+}
+
 function flushDataSaveQueue(){
   return dataSaveChain.catch(()=>{});
 }
@@ -1053,7 +1081,7 @@ function normalizeSheetRows(rows){
   return rows.filter(Array.isArray).map(r=>{
     const row = Array.from({length:12}, (_,i) => r[i] !== undefined ? r[i] : "");
     row[4] = parseVndInput(row[4]);
-    row[5] = Number(row[5]) || 0;
+    row[5] = Math.max(0, Number(row[5]) || 0);
     row[10] = parseVndInput(row[10]);
     row[0] = (row[0] || "MT").toString().trim().toUpperCase();
     row[1] = (row[1] || "").toString().trim();
@@ -1117,20 +1145,13 @@ async function loadData(){
         return;
       }
       if(!sheetRows.length){
-        try{
-          const savedRows = JSON.parse(localStorage.getItem("kho_cntt_data")||"[]");
-          if(Array.isArray(savedRows) && savedRows.length){
-            DATA = localSnapshot;
-            setSyncBadge("empty", "Google Sheet đang trống, app đang dùng dữ liệu lưu trên máy này");
-            return;
-          }
-        }catch(e){}
+        if(Array.isArray(localSnapshot) && localSnapshot.length){
+          DATA = localSnapshot;
+          setSyncBadge("empty", "Google Sheet đang trống, app đang dùng dữ liệu lưu trên máy này");
+          return;
+        }
       }
       DATA = sheetRows;
-
-      const GROUP_MIGRATE = {
-        "🖥️  Màn hình":"🖵  Màn hình"
-      };
 
       DATA.forEach(r=>{
         if(r[8] && GROUP_MIGRATE[r[8]]){
@@ -1143,7 +1164,7 @@ async function loadData(){
       }else{
         setSyncBadge("empty");
       }
-      try{ localStorage.setItem("kho_cntt_data", JSON.stringify(DATA)); }catch(e){}
+      try{ safeLocalStorageSet("kho_cntt_data", JSON.stringify(DATA)); }catch(e){}
       return;
     }catch(e){
       console.error("Lỗi tải từ Google Sheet:", e);
@@ -1171,7 +1192,7 @@ async function pushToSheet(){
 
 async function saveData(){
   const snapshot = normalizeSheetRows(JSON.parse(JSON.stringify(DATA)));
-  try { localStorage.setItem("kho_cntt_data", JSON.stringify(snapshot)); } catch(e){}
+  try { safeLocalStorageSet("kho_cntt_data", JSON.stringify(snapshot)); } catch(e){}
   if(!SHEET_API_URL){
     setPendingSync(false);
     return true;
@@ -1222,13 +1243,18 @@ async function manualSync(){
   await flushDataSaveQueue();
   setSyncBadge("syncing");
   try{
-    await Promise.all([
-      pushToSheet(),
-      postSheet("save_nv", NV_LIST),
-      postSheet("save_tx", TX_DATA)
+    let dataOk = true;
+    const [nvOk, txOk] = await Promise.all([
+      pushToSheet().then(()=>true).catch(e=>{ dataOk=false; throw e; }),
+      saveNV(),
+      saveTX()
     ]);
-    setSyncBadge("synced");
-    showToast("✅ Đã đẩy dữ liệu hiện tại lên Google Sheet");
+    if(dataOk && nvOk && txOk){
+      setSyncBadge("synced");
+      showToast("✅ Đã đẩy dữ liệu hiện tại lên Google Sheet");
+    }else{
+      setSyncBadge("error", "Một phần dữ liệu chưa đồng bộ được");
+    }
   }catch(e){
     console.error("Lỗi đồng bộ thủ công:", e);
     setSyncBadge("error", String(e));
@@ -1281,8 +1307,8 @@ function showKpiDetail(type){
       const c = cfg[r[0]]||cfg.MT;
       return `<div class="kpi-detail-row">
         <div class="kpi-detail-sh">
-          <span class="kpi-detail-badge" style="background: ${c.c};">${r[1]}</span>
-          <span style="font-size: 12px;">${r[2]}</span>
+          <span class="kpi-detail-badge" style="background: ${c.c};">${escapeHtml(r[1])}</span>
+          <span style="font-size: 12px;">${escapeHtml(r[2])}</span>
         </div>
         <span style="color: #C0392B; font-weight: bold; font-size: 12px;">Hết hàng</span>
       </div>`;
@@ -1295,8 +1321,8 @@ function showKpiDetail(type){
       const c = cfg[r[0]]||cfg.MT;
       return `<div class="kpi-detail-row">
         <div class="kpi-detail-sh">
-          <span class="kpi-detail-badge" style="background: ${c.c};">${r[1]}</span>
-          <span style="font-size: 12px;">${r[2]}</span>
+          <span class="kpi-detail-badge" style="background: ${c.c};">${escapeHtml(r[1])}</span>
+          <span style="font-size: 12px;">${escapeHtml(r[2])}</span>
         </div>
         <span style="color: #B7950B; font-weight: bold;">SL: ${r[5]}</span>
       </div>`;
@@ -1344,7 +1370,7 @@ function setupVndInputs(){
     });
   });
 }
-function removeAccents(s){ return s.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase(); }
+function removeAccents(s){ return s.toLowerCase().replace(/đ/g,"d").normalize("NFD").replace(/[\u0300-\u036f]/g,""); }
 function escapeHtml(s){
   return String(s ?? "")
     .replace(/&/g,"&amp;")
@@ -1352,6 +1378,61 @@ function escapeHtml(s){
     .replace(/>/g,"&gt;")
     .replace(/"/g,"&quot;")
     .replace(/'/g,"&#39;");
+}
+// Bôi vàng từ khóa trùng khớp trên văn bản gốc (có dấu), so khớp theo bản không dấu.
+// Nhận vào MẢNG các từ khóa (đã tách theo khoảng trắng) để khớp với cách tìm kiếm
+// đa từ, không cần đúng thứ tự — tô vàng tất cả các từ khớp được, kể cả khi chúng
+// nằm ở các vị trí khác nhau trong chuỗi hoặc chồng lấn nhau.
+// An toàn XSS: mọi đoạn văn bản (trước/trong/sau chỗ khớp) đều đi qua escapeHtml() riêng lẻ,
+// chỉ có thẻ <mark> là cố định do code viết ra, không lấy từ dữ liệu người dùng.
+function highlightMatch(text, kwTokens){
+  const str = String(text ?? "");
+  const tokens = (Array.isArray(kwTokens) ? kwTokens : [kwTokens]).filter(Boolean);
+  if(!tokens.length) return escapeHtml(str);
+  const chars = Array.from(str); // tách theo ký tự thật (an toàn với emoji/ký tự tổ hợp)
+  const noAccentChars = chars.map(ch => removeAccents(ch));
+  const noAccentStr = noAccentChars.join("");
+  // Gom mọi khoảng khớp (offset trong chuỗi không dấu) của từng từ khóa
+  let ranges = [];
+  for(const t of tokens){
+    let searchFrom = 0;
+    while(true){
+      const idx = noAccentStr.indexOf(t, searchFrom);
+      if(idx === -1) break;
+      ranges.push([idx, idx + t.length]);
+      searchFrom = idx + t.length;
+    }
+  }
+  if(!ranges.length) return escapeHtml(str);
+  ranges.sort((a,b)=>a[0]-b[0]);
+  const merged = [ranges[0].slice()];
+  for(let i=1;i<ranges.length;i++){
+    const last = merged[merged.length-1];
+    if(ranges[i][0] <= last[1]) last[1] = Math.max(last[1], ranges[i][1]);
+    else merged.push(ranges[i].slice());
+  }
+  // Bảng vị trí bắt đầu (trong chuỗi không dấu) của từng ký tự gốc, để ánh xạ ngược chỉ số.
+  const starts = [];
+  let pos = 0;
+  for(const c of noAccentChars){ starts.push(pos); pos += c.length; }
+  function mapOffsetToCharIndex(offset){
+    let lo = 0, hi = starts.length - 1, ans = 0;
+    while(lo <= hi){
+      const mid = (lo + hi) >> 1;
+      if(starts[mid] <= offset){ ans = mid; lo = mid + 1; } else { hi = mid - 1; }
+    }
+    return ans;
+  }
+  let html = "", cursor = 0;
+  for(const [s,e] of merged){
+    const startCharIdx = mapOffsetToCharIndex(s);
+    const endCharIdx = mapOffsetToCharIndex(e - 1) + 1;
+    html += escapeHtml(chars.slice(cursor, startCharIdx).join(""));
+    html += `<mark class="kw-hit">${escapeHtml(chars.slice(startCharIdx, endCharIdx).join(""))}</mark>`;
+    cursor = endCharIdx;
+  }
+  html += escapeHtml(chars.slice(cursor).join(""));
+  return html;
 }
 async function copyTextValue(text, label, btn){
   const code = (text || "").toString();
@@ -1446,6 +1527,7 @@ function setQuickGroupFilter(next){
     clearBtn.style.display = "none";
   }
   searchQ = "";
+  clearTimeout(searchRenderTimer);
   render();
 }
 
@@ -1985,7 +2067,7 @@ function resolveQuickGroupLabelFromFamily(family, title){
 }
 
 function resolveQuickGroupLabelFromRow(r, fallbackGroupLabel=""){
-  const fallback = cleanQuickLabel(fallbackGroupLabel || r?.[8] || "");
+  const fallback = canonGroupLabel(cleanQuickLabel(fallbackGroupLabel || r?.[8] || ""));
   const fallbackNorm = normalizeQuickText(fallback);
   if(fallback && fallbackNorm && fallbackNorm !== normalizeQuickText(NO_GROUP) && fallbackNorm !== "khac"){
     return fallback;
@@ -2163,78 +2245,6 @@ function getAutoSummaryMetaFromTitle(title){
   return { family: "other", kind: "other", primary: "Khác", secondary: "" };
 }
 
-function getSectionSummaryMeta(r, groupLabel){
-  return pickBestQuickMeta(r, groupLabel);
-}
-
-function buildSectionSummaryBuckets(items, groupLabel){
-  const map = new Map();
-  let family = "other";
-  items.forEach(({r})=>{
-    const meta = getSectionSummaryMeta(r, groupLabel);
-    if(!meta || meta.family === "other") return;
-    if(family === "other") family = meta.family;
-    const key = `${meta.family}|${quickMetaKey(meta)}`;
-    const current = map.get(key) || {
-      key,
-      family: meta.family,
-      primary: meta.primary || "Khác",
-      secondary: meta.secondary || "",
-      label: quickMetaLabel(meta),
-      count: 0,
-      stock: 0
-    };
-    current.count++;
-    current.stock += Number(r[5]) || 0;
-    map.set(key, current);
-  });
-  const orderMap = {
-    cpu: [...CPU_SERIES_ORDER, ...CPU_BRAND_ORDER],
-    ram: RAM_TYPE_ORDER,
-    storage: STORAGE_KIND_ORDER,
-    brand: BRAND_ORDER,
-    network: NETWORK_KIND_ORDER,
-    other: []
-  };
-  const order = orderMap[family] || [];
-  const orderIndex = new Map(order.map((key, idx)=>[key, idx]));
-  const ramSizeIndex = new Map(RAM_SIZE_ORDER.map((key, idx)=>[key, idx]));
-  const result = [...map.values()].sort((a, b)=>{
-    if(family === "ram"){
-      const ak = a.primary, ac = a.secondary;
-      const bk = b.primary, bc = b.secondary;
-      const ki = orderIndex.has(ak) ? orderIndex.get(ak) : 999;
-      const kj = orderIndex.has(bk) ? orderIndex.get(bk) : 999;
-      if(ki !== kj) return ki - kj;
-      const ai = ramSizeIndex.has(ac || "") ? ramSizeIndex.get(ac || "") : 999;
-      const bi = ramSizeIndex.has(bc || "") ? ramSizeIndex.get(bc || "") : 999;
-      if(ai !== bi) return ai - bi;
-      if(b.count !== a.count) return b.count - a.count;
-      return String(a.label).localeCompare(String(b.label), "vi");
-    }
-    if(family === "storage"){
-      const ak = a.primary, ac = a.secondary;
-      const bk = b.primary, bc = b.secondary;
-      const ki = orderIndex.has(ak) ? orderIndex.get(ak) : 999;
-      const kj = orderIndex.has(bk) ? orderIndex.get(bk) : 999;
-      if(ki !== kj) return ki - kj;
-      const capIndex = new Map(STORAGE_CAP_ORDER.map((key, idx)=>[key, idx]));
-      const ai = capIndex.has(ac || "") ? capIndex.get(ac || "") : 999;
-      const bi = capIndex.has(bc || "") ? capIndex.get(bc || "") : 999;
-      if(ai !== bi) return ai - bi;
-      if(b.count !== a.count) return b.count - a.count;
-      return String(a.label).localeCompare(String(b.label), "vi");
-    }
-    const ai = orderIndex.has(a.primary) ? orderIndex.get(a.primary) : 999;
-    const bi = orderIndex.has(b.primary) ? orderIndex.get(b.primary) : 999;
-    if(ai !== bi) return ai - bi;
-    if(b.count !== a.count) return b.count - a.count;
-    return String(a.label).localeCompare(String(b.label), "vi");
-  });
-  result.family = family;
-  return result;
-}
-
 function detectLaptopPartLabel(text){
   const t = normalizeQuickText(text);
   const rules = [
@@ -2253,254 +2263,8 @@ function detectLaptopPartLabel(text){
   return "";
 }
 
-function getCardInsightTags(r){
-  const groupLabel = r[8] || "";
-  const groupNorm = normalizeQuickText(groupLabel);
-  const text = normalizeQuickText([r[1], r[2], r[3], r[7], groupLabel].filter(Boolean).join(" "));
-  const tags = [];
-  const add = (value) => {
-    const v = (value || "").toString().trim();
-    if(!v) return;
-    if(tags.includes(v)) return;
-    tags.push(v);
-  };
-
-  if(isRamGroupLabel(groupNorm)){
-    add(detectRamType(text));
-    add(detectRamSize(text));
-    const brand = detectBrandLabel(text);
-    if(brand !== "Khác") add(brand);
-  } else if(groupNorm.includes("cpu")){
-    add(detectCpuBrand(text));
-    add(detectCpuSeries(text));
-    const brand = detectBrandLabel(text);
-    if(brand !== "Khác" && brand !== "Intel" && brand !== "AMD") add(brand);
-  } else if(isStorageGroupLabel(groupNorm)){
-    add(getStorageLabel(text));
-    const brand = detectBrandLabel(text);
-    if(brand !== "Khác") add(brand);
-  } else if(groupNorm.includes("camera")){
-    add(detectCameraType(text));
-    const brand = detectBrandLabel(text);
-    if(brand !== "Khác") add(brand);
-    const mp = text.match(/\b(\d+(?:\.\d+)?)\s*mp\b/i);
-    if(mp) add(`${mp[1]}MP`);
-    if(/\b1080p\b/i.test(text)) add("1080p");
-    if(/\b2k\b/i.test(text)) add("2K");
-    if(/\b4k\b/i.test(text)) add("4K");
-  } else if(groupNorm.includes("internet")){
-    add(detectNetworkType(text));
-    const brand = detectBrandLabel(text);
-    if(brand !== "Khác") add(brand);
-    const speed = text.match(/\b(\d{3,4})\s*mbps\b/i);
-    if(speed) add(`${speed[1]}Mbps`);
-  } else if(groupNorm.includes("laptop linh kien")){
-    add(detectLaptopPartLabel(text));
-    add(detectBrandLabel(text));
-  } else {
-    const brand = detectBrandLabel(text);
-    if(brand !== "Khác") add(brand);
-    const ramType = detectRamType(text);
-    if(ramType !== "Khác") add(ramType);
-    const ramSize = detectRamSize(text);
-    if(ramSize !== "Khác") add(ramSize);
-    const storage = getStorageLabel(text);
-    if(storage !== "Khác") add(storage);
-    const network = detectNetworkType(text);
-    if(network !== "Khác") add(network);
-    const part = detectLaptopPartLabel(text);
-    if(part) add(part);
-  }
-
-  return tags.filter(Boolean).slice(0, 3);
-}
-
-function getOverviewBucket(r){
-  const groupLabel = r[8] || "";
-  const meta = pickBestQuickMeta(r, groupLabel);
-  return {
-    group: groupLabel,
-    family: meta.family || "other",
-    primary: meta.primary || "Khác",
-    secondary: meta.secondary || "",
-    label: quickMetaLabel(meta) || groupLabel || "Khác"
-  };
-}
-
-function buildOverviewBuckets(items){
-  const map = new Map();
-  items.forEach(({r})=>{
-    const bucket = getOverviewBucket(r);
-    const key = `${bucket.group}|${bucket.family}|${bucket.primary}|${bucket.secondary}`;
-    const current = map.get(key) || { ...bucket, count: 0, stock: 0 };
-    current.count++;
-    current.stock += Number(r[5]) || 0;
-    map.set(key, current);
-  });
-  return [...map.values()].sort((a,b)=>{
-    if(b.count !== a.count) return b.count - a.count;
-    if(b.stock !== a.stock) return b.stock - a.stock;
-    return String(a.label).localeCompare(String(b.label), "vi");
-  });
-}
-
-function renderOverviewChip(bucket){
-  const active = isQuickChipActive(bucket.group, bucket.family, bucket.primary, bucket.secondary);
-  if(bucket.family === "other"){
-    return `<div class="overview-chip${active ? " active" : ""}" aria-disabled="true"><span class="overview-chip-top"><span class="overview-chip-title">${escapeHtml(bucket.label)}</span><span class="overview-chip-count">${bucket.count}</span></span><span class="overview-chip-sub">${bucket.stock.toLocaleString("vi-VN")} tồn</span></div>`;
-  }
-  return `<button type="button" class="overview-chip${active ? " active" : ""}" data-group="${escapeHtml(bucket.group)}" data-family="${escapeHtml(bucket.family)}" data-primary="${escapeHtml(bucket.primary)}" data-secondary="${escapeHtml(bucket.secondary || "")}" onclick="toggleQuickGroupFilter(this)"><span class="overview-chip-top"><span class="overview-chip-title">${escapeHtml(bucket.label)}</span><span class="overview-chip-count">${bucket.count}</span></span><span class="overview-chip-sub">${bucket.stock.toLocaleString("vi-VN")} tồn</span></button>`;
-}
-
-function renderMainTabChip(tabCode, label, color, count, stock, active){
-  return `<button type="button" class="overview-chip${active ? " active" : ""}" onclick="goToTab('${tabCode}')"><span class="overview-chip-top"><span class="overview-chip-title">${label}</span><span class="overview-chip-count">${count}</span></span><span class="overview-chip-sub">${stock.toLocaleString("vi-VN")} tồn</span></button>`;
-}
-
-function rankMtOverviewBucket(bucket){
-  const label = normalizeQuickText([bucket?.label, bucket?.group, bucket?.primary].filter(Boolean).join(" "));
-  if(/\b(psu|nguon)\b/i.test(label)) return 0;
-  if(/\bmainboard\b/i.test(label)) return 1;
-  if(/\bcpu\b/i.test(label)) return 2;
-  if(/\bram\b/i.test(label)) return 3;
-  if(/\bssd\b/i.test(label)) return 4;
-  if(/\bhdd\b/i.test(label)) return 5;
-  if(/\bmàn hình\b/i.test(label) || /\bman hinh\b/i.test(label) || /\bmonitor\b/i.test(label)) return 6;
-  if(/\bchuot\b/i.test(label) || /\bbàn phím\b/i.test(label) || /\bban phim\b/i.test(label)) return 7;
-  if(/\blaptop linh kien\b/i.test(label)) return 8;
-  return 99;
-}
-
-function renderOverviewPanel(results){
-  if(currentTab === "ALL") return "";
-  const totalCount = results.length;
-  const totalStock = results.reduce((s, item)=>s + (Number(item.r[5]) || 0), 0);
-  const lowStock = results.filter(item=>{
-    const ton = Number(item.r[5]) || 0;
-    return ton > 0 && ton <= 2;
-  }).length;
-  const outStock = results.filter(item=>(Number(item.r[5]) || 0) <= 0).length;
-  const title = currentTab === "ALL" ? "Tổng quan kho nhanh" : `Tổng quan nhanh: ${SHEET_CFG[currentTab]?.label || currentTab}`;
-  const subtitle = quickGroupFilter
-    ? `Đang lọc sâu: ${quickGroupFilter.primary}${quickGroupFilter.secondary ? " · " + quickGroupFilter.secondary : ""}`
-    : "Bấm chip để lọc theo thương hiệu hoặc tiêu đề, mỗi chip đều hiện số lượng và tồn kho";
-  const pills = [
-    `${totalCount} mục`,
-    `${totalStock.toLocaleString("vi-VN")} tồn`,
-    `${lowStock} sắp hết`,
-    `${outStock} hết`
-  ];
-
-  let html = `<div class="overview-panel">`;
-  html += `<div class="overview-head"><div><div class="overview-title">${title}</div><div class="overview-sub">${subtitle}</div></div>${quickGroupFilter ? `<button type="button" class="smart-summary-clear" onclick="clearQuickGroupFilter()">Bỏ lọc</button>` : ""}</div>`;
-  html += `<div class="overview-meta">${pills.map(p=>`<span class="overview-pill">${p}</span>`).join("")}</div>`;
-
-  if(currentTab === "ALL"){
-    const tabStats = ["MT","MI","CAM","INT"].map(code=>{
-      const items = results.filter(({r})=>r[0] === code);
-      return {
-        tabCode: code,
-        label: SHEET_CFG[code]?.label || code,
-        count: items.length,
-        stock: items.reduce((s, item)=>s + (Number(item.r[5]) || 0), 0)
-      };
-    });
-    html += `<div class="overview-sect"><div class="overview-sect-title">Theo danh mục</div><div class="overview-grid">` + tabStats.map(t=>renderMainTabChip(t.tabCode, t.label, "", t.count, t.stock, currentTab===t.tabCode)).join("") + `</div></div>`;
-  }
-
-  const buckets = buildOverviewBucketsV2(results)
-    .sort((a, b)=>{
-      if(currentTab === "MT"){
-        const ar = rankMtOverviewBucket(a);
-        const br = rankMtOverviewBucket(b);
-        if(ar !== br) return ar - br;
-      }
-      if(b.count !== a.count) return b.count - a.count;
-      if(b.stock !== a.stock) return b.stock - a.stock;
-      return String(a.label).localeCompare(String(b.label), "vi");
-    })
-    .slice(0, currentTab === "ALL" ? 8 : 10);
-  if(buckets.length){
-    html += `<div class="overview-sect"><div class="overview-sect-title">Theo thương hiệu / tiêu đề</div><div class="overview-grid">${buckets.map(renderOverviewChip).join("")}</div></div>`;
-  }
-
-  html += `</div>`;
-  return html;
-}
-function getQuickFamilyForGroup(items, groupLabel){
-  const groupNorm = normalizeQuickText(resolveQuickGroupLabelFromRow(items?.[0]?.r, groupLabel || ""));
-  const stats = { ram: 0, cpu: 0, brand: 0, storage: 0, network: 0 };
-  items.slice(0, 60).forEach(({r})=>{
-    const meta = getQuickMeta(r, resolveQuickGroupLabelFromRow(r, groupLabel || r?.[8] || ""));
-    if(meta && stats[meta.family] !== undefined){
-      stats[meta.family]++;
-    }
-  });
-  if(groupNorm.includes("laptop linh kien")) return "brand";
-  if(isRamGroupLabel(groupNorm)) return "ram";
-  if(isStorageGroupLabel(groupNorm)) return "storage";
-  if(groupNorm.includes("camera") || groupNorm.includes("internet")) return "network";
-  if(stats.ram > stats.cpu && stats.ram >= stats.brand && stats.ram > 0) return "ram";
-  if(groupNorm.includes("cpu") && stats.cpu >= stats.ram && stats.cpu > 0) return "cpu";
-  if(stats.storage > 0) return "storage";
-  if(stats.network > 0) return "network";
-  if(stats.brand >= stats.ram && stats.brand >= stats.cpu && stats.brand > 0) return "brand";
-  if(stats.cpu > 0) return "cpu";
-  if(stats.ram > 0) return "ram";
-  if(stats.brand > 0) return "brand";
-  return null;
-}
-
-function getQuickMeta(r, groupLabel){
-  const resolvedGroupLabel = resolveQuickGroupLabelFromRow(r, groupLabel || r?.[8] || "");
-  return pickBestQuickMeta(r, resolvedGroupLabel);
-}
-
-function buildQuickBuckets(items, groupLabel, family, keyGetter, labelGetter, order){
-  const map = new Map();
-  items.forEach(({r,i})=>{
-    const meta = getQuickMeta(r, resolveQuickGroupLabelFromRow(r, groupLabel || r?.[8] || ""));
-    if(!meta || meta.family !== family) return;
-    const key = keyGetter(meta, r, i);
-    if(!key) return;
-    const label = labelGetter ? labelGetter(meta, r, i) : key;
-    const bucket = map.get(key) || { key, label, count: 0, stock: 0 };
-    bucket.count++;
-    bucket.stock += Number(r[5]) || 0;
-    map.set(key, bucket);
-  });
-  const list = [...map.values()];
-  if(order && order.length){
-    const orderMap = new Map(order.map((key, idx)=>[key, idx]));
-    list.sort((a, b)=>{
-      const ai = orderMap.has(a.key) ? orderMap.get(a.key) : 999;
-      const bi = orderMap.has(b.key) ? orderMap.get(b.key) : 999;
-      if(ai !== bi) return ai - bi;
-      if(b.count !== a.count) return b.count - a.count;
-      return String(a.label).localeCompare(String(b.label), "vi");
-    });
-  } else {
-    list.sort((a, b)=> b.count - a.count || String(a.label).localeCompare(String(b.label), "vi"));
-  }
-  return list;
-}
-
 function sumQuickStock(items){
   return items.reduce((sum, {r})=>sum + (Number(r[5]) || 0), 0);
-}
-
-function isQuickChipActive(groupLabel, family, primary, secondary){
-  if(!quickGroupFilter) return false;
-  if(String(quickGroupFilter.scope || "group") !== "group") return false;
-  return quickGroupFilter.groupLabel === groupLabel
-    && quickGroupFilter.family === family
-    && quickGroupFilter.primary === primary
-    && String(quickGroupFilter.secondary || "") === String(secondary || "");
-}
-
-function renderQuickChip(groupLabel, family, bucket, primary, secondary){
-  const active = isQuickChipActive(groupLabel, family, primary, secondary);
-  const detail = `${bucket.count} mục · ${bucket.stock.toLocaleString("vi-VN")} tồn`;
-  return `<button type="button" class="smart-chip${active ? " active" : ""}" data-scope="group" data-group="${escapeHtml(groupLabel)}" data-family="${escapeHtml(family)}" data-primary="${escapeHtml(primary)}" data-secondary="${escapeHtml(secondary || "")}" onclick="toggleQuickGroupFilter(this)"><span class="smart-chip-name">${escapeHtml(bucket.label)}</span><span class="smart-chip-detail">${detail}</span></button>`;
 }
 
 function matchesQuickGroupFilter(r, groupLabel){
@@ -2578,6 +2342,8 @@ function focusFirstQuickMatch(){
 
 function renderCard(r,i,displayNo){
   const [sh,ma,ten,th,giaNhap,ton,tt,ghi,,img,giaBan]=r;
+  const kw = removeAccents(searchQ.trim());
+  const kwTokens = kw ? kw.split(/\s+/).filter(Boolean) : [];
   const cfg=SHEET_CFG[sh]||SHEET_CFG.MT;
   const no = displayNo || (i+1);
   const noColor = GROUP_STRONG_COLORS[(no-1)%GROUP_STRONG_COLORS.length];
@@ -2590,7 +2356,7 @@ function renderCard(r,i,displayNo){
   const stTxt=getStockStatusLabel(ton);
   const condition = detectConditionLabel([ten, th, ghi].filter(Boolean).join(" "));
   const imgHtml = img
-    ? `<img class="prod-img" src="${img}" alt="${ten}" />`
+    ? `<img class="prod-img" src="${escapeHtml(img)}" alt="${escapeHtml(ten)}" />`
     : `<div class="prod-img prod-img-ph" title="Chưa có ảnh sản phẩm">💻</div>`;
   const isAdmin = document.body.classList.contains("admin-mode");
   const isSelected = selectedItems.has(i);
@@ -2600,7 +2366,7 @@ function renderCard(r,i,displayNo){
   const quickClass = quickGroupFilter ? " quick-match" : "";
   const priceHtml = isAdmin
     ? `<div class="price-row">
-        <span class="price-label">Nhập:</span><span class="price admin-price">${fmt(giaNhap)}</span>
+        <span class="price-label">Nhập:</span><span class="price admin-price">${giaNhap>0?fmt(giaNhap):"Chưa nhập giá"}</span>
         <span class="price-label" style="margin-left: 8px;">Bán:</span><span class="price ${giaBan>0?"price-sale-on":""}" style="color: ${giaBan>0?"#D50000":"#aaa"};font-size:15px;font-weight:900">${giaBan>0?fmt(giaBan):"Chưa set"}</span>
        </div>`
     : `<div class="price-row">
@@ -2610,12 +2376,12 @@ function renderCard(r,i,displayNo){
           : `<button type="button" class="price price-contact-btn" data-title="${escapeHtml([ten, th].filter(Boolean).join(" "))}" aria-label="Liên hệ qua Zalo" onclick="openZaloContact(this.dataset.title)">Liên hệ</button>`
         }
        </div>`;
-  return `<div class="card${isHet?" het":isSap?" sap":" con"}${bulkSelectMode?" bulk-mode":""}${isSelected?" bulk-selected":""}${quickClass}" data-ma="${ma}">
+  return `<div class="card${isHet?" het":isSap?" sap":" con"}${bulkSelectMode?" bulk-mode":""}${isSelected?" bulk-selected":""}${quickClass}" data-ma="${escapeHtml(ma)}">
     ${selectHtml}
       <div class="card-top" style="--c: ${cfg.c}; background: ${cfg.light};">
       <div class="card-top-left">
         <span class="sheet-badge" style="--c: ${cfg.c};">${cfg.label}</span>
-        <span class="ma-code">${ma}</span>
+        <span class="ma-code">${highlightMatch(ma, kwTokens)}</span>
         <button class="btn-copy-code" type="button" data-code="${escapeHtml(ma)}" title="Copy mã hàng" aria-label="Copy mã hàng" onclick="copyProductCode(this)"><span>⧉</span></button>
       </div>
       <span class="status-badge" style="background: ${stBg}; color: ${stFg};">${stTxt}</span>
@@ -2625,13 +2391,13 @@ function renderCard(r,i,displayNo){
       <div class="card-main">
       <div class="product-name-row" data-copy-text="${escapeHtml(ten)}" data-copy-label="tiêu đề" title="Nhấp đúp để copy tiêu đề" ondblclick="copyFromElement(this)">
         ${condition ? `<span class="item-cond-badge item-cond-old">${condition}</span>` : ""}
-        <div class="product-name">${ten}</div>
+        <div class="product-name">${highlightMatch(ten, kwTokens)}</div>
       </div>
       <div class="card-footer">
-        <span class="brand-tag">🏷️ ${th}</span>
+        <span class="brand-tag">🏷️ ${escapeHtml(th)}</span>
         ${priceHtml}
       </div>
-      ${note?`<div class="note">📝 ${note}</div>`:""}
+      ${note?`<div class="note">📝 ${escapeHtml(note)}</div>`:""}
       <div class="ton-ctrl">
         <span class="ton-label">📦 Tồn kho:</span>
         <span class="ton-val" style="color: ${isHet?"#C0392B":"#1a1a1a"};">${ton}</span>
@@ -2675,6 +2441,7 @@ function render(){
   selectedItems.forEach(i=>{ if(i<0 || i>=DATA.length) selectedItems.delete(i); });
   updateBulkControls();
   const kw = removeAccents(searchQ.trim());
+  const kwTokens = kw ? kw.split(/\s+/).filter(Boolean) : [];
   const results = DATA.map((r,i)=>({r,i})).filter(({r})=>{
     const [sh,,ten,th,,,tt,ghi] = r;
     if(currentTab!=="ALL" && sh!==currentTab) return false;
@@ -2684,9 +2451,9 @@ function render(){
     if(currentStatus==="HET" && stockState!=="HET") return false;
     const resolvedGroupLabel = resolveQuickGroupLabelFromRow(r, r[8] || "");
     if(!matchesQuickGroupFilter(r, resolvedGroupLabel)) return false;
-    if(!kw) return true;
+    if(!kwTokens.length) return true;
     const hay = removeAccents(r[1]+" "+ten+" "+th+" "+(ghi||""));
-    return hay.includes(kw);
+    return kwTokens.every(t => hay.includes(t));
   });
   if(currentStatus==="CON" || currentStatus==="SAP" || currentStatus==="HET"){
     const txCount = TX_DATA.reduce((m,t)=>{ m[t.ma] = (m[t.ma]||0) + 1; return m; }, {});
@@ -2731,8 +2498,18 @@ function render(){
     const groupCompareKey = label => normalizeQuickText(stripIcon(label));
     let order;
     if(FIXED_ORDER[currentTab]){
-      const fromData = new Set();
-      DATA.forEach(r=>{ if(r[0]===currentTab){ const g = resolveQuickGroupLabelFromRow(r, r[8] || ""); if(g) fromData.add(g); } });
+      // Gộp các biến thể (khác hoa/thường, khác icon, khác khoảng trắng) của CÙNG một nhóm
+      // thành 1 nhãn duy nhất NGAY TỪ ĐẦU (theo groupCompareKey), trước khi so khớp với
+      // FIXED_ORDER — tránh trường hợp 1 nhóm bị tách thành 2 mục nhóm khác nhau (1 mục có
+      // hàng, 1 mục luôn hiện 0) chỉ vì dữ liệu trên Sheet nhập không đồng nhất chữ hoa/thường.
+      const fromDataMap = new Map();
+      DATA.forEach(r=>{
+        if(r[0]===currentTab){
+          const g = resolveQuickGroupLabelFromRow(r, r[8] || "");
+          if(g){ const key = groupCompareKey(g); if(!fromDataMap.has(key)) fromDataMap.set(key, g); }
+        }
+      });
+      const fromData = new Set(fromDataMap.values());
       // So sánh theo phần CHỮ (bỏ icon/emoji ở đầu + bỏ dấu + gộp khoảng trắng thừa) để không bị lệch
       // thứ tự chỉ vì nhãn nhóm cũ dùng icon khác hoặc format khoảng trắng khác (vd dữ liệu cũ dùng
       // "🖥️ Màn hình" trong khi danh sách chuẩn dùng "🖵 Màn hình").
@@ -2749,7 +2526,10 @@ function render(){
       order = [];
       const seen = new Set();
       DATA.forEach(r=>{
-        if(r[0]===currentTab){ const g=resolveQuickGroupLabelFromRow(r, r[8] || ""); if(g&&!seen.has(g)){seen.add(g);order.push(g);} }
+        if(r[0]===currentTab){
+          const g=resolveQuickGroupLabelFromRow(r, r[8] || "");
+          if(g){ const key = groupCompareKey(g); if(!seen.has(key)){ seen.add(key); order.push(g); } }
+        }
       });
     }
     order.push(NO_GROUP);
@@ -2956,7 +2736,7 @@ function setNVAvatarPreview(dataUrl){
 function loadNV(){ try{ NV_LIST = normalizeNVList(JSON.parse(localStorage.getItem("kho_cntt_nv")||"[]")); }catch(e){ NV_LIST=[]; } }
 async function saveNV(){
   NV_LIST = normalizeNVList(NV_LIST);
-  try{ localStorage.setItem("kho_cntt_nv", JSON.stringify(NV_LIST)); }catch(e){}
+  try{ safeLocalStorageSet("kho_cntt_nv", JSON.stringify(NV_LIST)); }catch(e){}
   if(!SHEET_API_URL) return true;
   try{
     await postSheet("save_nv", NV_LIST);
@@ -2976,7 +2756,7 @@ async function loadNVFromSheet(){
       const sheetNV = normalizeNVList(json.nv);
       if(sheetNV.length || !NV_LIST.length){
         NV_LIST = sheetNV;
-        localStorage.setItem("kho_cntt_nv", JSON.stringify(NV_LIST));
+        safeLocalStorageSet("kho_cntt_nv", JSON.stringify(NV_LIST));
       }
     }
   }catch(e){ console.warn("Lỗi tải NV:", e); setSyncBadge("error", String(e)); }
@@ -3063,7 +2843,7 @@ function normalizeTxList(list){
 function loadTX(){ try{ TX_DATA = normalizeTxList(JSON.parse(localStorage.getItem("kho_cntt_tx")||"[]")); }catch(e){ TX_DATA=[]; } }
 async function saveTX(){
   TX_DATA = normalizeTxList(TX_DATA);
-  try{ localStorage.setItem("kho_cntt_tx", JSON.stringify(TX_DATA)); }catch(e){}
+  try{ safeLocalStorageSet("kho_cntt_tx", JSON.stringify(TX_DATA)); }catch(e){}
   if(!SHEET_API_URL) return true;
   try{
     await postSheet("save_tx", TX_DATA);
@@ -3083,7 +2863,7 @@ function loadTXFromSheet(){
       const sheetTX = normalizeTxList(json.tx);
       if(sheetTX.length || !TX_DATA.length){
         TX_DATA = sheetTX;
-        localStorage.setItem("kho_cntt_tx", JSON.stringify(TX_DATA));
+        safeLocalStorageSet("kho_cntt_tx", JSON.stringify(TX_DATA));
       }
     })
     .catch(e=>{
@@ -3229,7 +3009,7 @@ function renderTxHistory(){
     <input type="date" id="txFilterDate" value="${dateVal}" onchange="applyTxHistoryFilters()">
     <select id="txFilterNV" onchange="applyTxHistoryFilters()">
       <option value="">Tất cả nhân viên</option>
-      ${nvOptions.map(nv=>`<option value="${nv}" ${nv===nvVal?"selected":""}>${nv}</option>`).join("")}
+      ${nvOptions.map(nv=>`<option value="${escapeHtml(nv)}" ${nv===nvVal?"selected":""}>${escapeHtml(nv)}</option>`).join("")}
     </select>
     <button type="button" onclick="clearTxHistoryFilters()">Xoá lọc</button>
   </div>`;
@@ -3257,8 +3037,8 @@ function renderTxHistory(){
             <span class="tx-pill">SL: <b>${t.qty}</b></span>
             <span class="tx-pill tx-price-pill">${t.gia>0?fmt(t.gia)+"/cái":"Không ghi giá"}</span>
           </div>
-          ${t.ghi?`<span class="tx-note">📝 ${t.ghi}</span>`:""}
-          ${t.img?`<img class="tx-img" src="${t.img}" alt="Ảnh giao dịch" onclick="openImageViewer('${t.id}')">`:""}
+          ${t.ghi?`<span class="tx-note">📝 ${escapeHtml(t.ghi)}</span>`:""}
+          ${t.img?`<img class="tx-img" src="${escapeHtml(t.img)}" alt="Ảnh giao dịch" onclick="openImageViewer('${escapeHtml(t.id)}')">`:""}
         </div>`).join("") : `<div style="text-align: center; padding: 20px; color: #888;">Không có giao dịch phù hợp bộ lọc</div>`;
   document.getElementById("txModalBody").innerHTML = filterBar + summary + rows;
 }
@@ -3310,11 +3090,24 @@ function openImageViewer(id){
   if(tx && tx.img) window.open(tx.img, "_blank");
 }
 async function deleteTX(id){ if(!requireAdmin()) return;
-  if(!confirm("Xóa giao dịch này?")) return;
+  const tx = TX_DATA.find(t=>String(t.id)===String(id));
+  if(!tx){ showToast("Không tìm thấy giao dịch"); return; }
+  const idx = DATA.findIndex(r=>r[1]===tx.ma);
+  const qty = Number(tx.qty) || 0;
+  const confirmMsg = idx >= 0 && qty > 0
+    ? `Xóa giao dịch này? Tồn kho "${DATA[idx][2]}" sẽ được cộng lại +${qty}.`
+    : "Xóa giao dịch này?";
+  if(!confirm(confirmMsg)) return;
   TX_DATA = TX_DATA.filter(t=>String(t.id)!==String(id));
+  if(idx >= 0 && qty > 0){
+    DATA[idx][5] = (Number(DATA[idx][5]) || 0) + qty;
+    DATA[idx][6] = getStockStatusValue(DATA[idx][5]);
+    await saveData();
+    render();
+  }
   await saveTX();
   renderTxHistory();
-  showToast("Đã xóa giao dịch");
+  showToast(idx >= 0 && qty > 0 ? `Đã xóa giao dịch, hoàn lại +${qty} tồn kho` : "Đã xóa giao dịch");
 }
 function setImagePreview(dataUrl){
   document.getElementById("fImg").value = dataUrl || "";
@@ -3437,8 +3230,14 @@ function openEditModal(idx){ if(!requireAdmin()) return;
   setImagePreview(r[9]||""); updateGroupOptions(r[8]||""); updateQuickTagOptions(r[11]||""); document.getElementById("editOverlay").classList.add("open");
 }
 async function saveItem(){ if(!requireAdmin()) return;
-  const sh = document.getElementById("fSheet").value.trim(), ma = document.getElementById("fMa").value.trim(), ten = document.getElementById("fTen").value.trim(), th = document.getElementById("fTH").value.trim(), gia = parseVndInput(document.getElementById("fGia").value), giaBan = parseVndInput(document.getElementById("fGiaBan").value), ton = parseInt(document.getElementById("fTon").value)||0, tt = document.getElementById("fTT").value, ghiNote = document.getElementById("fGhi").value.trim(), vitri = document.getElementById("fVitri").value.trim(), img = document.getElementById("fImg").value || "", idx = document.getElementById("editIdx").value, grp = document.getElementById("fGroup").value || "", quickTag = (document.getElementById("fQuickTag")?.value || "").trim();
+  const sh = document.getElementById("fSheet").value.trim(), ma = document.getElementById("fMa").value.trim(), ten = document.getElementById("fTen").value.trim(), th = document.getElementById("fTH").value.trim(), gia = parseVndInput(document.getElementById("fGia").value), giaBan = parseVndInput(document.getElementById("fGiaBan").value), ton = Math.max(0, parseInt(document.getElementById("fTon").value)||0), tt = document.getElementById("fTT").value, ghiNote = document.getElementById("fGhi").value.trim(), vitri = document.getElementById("fVitri").value.trim(), img = document.getElementById("fImg").value || "", idx = document.getElementById("editIdx").value, grp = document.getElementById("fGroup").value || "", quickTag = (document.getElementById("fQuickTag")?.value || "").trim();
   if(!ma||!ten){alert("Vui lòng nhập Mã hàng và Tên sản phẩm!"); return;}
+  const idxNum = idx === "" ? -1 : parseInt(idx);
+  const dupIdx = DATA.findIndex((row,i) => row[1] === ma && i !== idxNum);
+  if(dupIdx !== -1){
+    alert(`⚠️ Mã hàng "${ma}" đã được dùng cho sản phẩm "${DATA[dupIdx][2]}". Vui lòng đổi mã khác để tránh lẫn lộn tồn kho và lịch sử giao dịch.`);
+    return;
+  }
   const row = [sh,ma,ten,th,gia,ton,getStockStatusValue(ton),mergeNoteLocation(ghiNote, vitri),grp,img,giaBan,quickTag];
 if(idx===""){
   DATA.unshift(row);
@@ -3462,9 +3261,11 @@ function handleFile(input){ if(!requireAdmin()) return;
     try{
       const wb = XLSX.read(e.target.result, {type:"array"}), ws = wb.Sheets[wb.SheetNames[0]], json = XLSX.utils.sheet_to_json(ws, {header:1, defval:""});
       if(json.length<2){alert("File không có dữ liệu!"); return;}
-      importRows = json.slice(1).filter(r=>r[2]).map(r=>[(r[0]||"MT").toString().trim().toUpperCase(),(r[1]||"").toString().trim(),(r[2]||"").toString().trim(),(r[3]||"").toString().trim(),parseVndInput(r[4]),parseInt(r[5])||0,(r[6]||"CÒN HÀNG").toString().trim(),(r[7]||"").toString().trim(),"", "", parseVndInput(r[10])]);
-      document.getElementById("importPreview").innerHTML = `<table><tr><th>Danh mục</th><th>Mã</th><th>Tên</th><th>Tồn</th></tr>${importRows.slice(0,5).map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[5]}</td></tr>`).join("")}</table>`;
-      document.getElementById("importInfo").textContent = `✅ Đọc được ${importRows.length} sản phẩm`;
+      importRows = json.slice(1).filter(r=>r[2]).map(r=>[(r[0]||"MT").toString().trim().toUpperCase(),(r[1]||"").toString().trim(),(r[2]||"").toString().trim(),(r[3]||"").toString().trim(),parseVndInput(r[4]),Math.max(0,parseInt(r[5])||0),(r[6]||"CÒN HÀNG").toString().trim(),(r[7]||"").toString().trim(),"", "", parseVndInput(r[10])]);
+      document.getElementById("importPreview").innerHTML = `<table><tr><th>Danh mục</th><th>Mã</th><th>Tên</th><th>Tồn</th></tr>${importRows.slice(0,5).map(r=>`<tr><td>${escapeHtml(r[0])}</td><td>${escapeHtml(r[1])}</td><td>${escapeHtml(r[2])}</td><td>${escapeHtml(r[5])}</td></tr>`).join("")}</table>`;
+      const existingCodesPreview = new Set(DATA.map(r=>r[1]));
+      const dupCount = importRows.filter(r=>existingCodesPreview.has(r[1])).length;
+      document.getElementById("importInfo").textContent = `✅ Đọc được ${importRows.length} sản phẩm` + (dupCount > 0 ? ` (${dupCount} mã hàng đã có sẵn trong kho — sẽ bị bỏ qua nếu chọn "Thêm vào")` : "");
       document.getElementById("importMode").style.display="block"; document.getElementById("btnImport").style.display="block";
     }catch(err){alert("Lỗi đọc file: "+err.message);}
   };
@@ -3472,11 +3273,17 @@ function handleFile(input){ if(!requireAdmin()) return;
 }
 async function doImport(){ if(!requireAdmin()) return;
   const mode = document.querySelector('input[name="importMode"]:checked').value;
-  if(mode==="replace"){ if(!confirm(`Thay thế toàn bộ ${DATA.length} sản phẩm hiện có?`)) return; DATA = importRows; } else { DATA = DATA.concat(importRows); }
+  let skipped = 0;
+  if(mode==="replace"){ if(!confirm(`Thay thế toàn bộ ${DATA.length} sản phẩm hiện có?`)) return; DATA = importRows; } else {
+    const existingCodes = new Set(DATA.map(r=>r[1]));
+    const newRows = importRows.filter(r=>!existingCodes.has(r[1]));
+    skipped = importRows.length - newRows.length;
+    DATA = DATA.concat(newRows);
+  }
   await saveData();
 closeOverlay("importOverlay");
 render();
-showToast("Import thành công!");
+showToast(skipped > 0 ? `Import xong: đã thêm ${importRows.length - skipped} sản phẩm mới, bỏ qua ${skipped} dòng trùng mã hàng đã có sẵn` : "Import thành công!");
 }
 function goToTab(tabCode){
   document.querySelectorAll(".tab-btn").forEach(
@@ -3485,6 +3292,7 @@ function goToTab(tabCode){
 
   currentTab = tabCode;
   searchQ = "";
+  clearTimeout(searchRenderTimer);
   quickGroupFilter = null;
   currentStatus = "ALL";
 
@@ -3517,12 +3325,13 @@ function setStatus(btn){
   syncStatusButtons(currentStatus);
   render();
 }
-function clearSearch(){ document.getElementById("search").value=""; searchQ=""; quickGroupFilter = null; document.getElementById("clear-btn").style.display="none"; render(); document.getElementById("search").focus(); }
+function clearSearch(){ clearTimeout(searchRenderTimer); document.getElementById("search").value=""; searchQ=""; quickGroupFilter = null; document.getElementById("clear-btn").style.display="none"; render(); document.getElementById("search").focus(); }
 function closeOverlay(id){ document.getElementById(id).classList.remove("open"); }
 function overlayClose(e,id){ if(e.target===document.getElementById(id)) closeOverlay(id); }
 let toastTimer;
 function showToast(msg, duration=2200){ const t=document.getElementById("toast"); t.textContent=msg; t.classList.add("show"); clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove("show"),duration); }
-document.getElementById("search").addEventListener("input", function(){ searchQ = this.value; if(searchQ) quickGroupFilter = null; document.getElementById("clear-btn").style.display = searchQ ? "flex" : "none"; render(); });
+let searchRenderTimer = null;
+document.getElementById("search").addEventListener("input", function(){ searchQ = this.value; if(searchQ) quickGroupFilter = null; document.getElementById("clear-btn").style.display = searchQ ? "flex" : "none"; clearTimeout(searchRenderTimer); searchRenderTimer = setTimeout(render, 120); });
 document.getElementById("adminPass").addEventListener("keydown", function(e){ if(e.key==="Enter") submitAdminPass(); });
 document.querySelector(".title").addEventListener("click", handleOwnerTap);
 setupVndInputs();
