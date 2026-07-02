@@ -152,6 +152,9 @@ mark.kw-hit { background: #FFEB3B; color: #1A1A1A; padding: 0 1px; border-radius
 .img-preview { width: 64px; height: 64px; border-radius: 10px; object-fit: cover; border: 1.5px solid #ddd; flex-shrink: 0; }
 .img-preview-ph { display: flex; align-items: center; justify-content: center; font-size: 11px; color: #999; background: #fafafa; text-align: center; line-height: 1.2; }
 .img-upload-btns { display: flex; flex-direction: column; gap: 6px; }
+.img-link-row { margin-top: 6px; }
+.img-link-input { width: 100%; padding: 8px 10px; border-radius: 8px; border: 1.5px solid #D5DBDB; font-size: 12px; background: #fff; color: #2C3E50; }
+.img-link-hint { font-size: 10.5px; color: #999; margin-top: 3px; line-height: 1.4; }
 .btn-img-pick { background: #EBF5FB; color: #1A5276; border: none; border-radius: 8px; padding: 7px 14px; font-size: 12px; font-weight: bold; cursor: pointer; }
 .btn-img-remove { background: #FADBD8; color: #922B21; border: none; border-radius: 8px; padding: 7px 14px; font-size: 12px; font-weight: bold; cursor: pointer; }
 .nv-add-row { display: grid; grid-template-columns: 52px 1fr auto; gap: 8px; align-items: center; }
@@ -533,6 +536,13 @@ body.admin-mode .admin-btn { background: #1E8449; border-color: #1E8449; opacity
       </div>
       <input type="file" id="fImgFile" accept="image/*" style="display:none" onchange="handleImagePick(this)">
       <input type="hidden" id="fImg" value="">
+      <div class="img-link-row">
+        <input type="text" id="fImgLink" class="img-link-input" placeholder="Hoặc dán link ảnh Google Drive / URL ảnh vào đây..."
+          oninput="debounceImageLink(this,'fImgLink', setImagePreview)"
+          onchange="useImageLink('fImgLink', setImagePreview)"
+          onkeydown="if(event.key==='Enter'){event.preventDefault(); useImageLink('fImgLink', setImagePreview);}">
+        <div class="img-link-hint">Trên Drive: bấm chuột phải ảnh → Chia sẻ → Bất kỳ ai có link → dán link vào đây.</div>
+      </div>
     </div>
     <button class="btn-submit" onclick="saveItem()">💾 Lưu</button>
     <button class="btn-cancel" onclick="closeOverlay('editOverlay')">Huỷ</button>
@@ -582,6 +592,12 @@ body.admin-mode .admin-btn { background: #1E8449; border-color: #1E8449; opacity
       <input type="text" id="nvInput" placeholder="Tên nhân viên mới..." style="flex:1">
       <button class="btn-submit" style="padding:8px 14px;margin:0" onclick="addNV()">➕ Thêm</button>
     </div>
+    <div class="img-link-row">
+      <input type="text" id="nvAvatarLink" class="img-link-input" placeholder="Hoặc dán link ảnh Google Drive cho avatar vào đây..."
+        oninput="debounceImageLink(this,'nvAvatarLink', setNVAvatarPreview)"
+        onchange="useImageLink('nvAvatarLink', setNVAvatarPreview)"
+        onkeydown="if(event.key==='Enter'){event.preventDefault(); useImageLink('nvAvatarLink', setNVAvatarPreview);}">
+    </div>
     <div id="nvList" style="margin-top: 10px;"></div>
     <button class="btn-cancel" onclick="closeOverlay('nvOverlay')">Đóng</button>
   </div>
@@ -613,6 +629,12 @@ body.admin-mode .admin-btn { background: #1E8449; border-color: #1E8449; opacity
       </div>
       <input type="file" id="saleImgFile" accept="image/*" style="display:none" onchange="handleTxImagePick(this)">
       <input type="hidden" id="saleImg" value="">
+      <div class="img-link-row">
+        <input type="text" id="saleImgLink" class="img-link-input" placeholder="Hoặc dán link ảnh Google Drive / URL ảnh vào đây..."
+          oninput="debounceImageLink(this,'saleImgLink', setTxImagePreview)"
+          onchange="useImageLink('saleImgLink', setTxImagePreview)"
+          onkeydown="if(event.key==='Enter'){event.preventDefault(); useImageLink('saleImgLink', setTxImagePreview);}">
+      </div>
     </div>
     <button class="btn-submit" onclick="saveSale()">💾 Lưu giao dịch</button>
     <button class="btn-cancel" onclick="closeOverlay('saleOverlay')">Huỷ</button>
@@ -2356,7 +2378,7 @@ function renderCard(r,i,displayNo){
   const stTxt=getStockStatusLabel(ton);
   const condition = detectConditionLabel([ten, th, ghi].filter(Boolean).join(" "));
   const imgHtml = img
-    ? `<img class="prod-img" src="${escapeHtml(img)}" alt="${escapeHtml(ten)}" />`
+    ? `<img class="prod-img" src="${escapeHtml(img)}" alt="${escapeHtml(ten)}" referrerpolicy="no-referrer" onerror="this.outerHTML='<div class=\\'prod-img prod-img-ph\\' title=\\'Không tải được ảnh\\'>💻</div>';" />`
     : `<div class="prod-img prod-img-ph" title="Chưa có ảnh sản phẩm">💻</div>`;
   const isAdmin = document.body.classList.contains("admin-mode");
   const isSelected = selectedItems.has(i);
@@ -2678,11 +2700,31 @@ async function resetToDefault(){
 }
 
 let NV_LIST = [];
+// Một số bản Apps Script cũ ghi thẳng object xuống ô Sheet bằng .toString(),
+// ra chuỗi kiểu Java Map: "{name=CHƯƠNG, avatar=}" — không phải JSON hợp lệ.
+// Hàm này bóc tách chuỗi dạng đó thành object {key: value, ...} để dùng tạm,
+// tránh hiện nguyên chuỗi rác ra tên nhân viên/giao dịch.
+function parseLooseKeyValueString(raw){
+  const inner = raw.trim().replace(/^\{/, "").replace(/\}$/, "");
+  if(!inner) return null;
+  const obj = {};
+  let found = false;
+  inner.split(",").forEach(pair=>{
+    const eq = pair.indexOf("=");
+    if(eq === -1) return;
+    const k = pair.slice(0, eq).trim();
+    const v = pair.slice(eq+1).trim();
+    if(k){ obj[k] = v; found = true; }
+  });
+  return found ? obj : null;
+}
 function normalizeNVItem(nv){
   if(typeof nv === "string"){
     const raw = nv.trim();
     if(raw.startsWith("{") && raw.endsWith("}")){
       try{ return normalizeNVItem(JSON.parse(raw)); }catch(e){}
+      const loose = parseLooseKeyValueString(raw);
+      if(loose) return normalizeNVItem(loose);
     }
     const name = raw;
     return name ? { name, avatar: "" } : null;
@@ -2722,16 +2764,20 @@ function renderNVAvatar(name, extraClass=""){
   const nv = findNVByName(name);
   const avatar = nv && nv.avatar ? nv.avatar : "";
   const label = String(name || "").trim();
-  if(avatar) return `<span class="nv-avatar ${extraClass}"><img src="${avatar}" alt="${escapeHtml(label)}"></span>`;
   const initial = label ? escapeHtml(label.charAt(0).toUpperCase()) : "👤";
+  if(avatar) return `<span class="nv-avatar ${extraClass}"><img src="${avatar}" alt="${escapeHtml(label)}" referrerpolicy="no-referrer" onerror="this.parentElement.outerHTML='<span class=\\'nv-avatar ${extraClass}\\' title=\\'${escapeHtml(label)}\\'>${initial}</span>';"></span>`;
   return `<span class="nv-avatar ${extraClass}" title="${escapeHtml(label)}">${initial}</span>`;
 }
 function setNVAvatarPreview(dataUrl){
   const input = document.getElementById("nvAvatar");
   const preview = document.getElementById("nvAvatarPreview");
+  const linkInput = document.getElementById("nvAvatarLink");
   if(input) input.value = dataUrl || "";
+  if(linkInput) linkInput.value = (dataUrl && dataUrl.startsWith("http")) ? dataUrl : "";
   if(!preview) return;
-  preview.innerHTML = dataUrl ? `<img src="${dataUrl}" alt="Avatar nhân viên">` : "👤";
+  preview.innerHTML = dataUrl
+    ? `<img src="${dataUrl}" alt="Avatar nhân viên" referrerpolicy="no-referrer" onerror="this.parentElement.innerHTML='👤'; if(document.getElementById('nvAvatar')) document.getElementById('nvAvatar').value=''; showToast('⚠️ Không tải được ảnh avatar từ link này.',4000);">`
+    : "👤";
 }
 function loadNV(){ try{ NV_LIST = normalizeNVList(JSON.parse(localStorage.getItem("kho_cntt_nv")||"[]")); }catch(e){ NV_LIST=[]; } }
 async function saveNV(){
@@ -2768,10 +2814,58 @@ function renderNVList(){
   const el = document.getElementById("nvList");
   if(!NV_LIST.length){ el.innerHTML=`<div style="text-align: center; color: #aaa; padding: 10px;">Chưa có nhân viên nào</div>`; return; }
   el.innerHTML = NV_LIST.map((nv,i)=>`
-    <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 4px; border-bottom: 1px solid #f0f0f0;">
-      <span class="nv-row-main" style="font-size: 13px;">${renderNVAvatar(nv.name)} <span>${escapeHtml(nv.name)}</span></span>
-      <button onclick="removeNV(${i})" style="background:#FADBD8;border:none;border-radius:6px;padding:3px 10px;color:#C0392B;cursor:pointer;font-size:12px">Xóa</button>
+    <div class="nv-row-edit" style="display:flex; align-items:center; gap:8px; padding:8px 4px; border-bottom:1px solid #f0f0f0;">
+      <div class="nv-avatar-box" style="width:38px;height:38px;font-size:15px" onclick="document.getElementById('nvRowFile_${i}').click()" title="Bấm để đổi avatar từ file trên máy">
+        ${nv.avatar ? `<img src="${escapeHtml(nv.avatar)}" alt="${escapeHtml(nv.name)}" referrerpolicy="no-referrer" onerror="this.parentElement.innerHTML='👤';">` : "👤"}
+      </div>
+      <input type="file" id="nvRowFile_${i}" accept="image/*" style="display:none" onchange="handleNVRowAvatarPick(${i}, this)">
+      <div style="flex:1; min-width:0;">
+        <div style="font-size:13px; font-weight:bold; margin-bottom:3px;">${escapeHtml(nv.name)}</div>
+        <input type="text" class="img-link-input" style="font-size:11px; padding:5px 8px;"
+          placeholder="Dán link ảnh Google Drive cho avatar..."
+          value="${nv.avatar && nv.avatar.startsWith('http') ? escapeHtml(nv.avatar) : ''}"
+          oninput="debounceNVRowLink(this, ${i})"
+          onchange="applyNVRowLink(${i}, this.value)">
+      </div>
+      <button onclick="removeNV(${i})" style="background:#FADBD8;border:none;border-radius:6px;padding:5px 10px;color:#C0392B;cursor:pointer;font-size:12px;flex-shrink:0;">Xóa</button>
     </div>`).join("");
+}
+// Dán link Google Drive cho avatar của 1 nhân viên đã có sẵn trong danh sách.
+function applyNVRowLink(i, value){
+  if(!NV_LIST[i]) return;
+  const val = String(value || "").trim();
+  NV_LIST[i].avatar = val ? resolveImageUrl(val) : "";
+  saveNV();
+  renderNVList();
+}
+const __nvRowLinkTimers = {};
+function debounceNVRowLink(el, i){
+  clearTimeout(__nvRowLinkTimers[i]);
+  __nvRowLinkTimers[i] = setTimeout(()=>{
+    if(el.value.trim()) applyNVRowLink(i, el.value);
+  }, 500);
+}
+// Chọn file ảnh trên máy để đổi avatar cho 1 nhân viên đã có sẵn trong danh sách.
+function handleNVRowAvatarPick(i, input){
+  const file = input.files[0];
+  if(!file) return;
+  if(!file.type.startsWith("image/")){ alert("Vui lòng chọn 1 file ảnh!"); return; }
+  const reader = new FileReader();
+  reader.onload = function(e){
+    const img = new Image();
+    img.onload = function(){
+      const MAX = 160; let w = img.width, h = img.height;
+      if(w>MAX || h>MAX){ if(w>h){ h = Math.round(h*MAX/w); w = MAX; } else { w = Math.round(w*MAX/h); h = MAX; } }
+      const canvas = document.createElement("canvas"); canvas.width = w; canvas.height = h; canvas.getContext("2d").drawImage(img,0,0,w,h);
+      if(NV_LIST[i]){
+        NV_LIST[i].avatar = canvas.toDataURL("image/jpeg", 0.72);
+        saveNV();
+        renderNVList();
+      }
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
 }
 function addNV(){ if(!requireAdmin()) return;
   const val = document.getElementById("nvInput").value.trim();
@@ -2798,6 +2892,8 @@ function normalizeTxItem(tx){
     const raw = tx.trim();
     if(raw.startsWith("{") && raw.endsWith("}")){
       try{ return normalizeTxItem(JSON.parse(raw)); }catch(e){}
+      const loose = parseLooseKeyValueString(raw);
+      if(loose) return normalizeTxItem(loose);
     }
     return null;
   }
@@ -3038,7 +3134,7 @@ function renderTxHistory(){
             <span class="tx-pill tx-price-pill">${t.gia>0?fmt(t.gia)+"/cái":"Không ghi giá"}</span>
           </div>
           ${t.ghi?`<span class="tx-note">📝 ${escapeHtml(t.ghi)}</span>`:""}
-          ${t.img?`<img class="tx-img" src="${escapeHtml(t.img)}" alt="Ảnh giao dịch" onclick="openImageViewer('${escapeHtml(t.id)}')">`:""}
+          ${t.img?`<img class="tx-img" src="${escapeHtml(t.img)}" alt="Ảnh giao dịch" referrerpolicy="no-referrer" onclick="openImageViewer('${escapeHtml(t.id)}')" onerror="this.style.display='none';">`:""}
         </div>`).join("") : `<div style="text-align: center; padding: 20px; color: #888;">Không có giao dịch phù hợp bộ lọc</div>`;
   document.getElementById("txModalBody").innerHTML = filterBar + summary + rows;
 }
@@ -3109,13 +3205,57 @@ async function deleteTX(id){ if(!requireAdmin()) return;
   renderTxHistory();
   showToast(idx >= 0 && qty > 0 ? `Đã xóa giao dịch, hoàn lại +${qty} tồn kho` : "Đã xóa giao dịch");
 }
+// Nhận link chia sẻ Google Drive (hoặc File ID dán trực tiếp) và quy đổi về
+// dạng URL hiển thị ảnh trực tiếp được (dùng cho thẻ <img>). Nếu không nhận
+// diện được là link Drive thì giữ nguyên URL gốc (coi như URL ảnh bình thường).
+function resolveImageUrl(url){
+  const raw = String(url || "").trim();
+  if(!raw) return "";
+  let id = "";
+  let m = raw.match(/\/file\/d\/([a-zA-Z0-9_-]{10,})/);
+  if(m) id = m[1];
+  if(!id){ m = raw.match(/[?&]id=([a-zA-Z0-9_-]{10,})/); if(m) id = m[1]; }
+  if(!id && /^[a-zA-Z0-9_-]{20,}$/.test(raw)) id = raw;
+  if(id) return `https://lh3.googleusercontent.com/d/${id}`;
+  return raw;
+}
+// Đọc link người dùng dán vào ô input, quy đổi rồi đổ vào preview ảnh tương ứng.
+function useImageLink(inputId, setPreviewFn){
+  const el = document.getElementById(inputId);
+  if(!el) return;
+  const val = el.value.trim();
+  if(!val){ return; }
+  const resolved = resolveImageUrl(val);
+  setPreviewFn(resolved);
+}
+// Tự động áp dụng link sau khi người dùng ngừng gõ/dán ~450ms, không cần bấm ra ngoài.
+const __imgLinkTimers = {};
+function debounceImageLink(el, inputId, setPreviewFn){
+  clearTimeout(__imgLinkTimers[inputId]);
+  __imgLinkTimers[inputId] = setTimeout(()=>{
+    const val = el.value.trim();
+    if(val) useImageLink(inputId, setPreviewFn);
+  }, 450);
+}
 function setImagePreview(dataUrl){
   document.getElementById("fImg").value = dataUrl || "";
   const img = document.getElementById("fImgPreview");
   const ph = document.getElementById("fImgPlaceholder");
   const rmBtn = document.getElementById("fImgRemoveBtn");
-  if(dataUrl){ img.src = dataUrl; img.style.display="block"; ph.style.display="none"; rmBtn.style.display="block"; }
-  else { img.style.display="none"; ph.style.display="flex"; rmBtn.style.display="none"; }
+  const linkInput = document.getElementById("fImgLink");
+  if(dataUrl){
+    img.referrerPolicy = "no-referrer";
+    img.onerror = function(){
+      img.style.display="none"; ph.style.display="flex"; rmBtn.style.display="none";
+      showToast("⚠️ Không tải được ảnh từ link này. Kiểm tra lại quyền chia sẻ (Bất kỳ ai có link) hoặc link ảnh.", 4000);
+    };
+    img.onload = function(){ img.onerror = null; };
+    img.src = dataUrl; img.style.display="block"; ph.style.display="none"; rmBtn.style.display="block";
+  } else {
+    img.onerror = null;
+    img.style.display="none"; ph.style.display="flex"; rmBtn.style.display="none";
+  }
+  if(linkInput) linkInput.value = (dataUrl && dataUrl.startsWith("http")) ? dataUrl : "";
 }
 function removeImage(){ setImagePreview(""); document.getElementById("fImgFile").value=""; }
 function setTxImagePreview(dataUrl){
@@ -3123,8 +3263,20 @@ function setTxImagePreview(dataUrl){
   const img = document.getElementById("saleImgPreview");
   const ph = document.getElementById("saleImgPlaceholder");
   const rmBtn = document.getElementById("saleImgRemoveBtn");
-  if(dataUrl){ img.src = dataUrl; img.style.display="block"; ph.style.display="none"; rmBtn.style.display="block"; }
-  else { img.style.display="none"; ph.style.display="flex"; rmBtn.style.display="none"; }
+  const linkInput = document.getElementById("saleImgLink");
+  if(dataUrl){
+    img.referrerPolicy = "no-referrer";
+    img.onerror = function(){
+      img.style.display="none"; ph.style.display="flex"; rmBtn.style.display="none";
+      showToast("⚠️ Không tải được ảnh từ link này. Kiểm tra lại quyền chia sẻ (Bất kỳ ai có link) hoặc link ảnh.", 4000);
+    };
+    img.onload = function(){ img.onerror = null; };
+    img.src = dataUrl; img.style.display="block"; ph.style.display="none"; rmBtn.style.display="block";
+  } else {
+    img.onerror = null;
+    img.style.display="none"; ph.style.display="flex"; rmBtn.style.display="none";
+  }
+  if(linkInput) linkInput.value = (dataUrl && dataUrl.startsWith("http")) ? dataUrl : "";
 }
 function removeTxImage(){ setTxImagePreview(""); document.getElementById("saleImgFile").value=""; }
 function handleNVAvatarPick(input){
