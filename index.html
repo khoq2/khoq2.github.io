@@ -491,8 +491,8 @@ body.admin-mode .admin-btn { background: #1E8449; border-color: #1E8449; opacity
       <div id="fGroup" class="group-checkboxes" aria-label="Chọn một hoặc nhiều nhóm sản phẩm"></div>
     </div>
     <div class="form-row">
-      <label>Phân loại nhanh (để lọc chính xác, không đoán theo tiêu đề)</label>
-      <select id="fQuickTag"></select>
+      <label>Phân loại nhanh <span style="font-weight:normal;color:#777;">(có thể chọn nhiều)</span></label>
+      <div id="fQuickTag" class="group-checkboxes" aria-label="Chọn nhiều phân loại nhanh"></div>
     </div>
     <div class="form-row">
       <label>Tên sản phẩm *</label>
@@ -1148,7 +1148,7 @@ function normalizeSheetRows(rows){
     row[7] = (row[7] || "").toString();
     row[8] = joinRowGroups(row[8] || "");
     row[9] = (row[9] || "").toString();
-    row[11] = cleanQuickLabel(row[11] || "");
+    row[11] = joinRowQuickTags(row[11] || "");
     return row;
   }).filter(r=>r[1] && r[2]);
 }
@@ -1717,6 +1717,16 @@ function detectBrandLabel(text){
 function cleanQuickLabel(value){
   return String(value ?? "").replace(/\s+/g, " ").trim();
 }
+function getRowQuickTags(value){
+  const seen = new Set();
+  return String(value || "").split(/\s*\|\s*/).map(cleanQuickLabel).filter(tag=>{
+    const key = normalizeQuickText(tag);
+    if(!key || seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+function joinRowQuickTags(tags){ return getRowQuickTags(Array.isArray(tags) ? tags.join(" | ") : tags).join(" | "); }
 
 function isKnownQuickValue(value){
   const v = cleanQuickLabel(value);
@@ -2154,10 +2164,10 @@ function getQuickMetaCandidates(r, groupLabel){
   const resolvedGroupLabel = resolveQuickGroupLabelFromRow(r, groupLabel || r?.[8] || "");
   const groupNorm = normalizeQuickText(resolvedGroupLabel);
   const groupKind = getQuickGroupKind(resolvedGroupLabel);
-  const manualTag = cleanQuickLabel(r?.[11] || "");
-  if(manualTag){
-    const manualMeta = makeQuickMeta(groupKind, manualTag, "", manualTag);
-    if(manualMeta) return [manualMeta];
+  const manualTags = getRowQuickTags(r?.[11] || "");
+  if(manualTags.length){
+    const manualMetas = manualTags.map(tag=>makeQuickMeta(groupKind, tag, "", tag)).filter(Boolean);
+    if(manualMetas.length) return manualMetas;
   }
   const text = [r?.[2], r?.[3]].filter(Boolean).join(" ");
   const metas = [];
@@ -3425,17 +3435,21 @@ function updateProductCodeSuggestions(){
 function updateQuickTagOptions(selectedTag){
   const groupLabel = getSelectedFormGroups()[0] || "";
   const catalog = getQuickFixedCatalog(groupLabel);
-  const sel = document.getElementById("fQuickTag");
-  if(!sel) return;
-  const prevValue = selectedTag !== undefined ? selectedTag : sel.value;
+  const box = document.getElementById("fQuickTag");
+  if(!box) return;
+  const selected = new Set(getRowQuickTags(selectedTag));
   if(!catalog.length){
-    sel.innerHTML = '<option value="">-- Nhóm này chưa hỗ trợ phân loại nhanh --</option>';
-    sel.disabled = true;
+    box.innerHTML = '<span style="font-size:12px;color:#888;padding:4px;">Nhóm chính này chưa có phân loại nhanh.</span>';
     return;
   }
-  sel.disabled = false;
-  sel.innerHTML = '<option value="">-- Tự động theo tiêu đề --</option>' +
-    catalog.map(meta=>`<option value="${escapeHtml(meta.primary)}"${prevValue===meta.primary?' selected':''}>${escapeHtml(meta.label || meta.primary)}</option>`).join("");
+  box.innerHTML = catalog.map(meta=>{
+    const value = String(meta.primary || "");
+    return `<label class="group-check"><input type="checkbox" value="${escapeHtml(value)}"${selected.has(value)?" checked":""}><span>${escapeHtml(meta.label || value)}</span></label>`;
+  }).join("");
+}
+
+function getSelectedQuickTags(){
+  return [...document.querySelectorAll('#fQuickTag input[type="checkbox"]:checked')].map(input=>input.value);
 }
 
 function openAddModal(){ if(!requireAdmin()) return;
@@ -3458,7 +3472,7 @@ function openEditModal(idx){ if(!requireAdmin()) return;
   setImagePreview(r[9]||""); updateGroupOptions(r[8]||""); updateQuickTagOptions(r[11]||""); document.getElementById("editOverlay").classList.add("open");
 }
 async function saveItem(){ if(!requireAdmin()) return;
-  const sh = document.getElementById("fSheet").value.trim(), ma = document.getElementById("fMa").value.trim(), ten = document.getElementById("fTen").value.trim(), th = document.getElementById("fTH").value.trim(), gia = parseVndInput(document.getElementById("fGia").value), giaBan = parseVndInput(document.getElementById("fGiaBan").value), ton = Math.max(0, parseInt(document.getElementById("fTon").value)||0), tt = document.getElementById("fTT").value, ghiNote = document.getElementById("fGhi").value.trim(), vitri = document.getElementById("fVitri").value.trim(), img = document.getElementById("fImg").value || "", idx = document.getElementById("editIdx").value, grp = joinRowGroups(getSelectedFormGroups()), quickTag = (document.getElementById("fQuickTag")?.value || "").trim();
+  const sh = document.getElementById("fSheet").value.trim(), ma = document.getElementById("fMa").value.trim(), ten = document.getElementById("fTen").value.trim(), th = document.getElementById("fTH").value.trim(), gia = parseVndInput(document.getElementById("fGia").value), giaBan = parseVndInput(document.getElementById("fGiaBan").value), ton = Math.max(0, parseInt(document.getElementById("fTon").value)||0), tt = document.getElementById("fTT").value, ghiNote = document.getElementById("fGhi").value.trim(), vitri = document.getElementById("fVitri").value.trim(), img = document.getElementById("fImg").value || "", idx = document.getElementById("editIdx").value, grp = joinRowGroups(getSelectedFormGroups()), quickTag = joinRowQuickTags(getSelectedQuickTags());
   if(!ma||!ten){alert("Vui lòng nhập Mã hàng và Tên sản phẩm!"); return;}
   const idxNum = idx === "" ? -1 : parseInt(idx);
   const dupIdx = DATA.findIndex((row,i) => row[1] === ma && i !== idxNum);
