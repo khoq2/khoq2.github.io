@@ -451,8 +451,6 @@ body.admin-mode .admin-btn { background: #1E8449; border-color: #1E8449; opacity
   <div class="filters">
     <button class="filter-btn active" style="background:#1E3A5F;color:#fff" data-status="ALL" onclick="setStatus(this)">Tất cả</button>
     <button class="filter-btn" data-status="CON" onclick="setStatus(this)">✅ Còn hàng</button>
-    <button class="filter-btn" data-status="SAP" onclick="setStatus(this)">⚠️ Sắp hết</button>
-    <button class="filter-btn" data-status="HET" onclick="setStatus(this)">❌ Hết hàng</button>
     <button class="filter-btn" id="restockBtn" onclick="setRestockFilter()">📥 Cần nhập</button>
     <button class="bulk-btn bulk-btn-select admin-only" id="bulkModeBtn" onclick="toggleBulkSelectMode()">☑️ Chọn nhiều</button>
     <button class="bulk-btn bulk-btn-delete admin-only" id="bulkDeleteBtn" onclick="deleteSelectedItems()" disabled>🗑️ Xóa đã chọn</button>
@@ -466,6 +464,7 @@ body.admin-mode .admin-btn { background: #1E8449; border-color: #1E8449; opacity
   <div id="fabMenuItems" style="display:flex;flex-direction:column;gap:10px;align-items:flex-end;overflow:hidden;max-height:0;opacity:0;transition:max-height .35s ease,opacity .3s ease;">
     <button class="fab fab-add admin-only" onclick="openAddModal()">➕ Thêm thiết bị</button>
     <button class="fab admin-only" style="background:#8E44AD;color:#fff" onclick="openNVModal()">👥 Nhân viên</button>
+    <button class="fab admin-only" style="background:#5B2C6F;color:#fff" onclick="openQuickOrderModal()">↕️ Sắp xếp lọc</button>
     <button class="fab admin-only" style="background:#117864;color:#fff" onclick="backupDataToExcel()">💾 Sao lưu Excel</button>
   </div>
   <button class="fab admin-only" id="fabToggleBtn" style="background:#1E3A5F;color:#fff;" onclick="toggleFabMenu()">⚙️ Quản trị</button>
@@ -706,6 +705,17 @@ body.admin-mode .admin-btn { background: #1E8449; border-color: #1E8449; opacity
 <div id="imageLightbox" class="image-lightbox" role="dialog" aria-modal="true" aria-label="Xem ảnh phóng to" onclick="closeImageViewer(event)">
   <button type="button" class="image-lightbox-close" aria-label="Đóng ảnh" onclick="closeImageViewer()">×</button>
   <img id="imageLightboxImg" src="" alt="Ảnh phóng to" referrerpolicy="no-referrer" onclick="event.stopPropagation()">
+</div>
+
+<div class="overlay" id="quickOrderOverlay" onclick="overlayClose(event,'quickOrderOverlay')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-title">↕️ Sắp xếp bộ lọc nhanh</div>
+    <div class="form-row"><label>Nhóm sản phẩm</label><select id="quickOrderGroup" onchange="renderQuickOrderList()"></select></div>
+    <div id="quickOrderList"></div>
+    <div style="font-size:11px;color:#777;margin:10px 0;line-height:1.45;">Dùng ↑ ↓ để đổi thứ tự. Các mục 0 tồn vẫn được giữ nguyên; thứ tự này không làm thay đổi kết quả lọc.</div>
+    <button class="btn-cancel" onclick="resetQuickOrderForGroup()">Khôi phục thứ tự mặc định</button>
+    <button class="btn-cancel" onclick="closeOverlay('quickOrderOverlay')">Đóng</button>
+  </div>
 </div>
 
 <script>
@@ -2061,7 +2071,7 @@ function detectNetworkDetail(text){
   return "";
 }
 
-function getQuickFixedCatalog(groupLabel){
+function getQuickFixedCatalogBase(groupLabel){
   const kind = getQuickGroupKind(groupLabel);
   const makeList = (family, values)=>values.map(v=>makeQuickMeta(family, v, "", v)).filter(Boolean);
   if(kind === "cpu"){
@@ -2154,6 +2164,61 @@ function resolveQuickGroupLabelFromFamily(family, title){
   }
   if(family === "part") return "💻  Laptop linh kiện";
   return "";
+}
+
+const QUICK_ORDER_KEY = "kho_cntt_quick_order";
+let QUICK_ORDER = {};
+try { QUICK_ORDER = JSON.parse(localStorage.getItem(QUICK_ORDER_KEY) || "{}"); } catch(e) { QUICK_ORDER = {}; }
+function quickOrderKey(groupLabel){ return normalizeQuickText(groupLabel || ""); }
+function getQuickFixedCatalog(groupLabel){
+  const catalog = getQuickFixedCatalogBase(groupLabel);
+  const order = QUICK_ORDER[quickOrderKey(groupLabel)] || [];
+  if(!order.length) return catalog;
+  const rank = new Map(order.map((value,index)=>[value,index]));
+  return [...catalog].sort((a,b)=>{
+    const ar = rank.has(a.primary) ? rank.get(a.primary) : Number.MAX_SAFE_INTEGER;
+    const br = rank.has(b.primary) ? rank.get(b.primary) : Number.MAX_SAFE_INTEGER;
+    return ar - br;
+  });
+}
+function openQuickOrderModal(){
+  if(!requireAdmin()) return;
+  const select = document.getElementById("quickOrderGroup");
+  const groups = [...new Set(Object.values(GROUP_OPTIONS).flat())];
+  select.innerHTML = groups.map(group=>`<option value="${escapeHtml(group)}">${escapeHtml(group)}</option>`).join("");
+  renderQuickOrderList();
+  document.getElementById("quickOrderOverlay").classList.add("open");
+}
+function renderQuickOrderList(){
+  const group = document.getElementById("quickOrderGroup").value;
+  const base = getQuickFixedCatalogBase(group);
+  const key = quickOrderKey(group);
+  const order = QUICK_ORDER[key] || base.map(meta=>meta.primary);
+  const rank = new Map(order.map((value,index)=>[value,index]));
+  const metas = [...base].sort((a,b)=>(rank.get(a.primary)??9999)-(rank.get(b.primary)??9999));
+  document.getElementById("quickOrderList").innerHTML = metas.map((meta,index)=>`<div style="display:flex;align-items:center;gap:8px;padding:8px 4px;border-bottom:1px solid #eee"><span style="flex:1;font-size:13px">${escapeHtml(meta.label || meta.primary)}</span><button type="button" class="btn-img-pick" ${index===0?'disabled':''} onclick="moveQuickOrder(-1)">↑</button><button type="button" class="btn-img-pick" ${index===metas.length-1?'disabled':''} onclick="moveQuickOrder(1)">↓</button></div>`).join("");
+  QUICK_ORDER[key] = metas.map(meta=>meta.primary);
+}
+function moveQuickOrder(delta){
+  const group = document.getElementById("quickOrderGroup").value;
+  const key = quickOrderKey(group);
+  const active = document.activeElement;
+  const rows = [...document.querySelectorAll('#quickOrderList button')];
+  const buttonIndex = rows.indexOf(active);
+  const itemIndex = Math.floor(buttonIndex / 2);
+  const target = itemIndex + delta;
+  const order = QUICK_ORDER[key] || [];
+  if(target < 0 || target >= order.length) return;
+  [order[itemIndex], order[target]] = [order[target], order[itemIndex]];
+  QUICK_ORDER[key] = order;
+  localStorage.setItem(QUICK_ORDER_KEY, JSON.stringify(QUICK_ORDER));
+  renderQuickOrderList();
+  render();
+}
+function resetQuickOrderForGroup(){
+  const key = quickOrderKey(document.getElementById("quickOrderGroup").value);
+  delete QUICK_ORDER[key]; localStorage.setItem(QUICK_ORDER_KEY, JSON.stringify(QUICK_ORDER));
+  renderQuickOrderList(); render();
 }
 
 function resolveQuickGroupLabelFromRow(r, fallbackGroupLabel=""){
