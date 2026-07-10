@@ -2215,16 +2215,12 @@ function renderQuickOrderList(){
   const order = QUICK_ORDER[key] || base.map(meta=>meta.primary);
   const rank = new Map(order.map((value,index)=>[value,index]));
   const metas = [...base].sort((a,b)=>(rank.get(a.primary)??9999)-(rank.get(b.primary)??9999));
-  document.getElementById("quickOrderList").innerHTML = metas.map((meta,index)=>`<div style="display:flex;align-items:center;gap:8px;padding:8px 4px;border-bottom:1px solid #eee"><span style="flex:1;font-size:13px">${escapeHtml(meta.label || meta.primary)}</span><button type="button" class="btn-img-pick" ${index===0?'disabled':''} onclick="moveQuickOrder(-1)">↑</button><button type="button" class="btn-img-pick" ${index===metas.length-1?'disabled':''} onclick="moveQuickOrder(1)">↓</button></div>`).join("");
+  document.getElementById("quickOrderList").innerHTML = metas.map((meta,index)=>`<div style="display:flex;align-items:center;gap:8px;padding:8px 4px;border-bottom:1px solid #eee"><span style="flex:1;font-size:13px">${escapeHtml(meta.label || meta.primary)}</span><button type="button" class="btn-img-pick" ${index===0?'disabled':''} onclick="moveQuickOrder(${index},-1)">↑</button><button type="button" class="btn-img-pick" ${index===metas.length-1?'disabled':''} onclick="moveQuickOrder(${index},1)">↓</button></div>`).join("");
   QUICK_ORDER[key] = metas.map(meta=>meta.primary);
 }
-function moveQuickOrder(delta){
+function moveQuickOrder(itemIndex, delta){
   const group = document.getElementById("quickOrderGroup").value;
   const key = quickOrderKey(group);
-  const active = document.activeElement;
-  const rows = [...document.querySelectorAll('#quickOrderList button')];
-  const buttonIndex = rows.indexOf(active);
-  const itemIndex = Math.floor(buttonIndex / 2);
   const target = itemIndex + delta;
   const order = QUICK_ORDER[key] || [];
   if(target < 0 || target >= order.length) return;
