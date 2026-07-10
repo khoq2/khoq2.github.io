@@ -515,7 +515,11 @@ body.admin-mode .admin-btn { background: #1E8449; border-color: #1E8449; opacity
     <div class="form-2col">
       <div class="form-row">
         <label>Số lượng tồn *</label>
-        <input type="number" id="fTon" placeholder="0" min="0" oninput="document.getElementById('fTT').value = getStockStatusValue(parseInt(this.value)||0);">
+        <input type="number" id="fTon" placeholder="0" min="0" oninput="document.getElementById('fTT').value = getStockStatusValue(parseInt(this.value)||0, parseInt(document.getElementById('fSapHet').value)||2);">
+      </div>
+      <div class="form-row">
+        <label>Báo sắp hết khi còn</label>
+        <input type="number" id="fSapHet" value="2" min="1" oninput="document.getElementById('fTT').value = getStockStatusValue(parseInt(document.getElementById('fTon').value)||0, parseInt(this.value)||2);">
       </div>
       <div class="form-row">
         <label>Tình trạng (tự tính theo tồn kho)</label>
@@ -1136,7 +1140,7 @@ function flushDataSaveQueue(){
 function normalizeSheetRows(rows){
   if(!Array.isArray(rows)) return [];
   return rows.filter(Array.isArray).map(r=>{
-    const row = Array.from({length:12}, (_,i) => r[i] !== undefined ? r[i] : "");
+    const row = Array.from({length:13}, (_,i) => r[i] !== undefined ? r[i] : "");
     row[4] = parseVndInput(row[4]);
     row[5] = Math.max(0, Number(row[5]) || 0);
     row[10] = parseVndInput(row[10]);
@@ -1149,6 +1153,7 @@ function normalizeSheetRows(rows){
     row[8] = joinRowGroups(row[8] || "");
     row[9] = (row[9] || "").toString();
     row[11] = joinRowQuickTags(row[11] || "");
+    row[12] = Math.max(1, Number(row[12]) || 2);
     return row;
   }).filter(r=>r[1] && r[2]);
 }
@@ -2406,19 +2411,19 @@ function focusFirstQuickMatch(){
 }
 
 function renderCard(r,i,displayNo){
-  const [sh,ma,ten,th,giaNhap,ton,tt,ghi,,img,giaBan]=r;
+  const [sh,ma,ten,th,giaNhap,ton,tt,ghi,,img,giaBan,,sapHet]=r;
   const kw = removeAccents(searchQ.trim());
   const kwTokens = kw ? kw.split(/\s+/).filter(Boolean) : [];
   const cfg=SHEET_CFG[sh]||SHEET_CFG.MT;
   const no = displayNo || (i+1);
   const noColor = GROUP_STRONG_COLORS[(no-1)%GROUP_STRONG_COLORS.length];
-  const stockState = getStockState(ton);
+  const stockState = getStockState(ton, sapHet);
   const isHet = stockState === "HET";
   const isSap = stockState === "SAP";
   const { note, location } = splitNoteLocation(ghi || "");
   const stBg=isHet?"#FADBD8":isSap?"#FEF9E7":"#D5F5E3";
   const stFg=isHet?"#922B21":isSap?"#7D6608":"#1E8449";
-  const stTxt=getStockStatusLabel(ton);
+  const stTxt=getStockStatusLabel(ton, sapHet);
   const condition = detectConditionLabel([ten, th, ghi].filter(Boolean).join(" "));
   const imgHtml = img
     ? `<img class="prod-img" src="${escapeHtml(img)}" alt="${escapeHtml(ten)}" referrerpolicy="no-referrer" onclick="openImageViewer(this.src, this.alt)" onerror="this.outerHTML='<div class=\\'prod-img prod-img-ph\\' title=\\'Không tải được ảnh\\'>💻</div>';" />`
@@ -2718,12 +2723,17 @@ async function deleteAllItems(){
 function changeTon(idx, delta){
   if(!requireAdmin()) return;
   const r = DATA[idx];
+  const reason = prompt("Lý do điều chỉnh tồn kho:", "Nhập thêm hàng");
+  if(reason === null) return;
   const newTon = Math.max(0, r[5] + delta);
+  const actualDelta = newTon - r[5];
+  if(!actualDelta) return;
   DATA[idx][5] = newTon;
-  DATA[idx][6] = getStockStatusValue(newTon);
-  saveData();
+  DATA[idx][6] = getStockStatusValue(newTon, DATA[idx][12]);
+  TX_DATA.unshift({ id: Date.now(), ma: r[1], ten: r[2], sh: r[0], nv: "Điều chỉnh kho", qty: -actualDelta, gia: 0, ghi: `[ĐIỀU CHỈNH] ${reason.trim() || "Không ghi lý do"}`, img: "", time: formatTxTime(new Date()) });
+  saveData(); saveTX();
   render();
-  showToast(delta > 0 ? `+1 tồn kho: ${r[2]}` : `-1 tồn kho: ${r[2]}`);
+  showToast(`${actualDelta > 0 ? "+" : ""}${actualDelta} tồn kho: ${r[2]}`);
 }
 
 function deleteItem(idx){
@@ -3047,7 +3057,7 @@ async function saveSale(){ if(!requireAdmin()) return;
   const r = DATA[idx];
   if(r[5] < qty){ alert(`Tồn kho chỉ còn ${r[5]}, không đủ xuất ${qty}!`); return; }
   DATA[idx][5] = r[5] - qty;
-  DATA[idx][6] = getStockStatusValue(DATA[idx][5]);
+  DATA[idx][6] = getStockStatusValue(DATA[idx][5], DATA[idx][12]);
   TX_DATA.unshift({ id: Date.now(), ma: r[1], ten: r[2], sh: r[0], nv, qty, gia, ghi, img, time: formatTxTime(new Date()) });
   closeOverlay("saleOverlay");
   const dataSaved = await saveData();
@@ -3077,22 +3087,22 @@ function formatTxTime(value){
   return `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
 }
 
-function getStockState(ton){
+function getStockState(ton, lowLimit=2){
   ton = Number(ton) || 0;
   if(ton <= 0) return "HET";
-  if(ton <= 2) return "SAP";
+  if(ton <= Math.max(1, Number(lowLimit) || 2)) return "SAP";
   return "CON";
 }
 
-function getStockStatusValue(ton){
-  const state = getStockState(ton);
+function getStockStatusValue(ton, lowLimit=2){
+  const state = getStockState(ton, lowLimit);
   if(state === "HET") return "HẾT HÀNG";
   if(state === "SAP") return "SẮP HẾT";
   return "CÒN HÀNG";
 }
 
-function getStockStatusLabel(ton){
-  const state = getStockState(ton);
+function getStockStatusLabel(ton, lowLimit=2){
+  const state = getStockState(ton, lowLimit);
   if(state === "HET") return "❌ Hết hàng";
   if(state === "SAP") return "⚠️ Sắp hết";
   return "✅ Còn hàng";
@@ -3428,6 +3438,12 @@ function updateProductCodeSuggestions(){
     hint.textContent = "Danh mục này chưa có mã hàng nào.";
     return;
   }
+  if(idx >= 0 && qty < 0 && String(tx.ghi || "").startsWith("[ĐIỀU CHỈNH]")){
+    DATA[idx][5] = Math.max(0, (Number(DATA[idx][5]) || 0) + qty);
+    DATA[idx][6] = getStockStatusValue(DATA[idx][5], DATA[idx][12]);
+    await saveData();
+    render();
+  }
   const preview = codes.slice(0, 16).join(" · ");
   hint.innerHTML = `<b>${codes.length} mã đã có:</b> ${escapeHtml(preview)}${codes.length>16 ? " …" : ""}`;
 }
@@ -3456,7 +3472,7 @@ function openAddModal(){ if(!requireAdmin()) return;
   document.getElementById("editTitle").textContent = "➕ Thêm thiết bị mới"; document.getElementById("editIdx").value = "";
   document.getElementById("fSheet").value = "MT"; document.getElementById("fMa").value = ""; document.getElementById("fTen").value = "";
   document.getElementById("fTH").value = ""; setVndInputValue("fGia", 0); setVndInputValue("fGiaBan", 0);
-  document.getElementById("fTon").value = "0"; document.getElementById("fTT").value = "HẾT HÀNG";
+  document.getElementById("fTon").value = "0"; document.getElementById("fSapHet").value = "2"; document.getElementById("fTT").value = "HẾT HÀNG";
   document.getElementById("fGhi").value = ""; document.getElementById("fVitri").value = ""; document.getElementById("fImgFile").value = ""; setImagePreview(""); updateGroupOptions("");
   document.getElementById("editOverlay").classList.add("open");
 }
@@ -3467,12 +3483,12 @@ function openEditModal(idx){ if(!requireAdmin()) return;
   document.getElementById("fSheet").value = r[0]; document.getElementById("fMa").value = r[1];
   document.getElementById("fTen").value = r[2]; document.getElementById("fTH").value = r[3];
   setVndInputValue("fGia", r[4]); setVndInputValue("fGiaBan", r[10]||0);
-  document.getElementById("fTon").value = r[5]; document.getElementById("fTT").value = getStockStatusValue(r[5]);
+  document.getElementById("fTon").value = r[5]; document.getElementById("fSapHet").value = r[12] || 2; document.getElementById("fTT").value = getStockStatusValue(r[5], r[12]);
   document.getElementById("fGhi").value = parts.note || ""; document.getElementById("fVitri").value = parts.location || ""; document.getElementById("fImgFile").value = "";
   setImagePreview(r[9]||""); updateGroupOptions(r[8]||""); updateQuickTagOptions(r[11]||""); document.getElementById("editOverlay").classList.add("open");
 }
 async function saveItem(){ if(!requireAdmin()) return;
-  const sh = document.getElementById("fSheet").value.trim(), ma = document.getElementById("fMa").value.trim(), ten = document.getElementById("fTen").value.trim(), th = document.getElementById("fTH").value.trim(), gia = parseVndInput(document.getElementById("fGia").value), giaBan = parseVndInput(document.getElementById("fGiaBan").value), ton = Math.max(0, parseInt(document.getElementById("fTon").value)||0), tt = document.getElementById("fTT").value, ghiNote = document.getElementById("fGhi").value.trim(), vitri = document.getElementById("fVitri").value.trim(), img = document.getElementById("fImg").value || "", idx = document.getElementById("editIdx").value, grp = joinRowGroups(getSelectedFormGroups()), quickTag = joinRowQuickTags(getSelectedQuickTags());
+  const sh = document.getElementById("fSheet").value.trim(), ma = document.getElementById("fMa").value.trim(), ten = document.getElementById("fTen").value.trim(), th = document.getElementById("fTH").value.trim(), gia = parseVndInput(document.getElementById("fGia").value), giaBan = parseVndInput(document.getElementById("fGiaBan").value), ton = Math.max(0, parseInt(document.getElementById("fTon").value)||0), sapHet = Math.max(1, parseInt(document.getElementById("fSapHet").value)||2), tt = document.getElementById("fTT").value, ghiNote = document.getElementById("fGhi").value.trim(), vitri = document.getElementById("fVitri").value.trim(), img = document.getElementById("fImg").value || "", idx = document.getElementById("editIdx").value, grp = joinRowGroups(getSelectedFormGroups()), quickTag = joinRowQuickTags(getSelectedQuickTags());
   if(!ma||!ten){alert("Vui lòng nhập Mã hàng và Tên sản phẩm!"); return;}
   const idxNum = idx === "" ? -1 : parseInt(idx);
   const dupIdx = DATA.findIndex((row,i) => row[1] === ma && i !== idxNum);
@@ -3485,7 +3501,7 @@ async function saveItem(){ if(!requireAdmin()) return;
     alert(`⚠️ Mã hàng "${ma}" đã tồn tại trong lịch sử giao dịch. Không thể dùng lại mã này cho sản phẩm khác để tránh sai tồn kho.`);
     return;
   }
-  const row = [sh,ma,ten,th,gia,ton,getStockStatusValue(ton),mergeNoteLocation(ghiNote, vitri),grp,img,giaBan,quickTag];
+  const row = [sh,ma,ten,th,gia,ton,getStockStatusValue(ton, sapHet),mergeNoteLocation(ghiNote, vitri),grp,img,giaBan,quickTag,sapHet];
 if(idx===""){
   DATA.unshift(row);
   showToast("Đã thêm: "+ten);
