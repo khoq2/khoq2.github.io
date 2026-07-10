@@ -68,7 +68,7 @@ body { font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif
 .card-body { padding: 9px 12px; }
 .card-body-flex { display: flex; gap: 10px; align-items: flex-start; }
 .card-main { flex: 1; min-width: 0; }
-.prod-img { width: 64px; height: 64px; border-radius: 10px; object-fit: cover; flex-shrink: 0; border: 1px solid #eee; background: #fafafa; }
+.prod-img { width: 64px; height: 64px; border-radius: 10px; object-fit: cover; flex-shrink: 0; border: 1px solid #eee; background: #fafafa; cursor: zoom-in; }
 .prod-img-ph { display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: bold; }
 .product-name-row { display: block; max-width: 100%; margin-bottom: 5px; cursor: copy; user-select: none; }
 .product-name { font-size: 14px; font-weight: bold; line-height: 1.35; margin-bottom: 0; display: inline; }
@@ -141,11 +141,22 @@ mark.kw-hit { background: #FFEB3B; color: #1A1A1A; padding: 0 1px; border-radius
 .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 500; align-items: flex-end; }
 .overlay.open { display: flex; }
 .modal { background: #fff; border-radius: 20px 20px 0 0; width: 100%; max-height: 92vh; overflow-y: auto; padding: 20px 16px 32px; }
+.image-lightbox { display:none; position:fixed; inset:0; z-index:1000; align-items:center; justify-content:center; padding:18px; background:rgba(0,0,0,.88); cursor:zoom-out; }
+.image-lightbox.open { display:flex; }
+.image-lightbox img { display:block; max-width:100%; max-height:calc(100dvh - 36px); object-fit:contain; border-radius:10px; box-shadow:0 12px 42px rgba(0,0,0,.5); cursor:default; }
+.image-lightbox-close { position:absolute; top:max(14px, env(safe-area-inset-top)); right:max(14px, env(safe-area-inset-right)); width:42px; height:42px; border:0; border-radius:50%; background:rgba(255,255,255,.16); color:#fff; font-size:28px; line-height:1; cursor:pointer; }
+.group-checkboxes { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:7px; max-height:190px; overflow-y:auto; padding:9px; border:1.5px solid #ddd; border-radius:10px; background:#fafafa; }
+.group-check { display:flex; align-items:flex-start; gap:6px; padding:6px; border-radius:7px; font-size:12px; line-height:1.3; cursor:pointer; }
+.group-check:has(input:checked) { background:#EAF2F8; color:#1A5276; font-weight:bold; }
+.group-check input { width:auto!important; margin:2px 0 0; accent-color:#1A5276; flex-shrink:0; }
+@media (max-width:480px){ .group-checkboxes { grid-template-columns:1fr; max-height:180px; } .image-lightbox { padding:10px; } .image-lightbox img { max-height:calc(100dvh - 20px); border-radius:7px; } }
 .modal-title { font-size: 17px; font-weight: bold; margin-bottom: 16px; color: #1E3A5F; }
 .form-row { margin-bottom: 12px; }
 .form-row label { font-size: 12px; color: #555; font-weight: bold; display: block; margin-bottom: 4px; }
 .form-row input,.form-row select,.form-row textarea { width: 100%; border: 1.5px solid #ddd; border-radius: 10px; padding: 10px 12px; font-size: 14px; outline: none; background: #fafafa; color: #1a1a1a; }
 .form-row input:focus,.form-row select:focus { border-color: #1E3A5F; background: #fff; }
+.code-existing-hint { margin-top:5px; font-size:10.5px; line-height:1.45; color:#6C7A89; word-break:break-word; }
+.code-existing-hint b { color:#1A5276; }
 .form-row textarea { resize: vertical; min-height: 60px; }
 .form-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .img-upload-row { display: flex; align-items: center; gap: 12px; }
@@ -439,7 +450,6 @@ body.admin-mode .admin-btn { background: #1E8449; border-color: #1E8449; opacity
     <button class="filter-btn" data-status="HET" onclick="setStatus(this)">❌ Hết hàng</button>
     <button class="bulk-btn bulk-btn-select admin-only" id="bulkModeBtn" onclick="toggleBulkSelectMode()">☑️ Chọn nhiều</button>
     <button class="bulk-btn bulk-btn-delete admin-only" id="bulkDeleteBtn" onclick="deleteSelectedItems()" disabled>🗑️ Xóa đã chọn</button>
-    <button class="bulk-btn bulk-btn-all admin-only" onclick="deleteAllItems()">🔥 Xóa tất cả</button>
     <span class="count-badge" id="count">0 kết quả</span>
   </div>
 </div>
@@ -449,9 +459,8 @@ body.admin-mode .admin-btn { background: #1E8449; border-color: #1E8449; opacity
 <div class="fab-wrap">
   <div id="fabMenuItems" style="display:flex;flex-direction:column;gap:10px;align-items:flex-end;overflow:hidden;max-height:0;opacity:0;transition:max-height .35s ease,opacity .3s ease;">
     <button class="fab fab-add admin-only" onclick="openAddModal()">➕ Thêm thiết bị</button>
-    <button class="fab fab-import admin-only" onclick="openImportModal()">📤 Tải File lên</button>
     <button class="fab admin-only" style="background:#8E44AD;color:#fff" onclick="openNVModal()">👥 Nhân viên</button>
-    <button class="fab admin-only" style="background:#B7950B;color:#fff" onclick="resetToDefault()">🔄 Khôi phục dữ liệu mẫu</button>
+    <button class="fab admin-only" style="background:#117864;color:#fff" onclick="backupDataToExcel()">💾 Sao lưu Excel</button>
   </div>
   <button class="fab admin-only" id="fabToggleBtn" style="background:#1E3A5F;color:#fff;" onclick="toggleFabMenu()">⚙️ Quản trị</button>
 </div>
@@ -472,12 +481,14 @@ body.admin-mode .admin-btn { background: #1E8449; border-color: #1E8449; opacity
       </div>
       <div class="form-row">
         <label>Mã hàng *</label>
-      <input type="text" id="fMa" placeholder="VD: CPU001">
+      <input type="text" id="fMa" list="fMaSuggestions" placeholder="VD: CPU001" onfocus="updateProductCodeSuggestions()">
+      <datalist id="fMaSuggestions"></datalist>
+      <div id="fMaExistingHint" class="code-existing-hint"></div>
       </div>
     </div>
     <div class="form-row">
-      <label>Nhóm sản phẩm</label>
-      <select id="fGroup" onchange="updateQuickTagOptions()"></select>
+      <label>Nhóm sản phẩm <span style="font-weight:normal;color:#777;">(có thể chọn nhiều)</span></label>
+      <div id="fGroup" class="group-checkboxes" aria-label="Chọn một hoặc nhiều nhóm sản phẩm"></div>
     </div>
     <div class="form-row">
       <label>Phân loại nhanh (để lọc chính xác, không đoán theo tiêu đề)</label>
@@ -681,12 +692,17 @@ body.admin-mode .admin-btn { background: #1E8449; border-color: #1E8449; opacity
 
 <div class="toast" id="toast"></div>
 
+<div id="imageLightbox" class="image-lightbox" role="dialog" aria-modal="true" aria-label="Xem ảnh phóng to" onclick="closeImageViewer(event)">
+  <button type="button" class="image-lightbox-close" aria-label="Đóng ảnh" onclick="closeImageViewer()">×</button>
+  <img id="imageLightboxImg" src="" alt="Ảnh phóng to" referrerpolicy="no-referrer" onclick="event.stopPropagation()">
+</div>
+
 <script>
 
 // ====== Tự động dọn banner/overlay lạ do hosting chèn vào ======
 (function(){
-  const APP_IDS = new Set(["results","editOverlay","importOverlay","adminOverlay","toast"]);
-  const APP_CLASSES = ["sticky","fab-wrap","overlay","toast"];
+  const APP_IDS = new Set(["results","editOverlay","importOverlay","adminOverlay","toast","imageLightbox"]);
+  const APP_CLASSES = ["sticky","fab-wrap","overlay","toast","image-lightbox"];
   function isAppEl(el){
     if(el.id && APP_IDS.has(el.id)) return true;
     if(el.classList){
@@ -923,6 +939,20 @@ const GROUP_MIGRATE = {
 function canonGroupLabel(label){
   return (label && GROUP_MIGRATE[label]) || label;
 }
+// Một sản phẩm có thể thuộc nhiều nhóm. Vẫn dùng cùng cột Sheet cũ để không đổi
+// giao thức Apps Script; các nhãn được ngăn cách bằng " | ".
+const GROUP_SEPARATOR = " | ";
+function getRowGroups(value){
+  const seen = new Set();
+  return String(value || "").split(/\s*\|\s*/).map(cleanQuickLabel).map(canonGroupLabel).filter(label=>{
+    const key = normalizeQuickText(label);
+    if(!key || seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+function joinRowGroups(groups){ return getRowGroups(Array.isArray(groups) ? groups.join(GROUP_SEPARATOR) : groups).join(GROUP_SEPARATOR); }
+function getPrimaryRowGroup(value){ return getRowGroups(value)[0] || ""; }
 let currentTab = "ALL";
 let currentStatus = "ALL";
 let searchQ = "";
@@ -1020,8 +1050,12 @@ function checkAdminSession(){
 const SHEET_API_URL = "https://script.google.com/macros/s/AKfycbzGzP5Fkd9dYEYFrB7AcIeQSR3xJYTbJMadZHKMYVJmS6w0IcUEQbkIPSxNDzt_ge4o8Q/exec";
 const SHEET_TIMEOUT_MS = 12000;
 const PENDING_SYNC_KEY = "kho_cntt_pending_sync";
+const PENDING_TX_SYNC_KEY = "kho_cntt_pending_tx_sync";
+const PENDING_NV_SYNC_KEY = "kho_cntt_pending_nv_sync";
 let dataSaveChain = Promise.resolve();
 let dataSaveSeq = 0;
+let txSaveChain = Promise.resolve();
+let nvSaveChain = Promise.resolve();
 
 function setSyncBadge(state, detail){
   const el = document.getElementById("syncBadge");
@@ -1073,6 +1107,8 @@ function setPendingSync(on, reason){
 function hasPendingSync(){
   return localStorage.getItem(PENDING_SYNC_KEY) !== null;
 }
+function setAuxPendingSync(key, on){ try{ on ? localStorage.setItem(key, String(Date.now())) : localStorage.removeItem(key); }catch(e){} }
+function hasAuxPendingSync(key){ try{ return localStorage.getItem(key) !== null; }catch(e){ return false; } }
 
 // Lưu vào localStorage một cách an toàn: nếu bộ nhớ máy đầy (thường do ảnh base64
 // của sản phẩm/giao dịch/nhân viên chiếm dung lượng), báo cho người dùng biết thay vì
@@ -1110,7 +1146,7 @@ function normalizeSheetRows(rows){
     row[3] = (row[3] || "").toString().trim();
     row[6] = getStockStatusValue(row[5]);
     row[7] = (row[7] || "").toString();
-    row[8] = resolveQuickGroupLabelFromRow(row, row[8] || "");
+    row[8] = joinRowGroups(row[8] || "");
     row[9] = (row[9] || "").toString();
     row[11] = cleanQuickLabel(row[11] || "");
     return row;
@@ -1174,11 +1210,7 @@ async function loadData(){
       }
       DATA = sheetRows;
 
-      DATA.forEach(r=>{
-        if(r[8] && GROUP_MIGRATE[r[8]]){
-          r[8] = GROUP_MIGRATE[r[8]];
-        }
-      });
+      DATA.forEach(r=>{ r[8] = joinRowGroups(r[8] || ""); });
 
       if(DATA.length){
         setSyncBadge("synced");
@@ -2088,7 +2120,9 @@ function resolveQuickGroupLabelFromFamily(family, title){
 }
 
 function resolveQuickGroupLabelFromRow(r, fallbackGroupLabel=""){
-  const fallback = canonGroupLabel(cleanQuickLabel(fallbackGroupLabel || r?.[8] || ""));
+  // Phân loại nhanh chỉ dùng nhóm đầu tiên, tránh làm thay đổi quy tắc cũ khi
+  // một sản phẩm được gắn thêm các nhóm phụ.
+  const fallback = getPrimaryRowGroup(fallbackGroupLabel || r?.[8] || "");
   const fallbackNorm = normalizeQuickText(fallback);
   if(fallback && fallbackNorm && fallbackNorm !== normalizeQuickText(NO_GROUP) && fallbackNorm !== "khac"){
     return fallback;
@@ -2377,7 +2411,7 @@ function renderCard(r,i,displayNo){
   const stTxt=getStockStatusLabel(ton);
   const condition = detectConditionLabel([ten, th, ghi].filter(Boolean).join(" "));
   const imgHtml = img
-    ? `<img class="prod-img" src="${escapeHtml(img)}" alt="${escapeHtml(ten)}" referrerpolicy="no-referrer" onerror="this.outerHTML='<div class=\\'prod-img prod-img-ph\\' title=\\'Không tải được ảnh\\'>💻</div>';" />`
+    ? `<img class="prod-img" src="${escapeHtml(img)}" alt="${escapeHtml(ten)}" referrerpolicy="no-referrer" onclick="openImageViewer(this.src, this.alt)" onerror="this.outerHTML='<div class=\\'prod-img prod-img-ph\\' title=\\'Không tải được ảnh\\'>💻</div>';" />`
     : `<div class="prod-img prod-img-ph" title="Chưa có ảnh sản phẩm">💻</div>`;
   const isAdmin = document.body.classList.contains("admin-mode");
   const isSelected = selectedItems.has(i);
@@ -2526,8 +2560,10 @@ function render(){
       const fromDataMap = new Map();
       DATA.forEach(r=>{
         if(r[0]===currentTab){
-          const g = resolveQuickGroupLabelFromRow(r, r[8] || "");
-          if(g){ const key = groupCompareKey(g); if(!fromDataMap.has(key)) fromDataMap.set(key, g); }
+          getRowGroups(r[8]).forEach(g=>{
+            const key = groupCompareKey(g);
+            if(!fromDataMap.has(key)) fromDataMap.set(key, g);
+          });
         }
       });
       const fromData = new Set(fromDataMap.values());
@@ -2548,8 +2584,10 @@ function render(){
       const seen = new Set();
       DATA.forEach(r=>{
         if(r[0]===currentTab){
-          const g=resolveQuickGroupLabelFromRow(r, r[8] || "");
-          if(g){ const key = groupCompareKey(g); if(!seen.has(key)){ seen.add(key); order.push(g); } }
+          getRowGroups(r[8]).forEach(g=>{
+            const key = groupCompareKey(g);
+            if(!seen.has(key)){ seen.add(key); order.push(g); }
+          });
         }
       });
     }
@@ -2564,9 +2602,11 @@ function render(){
     });
     const buckets = {};
     results.forEach(({r,i})=>{
-      let g = resolveQuickGroupLabelFromRow(r, r[8] || "") || NO_GROUP;
-      g = canonMap[groupCompareKey(g)] || g;
-      (buckets[g] = buckets[g]||[]).push({r,i});
+      const groups = getRowGroups(r[8]);
+      (groups.length ? groups : [NO_GROUP]).forEach(rawGroup=>{
+        const g = canonMap[groupCompareKey(rawGroup)] || rawGroup;
+        (buckets[g] = buckets[g]||[]).push({r,i});
+      });
     });
     const cfg = SHEET_CFG[currentTab]||SHEET_CFG.MT;
     const visibleGroups = order.filter(g=>buckets[g]&&buckets[g].length);
@@ -2783,15 +2823,10 @@ async function saveNV(){
   NV_LIST = normalizeNVList(NV_LIST);
   try{ safeLocalStorageSet("kho_cntt_nv", JSON.stringify(NV_LIST)); }catch(e){}
   if(!SHEET_API_URL) return true;
-  try{
-    await postSheet("save_nv", NV_LIST);
-    return true;
-  }catch(e){
-    console.warn("Lỗi lưu NV lên Sheet:", e);
-    setSyncBadge("error", String(e));
-    showToast("⚠️ Lỗi lưu nhân viên lên Sheet: "+String(e));
-    return false;
-  }
+  const snapshot = JSON.parse(JSON.stringify(NV_LIST));
+  setAuxPendingSync(PENDING_NV_SYNC_KEY, true);
+  nvSaveChain = nvSaveChain.then(()=>postSheet("save_nv", snapshot).then(()=>{ setAuxPendingSync(PENDING_NV_SYNC_KEY, false); return true; }).catch(e=>{ console.warn("Lỗi lưu NV lên Sheet:", e); setSyncBadge("error", String(e)); return false; }));
+  return nvSaveChain;
 }
 async function loadNVFromSheet(){
   if(!SHEET_API_URL) return;
@@ -2799,7 +2834,7 @@ async function loadNVFromSheet(){
     const json = await fetchSheetJson(sheetUrl({type:"nv", _ts: Date.now()}));
     if(Array.isArray(json.nv)){
       const sheetNV = normalizeNVList(json.nv);
-      if(sheetNV.length || !NV_LIST.length){
+      if(!hasAuxPendingSync(PENDING_NV_SYNC_KEY) && (sheetNV.length || !NV_LIST.length)){
         NV_LIST = sheetNV;
         safeLocalStorageSet("kho_cntt_nv", JSON.stringify(NV_LIST));
       }
@@ -2940,15 +2975,10 @@ async function saveTX(){
   TX_DATA = normalizeTxList(TX_DATA);
   try{ safeLocalStorageSet("kho_cntt_tx", JSON.stringify(TX_DATA)); }catch(e){}
   if(!SHEET_API_URL) return true;
-  try{
-    await postSheet("save_tx", TX_DATA);
-    return true;
-  }catch(e){
-    console.warn("Lỗi lưu TX lên Sheet:", e);
-    setSyncBadge("error", String(e));
-    showToast("⚠️ Lỗi lưu giao dịch lên Sheet: "+String(e));
-    return false;
-  }
+  const snapshot = JSON.parse(JSON.stringify(TX_DATA));
+  setAuxPendingSync(PENDING_TX_SYNC_KEY, true);
+  txSaveChain = txSaveChain.then(()=>postSheet("save_tx", snapshot).then(()=>{ setAuxPendingSync(PENDING_TX_SYNC_KEY, false); return true; }).catch(e=>{ console.warn("Lỗi lưu TX lên Sheet:", e); setSyncBadge("error", String(e)); return false; }));
+  return txSaveChain;
 }
 function loadTXFromSheet(){
   if(!SHEET_API_URL) return Promise.resolve();
@@ -2956,7 +2986,7 @@ function loadTXFromSheet(){
     .then(json=>{
       if(!Array.isArray(json.tx)) return;
       const sheetTX = normalizeTxList(json.tx);
-      if(sheetTX.length || !TX_DATA.length){
+      if(!hasAuxPendingSync(PENDING_TX_SYNC_KEY) && (sheetTX.length || !TX_DATA.length)){
         TX_DATA = sheetTX;
         safeLocalStorageSet("kho_cntt_tx", JSON.stringify(TX_DATA));
       }
@@ -3010,7 +3040,10 @@ async function saveSale(){ if(!requireAdmin()) return;
   DATA[idx][6] = getStockStatusValue(DATA[idx][5]);
   TX_DATA.unshift({ id: Date.now(), ma: r[1], ten: r[2], sh: r[0], nv, qty, gia, ghi, img, time: formatTxTime(new Date()) });
   closeOverlay("saleOverlay");
-  await saveData(); await saveTX(); render(); showToast(`✅ Đã ghi giao dịch: ${r[2]} x${qty}`);
+  const dataSaved = await saveData();
+  const txSaved = await saveTX();
+  render();
+  showToast(dataSaved && txSaved ? `✅ Đã ghi giao dịch: ${r[2]} x${qty}` : "⚠️ Giao dịch đã lưu trên máy và đang chờ đồng bộ lên Sheet.", 4200);
 }
 
 function formatTxTime(value){
@@ -3133,7 +3166,7 @@ function renderTxHistory(){
             <span class="tx-pill tx-price-pill">${t.gia>0?fmt(t.gia)+"/cái":"Không ghi giá"}</span>
           </div>
           ${t.ghi?`<span class="tx-note">📝 ${escapeHtml(t.ghi)}</span>`:""}
-          ${t.img?`<img class="tx-img" src="${escapeHtml(t.img)}" alt="Ảnh giao dịch" referrerpolicy="no-referrer" onclick="openImageViewer('${escapeHtml(t.id)}')" onerror="this.style.display='none';">`:""}
+          ${t.img?`<img class="tx-img" src="${escapeHtml(t.img)}" alt="Ảnh giao dịch" referrerpolicy="no-referrer" onclick="openImageViewer(this.src, this.alt)" onerror="this.style.display='none';">`:""}
         </div>`).join("") : `<div style="text-align: center; padding: 20px; color: #888;">Không có giao dịch phù hợp bộ lọc</div>`;
   document.getElementById("txModalBody").innerHTML = filterBar + summary + rows;
 }
@@ -3180,10 +3213,31 @@ function editTX(id){ if(!requireAdmin()) return;
   document.getElementById("saleImgFile").value = "";
   document.getElementById("saleOverlay").classList.add("open");
 }
-function openImageViewer(id){
-  const tx = TX_DATA.find(t=>String(t.id)===String(id));
-  if(tx && tx.img) window.open(tx.img, "_blank");
+function openImageViewer(src, alt="Ảnh phóng to"){
+  if(!src) return;
+  const box = document.getElementById("imageLightbox");
+  const img = document.getElementById("imageLightboxImg");
+  img.referrerPolicy = "no-referrer";
+  img.onerror = function(){
+    closeImageViewer();
+    showToast("⚠️ Không tải được ảnh phóng to từ link này.", 3500);
+  };
+  img.onload = function(){ img.onerror = null; };
+  img.src = src;
+  img.alt = alt || "Ảnh phóng to";
+  box.classList.add("open");
+  document.body.style.overflow = "hidden";
 }
+function closeImageViewer(event){
+  if(event && event.target !== document.getElementById("imageLightbox")) return;
+  const box = document.getElementById("imageLightbox");
+  box.classList.remove("open");
+  document.getElementById("imageLightboxImg").src = "";
+  document.body.style.overflow = "";
+}
+document.addEventListener("keydown", event=>{
+  if(event.key === "Escape" && document.getElementById("imageLightbox").classList.contains("open")) closeImageViewer();
+});
 async function deleteTX(id){ if(!requireAdmin()) return;
   const tx = TX_DATA.find(t=>String(t.id)===String(id));
   if(!tx){ showToast("Không tìm thấy giao dịch"); return; }
@@ -3339,14 +3393,37 @@ INT: ["📡  Router — Bộ định tuyến","🔀  Switch — Bộ chuyển m�
 function updateGroupOptions(selectedGroup){
   const sh = document.getElementById("fSheet").value;
   const groups = GROUP_OPTIONS[sh] || [];
-  const sel = document.getElementById("fGroup");
-  sel.innerHTML = '<option value="">-- Chọn nhóm --</option>' + groups.map(g=>`<option value="${g}"${selectedGroup===g?' selected':''}>${g}</option>`).join("");
+  const box = document.getElementById("fGroup");
+  const selected = new Set(getRowGroups(selectedGroup));
+  box.innerHTML = groups.map((g,i)=>`<label class="group-check"><input type="checkbox" value="${escapeHtml(g)}"${selected.has(g)?" checked":""} onchange="updateQuickTagOptions()"><span>${escapeHtml(g)}</span></label>`).join("");
   updateQuickTagOptions("");
+  updateProductCodeSuggestions();
+}
+
+function getSelectedFormGroups(){
+  return [...document.querySelectorAll('#fGroup input[type="checkbox"]:checked')].map(input=>input.value);
+}
+
+function updateProductCodeSuggestions(){
+  const sheet = document.getElementById("fSheet")?.value || "";
+  const codes = [...new Set(DATA
+    .filter(row=>row[0]===sheet)
+    .map(row=>String(row[1] || "").trim())
+    .filter(Boolean))].sort((a,b)=>a.localeCompare(b, "vi", {numeric:true}));
+  const list = document.getElementById("fMaSuggestions");
+  const hint = document.getElementById("fMaExistingHint");
+  if(list) list.innerHTML = codes.map(code=>`<option value="${escapeHtml(code)}"></option>`).join("");
+  if(!hint) return;
+  if(!codes.length){
+    hint.textContent = "Danh mục này chưa có mã hàng nào.";
+    return;
+  }
+  const preview = codes.slice(0, 16).join(" · ");
+  hint.innerHTML = `<b>${codes.length} mã đã có:</b> ${escapeHtml(preview)}${codes.length>16 ? " …" : ""}`;
 }
 
 function updateQuickTagOptions(selectedTag){
-  const groupSel = document.getElementById("fGroup");
-  const groupLabel = groupSel ? groupSel.value : "";
+  const groupLabel = getSelectedFormGroups()[0] || "";
   const catalog = getQuickFixedCatalog(groupLabel);
   const sel = document.getElementById("fQuickTag");
   if(!sel) return;
@@ -3381,12 +3458,17 @@ function openEditModal(idx){ if(!requireAdmin()) return;
   setImagePreview(r[9]||""); updateGroupOptions(r[8]||""); updateQuickTagOptions(r[11]||""); document.getElementById("editOverlay").classList.add("open");
 }
 async function saveItem(){ if(!requireAdmin()) return;
-  const sh = document.getElementById("fSheet").value.trim(), ma = document.getElementById("fMa").value.trim(), ten = document.getElementById("fTen").value.trim(), th = document.getElementById("fTH").value.trim(), gia = parseVndInput(document.getElementById("fGia").value), giaBan = parseVndInput(document.getElementById("fGiaBan").value), ton = Math.max(0, parseInt(document.getElementById("fTon").value)||0), tt = document.getElementById("fTT").value, ghiNote = document.getElementById("fGhi").value.trim(), vitri = document.getElementById("fVitri").value.trim(), img = document.getElementById("fImg").value || "", idx = document.getElementById("editIdx").value, grp = document.getElementById("fGroup").value || "", quickTag = (document.getElementById("fQuickTag")?.value || "").trim();
+  const sh = document.getElementById("fSheet").value.trim(), ma = document.getElementById("fMa").value.trim(), ten = document.getElementById("fTen").value.trim(), th = document.getElementById("fTH").value.trim(), gia = parseVndInput(document.getElementById("fGia").value), giaBan = parseVndInput(document.getElementById("fGiaBan").value), ton = Math.max(0, parseInt(document.getElementById("fTon").value)||0), tt = document.getElementById("fTT").value, ghiNote = document.getElementById("fGhi").value.trim(), vitri = document.getElementById("fVitri").value.trim(), img = document.getElementById("fImg").value || "", idx = document.getElementById("editIdx").value, grp = joinRowGroups(getSelectedFormGroups()), quickTag = (document.getElementById("fQuickTag")?.value || "").trim();
   if(!ma||!ten){alert("Vui lòng nhập Mã hàng và Tên sản phẩm!"); return;}
   const idxNum = idx === "" ? -1 : parseInt(idx);
   const dupIdx = DATA.findIndex((row,i) => row[1] === ma && i !== idxNum);
   if(dupIdx !== -1){
     alert(`⚠️ Mã hàng "${ma}" đã được dùng cho sản phẩm "${DATA[dupIdx][2]}". Vui lòng đổi mã khác để tránh lẫn lộn tồn kho và lịch sử giao dịch.`);
+    return;
+  }
+  const oldCode = idxNum >= 0 ? String(DATA[idxNum]?.[1] || "") : "";
+  if(ma !== oldCode && TX_DATA.some(tx=>String(tx.ma || "") === ma)){
+    alert(`⚠️ Mã hàng "${ma}" đã tồn tại trong lịch sử giao dịch. Không thể dùng lại mã này cho sản phẩm khác để tránh sai tồn kho.`);
     return;
   }
   const row = [sh,ma,ten,th,gia,ton,getStockStatusValue(ton),mergeNoteLocation(ghiNote, vitri),grp,img,giaBan,quickTag];
@@ -3481,6 +3563,21 @@ function closeOverlay(id){ document.getElementById(id).classList.remove("open");
 function overlayClose(e,id){ if(e.target===document.getElementById(id)) closeOverlay(id); }
 let toastTimer;
 function showToast(msg, duration=2200){ const t=document.getElementById("toast"); t.textContent=msg; t.classList.add("show"); clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove("show"),duration); }
+function backupDataToExcel(){
+  if(!requireAdmin()) return;
+  if(typeof XLSX === "undefined"){ showToast("⚠️ Chưa tải được công cụ sao lưu. Kiểm tra kết nối mạng rồi thử lại.", 4000); return; }
+  const headers = ["Danh mục","Mã hàng","Tên sản phẩm","Thương hiệu","Giá nhập","Tồn kho","Trạng thái","Ghi chú / vị trí","Nhóm","Ảnh","Giá bán","Phân loại nhanh"];
+  const wb = XLSX.utils.book_new();
+  const wsData = XLSX.utils.aoa_to_sheet([headers, ...normalizeSheetRows(DATA)]);
+  const wsTx = XLSX.utils.json_to_sheet(normalizeTxList(TX_DATA));
+  const wsNv = XLSX.utils.json_to_sheet(normalizeNVList(NV_LIST));
+  XLSX.utils.book_append_sheet(wb, wsData, "Kho hang");
+  XLSX.utils.book_append_sheet(wb, wsTx, "Giao dich");
+  XLSX.utils.book_append_sheet(wb, wsNv, "Nhan vien");
+  const stamp = new Date().toISOString().slice(0,19).replace(/[:T]/g,"-");
+  XLSX.writeFile(wb, `Sao-luu-kho-${stamp}.xlsx`);
+  showToast("✅ Đang tạo file sao lưu Excel.");
+}
 let searchRenderTimer = null;
 document.getElementById("search").addEventListener("input", function(){ searchQ = this.value; if(searchQ) quickGroupFilter = null; document.getElementById("clear-btn").style.display = searchQ ? "flex" : "none"; clearTimeout(searchRenderTimer); searchRenderTimer = setTimeout(render, 120); });
 document.getElementById("adminPass").addEventListener("keydown", function(e){ if(e.key==="Enter") submitAdminPass(); });
@@ -3692,6 +3789,8 @@ function setLoadingUI(pct, step){
   await loadTXFromSheet();
   setLoadingUI(85, "Đang đồng bộ nhân viên từ máy chủ...");
   await loadNVFromSheet();
+  if(hasAuxPendingSync(PENDING_TX_SYNC_KEY)) await saveTX();
+  if(hasAuxPendingSync(PENDING_NV_SYNC_KEY)) await saveNV();
   setLoadingUI(100, "Hoàn tất! Đang hiển thị kho hàng...");
   await new Promise(r => setTimeout(r, 400));
   syncStatusButtons(currentStatus);
