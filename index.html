@@ -469,6 +469,7 @@ body.admin-mode .admin-btn { background: #1E8449; border-color: #1E8449; opacity
     <button class="fab fab-add admin-only" onclick="openAddModal()">➕ Thêm thiết bị</button>
     <button class="fab admin-only" style="background:#8E44AD;color:#fff" onclick="openNVModal()">👥 Nhân viên</button>
     <button class="fab admin-only" style="background:#5B2C6F;color:#fff" onclick="openQuickOrderModal()">↕️ Sắp xếp lọc</button>
+    <button class="fab admin-only" style="background:#1A5276;color:#fff" onclick="openGroupOrderModal()">↕️ Sắp xếp nhóm</button>
     <button class="fab admin-only" style="background:#117864;color:#fff" onclick="backupDataToExcel()">💾 Sao lưu Excel</button>
   </div>
   <button class="fab admin-only" id="fabToggleBtn" style="background:#1E3A5F;color:#fff;" onclick="toggleFabMenu()">⚙️ Quản trị</button>
@@ -709,6 +710,17 @@ body.admin-mode .admin-btn { background: #1E8449; border-color: #1E8449; opacity
 <div id="imageLightbox" class="image-lightbox" role="dialog" aria-modal="true" aria-label="Xem ảnh phóng to" onclick="closeImageViewer(event)">
   <button type="button" class="image-lightbox-close" aria-label="Đóng ảnh" onclick="closeImageViewer()">×</button>
   <img id="imageLightboxImg" src="" alt="Ảnh phóng to" referrerpolicy="no-referrer" onclick="event.stopPropagation()">
+</div>
+
+<div class="overlay" id="groupOrderOverlay" onclick="overlayClose(event,'groupOrderOverlay')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-title">↕️ Sắp xếp nhóm lớn</div>
+    <div class="form-row"><label>Danh mục</label><select id="groupOrderTab" onchange="renderGroupOrderList()"><option value="MT">💻 Máy Tính</option><option value="MI">🖨️ Máy In</option><option value="CAM">📷 Camera</option><option value="INT">🌐 Internet</option></select></div>
+    <div id="groupOrderList"></div>
+    <div style="font-size:11px;color:#777;margin:10px 0;line-height:1.45;">Đổi thứ tự hiển thị của các nhóm như RAM, SSD, HDD. Nhóm 0 sản phẩm vẫn được giữ nguyên.</div>
+    <button class="btn-cancel" onclick="resetGroupOrderForTab()">Khôi phục thứ tự mặc định</button>
+    <button class="btn-cancel" onclick="closeOverlay('groupOrderOverlay')">Đóng</button>
+  </div>
 </div>
 
 <div class="overlay" id="quickOrderOverlay" onclick="overlayClose(event,'quickOrderOverlay')">
@@ -2171,8 +2183,11 @@ function resolveQuickGroupLabelFromFamily(family, title){
 }
 
 const QUICK_ORDER_KEY = "kho_cntt_quick_order";
+const GROUP_ORDER_KEY = "kho_cntt_group_order";
 let QUICK_ORDER = {};
+let GROUP_ORDER = {};
 try { QUICK_ORDER = JSON.parse(localStorage.getItem(QUICK_ORDER_KEY) || "{}"); } catch(e) { QUICK_ORDER = {}; }
+try { GROUP_ORDER = JSON.parse(localStorage.getItem(GROUP_ORDER_KEY) || "{}"); } catch(e) { GROUP_ORDER = {}; }
 function quickOrderKey(groupLabel){ return normalizeQuickText(groupLabel || ""); }
 function getQuickFixedCatalog(groupLabel){
   const catalog = getQuickFixedCatalogBase(groupLabel);
@@ -2224,6 +2239,30 @@ function resetQuickOrderForGroup(){
   delete QUICK_ORDER[key]; localStorage.setItem(QUICK_ORDER_KEY, JSON.stringify(QUICK_ORDER));
   renderQuickOrderList(); render();
 }
+function groupOrderKey(label){ return normalizeQuickText(String(label || "").replace(/^[^\p{L}]+/u,"")); }
+function applyGroupOrder(tab, groups){
+  const order = GROUP_ORDER[tab] || [];
+  if(!order.length) return groups;
+  const rank = new Map(order.map((key,index)=>[key,index]));
+  return [...groups].sort((a,b)=>(rank.get(groupOrderKey(a))??9999)-(rank.get(groupOrderKey(b))??9999));
+}
+function openGroupOrderModal(){ if(!requireAdmin()) return; renderGroupOrderList(); document.getElementById("groupOrderOverlay").classList.add("open"); }
+function renderGroupOrderList(){
+  const tab = document.getElementById("groupOrderTab").value;
+  const base = GROUP_OPTIONS[tab] || [];
+  const keys = GROUP_ORDER[tab] || base.map(groupOrderKey);
+  const rank = new Map(keys.map((key,index)=>[key,index]));
+  const groups = [...base].sort((a,b)=>(rank.get(groupOrderKey(a))??9999)-(rank.get(groupOrderKey(b))??9999));
+  GROUP_ORDER[tab] = groups.map(groupOrderKey);
+  document.getElementById("groupOrderList").innerHTML = groups.map((group,index)=>`<div style="display:flex;align-items:center;gap:8px;padding:8px 4px;border-bottom:1px solid #eee"><span style="flex:1;font-size:13px">${escapeHtml(group)}</span><button type="button" class="btn-img-pick" ${index===0?'disabled':''} onclick="moveGroupOrder(${index},-1)">↑</button><button type="button" class="btn-img-pick" ${index===groups.length-1?'disabled':''} onclick="moveGroupOrder(${index},1)">↓</button></div>`).join("");
+}
+function moveGroupOrder(index, delta){
+  const tab = document.getElementById("groupOrderTab").value, order = GROUP_ORDER[tab] || [], target=index+delta;
+  if(target<0 || target>=order.length) return;
+  [order[index],order[target]]=[order[target],order[index]]; GROUP_ORDER[tab]=order;
+  localStorage.setItem(GROUP_ORDER_KEY,JSON.stringify(GROUP_ORDER)); renderGroupOrderList(); render();
+}
+function resetGroupOrderForTab(){ const tab=document.getElementById("groupOrderTab").value; delete GROUP_ORDER[tab]; localStorage.setItem(GROUP_ORDER_KEY,JSON.stringify(GROUP_ORDER)); renderGroupOrderList(); render(); }
 
 function resolveQuickGroupLabelFromRow(r, fallbackGroupLabel=""){
   // Phân loại nhanh chỉ dùng nhóm đầu tiên, tránh làm thay đổi quy tắc cũ khi
@@ -2698,6 +2737,7 @@ function render(){
         }
       });
     }
+    order = applyGroupOrder(currentTab, order);
     order.push(NO_GROUP);
     // Tạo bản đồ canonical: normalized key -> nhãn chuẩn trong order
     // Giúp gom "🎨  Máy in màu" (double-space từ data mẫu) và "🎨 Máy in màu"
