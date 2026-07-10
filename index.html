@@ -2,7 +2,7 @@
 <html lang="vi">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
@@ -298,6 +298,10 @@ body.admin-mode .admin-btn { background: #1E8449; border-color: #1E8449; opacity
 .sticky.collapsed #headerToggleBtn:hover { background: #E8910F; }
 .sticky.collapsed #headerToggleIcon { background: #1E3A5F; color: #fff; }
 @media (max-width: 420px) {
+  .form-2col { grid-template-columns: 1fr; }
+  .admin-bar { flex-wrap: wrap; justify-content: flex-start; }
+  .sync-badge { margin-right: 0; }
+  #lastSyncText { margin-right: auto; }
   #headerToggleBtn { padding: 7px 9px; font-size: 11px; }
   .filters { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
   .filters::-webkit-scrollbar { display: none; }
