@@ -458,7 +458,6 @@ body.admin-mode .admin-btn { background: #1E8449; border-color: #1E8449; opacity
     <button class="filter-btn" data-status="CON" onclick="setStatus(this)">✅ Còn hàng</button>
     <button class="filter-btn" id="restockBtn" onclick="setRestockFilter()">📥 Cần nhập</button>
     <span style="font-size:10px;font-weight:800;color:#607D8B;align-self:center;white-space:nowrap">Chi nhánh:</span>
-    <button class="filter-btn" data-branch="ALL" onclick="setBranchFilter(this)">🏢 Tất cả CN</button>
     <button class="filter-btn" data-branch="Q2" onclick="setBranchFilter(this)">📍 Q2</button>
     <button class="filter-btn" data-branch="Q5" onclick="setBranchFilter(this)">📍 Q5</button>
     <button class="bulk-btn bulk-btn-select admin-only" id="bulkModeBtn" onclick="toggleBulkSelectMode()">☑️ Chọn nhiều</button>
@@ -2805,7 +2804,7 @@ function render(){
     setupGroupChipsAutoScroll();
     return;
   }
-  if(!bulkSelectMode && !kw && currentTab==="ALL" && currentStatus==="ALL" && !restockOnly){
+  if(!bulkSelectMode && !kw && currentTab==="ALL" && currentStatus==="ALL" && !restockOnly && currentBranch==="ALL"){
     el.innerHTML = `<div class="empty"><div class="empty-icon">🔎</div><div class="empty-title">Gõ từ khóa để tìm kiếm</div><div class="empty-sub">VD: "SSD", "HP", "Camera wifi", "Canon"...</div></div>`;
     return;
   }
@@ -3730,7 +3729,8 @@ function setStatus(btn){
   render();
 }
 function setBranchFilter(btn){
-  currentBranch = btn.dataset.branch || "ALL";
+  const branch = btn.dataset.branch || "ALL";
+  currentBranch = currentBranch === branch ? "ALL" : branch;
   document.querySelectorAll('.filter-btn[data-branch]').forEach(b=>b.classList.toggle('active', b.dataset.branch===currentBranch));
   render();
 }
