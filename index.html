@@ -154,6 +154,25 @@ mark.kw-hit { background: #FFEB3B; color: #1A1A1A; padding: 0 1px; border-radius
 .fab:active { transform: scale(.95); }
 .fab-add { background: #1E3A5F; color: #fff; }
 .fab-import { background: #1E8449; color: #fff; }
+.latest-items-ticker { position: fixed; left: max(14px, env(safe-area-inset-left)); bottom: max(18px, env(safe-area-inset-bottom)); z-index: 190; display: none; align-items: center; gap: 7px; max-width: min(300px, calc(100vw - 92px - env(safe-area-inset-left))); color: #1E3A5F; cursor: pointer; will-change: opacity, transform; transition: opacity .42s ease-in-out, transform .42s cubic-bezier(.25,.1,.25,1); }
+.latest-items-ticker.show { display: flex; }
+.latest-items-ticker.is-leaving { opacity: 0; transform: translateY(4px); }
+.latest-items-ticker.is-rising { animation: latestItemRise .56s cubic-bezier(.25,.1,.25,1) both; }
+.latest-items-label { flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center; min-width: 31px; height: 20px; padding: 0 5px; border-radius: 6px; background: #E74C3C; color: #fff; font-size: 9px; font-weight: 900; letter-spacing: .4px; text-transform: uppercase; white-space: nowrap; box-shadow: 0 0 0 0 rgba(231,76,60,.48); animation: latestNewGlow 1.3s ease-in-out infinite; }
+.latest-items-title { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; font-weight: 800; text-shadow: 0 1px 2px rgba(255,255,255,.9); }
+.latest-items-ticker:hover .latest-items-title, .latest-items-ticker:focus-visible .latest-items-title { text-decoration: underline; }
+.latest-items-ticker:focus-visible { outline: 2px solid #F39C12; outline-offset: 4px; border-radius: 7px; }
+@keyframes latestItemRise { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes latestNewGlow { 0%,100% { box-shadow: 0 0 0 0 rgba(231,76,60,.34); transform: scale(1); } 50% { box-shadow: 0 0 0 5px rgba(231,76,60,0); transform: scale(1.05); } }
+.latest-items-ticker.is-leaving .latest-items-label, .latest-items-ticker.is-rising .latest-items-label { animation-play-state: paused; }
+@media (max-width: 480px) {
+  .latest-items-ticker { left: max(10px, env(safe-area-inset-left)); bottom: max(12px, env(safe-area-inset-bottom)); gap: 6px; max-width: calc(100vw - 78px - env(safe-area-inset-left)); }
+  .latest-items-label { min-width: 28px; height: 19px; padding: 0 4px; font-size: 8px; }
+  .latest-items-title { font-size: clamp(10px, 3.25vw, 12px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .latest-items-ticker, .latest-items-title, .latest-items-label { animation: none !important; transition: none !important; }
+}
 .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 500; align-items: flex-end; }
 .overlay.open { display: flex; }
 .modal { background: #fff; border-radius: 20px 20px 0 0; width: 100%; max-height: 92vh; overflow-y: auto; padding: 20px 16px 32px; }
@@ -345,6 +364,7 @@ body.admin-mode .admin-btn { background: #1E8449; border-color: #1E8449; opacity
 .sticky.collapsed .filters { display: none; }
 .sticky.collapsed .header { padding: 8px 10px; box-shadow: 0 2px 7px rgba(0,0,0,.18); }
 .sticky.collapsed .search-box { padding: 7px 8px; border-width: 2px; }
+.sticky.collapsed #headerToggleText { display: none; }
 #headerToggleBtn { border: 1px solid rgba(255,255,255,.28); background: #1E3A5F; color: #fff; border-radius: 999px; padding: 4px 9px 4px 5px; min-height: 30px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; font-size: 12px; font-weight: 800; line-height: 1; white-space: nowrap; box-shadow: 0 3px 10px rgba(30,58,95,.22); transition: background-color .18s ease, box-shadow .18s ease, transform .18s ease; user-select: none; }
 #headerToggleBtn:hover { background: #24476F; box-shadow: 0 5px 14px rgba(30,58,95,.26); transform: translateY(-1px); }
 #headerToggleBtn:active { transform: scale(.96); box-shadow: 0 2px 6px rgba(30,58,95,.18); }
@@ -353,6 +373,9 @@ body.admin-mode .admin-btn { background: #1E8449; border-color: #1E8449; opacity
 .sticky.collapsed #headerToggleBtn { background: #F39C12; color: #17202A; border-color: rgba(30,58,95,.14); box-shadow: 0 3px 10px rgba(243,156,18,.24); }
 .sticky.collapsed #headerToggleBtn:hover { background: #E8910F; }
 .sticky.collapsed #headerToggleIcon { background: #1E3A5F; color: #fff; }
+#headerFilterBtn { display: none; border: 1px solid rgba(30,58,95,.16); background: #fff; color: #1E3A5F; border-radius: 999px; min-height: 30px; padding: 4px 9px; cursor: pointer; align-items: center; justify-content: center; gap: 4px; font-size: 11px; font-weight: 900; white-space: nowrap; box-shadow: 0 2px 7px rgba(30,58,95,.12); }
+.sticky.collapsed #headerFilterBtn { display: inline-flex; }
+#headerFilterBtn:active { transform: scale(.96); }
 @media (max-width: 420px) {
   .form-2col { grid-template-columns: 1fr; }
   .admin-bar { flex-wrap: wrap; justify-content: flex-start; }
@@ -555,8 +578,9 @@ button:not(:disabled):hover::after,a:hover::after,[role="button"]:hover::after,.
           <path d="M16.2 16.2L21 21" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"></path>
         </svg>
       </span>
-      <input id="search" type="search" placeholder="Gõ tên, mã hàng, thương hiệu..." autocomplete="off" autocorrect="off" spellcheck="false">
+      <input id="search" type="search" placeholder="Bạn đang cần tìm gì...?" aria-label="Tìm kiếm kho hàng" autocomplete="off" autocorrect="off" spellcheck="false">
       <button class="clear-btn" id="clear-btn" onclick="clearSearch()">×</button>
+      <button id="headerFilterBtn" onclick="openHeaderFilters()" type="button" title="Mở bộ lọc" aria-label="Mở bộ lọc">⚙ Lọc</button>
       <button id="headerToggleBtn" onclick="toggleHeader()" type="button" aria-expanded="true" title="Thu gọn menu">
         <span id="headerToggleIcon">▲</span>
         <span id="headerToggleText">Thu gọn</span>
@@ -586,6 +610,11 @@ button:not(:disabled):hover::after,a:hover::after,[role="button"]:hover::after,.
 </div>
 
 <div id="results"></div>
+
+<div class="latest-items-ticker" id="latestItemsTicker" aria-live="polite" aria-label="Thiết bị mới thêm, bấm để mở" role="button" tabindex="0" onclick="openLatestItemFromTicker()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openLatestItemFromTicker();}">
+  <span class="latest-items-label" aria-label="Mới thêm">NEW</span>
+  <span class="latest-items-title" id="latestItemsTitle"></span>
+</div>
 
 <div class="fab-wrap">
   <div id="fabMenuItems" style="display:flex;flex-direction:column;gap:10px;align-items:flex-end;overflow:hidden;max-height:0;opacity:0;transition:max-height .35s ease,opacity .3s ease;">
@@ -4185,6 +4214,118 @@ function backupDataToExcel(){
 let searchRenderTimer = null;
 let searchSuggestionItems = [];
 let searchSuggestionIndex = -1;
+const SEARCH_PLACEHOLDER_SAMPLES = [
+  "SSD 128GB",
+  "M2 NVME 512GB",
+  "RAM PC 4GB",
+  "RAM LT 16GB",
+  "MAINBOARD",
+  "NGUỒN 350W",
+  "CARD MÀN HÌNH",
+  "HỘP MỰC 12A",
+  "CAMERA WIFI",
+  "USB WIFI"
+];
+const SEARCH_PLACEHOLDER_INTRO = "Bạn đang cần tìm gì...?";
+let searchPlaceholderTimer = null;
+let searchPlaceholderSampleIndex = 0;
+let searchPlaceholderCharIndex = 0;
+let searchPlaceholderDeleting = false;
+let searchPlaceholderShowingIntro = true;
+
+// Hiệu ứng gợi ý chỉ thay đổi placeholder khi ô tìm kiếm đang trống; không tác động
+// tới giá trị người dùng nhập hoặc cơ chế lọc/tìm kiếm hiện có.
+function startSearchPlaceholderTyping(){
+  const input = document.getElementById("search");
+  if(!input || searchPlaceholderTimer) return;
+  const tick = ()=>{
+    if(input.value || document.activeElement === input){
+      input.placeholder = "";
+      searchPlaceholderTimer = setTimeout(tick, 250);
+      return;
+    }
+    const sample = searchPlaceholderShowingIntro
+      ? SEARCH_PLACEHOLDER_INTRO
+      : SEARCH_PLACEHOLDER_SAMPLES[searchPlaceholderSampleIndex];
+    if(searchPlaceholderDeleting){
+      searchPlaceholderCharIndex--;
+    }else{
+      searchPlaceholderCharIndex++;
+    }
+    input.placeholder = sample.slice(0, Math.max(0, searchPlaceholderCharIndex));
+    let delay = searchPlaceholderDeleting ? 42 : 85;
+    if(!searchPlaceholderDeleting && searchPlaceholderCharIndex >= sample.length){
+      searchPlaceholderDeleting = true;
+      delay = 1450;
+    }else if(searchPlaceholderDeleting && searchPlaceholderCharIndex <= 0){
+      searchPlaceholderDeleting = false;
+      if(searchPlaceholderShowingIntro){
+        searchPlaceholderShowingIntro = false;
+      }else{
+        searchPlaceholderSampleIndex = (searchPlaceholderSampleIndex + 1) % SEARCH_PLACEHOLDER_SAMPLES.length;
+      }
+      delay = 350;
+    }
+    searchPlaceholderTimer = setTimeout(tick, delay);
+  };
+  tick();
+}
+
+let latestItemsTickerIndex = 0;
+let latestItemsTickerKey = "";
+let latestItemsTickerHasShown = false;
+function refreshLatestItemsTicker(){
+  const ticker = document.getElementById("latestItemsTicker");
+  const title = document.getElementById("latestItemsTitle");
+  if(!ticker || !title) return;
+  // Thiết bị mới luôn được thêm bằng unshift(), nên 5 dòng đầu là 5 thiết bị mới nhất.
+  const latestItems = DATA.slice(0, 5).filter(row=>row && row[2]);
+  const nextKey = latestItems.map(row=>`${row[1]}|${row[2]}`).join("||");
+  if(!latestItems.length){
+    ticker.classList.remove("show");
+    latestItemsTickerIndex = 0;
+    latestItemsTickerKey = "";
+    latestItemsTickerHasShown = false;
+    return;
+  }
+  if(nextKey !== latestItemsTickerKey){
+    latestItemsTickerKey = nextKey;
+    latestItemsTickerIndex = 0;
+  }
+  const itemIndex = latestItemsTickerIndex % latestItems.length;
+  const item = latestItems[itemIndex];
+  ticker.dataset.itemIndex = String(itemIndex);
+  const updateTitle = ()=>{ title.textContent = item[2]; };
+  if(latestItemsTickerHasShown){
+    ticker.classList.remove("is-rising");
+    ticker.classList.add("is-leaving");
+    setTimeout(()=>{
+      updateTitle();
+      ticker.classList.remove("is-leaving");
+      ticker.classList.add("is-rising");
+      setTimeout(()=>ticker.classList.remove("is-rising"), 580);
+    }, 340);
+  }else{
+    updateTitle();
+    ticker.classList.add("show");
+    latestItemsTickerHasShown = true;
+  }
+  latestItemsTickerIndex = (latestItemsTickerIndex + 1) % latestItems.length;
+}
+function startLatestItemsTicker(){
+  refreshLatestItemsTicker();
+  setInterval(refreshLatestItemsTicker, 3000);
+}
+function openLatestItemFromTicker(){
+  const ticker = document.getElementById("latestItemsTicker");
+  const idx = Number(ticker?.dataset.itemIndex);
+  if(!Number.isInteger(idx) || !DATA[idx]) return;
+  currentTab = "ALL";
+  currentBranch = "ALL";
+  document.querySelectorAll(".tab-btn").forEach(btn=>btn.classList.toggle("active", btn.dataset.tab === "ALL"));
+  document.querySelectorAll('.filter-btn[data-branch]').forEach(btn=>btn.classList.remove("active"));
+  selectSearchSuggestion(idx);
+}
 function closeSearchSuggestions(){
   searchSuggestionItems = [];
   searchSuggestionIndex = -1;
@@ -4249,12 +4390,18 @@ document.getElementById("search").addEventListener("keydown", function(e){
   else if(e.key==="Enter" && searchSuggestionIndex>=0){ e.preventDefault(); selectSearchSuggestion(searchSuggestionItems[searchSuggestionIndex].i); }
   else if(e.key==="Escape") closeSearchSuggestions();
 });
+document.getElementById("search").addEventListener("blur", ()=>{
+  // Khởi động lại hiệu ứng ngay sau khi người dùng rời ô trống.
+  setTimeout(startSearchPlaceholderTyping, 0);
+});
 document.addEventListener("click", function(e){ if(!e.target.closest(".search-box")) closeSearchSuggestions(); });
 document.getElementById("adminPass").addEventListener("keydown", function(e){ if(e.key==="Enter") submitAdminPass(); });
 document.querySelector(".title").addEventListener("click", handleOwnerTap);
 setupVndInputs();
 setupAdminEntry();
 checkAdminSession();
+startSearchPlaceholderTyping();
+startLatestItemsTicker();
 document.getElementById("headerToggleBtn").addEventListener("click", ()=>setTimeout(updateSearchFixedState, 0));
 function toggleFabMenu(){
   const menu = document.getElementById("fabMenuItems");
@@ -4270,16 +4417,54 @@ function toggleFabMenu(){
     btn.textContent = "✖️ Đóng";
   }
 }
-function toggleHeader(){
+const HEADER_COLLAPSE_PREF_KEY = "kho_cntt_header_collapsed";
+function setHeaderCollapsed(collapsed, persist=false){
   const sticky = document.querySelector('.sticky');
-  const isCollapsed = sticky.classList.toggle('collapsed');
+  if(!sticky) return;
+  const isCollapsed = Boolean(collapsed);
+  sticky.classList.toggle('collapsed', isCollapsed);
   const btn = document.getElementById('headerToggleBtn');
   document.getElementById('headerToggleIcon').textContent = isCollapsed ? '▼' : '▲';
   document.getElementById('headerToggleText').textContent = isCollapsed ? 'Mở rộng' : 'Thu gọn';
   btn.setAttribute('aria-expanded', String(!isCollapsed));
   btn.title = isCollapsed ? 'Mở rộng menu' : 'Thu gọn menu';
   document.getElementById('results').style.paddingTop = isCollapsed ? '6px' : '';
+  if(persist){
+    try{ localStorage.setItem(HEADER_COLLAPSE_PREF_KEY, isCollapsed ? '1' : '0'); }catch(e){}
+  }
+  setTimeout(updateSearchFixedState, 0);
 }
+function toggleHeader(){
+  const sticky = document.querySelector('.sticky');
+  setHeaderCollapsed(!sticky?.classList.contains('collapsed'), true);
+}
+function openHeaderFilters(){
+  setHeaderCollapsed(false, false);
+  setTimeout(()=>document.getElementById('tabs')?.scrollIntoView({block:'nearest', behavior:'smooth'}), 80);
+}
+function restoreHeaderState(){
+  try{ setHeaderCollapsed(localStorage.getItem(HEADER_COLLAPSE_PREF_KEY) === '1', false); }catch(e){}
+}
+function setupHeaderAutoCollapse(){
+  let previousY = window.scrollY;
+  let ticking = false;
+  window.addEventListener('scroll', ()=>{
+    if(ticking) return;
+    ticking = true;
+    requestAnimationFrame(()=>{
+      const y = Math.max(0, window.scrollY);
+      const delta = y - previousY;
+      previousY = y;
+      ticking = false;
+      if(Math.abs(delta) < 18 || document.activeElement === document.getElementById('search') || document.querySelector('.search-suggestions.open')) return;
+      if(y < 56) setHeaderCollapsed(false, false);
+      else if(delta > 0) setHeaderCollapsed(true, false);
+      else setHeaderCollapsed(false, false);
+    });
+  }, {passive:true});
+}
+restoreHeaderState();
+setupHeaderAutoCollapse();
 
 let scrollBtnsTimer;
 function setupScrollButtonsAutoHide(){
@@ -4457,6 +4642,8 @@ function setLoadingUI(pct, step){
   await loadNV();
   setLoadingUI(20, "Đang đọc dữ liệu lưu trên máy...");
   await loadData();
+  // Hiện ngay thiết bị mới nhất sau khi DATA đã có dữ liệu, không phải đợi chu kỳ 3 giây.
+  refreshLatestItemsTicker();
   setLoadingUI(65, "Đang đồng bộ giao dịch từ máy chủ...");
   await loadTXFromSheet();
   setLoadingUI(85, "Đang đồng bộ nhân viên từ máy chủ...");
