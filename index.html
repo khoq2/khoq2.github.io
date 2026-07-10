@@ -158,17 +158,21 @@ mark.kw-hit { background: #FFEB3B; color: #1A1A1A; padding: 0 1px; border-radius
 .latest-items-ticker.show { display: flex; }
 .latest-items-ticker.is-leaving { opacity: 0; transform: translateY(4px); }
 .latest-items-ticker.is-rising { animation: latestItemRise .56s cubic-bezier(.25,.1,.25,1) both; }
-.latest-items-label { flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center; min-width: 31px; height: 20px; padding: 0 5px; border-radius: 6px; background: #E74C3C; color: #fff; font-size: 9px; font-weight: 900; letter-spacing: .4px; text-transform: uppercase; white-space: nowrap; box-shadow: 0 0 0 0 rgba(231,76,60,.48); animation: latestNewGlow 1.3s ease-in-out infinite; }
+.latest-items-label { flex: 0 0 auto; color: #1E8449; font-size: 10px; font-weight: 900; white-space: nowrap; }
 .latest-items-title { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; font-weight: 800; text-shadow: 0 1px 2px rgba(255,255,255,.9); }
 .latest-items-ticker:hover .latest-items-title, .latest-items-ticker:focus-visible .latest-items-title { text-decoration: underline; }
 .latest-items-ticker:focus-visible { outline: 2px solid #F39C12; outline-offset: 4px; border-radius: 7px; }
 @keyframes latestItemRise { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes latestNewGlow { 0%,100% { box-shadow: 0 0 0 0 rgba(231,76,60,.34); transform: scale(1); } 50% { box-shadow: 0 0 0 5px rgba(231,76,60,0); transform: scale(1.05); } }
-.latest-items-ticker.is-leaving .latest-items-label, .latest-items-ticker.is-rising .latest-items-label { animation-play-state: paused; }
 @media (max-width: 480px) {
   .latest-items-ticker { left: max(10px, env(safe-area-inset-left)); bottom: max(12px, env(safe-area-inset-bottom)); gap: 6px; max-width: calc(100vw - 78px - env(safe-area-inset-left)); }
-  .latest-items-label { min-width: 28px; height: 19px; padding: 0 4px; font-size: 8px; }
+  .latest-items-label { font-size: 9px; }
   .latest-items-title { font-size: clamp(10px, 3.25vw, 12px); }
+}
+/* Safari iPhone có thanh URL/điều hướng nổi ở đáy; nâng thông báo lên để không bị che. */
+@supports (-webkit-touch-callout: none) {
+  @media (max-width: 480px) {
+    .latest-items-ticker { bottom: max(76px, calc(env(safe-area-inset-bottom) + 54px)); }
+  }
 }
 @media (prefers-reduced-motion: reduce) {
   .latest-items-ticker, .latest-items-title, .latest-items-label { animation: none !important; transition: none !important; }
@@ -265,6 +269,11 @@ body.admin-mode .admin-btn { background: #1E8449; border-color: #1E8449; opacity
 .cat-title { font-size: 15px; font-weight: bold; color: #fff; background: var(--c,#1E3A5F); padding: 10px 14px; border-radius: 10px; margin-bottom: 8px; }
 .quick-nav { display: flex; gap: 6px; flex-wrap: wrap; padding: 2px 0 10px; margin-bottom: 6px; border-bottom: 1.5px dashed #D7DBDD; }
 .quick-nav-btn { flex-shrink: 0; border: 1.5px solid rgba(0,0,0,.08); background: var(--c); color: #2C3E50; font-size: 11px; font-weight: bold; padding: 6px 11px; border-radius: 14px; cursor: pointer; white-space: nowrap; margin-bottom: 2px; box-shadow: inset 0 -2px 0 rgba(0,0,0,.08); }
+@media (max-width: 480px) {
+  .quick-nav { flex-wrap: nowrap; overflow-x: auto; overscroll-behavior-x: contain; -webkit-overflow-scrolling: touch; scrollbar-width: none; gap: 5px; padding: 1px 0 7px; margin-bottom: 3px; }
+  .quick-nav::-webkit-scrollbar { display: none; }
+  .quick-nav-btn { font-size: 10px; padding: 5px 8px; margin-bottom: 0; border-radius: 12px; }
+}
 .prod-index-badge { font-size: 18px; font-weight: 900; color: #fff; display: flex; align-items: center; justify-content: center; background: var(--idx-c,#1E3A5F)!important; box-shadow: inset 0 -3px 0 rgba(0,0,0,.16), 0 3px 10px rgba(0,0,0,.12); }
 .group-section { margin: 30px -2px 18px; padding: 10px 8px 6px; border-radius: 12px; border: 2px solid rgba(0,0,0,.08); border-left: 8px solid var(--group-strong,#1E3A5F); background: linear-gradient(180deg, rgba(255,255,255,.82), rgba(248,249,249,.96)); box-shadow: 0 4px 14px rgba(0,0,0,.08); }
 .group-section:first-of-type { margin-top: 12px; }
@@ -612,7 +621,7 @@ button:not(:disabled):hover::after,a:hover::after,[role="button"]:hover::after,.
 <div id="results"></div>
 
 <div class="latest-items-ticker" id="latestItemsTicker" aria-live="polite" aria-label="Thiết bị mới thêm, bấm để mở" role="button" tabindex="0" onclick="openLatestItemFromTicker()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openLatestItemFromTicker();}">
-  <span class="latest-items-label" aria-label="Mới thêm">NEW</span>
+  <span class="latest-items-label">Bài viết mới:</span>
   <span class="latest-items-title" id="latestItemsTitle"></span>
 </div>
 
@@ -2807,13 +2816,15 @@ function jumpToGroup(id){
   const sticky = document.querySelector(".sticky");
   const stickyHeight = sticky ? sticky.getBoundingClientRect().height : 0;
   const top = target.getBoundingClientRect().top + window.pageYOffset - stickyHeight - 10;
-  window.scrollTo({top: Math.max(0, top), behavior: "smooth"});
+  const isTouchDevice = window.matchMedia("(hover: none), (pointer: coarse)").matches;
+  // Trên điện thoại không cuộn mượt kéo dài sau cú chạm, tránh cảm giác trang tự chạy tiếp.
+  window.scrollTo({top: Math.max(0, top), behavior: isTouchDevice ? "auto" : "smooth"});
   target.classList.remove("jump-alert");
   void target.offsetWidth;
   setTimeout(()=>{
     target.classList.add("jump-alert");
     setTimeout(()=>target.classList.remove("jump-alert"), 1200);
-  }, 320);
+  }, isTouchDevice ? 0 : 320);
 }
 
 const GROUP_COLORS = ["#D6EAF8","#FDEBD0","#D5F5E3","#FADBD8","#E8DAEF","#FCF3CF","#D1F2EB","#F5CBA7","#D7DBFD","#F9E0F2","#D4EFDF","#FAE3D9","#CFF4FC","#EAEDED"];
@@ -4456,10 +4467,11 @@ function setupHeaderAutoCollapse(){
       const delta = y - previousY;
       previousY = y;
       ticking = false;
-      if(Math.abs(delta) < 18 || document.activeElement === document.getElementById('search') || document.querySelector('.search-suggestions.open')) return;
-      if(y < 56) setHeaderCollapsed(false, false);
-      else if(delta > 0) setHeaderCollapsed(true, false);
-      else setHeaderCollapsed(false, false);
+      if(Math.abs(delta) < 24 || document.activeElement === document.getElementById('search') || document.querySelector('.search-suggestions.open')) return;
+      // Chỉ tự thu khi đã cuộn đủ xa; không tự mở lại theo từng cú vuốt ngược nhỏ,
+      // vì việc đổi chiều cao header liên tục trên điện thoại tạo cảm giác trang bị nhảy.
+      if(y < 40) setHeaderCollapsed(false, false);
+      else if(delta > 0 && y > 150) setHeaderCollapsed(true, false);
     });
   }, {passive:true});
 }
