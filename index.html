@@ -453,9 +453,11 @@ body.admin-mode .admin-btn { background: #1E8449; border-color: #1E8449; opacity
     <button class="tab-btn" style="--c:#0B5345" data-tab="INT" onclick="setTab(this)">🌐 Internet</button>
   </div>
   <div class="filters">
-    <button class="filter-btn active" style="background:#1E3A5F;color:#fff" data-status="ALL" onclick="setStatus(this)">Tất cả</button>
+    <span style="font-size:10px;font-weight:800;color:#607D8B;align-self:center;white-space:nowrap">Tồn kho:</span>
+    <button class="filter-btn active" style="background:#1E3A5F;color:#fff" data-status="ALL" onclick="setStatus(this)">Tất cả tồn</button>
     <button class="filter-btn" data-status="CON" onclick="setStatus(this)">✅ Còn hàng</button>
     <button class="filter-btn" id="restockBtn" onclick="setRestockFilter()">📥 Cần nhập</button>
+    <span style="font-size:10px;font-weight:800;color:#607D8B;align-self:center;white-space:nowrap">Chi nhánh:</span>
     <button class="filter-btn" data-branch="ALL" onclick="setBranchFilter(this)">🏢 Tất cả CN</button>
     <button class="filter-btn" data-branch="Q2" onclick="setBranchFilter(this)">📍 Q2</button>
     <button class="filter-btn" data-branch="Q5" onclick="setBranchFilter(this)">📍 Q5</button>
@@ -3648,6 +3650,8 @@ if(idx===""){
 await saveData();
 
 closeOverlay("editOverlay");
+currentBranch = row[13] || "Q2";
+document.querySelectorAll('.filter-btn[data-branch]').forEach(b=>b.classList.toggle('active', b.dataset.branch===currentBranch));
 goToTab(sh);
 render(); 
 }
