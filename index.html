@@ -406,6 +406,7 @@ body.admin-mode .admin-btn { background: #1E8449; border-color: #1E8449; opacity
   <div class="header">
     <div class="admin-bar">
       <span class="sync-badge" id="syncBadge">💾 Lưu trên máy</span>
+      <span id="lastSyncText" style="font-size:10px;color:#718096"></span>
       <button class="admin-btn admin-only" id="syncBtn" onclick="manualSync()">🔄 Đẩy lên Sheet</button>
       <button class="admin-btn" id="adminBtn" onclick="onAdminBtnClick()">🔒 Admin</button>
     </div>
@@ -448,6 +449,7 @@ body.admin-mode .admin-btn { background: #1E8449; border-color: #1E8449; opacity
     <button class="filter-btn" data-status="CON" onclick="setStatus(this)">✅ Còn hàng</button>
     <button class="filter-btn" data-status="SAP" onclick="setStatus(this)">⚠️ Sắp hết</button>
     <button class="filter-btn" data-status="HET" onclick="setStatus(this)">❌ Hết hàng</button>
+    <button class="filter-btn" id="restockBtn" onclick="setRestockFilter()">📥 Cần nhập</button>
     <button class="bulk-btn bulk-btn-select admin-only" id="bulkModeBtn" onclick="toggleBulkSelectMode()">☑️ Chọn nhiều</button>
     <button class="bulk-btn bulk-btn-delete admin-only" id="bulkDeleteBtn" onclick="deleteSelectedItems()" disabled>🗑️ Xóa đã chọn</button>
     <span class="count-badge" id="count">0 kết quả</span>
@@ -536,7 +538,8 @@ body.admin-mode .admin-btn { background: #1E8449; border-color: #1E8449; opacity
     </div>
     <div class="form-row">
       <label>Vị trí trong kho</label>
-      <input type="text" id="fVitri" placeholder="VD: Kệ A1 - Tầng 2">
+      <input type="text" id="fVitri" list="fLocationSuggestions" placeholder="VD: Kệ A1 - Tầng 2">
+      <datalist id="fLocationSuggestions"></datalist>
     </div>
     <div class="form-row">
       <label>Ảnh sản phẩm</label>
@@ -959,6 +962,7 @@ function joinRowGroups(groups){ return getRowGroups(Array.isArray(groups) ? grou
 function getPrimaryRowGroup(value){ return getRowGroups(value)[0] || ""; }
 let currentTab = "ALL";
 let currentStatus = "ALL";
+let restockOnly = false;
 let searchQ = "";
 let quickGroupFilter = null;
 let importRows = [];
@@ -1111,6 +1115,14 @@ function setPendingSync(on, reason){
 function hasPendingSync(){
   return localStorage.getItem(PENDING_SYNC_KEY) !== null;
 }
+function markLastSync(){
+  const text = document.getElementById("lastSyncText");
+  const now = new Date();
+  const value = `Đồng bộ: ${String(now.getHours()).padStart(2,"0")}:${String(now.getMinutes()).padStart(2,"0")}`;
+  try{ localStorage.setItem("kho_cntt_last_sync", value); }catch(e){}
+  if(text) text.textContent = value;
+}
+function showLastSync(){ const text=document.getElementById("lastSyncText"); if(text) text.textContent=localStorage.getItem("kho_cntt_last_sync")||""; }
 function setAuxPendingSync(key, on){ try{ on ? localStorage.setItem(key, String(Date.now())) : localStorage.removeItem(key); }catch(e){} }
 function hasAuxPendingSync(key){ try{ return localStorage.getItem(key) !== null; }catch(e){ return false; } }
 
@@ -1148,7 +1160,7 @@ function normalizeSheetRows(rows){
     row[1] = (row[1] || "").toString().trim();
     row[2] = (row[2] || "").toString().trim();
     row[3] = (row[3] || "").toString().trim();
-    row[6] = getStockStatusValue(row[5]);
+    row[6] = getStockStatusValue(row[5], row[12]);
     row[7] = (row[7] || "").toString();
     row[8] = joinRowGroups(row[8] || "");
     row[9] = (row[9] || "").toString();
@@ -1218,7 +1230,7 @@ async function loadData(){
       DATA.forEach(r=>{ r[8] = joinRowGroups(r[8] || ""); });
 
       if(DATA.length){
-        setSyncBadge("synced");
+        setSyncBadge("synced"); markLastSync();
       }else{
         setSyncBadge("empty");
       }
@@ -1262,7 +1274,7 @@ async function saveData(){
     try{
       await postSheet("replace_all", snapshot);
       if(seq === dataSaveSeq){
-        setSyncBadge("synced");
+        setSyncBadge("synced"); markLastSync();
         setPendingSync(false);
       }
       return true;
@@ -1279,7 +1291,7 @@ async function saveData(){
     try{
       await postSheet("replace_all", snapshot);
       if(seq === dataSaveSeq){
-        setSyncBadge("synced");
+        setSyncBadge("synced"); markLastSync();
         setPendingSync(false);
       }
       return true;
@@ -1359,7 +1371,7 @@ function showKpiDetail(type){
       <span>Tổng cộng</span><span style="color: #1E8449;">${total.toLocaleString("vi-VN")}</span></div>`;
 
   } else if(type==="het"){
-    const items = DATA.filter(r=>getStockState(r[5])==="HET");
+    const items = DATA.filter(r=>getStockState(r[5], r[12])==="HET");
     if(!items.length){ html = `<div style="text-align: center; padding: 20px; color: #888;">✅ Không có mặt hàng nào hết hàng</div>`; }
     else html = items.map(r=>{
       const c = cfg[r[0]]||cfg.MT;
@@ -1394,7 +1406,7 @@ function showKpiDetail(type){
 function initKPI(){
   document.getElementById("kpi-mh").textContent = "📦 " + DATA.length;
   document.getElementById("kpi-ton").textContent = "📊 " + DATA.reduce((s,r)=>s+r[5],0).toLocaleString("vi-VN");
-  document.getElementById("kpi-het").textContent = "🔴 " + DATA.filter(r=>getStockState(r[5])==="HET").length;
+  document.getElementById("kpi-het").textContent = "🔴 " + DATA.filter(r=>getStockState(r[5], r[12])==="HET").length;
   document.getElementById("kpi-sap").textContent = "🟡 " + DATA.filter(r=>r[5]>0&&r[5]<=2).length;
 }
 
@@ -1549,6 +1561,12 @@ function mergeNoteLocation(note, location){
   if(cleanLocation && cleanNote) return `Vị trí kho: ${cleanLocation}\n${cleanNote}`;
   if(cleanLocation) return `Vị trí kho: ${cleanLocation}`;
   return cleanNote;
+}
+function updateLocationSuggestions(){
+  const list = document.getElementById("fLocationSuggestions");
+  if(!list) return;
+  const locations = [...new Set(DATA.map(r=>splitNoteLocation(r[7]||"").location).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"vi"));
+  list.innerHTML = locations.map(location=>`<option value="${escapeHtml(location)}"></option>`).join("");
 }
 function showWarehouseLocation(idx){
   const r = DATA[idx];
@@ -2515,10 +2533,11 @@ function render(){
   const results = DATA.map((r,i)=>({r,i})).filter(({r})=>{
     const [sh,,ten,th,,,tt,ghi] = r;
     if(currentTab!=="ALL" && sh!==currentTab) return false;
-    const stockState = getStockState(r[5]);
+    const stockState = getStockState(r[5], r[12]);
     if(currentStatus==="CON" && stockState!=="CON") return false;
     if(currentStatus==="SAP" && stockState!=="SAP") return false;
     if(currentStatus==="HET" && stockState!=="HET") return false;
+    if(restockOnly && stockState!=="SAP" && stockState!=="HET") return false;
     const resolvedGroupLabel = resolveQuickGroupLabelFromRow(r, r[8] || "");
     if(!matchesQuickGroupFilter(r, resolvedGroupLabel)) return false;
     if(!kwTokens.length) return true;
@@ -2662,7 +2681,7 @@ function render(){
     setupGroupChipsAutoScroll();
     return;
   }
-  if(!bulkSelectMode && !kw && currentTab==="ALL" && currentStatus==="ALL"){
+  if(!bulkSelectMode && !kw && currentTab==="ALL" && currentStatus==="ALL" && !restockOnly){
     el.innerHTML = `<div class="empty"><div class="empty-icon">🔎</div><div class="empty-title">Gõ từ khóa để tìm kiếm</div><div class="empty-sub">VD: "SSD", "HP", "Camera wifi", "Canon"...</div></div>`;
     return;
   }
@@ -3270,7 +3289,7 @@ async function deleteTX(id){ if(!requireAdmin()) return;
   TX_DATA = TX_DATA.filter(t=>String(t.id)!==String(id));
   if(idx >= 0 && qty > 0){
     DATA[idx][5] = (Number(DATA[idx][5]) || 0) + qty;
-    DATA[idx][6] = getStockStatusValue(DATA[idx][5]);
+    DATA[idx][6] = getStockStatusValue(DATA[idx][5], DATA[idx][12]);
     await saveData();
     render();
   }
@@ -3438,12 +3457,6 @@ function updateProductCodeSuggestions(){
     hint.textContent = "Danh mục này chưa có mã hàng nào.";
     return;
   }
-  if(idx >= 0 && qty < 0 && String(tx.ghi || "").startsWith("[ĐIỀU CHỈNH]")){
-    DATA[idx][5] = Math.max(0, (Number(DATA[idx][5]) || 0) + qty);
-    DATA[idx][6] = getStockStatusValue(DATA[idx][5], DATA[idx][12]);
-    await saveData();
-    render();
-  }
   const preview = codes.slice(0, 16).join(" · ");
   hint.innerHTML = `<b>${codes.length} mã đã có:</b> ${escapeHtml(preview)}${codes.length>16 ? " …" : ""}`;
 }
@@ -3473,7 +3486,7 @@ function openAddModal(){ if(!requireAdmin()) return;
   document.getElementById("fSheet").value = "MT"; document.getElementById("fMa").value = ""; document.getElementById("fTen").value = "";
   document.getElementById("fTH").value = ""; setVndInputValue("fGia", 0); setVndInputValue("fGiaBan", 0);
   document.getElementById("fTon").value = "0"; document.getElementById("fSapHet").value = "2"; document.getElementById("fTT").value = "HẾT HÀNG";
-  document.getElementById("fGhi").value = ""; document.getElementById("fVitri").value = ""; document.getElementById("fImgFile").value = ""; setImagePreview(""); updateGroupOptions("");
+  document.getElementById("fGhi").value = ""; document.getElementById("fVitri").value = ""; document.getElementById("fImgFile").value = ""; setImagePreview(""); updateLocationSuggestions(); updateGroupOptions("");
   document.getElementById("editOverlay").classList.add("open");
 }
 function openEditModal(idx){ if(!requireAdmin()) return;
@@ -3485,7 +3498,7 @@ function openEditModal(idx){ if(!requireAdmin()) return;
   setVndInputValue("fGia", r[4]); setVndInputValue("fGiaBan", r[10]||0);
   document.getElementById("fTon").value = r[5]; document.getElementById("fSapHet").value = r[12] || 2; document.getElementById("fTT").value = getStockStatusValue(r[5], r[12]);
   document.getElementById("fGhi").value = parts.note || ""; document.getElementById("fVitri").value = parts.location || ""; document.getElementById("fImgFile").value = "";
-  setImagePreview(r[9]||""); updateGroupOptions(r[8]||""); updateQuickTagOptions(r[11]||""); document.getElementById("editOverlay").classList.add("open");
+  setImagePreview(r[9]||""); updateLocationSuggestions(); updateGroupOptions(r[8]||""); updateQuickTagOptions(r[11]||""); document.getElementById("editOverlay").classList.add("open");
 }
 async function saveItem(){ if(!requireAdmin()) return;
   const sh = document.getElementById("fSheet").value.trim(), ma = document.getElementById("fMa").value.trim(), ten = document.getElementById("fTen").value.trim(), th = document.getElementById("fTH").value.trim(), gia = parseVndInput(document.getElementById("fGia").value), giaBan = parseVndInput(document.getElementById("fGiaBan").value), ton = Math.max(0, parseInt(document.getElementById("fTon").value)||0), sapHet = Math.max(1, parseInt(document.getElementById("fSapHet").value)||2), tt = document.getElementById("fTT").value, ghiNote = document.getElementById("fGhi").value.trim(), vitri = document.getElementById("fVitri").value.trim(), img = document.getElementById("fImg").value || "", idx = document.getElementById("editIdx").value, grp = joinRowGroups(getSelectedFormGroups()), quickTag = joinRowQuickTags(getSelectedQuickTags());
@@ -3585,7 +3598,16 @@ function syncStatusButtons(status){
 function setTab(btn){ goToTab(btn.dataset.tab); }
 function setStatus(btn){
   currentStatus = btn.dataset.status;
+  restockOnly = false;
+  document.getElementById("restockBtn")?.classList.remove("active");
   syncStatusButtons(currentStatus);
+  render();
+}
+function setRestockFilter(){
+  restockOnly = !restockOnly;
+  currentStatus = "ALL";
+  syncStatusButtons(currentStatus);
+  document.getElementById("restockBtn")?.classList.toggle("active", restockOnly);
   render();
 }
 function clearSearch(){ clearTimeout(searchRenderTimer); document.getElementById("search").value=""; searchQ=""; quickGroupFilter = null; document.getElementById("clear-btn").style.display="none"; render(); document.getElementById("search").focus(); }
@@ -3810,6 +3832,7 @@ function setLoadingUI(pct, step){
 }
 
 (async function init(){
+  showLastSync();
   setLoadingUI(5, "Đang khởi động kho hàng...");
   await loadTX();
   await loadNV();
