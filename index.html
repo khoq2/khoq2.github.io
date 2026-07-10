@@ -78,9 +78,9 @@ body { font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif
 .card-tag { font-size: 10px; font-weight: 800; color: #1E3A5F; background: #EBF5FB; border: 1px solid rgba(30,58,95,.12); padding: 2px 7px; border-radius: 999px; line-height: 1.3; }
 .price { font-size: 15px; font-weight: bold; }
 .price-sale-on { color: #D50000 !important; font-weight: 900 !important; }
-.price-contact-btn { border: 1px solid #008CEB; background: linear-gradient(180deg, #12B7FF 0%, #008CEB 100%); color: #fff; font: inherit; font-size: 12px; font-weight: 900; cursor: pointer; padding: 3px 9px; border-radius: 999px; box-shadow: 0 3px 8px rgba(0,140,235,.24), inset 0 -1px 0 rgba(0,0,0,.15); letter-spacing: 0; line-height: 1.25; text-shadow: 0 1px 1px rgba(0,0,0,.14); }
-.price-contact-btn:hover { background: linear-gradient(180deg, #22C1FF 0%, #007DDA 100%); border-color: #007DDA; transform: translateY(-1px); box-shadow: 0 5px 12px rgba(0,140,235,.30), inset 0 -1px 0 rgba(0,0,0,.15); }
-.price-contact-btn:active { transform: translateY(0); background: #007DDA; box-shadow: inset 0 2px 4px rgba(0,0,0,.18); }
+.price-contact-btn { border: 1px solid #B71C1C; background: linear-gradient(180deg, #EF5350 0%, #D32F2F 100%); color: #fff; font: inherit; font-size: 12px; font-weight: 900; cursor: pointer; padding: 3px 9px; border-radius: 999px; box-shadow: 0 3px 8px rgba(211,47,47,.28), inset 0 -1px 0 rgba(0,0,0,.16); letter-spacing: 0; line-height: 1.25; text-shadow: 0 1px 1px rgba(0,0,0,.18); }
+.price-contact-btn:hover { background: linear-gradient(180deg, #FF6B67 0%, #C62828 100%); border-color: #B71C1C; transform: translateY(-1px); box-shadow: 0 5px 12px rgba(211,47,47,.34), inset 0 -1px 0 rgba(0,0,0,.15); }
+.price-contact-btn:active { transform:translateY(0); background:#B71C1C; box-shadow:inset 0 2px 4px rgba(0,0,0,.2); }
 .nguoi-ban-row { display: flex; align-items: center; gap: 6px; margin-top: 6px; padding: 5px 8px; background: #F4F6F9; border-radius: 8px; cursor: pointer; font-size: 12px; color: #555; }
 .nguoi-ban-row:active { background: #E8ECF1; }
 .nguoi-ban-label { font-weight: bold; color: #1E3A5F; flex: 1; }
@@ -2538,6 +2538,7 @@ function openZaloContact(btn){
     window.location.href = url;
     return;
   }
+  if(!window.confirm(copied ? "Đã copy mẫu hỏi giá.\nBấm OK để mở Zalo ở tab mới." : "Bấm OK để mở Zalo ở tab mới.")) return;
   const win = window.open(url, "_blank");
   if(!win) window.location.href = url;
 }
@@ -2587,7 +2588,7 @@ function renderCard(r,i,displayNo){
         <span class="price-label">Giá bán:</span>
         ${giaBan>0
           ? `<span class="price price-sale-on" style="color: #D50000;font-size:15px;font-weight:900">${fmt(giaBan)}</span>`
-          : `<button type="button" class="price price-contact-btn" data-title="${escapeHtml([ten, th].filter(Boolean).join(" "))}" data-code="${escapeHtml(ma)}" data-branch="${escapeHtml(branch || "Q2")}" data-stock="${ton}" data-location="${escapeHtml(location || "Chưa ghi vị trí")}" aria-label="Hỏi giá qua Zalo" onclick="openZaloContact(this)">💬 Hỏi giá</button>`
+          : `<button type="button" class="price price-contact-btn" data-title="${escapeHtml([ten, th].filter(Boolean).join(" "))}" data-code="${escapeHtml(ma)}" data-branch="${escapeHtml(branch || "Q2")}" data-stock="${ton}" data-location="${escapeHtml(location || "Chưa ghi vị trí")}" aria-label="Liên hệ qua Zalo" onclick="openZaloContact(this)">💬 Liên hệ</button>`
         }
        </div>`;
   return `<div class="card${isHet?" het":isSap?" sap":" con"}${bulkSelectMode?" bulk-mode":""}${isSelected?" bulk-selected":""}${quickClass}" data-ma="${escapeHtml(ma)}">
@@ -3755,14 +3756,25 @@ function showToast(msg, duration=2200){ const t=document.getElementById("toast")
 function backupDataToExcel(){
   if(!requireAdmin()) return;
   if(typeof XLSX === "undefined"){ showToast("⚠️ Chưa tải được công cụ sao lưu. Kiểm tra kết nối mạng rồi thử lại.", 4000); return; }
-  const headers = ["Danh mục","Mã hàng","Tên sản phẩm","Thương hiệu","Giá nhập","Tồn kho","Trạng thái","Ghi chú / vị trí","Nhóm","Ảnh","Giá bán","Phân loại nhanh"];
   const wb = XLSX.utils.book_new();
-  const wsData = XLSX.utils.aoa_to_sheet([headers, ...normalizeSheetRows(DATA)]);
-  const wsTx = XLSX.utils.json_to_sheet(normalizeTxList(TX_DATA));
-  const wsNv = XLSX.utils.json_to_sheet(normalizeNVList(NV_LIST));
-  XLSX.utils.book_append_sheet(wb, wsData, "Kho hang");
-  XLSX.utils.book_append_sheet(wb, wsTx, "Giao dich");
-  XLSX.utils.book_append_sheet(wb, wsNv, "Nhan vien");
+  const khoHeaders = ["Chi nhánh","Danh mục","Mã hàng","Tên sản phẩm","Thương hiệu","Giá nhập","Tồn kho","Trạng thái","Mức sắp hết","Nhóm sản phẩm","Phân loại nhanh","Vị trí / ghi chú","Link ảnh","Giá bán"];
+  const khoRows = normalizeSheetRows(DATA).map(r=>[r[13]||"Q2",r[0],r[1],r[2],r[3],r[4],r[5],r[6],r[12]||2,r[8],r[11],r[7],r[9],r[10]]);
+  const txHeaders = ["Chi nhánh","Mã hàng","Tên sản phẩm","Danh mục","Nhân viên","Số lượng","Giá bán","Ghi chú","Link ảnh","Thời gian","Mã giao dịch"];
+  const txRows = normalizeTxList(TX_DATA).map(t=>[t.branch||"Q2",t.ma,t.ten,t.sh,t.nv,t.qty,t.gia,t.ghi,t.img,t.time,t.id]);
+  const nvHeaders = ["Tên nhân viên","Link avatar"];
+  const nvRows = normalizeNVList(NV_LIST).map(n=>[n.name,n.avatar]);
+  const wsData = XLSX.utils.aoa_to_sheet([khoHeaders,...khoRows]);
+  const wsTx = XLSX.utils.aoa_to_sheet([txHeaders,...txRows]);
+  const wsNv = XLSX.utils.aoa_to_sheet([nvHeaders,...nvRows]);
+  wsData['!cols'] = [10,10,16,42,18,14,10,14,13,26,24,38,46,14].map(w=>({wch:w}));
+  wsTx['!cols'] = [10,16,42,12,20,10,14,34,46,21,17].map(w=>({wch:w}));
+  wsNv['!cols'] = [{wch:24},{wch:52}];
+  wsData['!autofilter'] = {ref:`A1:N${Math.max(khoRows.length+1,1)}`};
+  wsTx['!autofilter'] = {ref:`A1:K${Math.max(txRows.length+1,1)}`};
+  wsNv['!autofilter'] = {ref:`A1:B${Math.max(nvRows.length+1,1)}`};
+  XLSX.utils.book_append_sheet(wb, wsData, "Kho hàng");
+  XLSX.utils.book_append_sheet(wb, wsTx, "Giao dịch");
+  XLSX.utils.book_append_sheet(wb, wsNv, "Nhân viên");
   const stamp = new Date().toISOString().slice(0,19).replace(/[:T]/g,"-");
   XLSX.writeFile(wb, `Sao-luu-kho-${stamp}.xlsx`);
   showToast("✅ Đang tạo file sao lưu Excel.");
