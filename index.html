@@ -2511,22 +2511,28 @@ function renderQuickSummary(items, groupLabel){
 }
 
 let quickFocusTimer = null;
-async function openZaloContact(title){
-  const cleanTitle = String(title || "").trim() || "Sản phẩm";
-  const message = `Xin chào anh/chị, em muốn hỏi sản phẩm:\n${cleanTitle}\nLoại này giá sao anh chị?`;
-  const url = `https://zalo.me/0375111112?text=${encodeURIComponent(message)}`;
+function copyContactMessage(message){
   let copied = false;
   try{
-    if(navigator.clipboard && navigator.clipboard.writeText){
-      await navigator.clipboard.writeText(message);
-      copied = true;
-    }
+    const area = document.createElement("textarea");
+    area.value = message; area.setAttribute("readonly", "");
+    area.style.cssText = "position:fixed;opacity:0;left:-9999px;top:-9999px";
+    document.body.appendChild(area); area.select(); area.setSelectionRange(0, area.value.length);
+    copied = document.execCommand("copy"); document.body.removeChild(area);
   }catch(e){}
-  const confirmMsg = copied
-    ? `Đã copy nội dung tiêu đề.\nBạn có thể dán vào Zalo.`
-    : `Bấm OK để mở Zalo và nhắn tin liên hệ.`;
-  const proceed = window.confirm(confirmMsg);
-  if(!proceed) return;
+  try{ if(navigator.clipboard?.writeText) navigator.clipboard.writeText(message).catch(()=>{}); }catch(e){}
+  return copied;
+}
+function openZaloContact(btn){
+  const title = btn?.dataset?.title || "Sản phẩm";
+  const code = btn?.dataset?.code || "";
+  const branch = btn?.dataset?.branch || "Q2";
+  const stock = Number(btn?.dataset?.stock || 0);
+  const location = btn?.dataset?.location || "Chưa ghi vị trí";
+  const message = `[HỎI GIÁ LINH KIỆN]\nMã: ${code}\nTên: ${title}\nChi nhánh: ${branch}\nTồn hiện tại: ${stock}\nVị trí: ${location}${stock<=0 ? "\n⚠️ Hàng đang hết" : ""}\n\nNhờ anh/chị báo giá và tình trạng hàng giúp em.`;
+  const url = `https://zalo.me/0375111112?text=${encodeURIComponent(message)}`;
+  const copied = copyContactMessage(message);
+  showToast(copied ? "✅ Đã copy mẫu hỏi giá — đang mở Zalo" : "⚠️ Đang mở Zalo — nếu chưa có nội dung, hãy quay lại copy thủ công.", 4000);
   const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent || "");
   if(isMobile){
     window.location.href = url;
@@ -2581,7 +2587,7 @@ function renderCard(r,i,displayNo){
         <span class="price-label">Giá bán:</span>
         ${giaBan>0
           ? `<span class="price price-sale-on" style="color: #D50000;font-size:15px;font-weight:900">${fmt(giaBan)}</span>`
-          : `<button type="button" class="price price-contact-btn" data-title="${escapeHtml([ten, th].filter(Boolean).join(" "))}" aria-label="Liên hệ qua Zalo" onclick="openZaloContact(this.dataset.title)">Liên hệ</button>`
+          : `<button type="button" class="price price-contact-btn" data-title="${escapeHtml([ten, th].filter(Boolean).join(" "))}" data-code="${escapeHtml(ma)}" data-branch="${escapeHtml(branch || "Q2")}" data-stock="${ton}" data-location="${escapeHtml(location || "Chưa ghi vị trí")}" aria-label="Hỏi giá qua Zalo" onclick="openZaloContact(this)">💬 Hỏi giá</button>`
         }
        </div>`;
   return `<div class="card${isHet?" het":isSap?" sap":" con"}${bulkSelectMode?" bulk-mode":""}${isSelected?" bulk-selected":""}${quickClass}" data-ma="${escapeHtml(ma)}">
