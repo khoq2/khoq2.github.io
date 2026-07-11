@@ -154,7 +154,7 @@ mark.kw-hit { background: #FFEB3B; color: #1A1A1A; padding: 0 1px; border-radius
 .fab:active { transform: scale(.95); }
 .fab-add { background: #1E3A5F; color: #fff; }
 .fab-import { background: #1E8449; color: #fff; }
-.latest-items-ticker { position: fixed; left: max(14px, env(safe-area-inset-left)); bottom: max(18px, env(safe-area-inset-bottom)); z-index: 190; display: none; align-items: center; gap: 7px; max-width: min(300px, calc(100vw - 92px - env(safe-area-inset-left))); color: #1E3A5F; cursor: pointer; will-change: opacity, transform; transition: opacity .42s ease-in-out, transform .42s cubic-bezier(.25,.1,.25,1); }
+.latest-items-ticker { position: fixed; left: max(14px, env(safe-area-inset-left)); bottom: max(18px, env(safe-area-inset-bottom)); z-index: 190; display: none; align-items: center; gap: 7px; max-width: min(300px, calc(100vw - 92px - env(safe-area-inset-left))); color: #1E3A5F; cursor: pointer; will-change: opacity,transform; transition: opacity .7s ease-in-out, transform .7s cubic-bezier(.22,.61,.36,1); }
 .latest-items-ticker.show { display: flex; }
 .latest-items-ticker.is-leaving { opacity: 0; transform: translateY(4px); }
 .latest-items-ticker.is-rising { animation: latestItemRise .56s cubic-bezier(.25,.1,.25,1) both; }
@@ -4349,18 +4349,19 @@ function refreshLatestItemsTicker(){
       updateTitle();
       ticker.classList.remove("is-leaving");
       ticker.classList.add("is-rising");
-      setTimeout(()=>ticker.classList.remove("is-rising"), 580);
-    }, 340);
+      setTimeout(()=>ticker.classList.remove("is-rising"), 720);
+    }, 700);
   }else{
     updateTitle();
-    ticker.classList.add("show");
+    ticker.classList.add("show", "is-rising");
+    setTimeout(()=>ticker.classList.remove("is-rising"), 720);
     latestItemsTickerHasShown = true;
   }
   latestItemsTickerIndex = (latestItemsTickerIndex + 1) % latestItems.length;
 }
 function startLatestItemsTicker(){
   refreshLatestItemsTicker();
-  setInterval(refreshLatestItemsTicker, 3000);
+  setInterval(refreshLatestItemsTicker, 6200);
 }
 function openLatestItemFromTicker(){
   const ticker = document.getElementById("latestItemsTicker");
