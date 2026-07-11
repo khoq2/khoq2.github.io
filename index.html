@@ -107,6 +107,8 @@ body { font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif
 .tx-summary-value { display: block; font-size: 12px; font-weight: 700; color: #1E3A5F; }
 .tx-summary-value.revenue { color: #1E8449; }
 .tx-filter { display: grid; grid-template-columns: 1fr 1fr auto; gap: 8px; margin: 0 0 10px; }
+.tx-filter-field { display: grid; gap: 4px; min-width: 0; }
+.tx-filter-label { color: #607D8B; font-size: 11px; font-weight: 800; padding-left: 1px; }
 .tx-filter select, .tx-filter input { width: 100%; padding: 9px 10px; border-radius: 8px; border: 1.5px solid #D5DBDB; font-size: 13px; background: #fff; color: #2C3E50; }
 .tx-filter button { border: none; border-radius: 8px; padding: 9px 12px; background: #F4F6F9; color: #34495E; font-size: 13px; font-weight: 700; cursor: pointer; }
 .tx-filter button:active { transform: scale(.98); }
@@ -2721,10 +2723,10 @@ function openZaloContact(btn){
   const branch = btn?.dataset?.branch || "Q2";
   const stock = Number(btn?.dataset?.stock || 0);
   const location = btn?.dataset?.location || "Chưa ghi vị trí";
-  const message = `Mã: ${code}\nTên: ${title}\nChi nhánh: ${branch}\nTồn hiện tại: ${stock}\nVị trí: ${location}\nLiên hệ: 094 8300735\n\nNhờ anh/chị báo giá hàng này giúp em.`;
+  const message = `Mã: ${code}\nTên: ${title}\nChi nhánh: ${branch}\nTồn hiện tại: ${stock}\nVị trí: ${location}\nKế toán: 094 8300735\n\nNhờ anh/chị báo giá hàng này giúp em.`;
   const url = `https://zalo.me/0375111112?text=${encodeURIComponent(message)}`;
   const copied = copyContactMessage(message);
-  showToast(copied ? "✅ Đã Copy thông tin — đang mở Zalo" : "⚠️ Đang mở Zalo — nếu chưa có nội dung, hãy quay lại copy thủ công.", 4000);
+  showToast(copied ? "✅ Đã copy mẫu hỏi giá — đang mở Zalo" : "⚠️ Đang mở Zalo — nếu chưa có nội dung, hãy quay lại copy thủ công.", 4000);
   const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent || "");
   if(isMobile){
     window.location.href = url;
@@ -3685,11 +3687,17 @@ function renderTxHistory(){
   const dateVal = TX_HISTORY_STATE.date || "";
   const nvVal = TX_HISTORY_STATE.nv || "";
   const filterBar = `<div class="tx-filter">
-    <input type="date" id="txFilterDate" value="${dateVal}" onchange="applyTxHistoryFilters()">
-    <select id="txFilterNV" onchange="applyTxHistoryFilters()">
-      <option value="">Tất cả nhân viên</option>
-      ${nvOptions.map(nv=>`<option value="${escapeHtml(nv)}" ${nv===nvVal?"selected":""}>${escapeHtml(nv)}</option>`).join("")}
-    </select>
+    <div class="tx-filter-field">
+      <label class="tx-filter-label" for="txFilterDate">Ngày giao dịch (dd/mm/yyyy)</label>
+      <input type="date" id="txFilterDate" value="${dateVal}" aria-label="Ngày giao dịch theo định dạng ngày/tháng/năm" onchange="applyTxHistoryFilters()">
+    </div>
+    <div class="tx-filter-field">
+      <label class="tx-filter-label" for="txFilterNV">Nhân viên</label>
+      <select id="txFilterNV" aria-label="Lọc theo nhân viên" onchange="applyTxHistoryFilters()">
+        <option value="">Tất cả nhân viên</option>
+        ${nvOptions.map(nv=>`<option value="${escapeHtml(nv)}" ${nv===nvVal?"selected":""}>${escapeHtml(nv)}</option>`).join("")}
+      </select>
+    </div>
     <button type="button" onclick="clearTxHistoryFilters()">Xoá lọc</button>
   </div>`;
   if(!txs.length){
