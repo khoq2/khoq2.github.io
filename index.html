@@ -266,6 +266,7 @@ body.admin-mode .admin-btn { background: #1E8449; border-color: #1E8449; opacity
 .is-dragging, .is-dragging * { user-select: none !important; -webkit-user-select: none !important; }
 .scroll-btns { position: fixed; right: 14px; bottom: 92px; display: flex; flex-direction: column; gap: 5px; z-index: 200; padding: 5px; border-radius: 14px; background: rgba(255,255,255,.94); border: 1px solid rgba(30,58,95,.18); box-shadow: 0 8px 22px rgba(17,34,51,.18); backdrop-filter: blur(10px); opacity: 1; transform: translateX(0); pointer-events: auto; transition: opacity .22s ease, transform .22s ease; }
 .scroll-btns.is-hidden { opacity: 0; transform: translateX(18px); pointer-events: none; }
+body.fab-menu-open .scroll-btns { opacity: 0; transform: translateX(18px); pointer-events: none; }
 .price-row { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; margin-top: 3px; }
 .price-label { font-size: 10px; color: #888; }
 .admin-price { color: #1A5276!important; }
@@ -1266,6 +1267,11 @@ function setAdminMode(on){
   } else {
     sessionStorage.removeItem("kho_cntt_admin");
     document.body.classList.remove("admin-mode");
+    document.body.classList.remove("fab-menu-open");
+    const fabMenu = document.getElementById("fabMenuItems");
+    const fabBtn = document.getElementById("fabToggleBtn");
+    if(fabMenu){ fabMenu.style.maxHeight = "0"; fabMenu.style.opacity = "0"; }
+    if(fabBtn) fabBtn.textContent = "⚙️ Quản trị";
     if(new URLSearchParams(location.search).get("admin")!=="1"){
       document.body.classList.remove("admin-entry-visible");
     }
@@ -4837,10 +4843,12 @@ function toggleFabMenu(){
     menu.style.maxHeight = "0";
     menu.style.opacity = "0";
     btn.textContent = "⚙️ Phạm Văn Chương";
+    document.body.classList.remove("fab-menu-open");
   } else {
     menu.style.maxHeight = "400px";
     menu.style.opacity = "1";
     btn.textContent = "✖️ Đóng";
+    document.body.classList.add("fab-menu-open");
   }
 }
 const HEADER_COLLAPSE_PREF_KEY = "kho_cntt_header_collapsed";
