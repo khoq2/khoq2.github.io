@@ -142,6 +142,11 @@ body { font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif
 .tx-price-pill { background: #EAF7EE; color: #1E8449; }
 .tx-note { display: block; margin-top: 6px; color: #7B7D7D; font-size: 11px; line-height: 1.4; word-break: break-word; }
 .tx-img { display: block; width: 74px; height: 74px; object-fit: cover; border-radius: 8px; border: 1px solid #E5E8E8; margin-top: 8px; background: #fafafa; cursor: zoom-in; }
+.tx-related { margin-top: 7px; padding: 7px 8px; border-radius: 8px; background: #F8FAFC; border: 1px solid #E5EAF0; }
+.tx-related-label { display: block; margin-bottom: 5px; color: #607D8B; font-size: 10px; font-weight: 800; }
+.tx-related-links { display: flex; flex-wrap: wrap; gap: 5px; }
+.tx-related-link { max-width: 100%; border: 1px solid #D6EAF8; background: #fff; color: #1A5276; border-radius: 999px; padding: 4px 8px; font-size: 10px; font-weight: 800; line-height: 1.2; cursor: pointer; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tx-related-link:active { background: #EBF5FB; transform: scale(.98); }
 .tx-action { background: none; border: none; font-size: 12px; cursor: pointer; padding: 2px 6px; border-radius: 6px; }
 .tx-edit { color: #1A5276; }
 .tx-delete { color: #C0392B; }
@@ -3823,6 +3828,46 @@ function sortTxHistoryRows(txs){
     return timeDiff;
   });
 }
+function getSameDayEmployeeProductLinks(tx, currentRow){
+  const dateKey = parseTxDateKey(tx?.time);
+  const employeeKey = removeAccents(String(tx?.nv || "")).trim().toLowerCase();
+  const branch = String(tx?.branch || currentRow?.[13] || "Q2").trim().toUpperCase() === "Q5" ? "Q5" : "Q2";
+  const currentCode = String(currentRow?.[1] || "").trim();
+  if(!dateKey || !employeeKey) return [];
+  const seenCodes = new Set();
+  return TX_DATA.filter(other=>{
+    const otherBranch = String(other?.branch || "Q2").trim().toUpperCase() === "Q5" ? "Q5" : "Q2";
+    return getTransactionKind(other) === "SALE"
+      && parseTxDateKey(other.time) === dateKey
+      && removeAccents(String(other.nv || "")).trim().toLowerCase() === employeeKey
+      && otherBranch === branch
+      && String(other.ma || "").trim() !== currentCode;
+  }).map(other=>{
+    const index = DATA.findIndex(row=>String(row[1] || "").trim() === String(other.ma || "").trim()
+      && (String(row[13] || "Q2").trim().toUpperCase() === "Q5" ? "Q5" : "Q2") === branch);
+    return {other, index};
+  }).filter(item=>{
+    if(item.index < 0) return false;
+    const key = String(item.other.ma || "").trim();
+    if(seenCodes.has(key)) return false;
+    seenCodes.add(key);
+    return true;
+  }).slice(0, 8);
+}
+function openRelatedHistoryProduct(idx){
+  if(!DATA[idx]) return;
+  closeOverlay("txOverlay");
+  currentTab = "ALL";
+  currentBranch = "ALL";
+  document.querySelectorAll(".tab-btn").forEach(btn=>btn.classList.toggle("active", btn.dataset.tab === "ALL"));
+  document.querySelectorAll('.filter-btn[data-branch]').forEach(btn=>btn.classList.remove("active"));
+  selectSearchSuggestion(idx);
+}
+function renderSameDayEmployeeLinks(tx, currentRow){
+  const links = getSameDayEmployeeProductLinks(tx, currentRow);
+  if(!links.length) return "";
+  return `<div class="tx-related"><span class="tx-related-label">Cùng ngày, ${escapeHtml(tx.nv || "nhân viên này")} đã bán thêm:</span><div class="tx-related-links">${links.map(({other,index})=>`<button type="button" class="tx-related-link" title="Mở ${escapeHtml(other.ten || other.ma || "sản phẩm")}" onclick="openRelatedHistoryProduct(${index})">${escapeHtml(other.ten || other.ma || "Sản phẩm")}</button>`).join("")}</div></div>`;
+}
 
 function renderTxHistory(){
   const idx = TX_HISTORY_STATE.idx;
@@ -3885,6 +3930,7 @@ function renderTxHistory(){
             ${getTransactionKind(t)==="SALE" ? `<span class="tx-pill tx-price-pill">${t.gia>0?fmt(t.gia)+"/cái":"Không ghi giá"}</span>` : ""}
           </div>
           ${t.ghi?`<span class="tx-note">📝 ${escapeHtml(t.ghi)}</span>`:""}
+          ${renderSameDayEmployeeLinks(t, r)}
           ${t.img?`<img class="tx-img" src="${escapeHtml(t.img)}" alt="Ảnh giao dịch" referrerpolicy="no-referrer" onclick="openImageViewer(this.src, this.alt)" onerror="this.style.display='none';">`:""}
         </div>`).join("") : `<div style="text-align: center; padding: 20px; color: #888;">Không có giao dịch phù hợp bộ lọc</div>`;
   document.getElementById("txModalBody").innerHTML = filterBar + summary + rows;
