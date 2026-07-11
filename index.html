@@ -1611,12 +1611,12 @@ async function manualSync(){
   setSyncBadge("syncing");
   try{
     let dataOk = true;
-    const [nvOk, txOk] = await Promise.all([
+    const [dataPushOk, nvOk, txOk] = await Promise.all([
       pushToSheet().then(()=>true).catch(e=>{ dataOk=false; throw e; }),
       saveNV(),
       saveTX()
     ]);
-    if(dataOk && nvOk && txOk){
+    if(dataOk && dataPushOk && nvOk && txOk){
       setSyncBadge("synced");
       showToast("✅ Đã đẩy dữ liệu hiện tại lên Google Sheet");
     }else{
@@ -3404,7 +3404,7 @@ async function deleteAllItems(){
   showToast("Đã xóa tất cả sản phẩm");
 }
 
-function changeTon(idx, delta){
+async function changeTon(idx, delta){
   if(!requireAdmin()) return;
   const r = DATA[idx];
   const reason = prompt("Lý do điều chỉnh tồn kho:", "Nhập thêm hàng");
@@ -3415,9 +3415,12 @@ function changeTon(idx, delta){
   DATA[idx][5] = newTon;
   DATA[idx][6] = getStockStatusValue(newTon, DATA[idx][12]);
   TX_DATA.unshift({ id: Date.now(), ma: r[1], ten: r[2], sh: r[0], nv: "Điều chỉnh kho", qty: -actualDelta, gia: 0, ghi: `[ĐIỀU CHỈNH] ${reason.trim() || "Không ghi lý do"}`, img: "", time: formatTxTime(new Date()), branch: r[13] || "Q2" });
-  saveData(); saveTX();
+  const [dataSaved, txSaved] = await Promise.all([
+    saveProductRow(DATA[idx], r[1], r[13] || "Q2"),
+    saveTX()
+  ]);
   render();
-  showToast(`${actualDelta > 0 ? "+" : ""}${actualDelta} tồn kho: ${r[2]}`);
+  showToast(dataSaved && txSaved ? `${actualDelta > 0 ? "+" : ""}${actualDelta} tồn kho: ${r[2]}` : "⚠️ Đã lưu trên máy, đang chờ đồng bộ lại.", 4200);
 }
 
 async function deleteItem(idx){
@@ -3738,7 +3741,10 @@ async function saveRestock(){ if(!requireAdmin()) return;
   DATA[idx][6] = getStockStatusValue(DATA[idx][5], DATA[idx][12]);
   TX_DATA.unshift({ id: Date.now(), ma:r[1], ten:r[2], sh:r[0], nv, qty:-qty, gia:0, ghi:`[NHẬP HÀNG] ${ghi || "Nhập thêm vào kho"}`, img:"", time:formatTxTime(new Date()), branch:r[13] || "Q2" });
   closeOverlay("restockOverlay");
-  const [dataSaved, txSaved] = await Promise.all([saveData(), saveTX()]);
+  const [dataSaved, txSaved] = await Promise.all([
+    saveProductRow(DATA[idx], r[1], r[13] || "Q2"),
+    saveTX()
+  ]);
   render();
   showToast(dataSaved && txSaved ? `✅ Đã nhập thêm ${qty}: ${r[2]}` : "⚠️ Phiếu nhập đã lưu trên máy và đang chờ đồng bộ lên Sheet.", 4200);
 }
@@ -3771,8 +3777,10 @@ async function saveSale(){ if(!requireAdmin()) return;
   DATA[idx][6] = getStockStatusValue(DATA[idx][5], DATA[idx][12]);
   TX_DATA.unshift({ id: Date.now(), ma: r[1], ten: r[2], sh: r[0], nv, qty, gia, ghi, img, time: formatTxTime(new Date()), branch: r[13] || "Q2" });
   closeOverlay("saleOverlay");
-  const dataSaved = await saveData();
-  const txSaved = await saveTX();
+  const [dataSaved, txSaved] = await Promise.all([
+    saveProductRow(DATA[idx], r[1], r[13] || "Q2"),
+    saveTX()
+  ]);
   render();
   showToast(dataSaved && txSaved ? `✅ Đã ghi giao dịch: ${r[2]} x${qty}` : "⚠️ Giao dịch đã lưu trên máy và đang chờ đồng bộ lên Sheet.", 4200);
 }
@@ -4082,7 +4090,7 @@ async function deleteTX(id){ if(!requireAdmin()) return;
   if(idx >= 0 && qty > 0){
     DATA[idx][5] = (Number(DATA[idx][5]) || 0) + qty;
     DATA[idx][6] = getStockStatusValue(DATA[idx][5], DATA[idx][12]);
-    await saveData();
+    await saveProductRow(DATA[idx], DATA[idx][1], DATA[idx][13] || "Q2");
     render();
   }
   await saveTX();
@@ -5139,6 +5147,38 @@ function setLoadingUI(pct, step){
     </div>`;
 }
 
+// Đồng bộ nền an toàn giữa nhiều thiết bị. Chỉ kéo dữ liệu mới khi trang đang rảnh
+// và không có bất kỳ thay đổi cục bộ nào đang chờ gửi, tránh ghi đè thao tác của Admin.
+let backgroundSyncRunning = false;
+async function syncFromServerIfIdle(){
+  if(backgroundSyncRunning || !SHEET_API_URL || document.hidden || !navigator.onLine) return;
+  if(document.querySelector(".overlay.open") || document.body.classList.contains("fab-menu-open")) return;
+  backgroundSyncRunning = true;
+  try{
+    // Ưu tiên đẩy bản cục bộ đang chờ trước, tuyệt đối không kéo dữ liệu máy chủ
+    // về đè lên thay đổi chưa gửi của thiết bị này.
+    if(hasPendingSync()) await saveData();
+    if(hasAuxPendingSync(PENDING_TX_SYNC_KEY)) await saveTX();
+    if(hasAuxPendingSync(PENDING_NV_SYNC_KEY)) await saveNV();
+    if(hasPendingSync() || hasAuxPendingSync(PENDING_TX_SYNC_KEY) || hasAuxPendingSync(PENDING_NV_SYNC_KEY)) return;
+    await loadData();
+    await Promise.all([loadTXFromSheet(), loadNVFromSheet(), loadDisplayConfig()]);
+    refreshLatestItemsTicker();
+    render();
+  }catch(e){
+    console.warn("Lỗi đồng bộ nền:", e);
+  }finally{
+    backgroundSyncRunning = false;
+  }
+}
+function startBackgroundSync(){
+  setInterval(syncFromServerIfIdle, 60000);
+  window.addEventListener("online", ()=>setTimeout(syncFromServerIfIdle, 800));
+  document.addEventListener("visibilitychange", ()=>{
+    if(!document.hidden) setTimeout(syncFromServerIfIdle, 500);
+  });
+}
+
 (async function init(){
   showLastSync();
   setLoadingUI(5, "Đang khởi động kho hàng...");
@@ -5154,12 +5194,16 @@ function setLoadingUI(pct, step){
   await loadNVFromSheet();
   await loadDisplayConfig();
   refreshLatestItemsTicker();
+  // Nếu lần lưu sản phẩm trước bị mất mạng, loadData đã giữ bản cục bộ mới nhất;
+  // tự gửi lại ngay thay vì buộc người dùng bấm "Đẩy lên Sheet".
+  if(hasPendingSync()) await saveData();
   if(hasAuxPendingSync(PENDING_TX_SYNC_KEY)) await saveTX();
   if(hasAuxPendingSync(PENDING_NV_SYNC_KEY)) await saveNV();
   setLoadingUI(100, "Hoàn tất! Đang hiển thị kho hàng...");
   await new Promise(r => setTimeout(r, 400));
   syncStatusButtons(totalStockView ? currentStatus : "");
   render();
+  startBackgroundSync();
 })();
 </script>
 </body>
