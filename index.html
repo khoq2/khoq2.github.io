@@ -113,7 +113,7 @@ body { font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif
 .nguoi-ban-row { display: flex; align-items: center; gap: 6px; margin-top: 6px; padding: 5px 8px; background: #F4F6F9; border-radius: 8px; cursor: pointer; font-size: 12px; color: #555; }
 .nguoi-ban-row:active { background: #E8ECF1; }
 .nguoi-ban-label { font-weight: bold; color: #1E3A5F; flex: 1; }
-.nguoi-ban-count { color: #2E86C1; font-size: 11px; font-weight: bold; }
+.nguoi-ban-count { color: #2E86C1; font-size: 11px; font-weight: bold; max-width: 68%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .tx-summary { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; background: #EBF5FB; padding: 10px 12px; border-radius: 10px; margin-bottom: 10px; font-size: 12px; }
 .tx-summary-item { min-width: 0; }
 .tx-summary-label { display: block; font-size: 10px; color: #6C7A89; margin-bottom: 2px; }
@@ -209,6 +209,7 @@ mark.kw-hit { background: #FFEB3B; color: #1A1A1A; padding: 0 1px; border-radius
 .form-row label { font-size: 12px; color: #555; font-weight: bold; display: block; margin-bottom: 4px; }
 .form-row input,.form-row select,.form-row textarea { width: 100%; border: 1.5px solid #ddd; border-radius: 10px; padding: 10px 12px; font-size: 14px; outline: none; background: #fafafa; color: #1a1a1a; }
 .form-row input:focus,.form-row select:focus { border-color: #1E3A5F; background: #fff; }
+.form-row input.input-code-conflict { border-color: #C0392B !important; background: #FFF5F5 !important; box-shadow: 0 0 0 3px rgba(192,57,43,.13); }
 .code-existing-hint { margin-top:5px; font-size:10.5px; line-height:1.45; color:#6C7A89; word-break:break-word; }
 .code-existing-hint b { color:#1A5276; }
 .form-row textarea { resize: vertical; min-height: 60px; }
@@ -664,7 +665,7 @@ button:not(:disabled):hover::after,a:hover::after,[role="button"]:hover::after,.
     <div class="form-2col">
       <div class="form-row">
         <label>Chi nhánh *</label>
-        <select id="fBranch"><option value="Q2">📍 Q2</option><option value="Q5">📍 Q5</option></select>
+        <select id="fBranch" onchange="checkProductCodeDuplicate()"><option value="Q2">📍 Q2</option><option value="Q5">📍 Q5</option></select>
       </div>
       <div class="form-row">
         <label>Danh mục *</label>
@@ -677,7 +678,7 @@ button:not(:disabled):hover::after,a:hover::after,[role="button"]:hover::after,.
       </div>
       <div class="form-row">
         <label>Mã hàng *</label>
-      <input type="text" id="fMa" list="fMaSuggestions" placeholder="VD: CPU001" onfocus="updateProductCodeSuggestions()">
+      <input type="text" id="fMa" list="fMaSuggestions" placeholder="VD: CPU001" onfocus="updateProductCodeSuggestions();checkProductCodeDuplicate()" oninput="checkProductCodeDuplicate()" autocomplete="off">
       <datalist id="fMaSuggestions"></datalist>
       <div id="fMaExistingHint" class="code-existing-hint"></div>
       </div>
@@ -2821,6 +2822,11 @@ function renderCard(r,i,displayNo){
   const stFg=isHet?"#922B21":isSap?"#7D6608":"#1E8449";
   const stTxt=getStockStatusLabel(ton, sapHet);
   const condition = detectConditionLabel([ten, th, ghi].filter(Boolean).join(" "));
+  const productTransactions = getTransactionsForProduct(r);
+  const latestTransaction = productTransactions[0];
+  const latestTransactionText = latestTransaction
+    ? `${latestTransaction.nv || "Chưa rõ nhân viên"} · ${formatTxTime(latestTransaction.time) || "Chưa rõ thời gian"}`
+    : "Xem lịch sử ›";
   const imgHtml = img
     ? `<img class="prod-img" src="${escapeHtml(img)}" alt="${escapeHtml(ten)}" referrerpolicy="no-referrer" onclick="openImageViewer(this.src, this.alt)" onerror="this.outerHTML='<div class=\\'prod-img prod-img-ph\\' title=\\'Không tải được ảnh\\'>💻</div>';" />`
     : `<div class="prod-img prod-img-ph" title="Chưa có ảnh sản phẩm">💻</div>`;
@@ -2873,8 +2879,8 @@ function renderCard(r,i,displayNo){
         <button class="btn-ton btn-plus admin-only" onclick="changeTon(${i},1)">+</button>
       </div>
       <div class="nguoi-ban-row" onclick="showTxHistory(${i})">
-        👤 <span class="nguoi-ban-label">Người bán</span>
-        <span class="nguoi-ban-count">${TX_DATA.filter(t=>t.ma===ma).length > 0 ? TX_DATA.filter(t=>t.ma===ma).length+" giao dịch ›" : "Xem lịch sử ›"}</span>
+        👤 <span class="nguoi-ban-label">${latestTransaction ? "Giao dịch gần nhất" : "Người bán"}</span>
+        <span class="nguoi-ban-count" title="${escapeHtml(latestTransactionText)}">${escapeHtml(latestTransactionText)}</span>
       </div>
       <div class="card-actions admin-only">
         <button class="btn-edit" onclick="openEditModal(${i})">✏️ Sửa</button>
@@ -3678,6 +3684,12 @@ function formatTxTime(value){
   return `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
 }
 
+function getTransactionsForProduct(row){
+  const code = String(row?.[1] || "").trim();
+  const branch = String(row?.[13] || "Q2").trim().toUpperCase() === "Q5" ? "Q5" : "Q2";
+  return TX_DATA.filter(tx=>String(tx.ma || "").trim() === code && (String(tx.branch || "Q2").trim().toUpperCase() === "Q5" ? "Q5" : "Q2") === branch);
+}
+
 function getStockState(ton, lowLimit=2){
   ton = Number(ton) || 0;
   if(ton <= 0) return "HET";
@@ -3738,7 +3750,7 @@ function renderTxHistory(){
   const idx = TX_HISTORY_STATE.idx;
   if(idx < 0 || !DATA[idx]) return;
   const r = DATA[idx];
-  const txs = TX_DATA.filter(t=>t.ma===r[1]);
+  const txs = getTransactionsForProduct(r);
   const filtered = txHistoryFilteredRows(txs);
   const nvOptions = [...new Set(txs.map(t=>t.nv).filter(Boolean))];
   document.getElementById("txModalTitle").textContent = `📋 ${r[2]}`;
@@ -4045,6 +4057,37 @@ function updateProductCodeSuggestions(){
   hint.innerHTML = `<b>${codes.length} mã đã có:</b> ${escapeHtml(preview)}${codes.length>16 ? " …" : ""}`;
 }
 
+function normalizeProductCode(value){
+  return String(value || "").trim().replace(/\s+/g, "").toUpperCase();
+}
+function checkProductCodeDuplicate(){
+  const input = document.getElementById("fMa");
+  const hint = document.getElementById("fMaExistingHint");
+  const branch = document.getElementById("fBranch")?.value || "Q2";
+  const editingIndex = document.getElementById("editIdx")?.value;
+  const editIndexNumber = editingIndex === "" ? -1 : Number(editingIndex);
+  const codeKey = normalizeProductCode(input?.value);
+  if(!input || !hint) return false;
+  input.classList.remove("input-code-conflict");
+  input.removeAttribute("aria-invalid");
+  if(!codeKey) return false;
+  const sameBranch = DATA.findIndex((row,index)=>index !== editIndexNumber
+    && normalizeProductCode(row[1]) === codeKey
+    && String(row[13] || "Q2") === branch);
+  if(sameBranch >= 0){
+    const item = DATA[sameBranch];
+    input.classList.add("input-code-conflict");
+    input.setAttribute("aria-invalid", "true");
+    hint.innerHTML = `⚠️ <b style="color:#C0392B;">Mã đã tồn tại tại ${escapeHtml(branch)}:</b> ${escapeHtml(item[2] || "Chưa có tên")}. Hãy đổi mã khác.`;
+    return true;
+  }
+  const otherBranch = DATA.find(row=>normalizeProductCode(row[1]) === codeKey && String(row[13] || "Q2") !== branch);
+  if(otherBranch){
+    hint.innerHTML = `ℹ️ Mã này đang có ở ${escapeHtml(otherBranch[13] || "Q2")}: ${escapeHtml(otherBranch[2] || "Chưa có tên")}. Có thể dùng ở ${escapeHtml(branch)} nếu là hàng riêng chi nhánh.`;
+  }
+  return false;
+}
+
 function updateBrandSuggestions(){
   const brandsByKey = new Map();
   DATA.forEach(row=>{
@@ -4128,7 +4171,7 @@ function openAddModal(){ if(!requireAdmin()) return;
   document.getElementById("fBranch").value = "Q2"; document.getElementById("fSheet").value = "MT"; document.getElementById("fMa").value = ""; document.getElementById("fTen").value = "";
   document.getElementById("fTH").value = ""; setVndInputValue("fGia", 0); setVndInputValue("fGiaBan", 0);
   document.getElementById("fTon").value = "0"; document.getElementById("fSapHet").value = "2"; document.getElementById("fTT").value = "HẾT HÀNG";
-  document.getElementById("fGhi").value = ""; document.getElementById("fVitri").value = ""; document.getElementById("fImgFile").value = ""; setImagePreview(""); updateLocationSuggestions(); updateGroupOptions(""); updateBrandSuggestions();
+  document.getElementById("fGhi").value = ""; document.getElementById("fVitri").value = ""; document.getElementById("fImgFile").value = ""; setImagePreview(""); updateLocationSuggestions(); updateGroupOptions(""); updateBrandSuggestions(); checkProductCodeDuplicate();
   document.getElementById("editOverlay").classList.add("open");
 }
 function openEditModal(idx){ if(!requireAdmin()) return;
@@ -4140,13 +4183,13 @@ function openEditModal(idx){ if(!requireAdmin()) return;
   setVndInputValue("fGia", r[4]); setVndInputValue("fGiaBan", r[10]||0);
   document.getElementById("fTon").value = r[5]; document.getElementById("fSapHet").value = r[12] || 2; document.getElementById("fTT").value = getStockStatusValue(r[5], r[12]);
   document.getElementById("fGhi").value = parts.note || ""; document.getElementById("fVitri").value = parts.location || ""; document.getElementById("fImgFile").value = ""; document.getElementById("fQuickTagNew").value = "";
-  setImagePreview(r[9]||""); updateLocationSuggestions(); updateGroupOptions(r[8]||""); updateQuickTagOptions(r[11]||""); updateBrandSuggestions(); document.getElementById("editOverlay").classList.add("open");
+  setImagePreview(r[9]||""); updateLocationSuggestions(); updateGroupOptions(r[8]||""); updateQuickTagOptions(r[11]||""); updateBrandSuggestions(); checkProductCodeDuplicate(); document.getElementById("editOverlay").classList.add("open");
 }
 async function saveItem(){ if(!requireAdmin()) return;
   const sh = document.getElementById("fSheet").value.trim(), ma = document.getElementById("fMa").value.trim(), ten = document.getElementById("fTen").value.trim(), th = document.getElementById("fTH").value.trim(), gia = parseVndInput(document.getElementById("fGia").value), giaBan = parseVndInput(document.getElementById("fGiaBan").value), ton = Math.max(0, parseInt(document.getElementById("fTon").value)||0), sapHet = Math.max(1, parseInt(document.getElementById("fSapHet").value)||2), tt = document.getElementById("fTT").value, ghiNote = document.getElementById("fGhi").value.trim(), vitri = document.getElementById("fVitri").value.trim(), img = document.getElementById("fImg").value || "", idx = document.getElementById("editIdx").value, grp = joinRowGroups(getSelectedFormGroups()), quickTag = joinRowQuickTags(getSelectedQuickTags());
   if(!ma||!ten){alert("Vui lòng nhập Mã hàng và Tên sản phẩm!"); return;}
   const idxNum = idx === "" ? -1 : parseInt(idx);
-  const dupIdx = DATA.findIndex((row,i) => row[1] === ma && (row[13]||"Q2") === document.getElementById("fBranch").value && i !== idxNum);
+  const dupIdx = DATA.findIndex((row,i) => normalizeProductCode(row[1]) === normalizeProductCode(ma) && (row[13]||"Q2") === document.getElementById("fBranch").value && i !== idxNum);
   if(dupIdx !== -1){
     alert(`⚠️ Mã hàng "${ma}" đã được dùng cho sản phẩm "${DATA[dupIdx][2]}". Vui lòng đổi mã khác để tránh lẫn lộn tồn kho và lịch sử giao dịch.`);
     return;
@@ -4154,7 +4197,7 @@ async function saveItem(){ if(!requireAdmin()) return;
   const oldRow = idxNum >= 0 ? DATA[idxNum] : null;
   const oldCode = idxNum >= 0 ? String(oldRow?.[1] || "") : "";
   const oldBranch = idxNum >= 0 ? String(oldRow?.[13] || "Q2") : String(document.getElementById("fBranch").value || "Q2");
-  if(ma !== oldCode && TX_DATA.some(tx=>String(tx.ma || "") === ma && String(tx.branch || "Q2") === document.getElementById("fBranch").value)){
+  if(normalizeProductCode(ma) !== normalizeProductCode(oldCode) && TX_DATA.some(tx=>normalizeProductCode(tx.ma) === normalizeProductCode(ma) && String(tx.branch || "Q2") === document.getElementById("fBranch").value)){
     alert(`⚠️ Mã hàng "${ma}" đã tồn tại trong lịch sử giao dịch. Không thể dùng lại mã này cho sản phẩm khác để tránh sai tồn kho.`);
     return;
   }
