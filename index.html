@@ -1403,6 +1403,22 @@ async function postSheet(action, data){
     body: JSON.stringify({action, data})
   });
 }
+async function saveProductRow(row, oldCode="", oldBranch="Q2"){
+  try{ safeLocalStorageSet("kho_cntt_data", JSON.stringify(normalizeSheetRows(DATA))); }catch(e){}
+  if(!SHEET_API_URL) return true;
+  setPendingSync(true, "Đang chờ đồng bộ sản phẩm");
+  try{
+    await postSheet("upsert_product", {row: normalizeSheetRows([row])[0], oldCode, oldBranch});
+    setPendingSync(false); setSyncBadge("synced"); markLastSync();
+    return true;
+  }catch(e){ setSyncBadge("error", String(e)); return false; }
+}
+async function deleteProductRow(code, branch){
+  if(!SHEET_API_URL) return true;
+  setPendingSync(true, "Đang chờ xóa sản phẩm");
+  try{ await postSheet("delete_product", {code, branch}); setPendingSync(false); setSyncBadge("synced"); markLastSync(); return true; }
+  catch(e){ setSyncBadge("error", String(e)); return false; }
+}
 
 async function loadData(){
   loadLocal();
@@ -3249,15 +3265,17 @@ function changeTon(idx, delta){
   showToast(`${actualDelta > 0 ? "+" : ""}${actualDelta} tồn kho: ${r[2]}`);
 }
 
-function deleteItem(idx){
+async function deleteItem(idx){
   if(!requireAdmin()) return;
   if(!confirm(`Xóa "${DATA[idx][2]}"?`)) return;
+  const item = DATA[idx];
   DATA.splice(idx,1);
   selectedItems.clear();
   bulkSelectMode = false;
-  saveData();
+  try{ safeLocalStorageSet("kho_cntt_data", JSON.stringify(normalizeSheetRows(DATA))); }catch(e){}
+  const deleted = await deleteProductRow(item[1], item[13] || "Q2");
   render();
-  showToast("Đã xóa thiết bị");
+  showToast(deleted ? "Đã xóa thiết bị" : "⚠️ Đã xóa trên máy, đang chờ đồng bộ lên Sheet.", 4200);
 }
 
 async function resetToDefault(){
@@ -4017,7 +4035,8 @@ if(idx===""){
   showToast("Đã lưu: "+ten);
 }
 
-await saveData();
+const saved = await saveProductRow(row, oldCode, idxNum >= 0 ? (DATA[idxNum]?.[13] || "Q2") : (row[13] || "Q2"));
+if(!saved) showToast("⚠️ Sản phẩm đã lưu trên máy, đang chờ đồng bộ lên Sheet.", 4200);
 
 closeOverlay("editOverlay");
 currentBranch = row[13] || "Q2";
