@@ -1411,12 +1411,12 @@ function sheetUrl(params){
   return SHEET_API_URL + "?" + new URLSearchParams(params).toString();
 }
 
-async function postSheet(action, data){
+async function postSheet(action, data, timeoutMs=SHEET_TIMEOUT_MS){
   return fetchSheetJson(SHEET_API_URL, {
     method: "POST",
     headers: {"Content-Type": "text/plain;charset=utf-8"},
     body: JSON.stringify({action, data})
-  });
+  }, timeoutMs);
 }
 async function saveProductRow(row, oldCode="", oldBranch="Q2"){
   try{ safeLocalStorageSet("kho_cntt_data", JSON.stringify(normalizeSheetRows(DATA))); }catch(e){}
@@ -1990,13 +1990,30 @@ function saveDisplayConfig(){
   }catch(e){}
   if(!SHEET_API_URL) return Promise.resolve(true);
   const snapshot = {quickOrder: QUICK_ORDER, groupOrder: GROUP_ORDER, customQuickTags: QUICK_CUSTOM_TAGS, itemCreatedAt: ITEM_CREATED_AT};
-  configSaveChain = configSaveChain.then(()=>postSheet("save_config", snapshot).then(()=>true).catch(e=>{ console.warn("Lỗi lưu thứ tự hiển thị:",e); return false; }));
+  configSaveChain = configSaveChain.then(async ()=>{
+    setSyncBadge("syncing");
+    try{
+      await postSheet("save_config", snapshot, 35000);
+      setSyncBadge("synced"); markLastSync();
+      return true;
+    }catch(e){
+      console.warn("Lỗi lưu thứ tự hiển thị:",e);
+      setSyncBadge("error", String(e));
+      return false;
+    }
+  });
   return configSaveChain;
 }
 async function loadDisplayConfig(){
   if(!SHEET_API_URL) return;
   try{
-    const json = await fetchSheetJson(sheetUrl({type:"config", _ts:Date.now()}));
+    let json;
+    try{
+      json = await fetchSheetJson(sheetUrl({type:"config", _ts:Date.now()}), {}, 35000);
+    }catch(firstError){
+      // Apps Script có thể khởi động chậm ở máy/lần truy cập đầu tiên: thử lại một lần.
+      json = await fetchSheetJson(sheetUrl({type:"config", _ts:Date.now()}), {}, 35000);
+    }
     if(json.config?.quickOrder && typeof json.config.quickOrder === "object") QUICK_ORDER = json.config.quickOrder;
     if(json.config?.groupOrder && typeof json.config.groupOrder === "object") GROUP_ORDER = json.config.groupOrder;
     if(json.config?.customQuickTags && typeof json.config.customQuickTags === "object") QUICK_CUSTOM_TAGS = json.config.customQuickTags;
