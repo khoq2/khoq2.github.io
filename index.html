@@ -765,6 +765,7 @@ body.admin-mode .customer-admin-login { display:none; }
 .customer-editor label { display:grid; gap:4px; color:#52606D; font-size:11px; font-weight:850; }
 .customer-editor input,.customer-editor textarea,.customer-editor select { width:100%; min-height:42px; padding:9px 10px; border:1.5px solid #D5DBDB; border-radius:9px; background:#fff; color:#2C3E50; font-size:16px; outline:none; }
 .customer-editor textarea { min-height:76px; resize:vertical; }
+.customer-editor textarea.customer-drive-links { min-height:238px; line-height:1.55; }
 .customer-editor .wide { grid-column:1/-1; }
 @media (max-width:520px) {
   .customer-modal { max-height:94dvh; padding-left:11px; padding-right:11px; }
@@ -1116,9 +1117,10 @@ body.admin-mode .customer-admin-login { display:none; }
       <div class="customer-editor-grid">
         <label>Thiết bị<input id="customerRecordDevice" type="text" placeholder="VD: Laptop Dell Inspiron"></label>
         <label>Chi nhánh<select id="customerRecordBranch"><option value="Q2">Q2</option><option value="Q5">Q5</option></select></label>
+        <label class="wide">Ngày giờ khách đến / thực hiện *<input id="customerRecordTime" type="datetime-local"></label>
         <label class="wide">Đã làm / sửa gì *<textarea id="customerRecordWork" placeholder="VD: Thay SSD 256GB, cài Windows..."></textarea></label>
-        <label class="wide">Link ảnh bill Google Drive<textarea id="customerRecordImages" placeholder="Mỗi link một dòng"></textarea></label>
-        <label class="wide">Ghi chú lần này<textarea id="customerRecordNote" placeholder="Bảo hành, tình trạng máy, lưu ý cho lần sau..."></textarea></label>
+        <label class="wide">Link ảnh bill Google Drive <span style="font-weight:normal;color:#7B8A97">(tối đa 10 ảnh, mỗi link một dòng)</span><textarea id="customerRecordImages" class="customer-drive-links" rows="10" placeholder="Link ảnh 1&#10;Link ảnh 2&#10;Link ảnh 3&#10;Link ảnh 4&#10;Link ảnh 5&#10;Link ảnh 6&#10;Link ảnh 7&#10;Link ảnh 8&#10;Link ảnh 9&#10;Link ảnh 10"></textarea></label>
+        <label class="wide">Ghi chú riêng của lần sửa này<textarea id="customerRecordNote" placeholder="Bảo hành, tình trạng máy, lỗi khách báo, lưu ý cho lần sau..."></textarea></label>
         <label>Nhân viên<input id="customerRecordEmployee" type="text" list="customerEmployeeSuggestions" placeholder="Người thực hiện"></label>
         <datalist id="customerEmployeeSuggestions"></datalist>
       </div>
@@ -4980,14 +4982,28 @@ async function openCustomerDetail(phone){
   }
 }
 function splitCustomerImages(value){
-  return String(value || "").split(/\r?\n/).map(v=>v.trim()).filter(Boolean).slice(0,20);
+  return String(value || "").split(/\r?\n/).map(v=>v.trim()).filter(Boolean).slice(0,10);
+}
+function customerNowLocalValue(){
+  const now=new Date();
+  return new Date(now.getTime()-now.getTimezoneOffset()*60000).toISOString().slice(0,16);
+}
+function customerTimeInputValue(value){
+  const text=String(value || "").trim();
+  const match=text.match(/^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2})/);
+  return match ? `${match[1]}-${match[2]}-${match[3]}T${match[4]}:${match[5]}` : customerNowLocalValue();
+}
+function formatCustomerRecordTime(value){
+  const text=String(value || "").trim();
+  const match=text.match(/^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2})/);
+  return match ? `${match[3]}/${match[2]}/${match[1]} · ${match[4]}:${match[5]}` : (text || "Chưa rõ thời gian");
 }
 function renderCustomerDetail(loading=false){
   if(!selectedCustomer) return;
   const c=selectedCustomer;
   const recordsHtml = loading ? '<div class="customer-empty">⏳ Đang tải lịch sử bill...</div>' : (CUSTOMER_RECORDS.length ? CUSTOMER_RECORDS.map(record=>{
     const images=splitCustomerImages(record.images);
-    return `<article class="customer-record ${record.status==="CANCELLED"?"cancelled":""}"><div class="customer-record-head"><span>${escapeHtml(record.time || "Chưa rõ thời gian")} · ${escapeHtml(record.branch || "Q2")}</span><span>${escapeHtml(record.employee || "")}${record.status==="CANCELLED"?" · ĐÃ HỦY":""}</span></div><div class="customer-record-device">${escapeHtml(record.device || "Thiết bị chưa ghi tên")}</div><div class="customer-record-work">${escapeHtml(record.work || "Chưa ghi nội dung đã làm")}</div>${record.note?`<div class="customer-record-note">📝 ${escapeHtml(record.note)}</div>`:""}${images.length?`<div class="customer-bill-grid">${images.map(url=>`<img class="customer-bill-img" src="${escapeHtml(resolveImageUrl(url))}" data-full="${escapeHtml(resolveImageUrl(url))}" alt="Ảnh bill" loading="lazy" referrerpolicy="no-referrer" onclick="openCustomerBillImage(this)">`).join("")}</div>`:""}<div class="customer-toolbar admin-only"><button type="button" class="customer-secondary" data-record-id="${escapeHtml(record.id)}" onclick="openCustomerRecordEditor(this.dataset.recordId)">✏️ Sửa hồ sơ</button></div></article>`;
+    return `<article class="customer-record ${record.status==="CANCELLED"?"cancelled":""}"><div class="customer-record-head"><span>🕒 ${escapeHtml(formatCustomerRecordTime(record.time))} · ${escapeHtml(record.branch || "Q2")}</span><span>${escapeHtml(record.employee || "")}${record.status==="CANCELLED"?" · ĐÃ HỦY":""}</span></div><div class="customer-record-device">${escapeHtml(record.device || "Thiết bị chưa ghi tên")}</div><div class="customer-record-work">${escapeHtml(record.work || "Chưa ghi nội dung đã làm")}</div>${record.note?`<div class="customer-record-note">📝 ${escapeHtml(record.note)}</div>`:""}${images.length?`<div class="customer-bill-grid">${images.map(url=>`<img class="customer-bill-img" src="${escapeHtml(resolveImageUrl(url))}" data-full="${escapeHtml(resolveImageUrl(url))}" alt="Ảnh bill" loading="lazy" referrerpolicy="no-referrer" onclick="openCustomerBillImage(this)">`).join("")}</div>`:""}<div class="customer-toolbar admin-only"><button type="button" class="customer-secondary" data-record-id="${escapeHtml(record.id)}" onclick="openCustomerRecordEditor(this.dataset.recordId)">✏️ Sửa hồ sơ</button></div></article>`;
   }).join("") : '<div class="customer-empty">Khách này chưa có bill hoặc lịch sử sửa chữa.</div>');
   document.getElementById("customerDetail").innerHTML=`<div class="customer-profile"><div class="customer-profile-name">${escapeHtml(c.name || "KHÁCH CHƯA GHI TÊN")}</div><div class="customer-profile-phone">☎ ${escapeHtml(formatCustomerPhone(c.phone))}</div>${c.note?`<div class="customer-profile-note">${escapeHtml(c.note)}</div>`:""}</div><div class="customer-toolbar admin-only"><button type="button" class="customer-secondary" onclick="openCustomerEditor('${c.phone}')">✏️ Sửa khách</button><button type="button" class="customer-primary" onclick="openCustomerRecordEditor()">＋ Thêm bill / lần sửa</button></div><div class="customer-records">${recordsHtml}</div>`;
 }
@@ -5034,6 +5050,7 @@ function openCustomerRecordEditor(recordId=""){
   document.getElementById("customerRecordNote").value=record?.note || "";
   document.getElementById("customerRecordEmployee").value=record?.employee || "";
   document.getElementById("customerRecordBranch").value=record?.branch || "Q2";
+  document.getElementById("customerRecordTime").value=customerTimeInputValue(record?.time);
   document.getElementById("customerEmployeeSuggestions").innerHTML=NV_LIST.map(n=>`<option value="${escapeHtml(getNVName(n))}"></option>`).join("");
   document.getElementById("customerRecordEditor").classList.add("open");
 }
@@ -5041,9 +5058,13 @@ async function saveCustomerRecord(){
   if(!requireAdmin() || customerSaving || !selectedCustomer) return;
   const work=document.getElementById("customerRecordWork").value.trim();
   if(!work){ alert("Vui lòng ghi nội dung đã làm hoặc sửa chữa!"); return; }
+  const imageLinks=String(document.getElementById("customerRecordImages").value || "").split(/\r?\n/).map(v=>v.trim()).filter(Boolean);
+  if(imageLinks.length>10){ alert("Mỗi lần sửa chỉ lưu tối đa 10 link ảnh Google Drive!"); return; }
+  const recordTime=document.getElementById("customerRecordTime").value;
+  if(!recordTime){ alert("Vui lòng chọn ngày giờ khách đến hoặc thực hiện!"); return; }
   customerSaving=true;
   try{
-    await postSheet("upsert_customer_record",{id:document.getElementById("customerRecordId").value,phone:selectedCustomer.phone,device:document.getElementById("customerRecordDevice").value.trim(),work,images:document.getElementById("customerRecordImages").value.trim(),note:document.getElementById("customerRecordNote").value.trim(),employee:document.getElementById("customerRecordEmployee").value.trim(),branch:document.getElementById("customerRecordBranch").value},35000);
+    await postSheet("upsert_customer_record",{id:document.getElementById("customerRecordId").value,phone:selectedCustomer.phone,device:document.getElementById("customerRecordDevice").value.trim(),work,images:imageLinks.join("\n"),note:document.getElementById("customerRecordNote").value.trim(),employee:document.getElementById("customerRecordEmployee").value.trim(),branch:document.getElementById("customerRecordBranch").value,time:recordTime.replace("T"," ")},35000);
     closeCustomerEditors();
     await openCustomerDetail(selectedCustomer.phone);
     showToast("✅ Đã lưu hồ sơ khách hàng");
