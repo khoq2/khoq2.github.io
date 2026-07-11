@@ -867,6 +867,18 @@ button:not(:disabled):hover::after,a:hover::after,[role="button"]:hover::after,.
   </div>
 </div>
 
+<div class="overlay" id="restockOverlay" onclick="overlayClose(event,'restockOverlay')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-title">📥 Nhập thêm hàng</div>
+    <input type="hidden" id="restockIdx">
+    <div class="form-row"><label>Người nhập</label><select id="restockNV" style="width:100%;padding:9px;border-radius:8px;border:1.5px solid #ddd;font-size:14px"><option value="">-- Chọn người nhập --</option></select></div>
+    <div class="form-row"><label>Số lượng nhập thêm *</label><input type="number" id="restockQty" value="1" min="1" inputmode="numeric"></div>
+    <div class="form-row"><label>Ghi chú</label><input type="text" id="restockGhi" placeholder="VD: Nhập NCC A, bổ sung kho, kiểm kê..."></div>
+    <button class="btn-submit" onclick="saveRestock()">📥 Xác nhận nhập hàng</button>
+    <button class="btn-cancel" onclick="closeOverlay('restockOverlay')">Huỷ</button>
+  </div>
+</div>
+
 <div class="overlay" id="txOverlay" onclick="overlayClose(event,'txOverlay')">
   <div class="modal" onclick="event.stopPropagation()" style="max-height: 80vh; overflow-y: auto;">
     <div class="modal-title" id="txModalTitle">📋 Lịch sử giao dịch</div>
@@ -2885,10 +2897,10 @@ function renderCard(r,i,displayNo){
         <span class="ton-val" style="color: ${isHet?"#C0392B":"#1a1a1a"};">${ton}</span>
         <button class="btn-location" type="button" title="${escapeHtml(location ? location : "Chưa có vị trí trong kho")}" onclick="showWarehouseLocation(${i})">📍 Vị trí trong kho${location ? `: ${escapeHtml(location)}` : ""}</button>
         <button class="btn-ton btn-minus admin-only" onclick="openSaleModal(${i})">−</button>
-        <button class="btn-ton btn-plus admin-only" onclick="changeTon(${i},1)">+</button>
+        <button class="btn-ton btn-plus admin-only" title="Nhập thêm hàng" aria-label="Nhập thêm hàng" onclick="openRestockModal(${i})">+</button>
       </div>
       <div class="nguoi-ban-row" onclick="showTxHistory(${i})">
-        👤 <span class="nguoi-ban-label">${latestTransaction ? "Giao dịch gần nhất" : "Người bán"}</span>
+        👤 <span class="nguoi-ban-label">${latestTransaction ? (getTransactionKind(latestTransaction)==="IMPORT" ? "Nhập thêm gần nhất" : "Giao dịch gần nhất") : "Người bán"}</span>
         <span class="nguoi-ban-count" title="${escapeHtml(latestTransactionText)}">${latestTransactionHtml}</span>
       </div>
       <div class="card-actions admin-only">
@@ -3539,8 +3551,8 @@ function removeNV(i){ if(!requireAdmin()) return;
   if(!confirm(`Xóa nhân viên "${NV_LIST[i]?.name || ""}"?`)) return;
   NV_LIST.splice(i,1); saveNV(); renderNVList();
 }
-function refreshNVSelect(){
-  const sel = document.getElementById("saleNV");
+function refreshNVSelect(selectId="saleNV"){
+  const sel = document.getElementById(selectId);
   if(!sel) return;
   NV_LIST = normalizeNVList(NV_LIST);
   sel.innerHTML = `<option value="">-- Chọn nhân viên --</option>` + NV_LIST.map(nv=>`<option value="${escapeHtml(nv.name)}">${escapeHtml(nv.name)}</option>`).join("");
@@ -3637,6 +3649,31 @@ function openSaleModal(idx){ if(!requireAdmin()) return;
   document.getElementById("saleImgFile").value = "";
   document.getElementById("saleOverlay").classList.add("open");
 }
+function openRestockModal(idx){ if(!requireAdmin()) return;
+  if(!DATA[idx]) return;
+  document.getElementById("restockIdx").value = idx;
+  refreshNVSelect("restockNV");
+  document.getElementById("restockQty").value = "1";
+  document.getElementById("restockGhi").value = "";
+  document.getElementById("restockOverlay").classList.add("open");
+}
+async function saveRestock(){ if(!requireAdmin()) return;
+  const idx = Number(document.getElementById("restockIdx").value);
+  const r = DATA[idx];
+  const nv = document.getElementById("restockNV").value.trim();
+  const qty = Math.max(0, parseInt(document.getElementById("restockQty").value) || 0);
+  const ghi = document.getElementById("restockGhi").value.trim();
+  if(!r) return;
+  if(!nv){ alert("Vui lòng chọn người nhập!"); return; }
+  if(!qty){ alert("Số lượng nhập phải lớn hơn 0!"); return; }
+  DATA[idx][5] = (Number(r[5]) || 0) + qty;
+  DATA[idx][6] = getStockStatusValue(DATA[idx][5], DATA[idx][12]);
+  TX_DATA.unshift({ id: Date.now(), ma:r[1], ten:r[2], sh:r[0], nv, qty:-qty, gia:0, ghi:`[NHẬP HÀNG] ${ghi || "Nhập thêm vào kho"}`, img:"", time:formatTxTime(new Date()), branch:r[13] || "Q2" });
+  closeOverlay("restockOverlay");
+  const [dataSaved, txSaved] = await Promise.all([saveData(), saveTX()]);
+  render();
+  showToast(dataSaved && txSaved ? `✅ Đã nhập thêm ${qty}: ${r[2]}` : "⚠️ Phiếu nhập đã lưu trên máy và đang chờ đồng bộ lên Sheet.", 4200);
+}
 async function saveSale(){ if(!requireAdmin()) return;
   const idx = parseInt(document.getElementById("saleIdx").value);
   const txId = document.getElementById("saleTxId").value;
@@ -3691,6 +3728,19 @@ function formatTxTime(value){
   if(isNaN(d.getTime())) return value || "";
   const pad = n => String(n).padStart(2, "0");
   return `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+}
+
+function getTransactionKind(tx){
+  const note = String(tx?.ghi || "").trim().toUpperCase();
+  if(note.startsWith("[NHẬP HÀNG]")) return "IMPORT";
+  if(note.startsWith("[ĐIỀU CHỈNH]")) return "ADJUST";
+  return "SALE";
+}
+function getTransactionKindLabel(tx){
+  const kind = getTransactionKind(tx);
+  if(kind === "IMPORT") return "📥 Nhập thêm hàng";
+  if(kind === "ADJUST") return "⚙️ Điều chỉnh kho";
+  return "🛒 Giao dịch bán";
 }
 
 function getTransactionsForProduct(row){
@@ -3811,25 +3861,28 @@ function renderTxHistory(){
     document.getElementById("txModalBody").innerHTML = filterBar + `<div style="text-align: center; padding: 20px; color: #888;">Chưa có giao dịch nào</div>`;
     return;
   }
-  const totalQty = filtered.reduce((s,t)=>s+t.qty,0);
-  const totalGia = filtered.reduce((s,t)=>s+t.gia*t.qty,0);
+  const soldRows = filtered.filter(t=>getTransactionKind(t)==="SALE");
+  const importedRows = filtered.filter(t=>getTransactionKind(t)==="IMPORT");
+  const totalSoldQty = soldRows.reduce((s,t)=>s + Math.abs(Number(t.qty) || 0),0);
+  const totalImportedQty = importedRows.reduce((s,t)=>s + Math.abs(Number(t.qty) || 0),0);
+  const totalGia = soldRows.reduce((s,t)=>s+(Number(t.gia)||0)*Math.abs(Number(t.qty)||0),0);
   const summary = `<div class="tx-summary">
       <div class="tx-summary-item"><span class="tx-summary-label">Hiển thị</span><span class="tx-summary-value">${filtered.length}</span></div>
-      <div class="tx-summary-item"><span class="tx-summary-label">Đã xuất</span><span class="tx-summary-value">${totalQty}</span></div>
+      <div class="tx-summary-item"><span class="tx-summary-label">Đã xuất / Đã nhập</span><span class="tx-summary-value">${totalSoldQty} / ${totalImportedQty}</span></div>
       <div class="tx-summary-item"><span class="tx-summary-label">Doanh thu</span><span class="tx-summary-value revenue">${fmt(totalGia)}</span></div>
     </div>`;
   const rows = filtered.length ? filtered.map(t=>`
         <div class="tx-row">
           <div class="tx-header">
-            <span class="tx-nv">${renderNVAvatar(t.nv)} ${escapeHtml(t.nv || "")}</span>
+            <span class="tx-nv">${renderNVAvatar(t.nv)} ${escapeHtml(t.nv || "")} <span class="tx-pill" style="margin-left:4px;${getTransactionKind(t)==="IMPORT" ? "background:#E8F8F0;color:#1E8449;" : getTransactionKind(t)==="ADJUST" ? "background:#FEF9E7;color:#7D6608;" : ""}">${getTransactionKindLabel(t)}</span></span>
             <div class="tx-head-right">
               <span class="tx-time">${formatTxTime(t.time)}</span>
               ${document.body.classList.contains("admin-mode")?`<button class="tx-action tx-edit" title="Sửa giao dịch" onclick="editTX('${escapeHtml(t.id)}')">✏️</button><button class="tx-action tx-delete" title="Xóa giao dịch" onclick="deleteTX('${escapeHtml(t.id)}')">🗑️</button>`:""}
             </div>
           </div>
           <div class="tx-meta">
-            <span class="tx-pill">SL: <b>${t.qty}</b></span>
-            <span class="tx-pill tx-price-pill">${t.gia>0?fmt(t.gia)+"/cái":"Không ghi giá"}</span>
+            <span class="tx-pill">${getTransactionKind(t)==="IMPORT" ? "Nhập" : getTransactionKind(t)==="ADJUST" ? "Điều chỉnh" : "Xuất"}: <b>${Math.abs(Number(t.qty) || 0)}</b></span>
+            ${getTransactionKind(t)==="SALE" ? `<span class="tx-pill tx-price-pill">${t.gia>0?fmt(t.gia)+"/cái":"Không ghi giá"}</span>` : ""}
           </div>
           ${t.ghi?`<span class="tx-note">📝 ${escapeHtml(t.ghi)}</span>`:""}
           ${t.img?`<img class="tx-img" src="${escapeHtml(t.img)}" alt="Ảnh giao dịch" referrerpolicy="no-referrer" onclick="openImageViewer(this.src, this.alt)" onerror="this.style.display='none';">`:""}
