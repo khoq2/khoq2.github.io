@@ -89,10 +89,14 @@ body { font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif
 .card-top-left { display: flex; align-items: center; gap: 6px; min-width: 0; flex-wrap: wrap; }
 .sheet-badge { background: var(--c); color: #fff; font-size: 10px; font-weight: bold; padding: 2px 7px; border-radius: 6px; margin-right: 6px; }
 .ma-code { font-size: 11px; color: #666; font-weight: bold; }
-.btn-copy-code { border: none; background: #F4F6F7; color: #1E3A5F; width: 26px; height: 26px; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; box-shadow: inset 0 -1px 0 rgba(0,0,0,.08); }
-.btn-copy-code span { display: block; font-size: 14px; line-height: 1; font-weight: 900; }
-.btn-copy-code.copied { background: #D5F5E3; color: #1E8449; }
-.btn-copy-code:active { transform: scale(.95); }
+.btn-copy-code { border: 1px solid rgba(30,58,95,.16); background: rgba(255,255,255,.72); color: #1E3A5F; width: 28px; height: 28px; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; box-shadow: 0 1px 2px rgba(30,58,95,.08), inset 0 1px 0 rgba(255,255,255,.9); transition: background .18s ease, border-color .18s ease, color .18s ease, box-shadow .18s ease, transform .18s ease; }
+.btn-copy-code:hover { background: #fff; border-color: rgba(30,58,95,.38); box-shadow: 0 3px 8px rgba(30,58,95,.14); transform: translateY(-1px); }
+.btn-copy-code svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
+.btn-copy-code .copy-check { opacity: 0; transform: scale(.75); transform-origin: center; transition: opacity .16s ease, transform .16s ease; }
+.btn-copy-code.copied { background: #E8F8F0; border-color: rgba(30,132,73,.35); color: #1E8449; }
+.btn-copy-code.copied .copy-sheets { opacity: 0; }
+.btn-copy-code.copied .copy-check { opacity: 1; transform: scale(1); }
+.btn-copy-code:active { transform: scale(.94); }
 .status-badge { font-size: 11px; font-weight: bold; padding: 3px 10px; border-radius: 12px; }
 .card-body { padding: 9px 12px; }
 .card-body-flex { display: flex; gap: 10px; align-items: flex-start; }
@@ -113,13 +117,15 @@ body { font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif
 .nguoi-ban-row { display: flex; align-items: center; gap: 6px; margin-top: 6px; padding: 5px 8px; background: #F4F6F9; border-radius: 8px; cursor: pointer; font-size: 12px; color: #555; }
 .nguoi-ban-row:active { background: #E8ECF1; }
 .nguoi-ban-label { font-weight: bold; color: #1E3A5F; flex: 1; }
-.nguoi-ban-count { color: #2E86C1; font-size: 11px; font-weight: bold; max-width: 68%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.nguoi-ban-count { color: #2E86C1; font-size: 11px; font-weight: bold; max-width: 68%; min-width: 0; display: flex; align-items: center; gap: 4px; overflow: hidden; }
+.nguoi-ban-count .nv-avatar-latest { width: 20px; height: 20px; min-width: 20px; font-size: 9px; }
+.nguoi-ban-latest-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .tx-summary { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; background: #EBF5FB; padding: 10px 12px; border-radius: 10px; margin-bottom: 10px; font-size: 12px; }
 .tx-summary-item { min-width: 0; }
 .tx-summary-label { display: block; font-size: 10px; color: #6C7A89; margin-bottom: 2px; }
 .tx-summary-value { display: block; font-size: 12px; font-weight: 700; color: #1E3A5F; }
 .tx-summary-value.revenue { color: #1E8449; }
-.tx-filter { display: grid; grid-template-columns: 1fr 1fr auto; gap: 8px; margin: 0 0 10px; }
+.tx-filter { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)) auto; gap: 8px; margin: 0 0 10px; }
 .tx-filter-field { display: grid; gap: 4px; min-width: 0; }
 .tx-filter-label { color: #607D8B; font-size: 11px; font-weight: 800; padding-left: 1px; }
 .tx-filter select, .tx-filter input { width: 100%; padding: 9px 10px; border-radius: 8px; border: 1.5px solid #D5DBDB; font-size: 13px; background: #fff; color: #2C3E50; }
@@ -2827,6 +2833,9 @@ function renderCard(r,i,displayNo){
   const latestTransactionText = latestTransaction
     ? `${latestTransaction.nv || "Chưa rõ nhân viên"} · ${formatTxTime(latestTransaction.time) || "Chưa rõ thời gian"}`
     : "Xem lịch sử ›";
+  const latestTransactionHtml = latestTransaction
+    ? `${renderNVAvatar(latestTransaction.nv, "nv-avatar-latest")}<span class="nguoi-ban-latest-text">${escapeHtml(latestTransactionText)}</span>`
+    : escapeHtml(latestTransactionText);
   const imgHtml = img
     ? `<img class="prod-img" src="${escapeHtml(img)}" alt="${escapeHtml(ten)}" referrerpolicy="no-referrer" onclick="openImageViewer(this.src, this.alt)" onerror="this.outerHTML='<div class=\\'prod-img prod-img-ph\\' title=\\'Không tải được ảnh\\'>💻</div>';" />`
     : `<div class="prod-img prod-img-ph" title="Chưa có ảnh sản phẩm">💻</div>`;
@@ -2855,7 +2864,7 @@ function renderCard(r,i,displayNo){
         <span class="sheet-badge" style="--c: ${cfg.c};">${cfg.label}</span>
         <span class="sheet-badge" style="--c: ${branchCfg.color};">${branchCfg.label}</span>
         <span class="ma-code">${highlightMatch(ma, kwTokens)}</span>
-        <button class="btn-copy-code" type="button" data-code="${escapeHtml(ma)}" title="Copy mã hàng" aria-label="Copy mã hàng" onclick="copyProductCode(this)"><span>⧉</span></button>
+        <button class="btn-copy-code" type="button" data-code="${escapeHtml(ma)}" data-copy-label="mã hàng" title="Sao chép mã hàng" aria-label="Sao chép mã hàng" onclick="copyProductCode(this)"><svg viewBox="0 0 24 24" aria-hidden="true"><g class="copy-sheets"><rect x="8" y="8" width="10" height="11" rx="1.5"></rect><path d="M16 8V6.5A1.5 1.5 0 0 0 14.5 5H7.5A1.5 1.5 0 0 0 6 6.5v9A1.5 1.5 0 0 0 7.5 17H8"></path></g><path class="copy-check" d="m7.5 12.2 3 3 6-6.5"></path></svg></button>
       </div>
       <span class="status-badge" style="background: ${stBg}; color: ${stFg};">${stTxt}</span>
     </div>
@@ -2880,7 +2889,7 @@ function renderCard(r,i,displayNo){
       </div>
       <div class="nguoi-ban-row" onclick="showTxHistory(${i})">
         👤 <span class="nguoi-ban-label">${latestTransaction ? "Giao dịch gần nhất" : "Người bán"}</span>
-        <span class="nguoi-ban-count" title="${escapeHtml(latestTransactionText)}">${escapeHtml(latestTransactionText)}</span>
+        <span class="nguoi-ban-count" title="${escapeHtml(latestTransactionText)}">${latestTransactionHtml}</span>
       </div>
       <div class="card-actions admin-only">
         <button class="btn-edit" onclick="openEditModal(${i})">✏️ Sửa</button>
@@ -3711,7 +3720,7 @@ function getStockStatusLabel(ton, lowLimit=2){
   return "✅ Còn hàng";
 }
 
-let TX_HISTORY_STATE = { idx: -1, date: "", nv: "" };
+let TX_HISTORY_STATE = { idx: -1, date: "", nv: "", sort: "newest" };
 
 function parseTxDateKey(value){
   if(value == null || value === "") return "";
@@ -3745,17 +3754,37 @@ function txHistoryFilteredRows(txs){
     return okDate && okNV;
   });
 }
+function txTimeSortValue(tx){
+  const text = String(tx?.time || "").trim();
+  const m = text.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})(?:,?\s*(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?)?/);
+  if(m) return new Date(Number(m[3]), Number(m[2])-1, Number(m[1]), Number(m[4]||0), Number(m[5]||0), Number(m[6]||0)).getTime();
+  const time = new Date(text).getTime();
+  return Number.isFinite(time) ? time : Number(tx?.id) || 0;
+}
+function sortTxHistoryRows(txs){
+  const mode = TX_HISTORY_STATE.sort || "newest";
+  return [...txs].sort((a,b)=>{
+    const timeDiff = txTimeSortValue(b) - txTimeSortValue(a);
+    if(mode === "oldest") return -timeDiff;
+    if(mode === "employee"){
+      const nameDiff = String(a.nv || "").localeCompare(String(b.nv || ""), "vi", {sensitivity:"base"});
+      return nameDiff || timeDiff;
+    }
+    return timeDiff;
+  });
+}
 
 function renderTxHistory(){
   const idx = TX_HISTORY_STATE.idx;
   if(idx < 0 || !DATA[idx]) return;
   const r = DATA[idx];
   const txs = getTransactionsForProduct(r);
-  const filtered = txHistoryFilteredRows(txs);
+  const filtered = sortTxHistoryRows(txHistoryFilteredRows(txs));
   const nvOptions = [...new Set(txs.map(t=>t.nv).filter(Boolean))];
   document.getElementById("txModalTitle").textContent = `📋 ${r[2]}`;
   const dateVal = TX_HISTORY_STATE.date || "";
   const nvVal = TX_HISTORY_STATE.nv || "";
+  const sortVal = TX_HISTORY_STATE.sort || "newest";
   const filterBar = `<div class="tx-filter">
     <div class="tx-filter-field">
       <label class="tx-filter-label" for="txFilterDate">Ngày giao dịch (dd/mm/yyyy)</label>
@@ -3766,6 +3795,14 @@ function renderTxHistory(){
       <select id="txFilterNV" aria-label="Lọc theo nhân viên" onchange="applyTxHistoryFilters()">
         <option value="">Tất cả nhân viên</option>
         ${nvOptions.map(nv=>`<option value="${escapeHtml(nv)}" ${nv===nvVal?"selected":""}>${escapeHtml(nv)}</option>`).join("")}
+      </select>
+    </div>
+    <div class="tx-filter-field">
+      <label class="tx-filter-label" for="txFilterSort">Sắp xếp</label>
+      <select id="txFilterSort" aria-label="Sắp xếp giao dịch" onchange="applyTxHistoryFilters()">
+        <option value="newest" ${sortVal==="newest"?"selected":""}>Mới nhất</option>
+        <option value="oldest" ${sortVal==="oldest"?"selected":""}>Cũ nhất</option>
+        <option value="employee" ${sortVal==="employee"?"selected":""}>Theo nhân viên</option>
       </select>
     </div>
     <button type="button" onclick="clearTxHistoryFilters()">Xoá lọc</button>
@@ -3803,8 +3840,10 @@ function renderTxHistory(){
 function applyTxHistoryFilters(){
   const dateEl = document.getElementById("txFilterDate");
   const nvEl = document.getElementById("txFilterNV");
+  const sortEl = document.getElementById("txFilterSort");
   if(dateEl) TX_HISTORY_STATE.date = dateEl.value || "";
   if(nvEl) TX_HISTORY_STATE.nv = nvEl.value || "";
+  if(sortEl) TX_HISTORY_STATE.sort = sortEl.value || "newest";
   renderTxHistory();
 }
 
@@ -3818,6 +3857,7 @@ function showTxHistory(idx){
   TX_HISTORY_STATE.idx = idx;
   TX_HISTORY_STATE.date = "";
   TX_HISTORY_STATE.nv = "";
+  TX_HISTORY_STATE.sort = "newest";
   renderTxHistory();
   document.getElementById("txOverlay").classList.add("open");
 }
