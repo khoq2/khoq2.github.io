@@ -808,7 +808,7 @@ button:not(:disabled):hover::after,a:hover::after,[role="button"]:hover::after,.
     <div class="form-row"><label>Giá bán (Vnd)</label><input type="text" id="saleGia" inputmode="numeric" placeholder="VD: 3.500.000"></div>
     <div class="form-row"><label>Ghi chú</label><input type="text" id="saleGhi" placeholder="VD: Khách lẻ, bảo hành 12 tháng..."></div>
     <div class="form-row">
-      <label>Ảnh giao dịch</label>
+      <label>Ảnh giao dịch (tuỳ chọn)</label>
       <div class="img-upload-row">
         <img id="saleImgPreview" class="img-preview" style="display: none;" src="" alt="" />
         <div id="saleImgPlaceholder" class="img-preview img-preview-ph">📷 Chưa có ảnh</div>
@@ -824,6 +824,7 @@ button:not(:disabled):hover::after,a:hover::after,[role="button"]:hover::after,.
           oninput="debounceImageLink(this,'saleImgLink', setTxImagePreview)"
           onchange="useImageLink('saleImgLink', setTxImagePreview)"
           onkeydown="if(event.key==='Enter'){event.preventDefault(); useImageLink('saleImgLink', setTxImagePreview);}">
+        <div class="img-link-hint">Trên Drive: bấm chuột phải ảnh → Chia sẻ → Bất kỳ ai có link → dán link vào đây.</div>
       </div>
     </div>
     <button class="btn-submit" onclick="saveSale()">💾 Lưu giao dịch</button>
@@ -2998,6 +2999,7 @@ function renderRestockOverview(el){
   el.innerHTML = html;
 }
 function render(){
+  syncLatestItemsTickerVisibility();
   openSummaryListKey = "";
   initKPI();
   selectedItems.forEach(i=>{ if(i<0 || i>=DATA.length) selectedItems.delete(i); });
@@ -4285,10 +4287,24 @@ function startSearchPlaceholderTyping(){
 let latestItemsTickerIndex = 0;
 let latestItemsTickerKey = "";
 let latestItemsTickerHasShown = false;
+function syncLatestItemsTickerVisibility(){
+  const ticker = document.getElementById("latestItemsTicker");
+  if(!ticker) return;
+  if(currentTab !== "ALL"){
+    ticker.classList.remove("show", "is-leaving", "is-rising");
+    return;
+  }
+  if(!ticker.classList.contains("show")) refreshLatestItemsTicker();
+}
 function refreshLatestItemsTicker(){
   const ticker = document.getElementById("latestItemsTicker");
   const title = document.getElementById("latestItemsTitle");
   if(!ticker || !title) return;
+  // Chỉ hiển thị ở Trang chủ (tab Tất cả), không che nội dung các danh mục khác.
+  if(currentTab !== "ALL"){
+    ticker.classList.remove("show", "is-leaving", "is-rising");
+    return;
+  }
   // Thiết bị mới luôn được thêm bằng unshift(), nên 5 dòng đầu là 5 thiết bị mới nhất.
   const latestItems = DATA.slice(0, 5).filter(row=>row && row[2]);
   const nextKey = latestItems.map(row=>`${row[1]}|${row[2]}`).join("||");
@@ -4307,7 +4323,7 @@ function refreshLatestItemsTicker(){
   const item = latestItems[itemIndex];
   ticker.dataset.itemIndex = String(itemIndex);
   const updateTitle = ()=>{ title.textContent = item[2]; };
-  if(latestItemsTickerHasShown){
+  if(latestItemsTickerHasShown && ticker.classList.contains("show")){
     ticker.classList.remove("is-rising");
     ticker.classList.add("is-leaving");
     setTimeout(()=>{
@@ -4476,7 +4492,6 @@ function setupHeaderAutoCollapse(){
   }, {passive:true});
 }
 restoreHeaderState();
-setupHeaderAutoCollapse();
 
 let scrollBtnsTimer;
 function setupScrollButtonsAutoHide(){
@@ -4619,6 +4634,14 @@ function updateSearchFixedState(){
   const box = document.querySelector(".search-box");
   const spacer = document.getElementById("searchSpacer");
   if(!box || !spacer) return;
+  // Header vốn đã sticky; trên điện thoại không tách riêng ô tìm kiếm ra fixed
+  // để tránh đổi chiều cao trang và gây cảm giác giật khi vuốt.
+  if(window.matchMedia("(hover: none), (pointer: coarse)").matches){
+    box.classList.remove("is-fixed");
+    spacer.classList.remove("on");
+    spacer.style.height = "0px";
+    return;
+  }
   const shouldFix = window.scrollY > 0;
   box.classList.toggle("is-fixed", shouldFix);
   spacer.classList.toggle("on", shouldFix);
