@@ -725,14 +725,7 @@ html::-webkit-scrollbar-corner { background: #EAF2F8; }
   .scroll-btns::before { top: 39px; bottom: 39px; }
 }
 
-/* Hồ sơ khách hàng mở bằng thao tác giữ bí mật trên biểu tượng cửa hàng. */
-.title-icon { position: relative; touch-action: none; user-select: none; -webkit-user-select: none; }
-.title-icon.customer-holding { animation: customerSecretHold 3.4s linear forwards; }
-@keyframes customerSecretHold {
-  0% { transform:scale(1); filter:none; }
-  70% { transform:scale(1.13); filter:drop-shadow(0 0 5px rgba(243,156,18,.55)); }
-  100% { transform:scale(1.2); filter:drop-shadow(0 0 10px rgba(243,156,18,1)); }
-}
+/* Hồ sơ khách hàng mở bằng thao tác chạm nhanh 5 lần trên tiêu đề. */
 .customer-modal { width:min(760px,100%); max-height:min(92dvh,860px); margin:0 auto; padding:18px 16px max(24px,env(safe-area-inset-bottom)); border-radius:22px 22px 0 0; background:linear-gradient(180deg,#fff 0%,#F7FAFC 100%); box-shadow:0 -12px 38px rgba(17,34,51,.25); }
 .customer-head { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:12px; }
 .customer-title { color:#1E3A5F; font-size:16px; font-weight:950; }
@@ -745,6 +738,7 @@ html::-webkit-scrollbar-corner { background: #EAF2F8; }
 .customer-primary,.customer-secondary { border:0; border-radius:10px; padding:9px 12px; cursor:pointer; font-size:12px; font-weight:900; }
 .customer-primary { background:linear-gradient(135deg,#1E3A5F,#2E86C1); color:#fff; box-shadow:0 4px 10px rgba(30,58,95,.2); }
 .customer-secondary { background:#EAF2F8; color:#1A5276; }
+body.admin-mode .customer-admin-login { display:none; }
 .customer-results { display:grid; gap:7px; max-height:34dvh; overflow:auto; overscroll-behavior:contain; }
 .customer-result { width:100%; display:grid; gap:3px; padding:11px 12px; border:1px solid #D6EAF8; border-radius:12px; background:#fff; color:#2C3E50; text-align:left; cursor:pointer; }
 .customer-result-phone { color:#1A5276; font-size:14px; font-weight:950; }
@@ -851,6 +845,7 @@ html::-webkit-scrollbar-corner { background: #EAF2F8; }
   <div id="fabMenuItems" style="display:flex;flex-direction:column;gap:10px;align-items:flex-end;overflow:hidden;max-height:0;opacity:0;transition:max-height .35s ease,opacity .3s ease;">
     <button class="fab fab-add admin-only" onclick="openAddModal()">➕ Thêm thiết bị</button>
     <button class="fab admin-only" style="background:#8E44AD;color:#fff" onclick="openNVModal()">👥 Nhân viên</button>
+    <button class="fab admin-only" style="background:#21618C;color:#fff" onclick="openCustomerPanel()">👤 Khách hàng</button>
     <button class="fab admin-only" style="background:#5B2C6F;color:#fff" onclick="openQuickOrderModal()">↕️ Sắp xếp lọc</button>
     <button class="fab admin-only" style="background:#1A5276;color:#fff" onclick="openGroupOrderModal()">↕️ Sắp xếp nhóm</button>
     <button class="fab admin-only" style="background:#117864;color:#fff" onclick="backupDataToExcel()">💾 Sao lưu Excel</button>
@@ -1102,6 +1097,7 @@ html::-webkit-scrollbar-corner { background: #EAF2F8; }
     </div>
     <div style="margin:6px 3px 0;color:#718096;font-size:10px;line-height:1.35;">Có thể nhập 0901234567, 0901 234 567, 0901.234.567, +84901… hoặc chỉ 4 số cuối.</div>
     <div class="customer-toolbar">
+      <button type="button" class="customer-secondary customer-admin-login" onclick="onAdminBtnClick()">🔐 Đăng nhập Admin để chỉnh sửa</button>
       <button type="button" class="customer-primary admin-only" onclick="openCustomerEditor()">＋ Thêm khách hàng</button>
     </div>
     <div id="customerResults" class="customer-results"></div>
@@ -1473,14 +1469,16 @@ function revealAdminEntry(openLogin){
 }
 
 function handleOwnerTap(){
-  if(suppressOwnerTapOnce){ suppressOwnerTapOnce=false; return; }
   ownerTapCount++;
   clearTimeout(ownerTapTimer);
-  ownerTapTimer = setTimeout(()=>ownerTapCount=0, 1800);
-  if(ownerTapCount >= 7){
+  // Chờ người dùng ngừng chạm rồi mới quyết định, để lần thứ 5 không mở
+  // khách hàng khi họ đang tiếp tục chạm đến lần thứ 7 để vào Admin.
+  ownerTapTimer = setTimeout(()=>{
+    const taps = ownerTapCount;
     ownerTapCount = 0;
-    revealAdminEntry(true);
-  }
+    if(taps >= 7) revealAdminEntry(true);
+    else if(taps >= 5) openCustomerPanel();
+  }, 650);
 }
 
 function setupAdminEntry(){
@@ -5056,6 +5054,8 @@ function setupCustomerSecretHold(){
   const icon=document.querySelector(".title-icon");
   if(!icon || icon.dataset.customerHoldBound) return;
   icon.dataset.customerHoldBound="1";
+  // Tách hoàn toàn biểu tượng khỏi thao tác bấm 7 lần trên phần tiêu đề còn lại.
+  icon.addEventListener("click",event=>{ event.preventDefault(); event.stopPropagation(); });
   const cancel=()=>{ clearTimeout(customerHoldTimer); customerHoldTimer=null; icon.classList.remove("customer-holding"); customerHoldPointerId=null; };
   icon.addEventListener("pointerdown",event=>{
     if(event.button!==undefined && event.button!==0) return;
@@ -5076,7 +5076,7 @@ function setupCustomerSecretHold(){
   });
   icon.addEventListener("pointermove",event=>{
     if(customerHoldPointerId!==event.pointerId) return;
-    if(Math.hypot(event.clientX-customerHoldStartX,event.clientY-customerHoldStartY)>24) cancel();
+    if(Math.hypot(event.clientX-customerHoldStartX,event.clientY-customerHoldStartY)>48) cancel();
   });
   ["pointerup","pointercancel"].forEach(type=>icon.addEventListener(type,cancel));
   icon.addEventListener("contextmenu",event=>event.preventDefault());
@@ -5375,7 +5375,6 @@ document.getElementById("adminPass").addEventListener("keydown", function(e){ if
 document.querySelector(".title").addEventListener("click", handleOwnerTap);
 setupVndInputs();
 setupAdminEntry();
-setupCustomerSecretHold();
 checkAdminSession();
 startSearchPlaceholderTyping();
 startLatestItemsTicker();
