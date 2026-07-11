@@ -629,7 +629,7 @@ button:not(:disabled):hover::after,a:hover::after,[role="button"]:hover::after,.
 <div id="results"></div>
 
 <div class="latest-items-ticker" id="latestItemsTicker" aria-live="polite" aria-label="Thiết bị mới thêm, bấm để mở" role="button" tabindex="0" onclick="openLatestItemFromTicker()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openLatestItemFromTicker();}">
-  <span class="latest-items-label">Cập nhật mới:</span>
+  <span class="latest-items-label">Bài viết mới:</span>
   <span class="latest-items-title" id="latestItemsTitle"></span>
 </div>
 
@@ -2149,9 +2149,15 @@ function buildSectionSummaryBucketsV2(items, groupLabel){
   };
   const order = orderMap[family] || [];
   const orderIndex = new Map(order.map((key, idx)=>[key, idx]));
+  // Ưu tiên tuyệt đối thứ tự admin đã lưu; danh sách mặc định chỉ dùng cho mục
+  // chưa được đưa vào cấu hình (ví dụ nhãn hệ thống tự nhận diện).
+  const savedQuickOrder = QUICK_ORDER[quickOrderKey(resolvedGroupLabel)] || [];
+  const savedQuickIndex = new Map(savedQuickOrder.map((key, idx)=>[normalizeQuickText(key), idx]));
   const result = [...map.values()].sort((a, b)=>{
-    const ai = orderIndex.has(a.primary) ? orderIndex.get(a.primary) : 999;
-    const bi = orderIndex.has(b.primary) ? orderIndex.get(b.primary) : 999;
+    const aSaved = savedQuickIndex.get(normalizeQuickText(a.primary));
+    const bSaved = savedQuickIndex.get(normalizeQuickText(b.primary));
+    const ai = aSaved !== undefined ? aSaved : savedQuickOrder.length + (orderIndex.has(a.primary) ? orderIndex.get(a.primary) : 999);
+    const bi = bSaved !== undefined ? bSaved : savedQuickOrder.length + (orderIndex.has(b.primary) ? orderIndex.get(b.primary) : 999);
     if(ai !== bi) return ai - bi;
     if(b.count !== a.count) return b.count - a.count;
     return String(a.label).localeCompare(String(b.label), "vi");
