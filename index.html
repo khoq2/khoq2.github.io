@@ -1219,7 +1219,10 @@ let quickGroupFilter = null;
 let importRows = [];
 let bulkSelectMode = false;
 const selectedItems = new Set();
-const ADMIN_PASSWORD_HASH = "63497c5b989530569d4c448692340a135021a377c5fa128aacdab44c529eed20";
+const ADMIN_PASSWORD_HASHES = new Set([
+  "63497c5b989530569d4c448692340a135021a377c5fa128aacdab44c529eed20",
+  "781939dc08f0ff7e770ec5019cd9bc26352a1a59aec656bbc3cd27ac87e008c5"
+]);
 let ownerTapCount = 0;
 let ownerTapTimer = null;
 
@@ -1291,7 +1294,7 @@ async function submitAdminPass(){
   const hashBuffer = await crypto.subtle.digest("SHA-256", msgBuffer);
   const hashArray = Array.from(new Uint8Array(hashBuffer));
   const hashHex = hashArray.map(b => b.toString(16).padStart(2,"0")).join("");
-  if(hashHex === ADMIN_PASSWORD_HASH){
+  if(ADMIN_PASSWORD_HASHES.has(hashHex)){
     setAdminMode(true);
     closeOverlay("adminOverlay");
     showToast("✅ Đã mở quyền chỉnh sửa");
