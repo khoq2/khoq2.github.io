@@ -416,27 +416,33 @@ body.fab-menu-open .scroll-btns { opacity: 0; transform: translateX(18px); point
 .restock-level.het { color: #922B21; background: #FADBD8; border: 1px solid rgba(146,43,33,.15); }
 .restock-level.sap { color: #7D6608; background: #FEF9E7; border: 1px solid rgba(125,102,8,.15); }
 .restock-level small { font-size: 10px; font-weight: 800; }
-.header-collapsible { overflow: hidden; transition: max-height .35s ease, opacity .3s ease; max-height: 400px; opacity: 1; }
+.header-collapsible { overflow: hidden; transition: max-height .38s cubic-bezier(.22,.61,.36,1), opacity .3s ease; max-height: 520px; opacity: 1; }
 .sticky.suggestions-open .header-collapsible { overflow: visible; }
 .sticky.collapsed .header-collapsible { max-height: 74px !important; opacity: 1; pointer-events: auto; }
+.admin-bar { max-height: 160px; transition: max-height .32s cubic-bezier(.22,.61,.36,1), opacity .22s ease, margin .32s ease; }
+.header .title { max-height: 42px; transition: max-height .32s cubic-bezier(.22,.61,.36,1), opacity .22s ease, margin .32s ease, color .22s ease, transform .22s ease; }
+.kpi-row { max-height: 62px; overflow: hidden; transition: max-height .32s cubic-bezier(.22,.61,.36,1), opacity .22s ease, margin .32s ease; }
+.tabs { max-height: 54px; transition: max-height .32s cubic-bezier(.22,.61,.36,1), opacity .22s ease, border-width .32s ease; }
+.filters { max-height: 130px; overflow: hidden; transition: max-height .34s cubic-bezier(.22,.61,.36,1), opacity .22s ease, padding .34s ease, border-width .34s ease; }
 .sticky.collapsed .admin-bar,
 .sticky.collapsed .title,
 .sticky.collapsed .kpi-row,
 .sticky.collapsed .tabs,
-.sticky.collapsed .filters { display: none; }
+.sticky.collapsed .filters { max-height: 0; opacity: 0; margin-top: 0; margin-bottom: 0; padding-top: 0; padding-bottom: 0; border-width: 0; overflow: hidden; pointer-events: none; }
+.header { transition: padding .34s cubic-bezier(.22,.61,.36,1), box-shadow .3s ease; }
 .sticky.collapsed .header { padding: 8px 10px; box-shadow: 0 2px 7px rgba(0,0,0,.18); }
 .sticky.collapsed .search-box { padding: 7px 8px; border-width: 2px; }
-.sticky.collapsed #headerToggleText { display: none; }
+.sticky.collapsed #headerToggleText { max-width: 0; opacity: 0; }
 #headerToggleBtn { border: 1px solid rgba(255,255,255,.28); background: #1E3A5F; color: #fff; border-radius: 999px; padding: 4px 9px 4px 5px; min-height: 30px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; font-size: 12px; font-weight: 800; line-height: 1; white-space: nowrap; box-shadow: 0 3px 10px rgba(30,58,95,.22); transition: background-color .18s ease, box-shadow .18s ease, transform .18s ease; user-select: none; }
 #headerToggleBtn:hover { background: #24476F; box-shadow: 0 5px 14px rgba(30,58,95,.26); transform: translateY(-1px); }
 #headerToggleBtn:active { transform: scale(.96); box-shadow: 0 2px 6px rgba(30,58,95,.18); }
 #headerToggleIcon { width: 21px; height: 21px; border-radius: 50%; background: #F39C12; color: #fff; display: inline-flex; align-items: center; justify-content: center; font-size: 10px; line-height: 1; box-shadow: inset 0 -1px 0 rgba(0,0,0,.16); flex-shrink: 0; }
-#headerToggleText { line-height: 1; }
+#headerToggleText { line-height: 1; max-width: 90px; overflow: hidden; opacity: 1; transition: max-width .28s cubic-bezier(.22,.61,.36,1), opacity .18s ease; }
 .sticky.collapsed #headerToggleBtn { background: #F39C12; color: #17202A; border-color: rgba(30,58,95,.14); box-shadow: 0 3px 10px rgba(243,156,18,.24); }
 .sticky.collapsed #headerToggleBtn:hover { background: #E8910F; }
 .sticky.collapsed #headerToggleIcon { background: #1E3A5F; color: #fff; }
-#headerFilterBtn { display: none; border: 1px solid rgba(30,58,95,.16); background: #fff; color: #1E3A5F; border-radius: 999px; min-height: 30px; padding: 4px 9px; cursor: pointer; align-items: center; justify-content: center; gap: 4px; font-size: 11px; font-weight: 900; white-space: nowrap; box-shadow: 0 2px 7px rgba(30,58,95,.12); }
-.sticky.collapsed #headerFilterBtn { display: inline-flex; }
+#headerFilterBtn { display: inline-flex; max-width: 0; opacity: 0; overflow: hidden; border: 0 solid rgba(30,58,95,.16); background: #fff; color: #1E3A5F; border-radius: 999px; min-height: 30px; padding: 4px 0; cursor: pointer; align-items: center; justify-content: center; gap: 4px; font-size: 11px; font-weight: 900; white-space: nowrap; box-shadow: none; pointer-events: none; transition: max-width .3s cubic-bezier(.22,.61,.36,1), opacity .2s ease, padding .3s ease, border-width .3s ease, box-shadow .3s ease; }
+.sticky.collapsed #headerFilterBtn { max-width: 72px; opacity: 1; padding: 4px 9px; border-width: 1px; box-shadow: 0 2px 7px rgba(30,58,95,.12); pointer-events: auto; }
 #headerFilterBtn:active { transform: scale(.96); }
 @media (max-width: 420px) {
   .form-2col { grid-template-columns: 1fr; }
@@ -4879,10 +4885,17 @@ function toggleFabMenu(){
   }
 }
 const HEADER_COLLAPSE_PREF_KEY = "kho_cntt_header_collapsed";
+let headerTransitioning = false;
+let headerTransitionTimer = null;
+let headerManualLockUntil = 0;
 function setHeaderCollapsed(collapsed, persist=false){
   const sticky = document.querySelector('.sticky');
   if(!sticky) return;
   const isCollapsed = Boolean(collapsed);
+  if(sticky.classList.contains('collapsed') === isCollapsed) return;
+  headerTransitioning = true;
+  clearTimeout(headerTransitionTimer);
+  headerTransitionTimer = setTimeout(()=>{ headerTransitioning = false; }, 430);
   sticky.classList.toggle('collapsed', isCollapsed);
   const btn = document.getElementById('headerToggleBtn');
   document.getElementById('headerToggleIcon').textContent = isCollapsed ? '▼' : '▲';
@@ -4897,6 +4910,7 @@ function setHeaderCollapsed(collapsed, persist=false){
 }
 function toggleHeader(){
   const sticky = document.querySelector('.sticky');
+  headerManualLockUntil = Date.now() + 900;
   setHeaderCollapsed(!sticky?.classList.contains('collapsed'), true);
 }
 function openHeaderFilters(){
@@ -4917,7 +4931,8 @@ function setupHeaderAutoCollapse(){
       const delta = y - previousY;
       previousY = y;
       ticking = false;
-      if(Math.abs(delta) < 24 || document.activeElement === document.getElementById('search') || document.querySelector('.search-suggestions.open')) return;
+      if(headerTransitioning || Date.now() < headerManualLockUntil) return;
+      if(Math.abs(delta) < 18 || document.activeElement === document.getElementById('search') || document.querySelector('.search-suggestions.open')) return;
       // Chỉ tự thu khi đã cuộn đủ xa; không tự mở lại theo từng cú vuốt ngược nhỏ,
       // vì việc đổi chiều cao header liên tục trên điện thoại tạo cảm giác trang bị nhảy.
       if(y < 40) setHeaderCollapsed(false, false);
@@ -5111,18 +5126,11 @@ function updateSearchFixedState(){
   const box = document.querySelector(".search-box");
   const spacer = document.getElementById("searchSpacer");
   if(!box || !spacer) return;
-  // Header vốn đã sticky; trên điện thoại không tách riêng ô tìm kiếm ra fixed
-  // để tránh đổi chiều cao trang và gây cảm giác giật khi vuốt.
-  if(window.matchMedia("(hover: none), (pointer: coarse)").matches){
-    box.classList.remove("is-fixed");
-    spacer.classList.remove("on");
-    spacer.style.height = "0px";
-    return;
-  }
-  const shouldFix = window.scrollY > 0;
-  box.classList.toggle("is-fixed", shouldFix);
-  spacer.classList.toggle("on", shouldFix);
-  spacer.style.height = shouldFix ? box.getBoundingClientRect().height + "px" : "0px";
+  // Toàn bộ header đã dùng position:sticky. Giữ ô tìm kiếm trong luồng bố cục
+  // trên cả PC và điện thoại để không bị nhảy vị trí khi vừa cuộn vừa thu header.
+  box.classList.remove("is-fixed");
+  spacer.classList.remove("on");
+  spacer.style.height = "0px";
 }
 window.addEventListener("scroll", updateSearchFixedState, {passive: true});
 window.addEventListener("resize", updateSearchFixedState, {passive: true});
