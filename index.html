@@ -2862,7 +2862,8 @@ function getQuickFixedCatalog(groupLabel){
   (QUICK_CUSTOM_TAGS[quickOrderKey(groupLabel)] || []).forEach(value=>{
     const meta = makeQuickMeta(kind, value, "", value);
     const key = meta && normalizeQuickText(meta.primary);
-    if(meta && key && !seen.has(key)){ catalog.push(meta); seen.add(key); }
+    const isHidden = meta && quickHiddenAliases(meta.primary).some(alias=>hidden.has(alias));
+    if(meta && key && !isHidden && !seen.has(key)){ catalog.push(meta); seen.add(key); }
   });
   const order = QUICK_ORDER[quickOrderKey(groupLabel)] || [];
   if(!order.length) return catalog;
