@@ -4281,7 +4281,7 @@ function renderTxHistory(){
             <span class="tx-nv">${renderNVAvatar(t.nv)} ${escapeHtml(t.nv || "")} <span class="tx-pill" style="margin-left:4px;${getTransactionKind(t)==="IMPORT" ? "background:#E8F8F0;color:#1E8449;" : getTransactionKind(t)==="ADJUST" ? "background:#FEF9E7;color:#7D6608;" : ""}">${getTransactionKindLabel(t)}</span></span>
             <div class="tx-head-right">
               <span class="tx-time">${formatTxTime(t.time)}</span>
-              ${document.body.classList.contains("admin-mode")?`<button class="tx-action tx-edit" title="Sửa giao dịch" onclick="editTX('${escapeHtml(t.id)}')">✏️</button><button class="tx-action tx-delete" title="Xóa giao dịch" onclick="deleteTX('${escapeHtml(t.id)}')">🗑️</button>`:""}
+              ${document.body.classList.contains("admin-mode")?`<button class="tx-action tx-edit" title="Sửa ngày giờ và thông tin giao dịch" onclick="event.stopPropagation(); editTX('${escapeHtml(t.id)}')">📅 Sửa ngày giờ</button><button class="tx-action tx-delete" title="Xóa giao dịch" onclick="event.stopPropagation(); deleteTX('${escapeHtml(t.id)}')">🗑️</button>`:""}
             </div>
           </div>
           <div class="tx-meta">
@@ -4323,7 +4323,7 @@ function editTX(id){ if(!requireAdmin()) return;
   const tx = TX_DATA.find(t=>String(t.id)===String(id));
   if(!tx){ alert("Không tìm thấy giao dịch cần sửa!"); return; }
   const idx = DATA.findIndex(r=>r[1]===tx.ma && (r[13]||"Q2") === (tx.branch||"Q2"));
-  document.getElementById("saleModalTitle").textContent = "✏️ Sửa giao dịch";
+  document.getElementById("saleModalTitle").textContent = "📅 Sửa ngày giờ giao dịch";
   document.getElementById("saleIdx").value = idx >= 0 ? idx : "";
   document.getElementById("saleTxId").value = tx.id;
   refreshNVSelect();
@@ -5925,5 +5925,4 @@ function startBackgroundSync(){
 </script>
 </body>
 </html>
-
 
