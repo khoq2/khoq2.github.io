@@ -1046,6 +1046,7 @@ html::-webkit-scrollbar-corner { background: #EAF2F8; }
       </select>
     </div>
     <div class="form-row"><label>Số lượng xuất</label><input type="number" id="saleQty" value="1" min="1"></div>
+    <div class="form-row"><label>Ngày giờ giao dịch</label><input type="datetime-local" id="saleTime" step="1"></div>
     <div class="form-row"><label>Giá bán (Vnd)</label><input type="text" id="saleGia" inputmode="numeric" placeholder="VD: 3.500.000"></div>
     <div class="form-row"><label>Ghi chú</label><input type="text" id="saleGhi" placeholder="VD: Khách lẻ, bảo hành 12 tháng..."></div>
     <div class="form-row">
@@ -3982,6 +3983,7 @@ function openSaleModal(idx){ if(!requireAdmin()) return;
   refreshNVSelect();
   document.getElementById("saleQty").value = "1";
   document.getElementById("saleQty").disabled = false;
+  document.getElementById("saleTime").value = txTimeInputValue(new Date());
   setVndInputValue("saleGia", r[10] || r[4] || 0);
   document.getElementById("saleGhi").value = "";
   setTxImagePreview("");
@@ -4024,7 +4026,10 @@ async function saveSale(){ if(!requireAdmin()) return;
   const gia = parseVndInput(document.getElementById("saleGia").value);
   const ghi = document.getElementById("saleGhi").value.trim();
   const img = document.getElementById("saleImg").value || "";
+  const timeInput = document.getElementById("saleTime").value;
   if(!nv){ alert("Vui lòng nhập tên nhân viên!"); return; }
+  if(!timeInput){ alert("Vui lòng chọn ngày giờ giao dịch!"); return; }
+  const transactionTime = formatTxTimeFromInput(timeInput);
   if(txId){
     const tx = TX_DATA.find(t=>String(t.id)===String(txId));
     if(!tx){ alert("Không tìm thấy giao dịch cần sửa!"); return; }
@@ -4032,6 +4037,7 @@ async function saveSale(){ if(!requireAdmin()) return;
     tx.gia = gia;
     tx.ghi = ghi;
     tx.img = img;
+    tx.time = transactionTime;
     closeOverlay("saleOverlay");
     await saveTX();
     renderTxHistory();
@@ -4043,7 +4049,7 @@ async function saveSale(){ if(!requireAdmin()) return;
   if(r[5] < qty){ alert(`Tồn kho chỉ còn ${r[5]}, không đủ xuất ${qty}!`); return; }
   DATA[idx][5] = r[5] - qty;
   DATA[idx][6] = getStockStatusValue(DATA[idx][5], DATA[idx][12]);
-  TX_DATA.unshift({ id: Date.now(), ma: r[1], ten: r[2], sh: r[0], nv, qty, gia, ghi, img, time: formatTxTime(new Date()), branch: r[13] || "Q2" });
+  TX_DATA.unshift({ id: Date.now(), ma: r[1], ten: r[2], sh: r[0], nv, qty, gia, ghi, img, time: transactionTime, branch: r[13] || "Q2" });
   closeOverlay("saleOverlay");
   const [dataSaved, txSaved] = await Promise.all([
     saveProductRow(DATA[idx], r[1], r[13] || "Q2"),
@@ -4072,6 +4078,20 @@ function formatTxTime(value){
   if(isNaN(d.getTime())) return value || "";
   const pad = n => String(n).padStart(2, "0");
   return `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+}
+
+function txTimeInputValue(value){
+  const text = formatTxTime(value);
+  const m = text.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})\s+(\d{1,2}):(\d{1,2}):(\d{1,2})/);
+  if(!m) return "";
+  const pad = n => String(n).padStart(2, "0");
+  return `${m[3]}-${pad(m[2])}-${pad(m[1])}T${pad(m[4])}:${pad(m[5])}:${pad(m[6])}`;
+}
+
+function formatTxTimeFromInput(value){
+  const m = String(value || "").match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})(?::(\d{2}))?$/);
+  if(!m) return formatTxTime(value);
+  return `${m[3]}/${m[2]}/${m[1]} ${m[4]}:${m[5]}:${m[6] || "00"}`;
 }
 
 function getTransactionKind(tx){
@@ -4314,6 +4334,7 @@ function editTX(id){ if(!requireAdmin()) return;
   nvSel.value = tx.nv || "";
   document.getElementById("saleQty").value = tx.qty || 1;
   document.getElementById("saleQty").disabled = true;
+  document.getElementById("saleTime").value = txTimeInputValue(tx.time || new Date());
   setVndInputValue("saleGia", tx.gia || 0);
   document.getElementById("saleGhi").value = tx.ghi || "";
   setTxImagePreview(tx.img || "");
@@ -5904,6 +5925,5 @@ function startBackgroundSync(){
 </script>
 </body>
 </html>
-
 
 
