@@ -2473,8 +2473,11 @@ function buildSectionSummaryBucketsV2(items, groupLabel){
   const map = new Map();
   const resolvedGroupLabel = resolveQuickGroupLabelFromRow(items?.[0]?.r, groupLabel || "");
   const family = getQuickGroupKind(resolvedGroupLabel);
+  const hiddenQuickValues = new Set((QUICK_HIDDEN_TAGS[quickOrderKey(resolvedGroupLabel)] || []).flatMap(quickHiddenAliases));
   const addBucket = (meta, countDelta=0, stockDelta=0, isFixed=false) => {
     if(!meta || meta.family === "other") return;
+    const hiddenCandidates=[meta.primary,quickMetaKey(meta),quickMetaLabel(meta)].flatMap(quickHiddenAliases);
+    if(hiddenCandidates.some(value=>hiddenQuickValues.has(value))) return;
     const key = `${meta.family}|${quickMetaKey(meta)}`;
     const current = map.get(key) || {
       key,
@@ -2545,6 +2548,8 @@ function buildOverviewBucketsV2(items){
     const list = metas.length ? metas : (fallback ? [fallback] : []);
     list.forEach(meta=>{
       if(!meta || meta.family === "other") return;
+      const hidden = new Set((QUICK_HIDDEN_TAGS[quickOrderKey(group)] || []).flatMap(quickHiddenAliases));
+      if([meta.primary,quickMetaKey(meta),quickMetaLabel(meta)].flatMap(quickHiddenAliases).some(value=>hidden.has(value))) return;
       const key = `${group}|${meta.family}|${quickMetaKey(meta)}`;
       const current = map.get(key) || {
         group,
@@ -2823,11 +2828,19 @@ try {
   Object.keys(GROUP_OPTIONS).forEach(tab=>{ if(Array.isArray(savedGroupOptions[tab])) GROUP_OPTIONS[tab]=savedGroupOptions[tab]; });
 } catch(e) {}
 function quickOrderKey(groupLabel){ return normalizeQuickText(groupLabel || ""); }
+function quickHiddenAliases(value){
+  const normalized=normalizeQuickText(value);
+  if(!normalized) return [];
+  const aliases=[normalized];
+  const withoutRam=normalized.replace(/^ram\s+/i,"").trim();
+  if(withoutRam && withoutRam!==normalized) aliases.push(withoutRam);
+  return aliases;
+}
 function getQuickFixedCatalog(groupLabel){
   const kind = getQuickGroupKind(groupLabel);
   const groupKey = quickOrderKey(groupLabel);
-  const hidden = new Set((QUICK_HIDDEN_TAGS[groupKey] || []).map(normalizeQuickText));
-  const catalog = [...getQuickFixedCatalogBase(groupLabel)].filter(meta=>!hidden.has(normalizeQuickText(meta.primary)));
+  const hidden = new Set((QUICK_HIDDEN_TAGS[groupKey] || []).flatMap(quickHiddenAliases));
+  const catalog = [...getQuickFixedCatalogBase(groupLabel)].filter(meta=>!quickHiddenAliases(meta.primary).some(value=>hidden.has(value)));
   const seen = new Set(catalog.map(meta=>normalizeQuickText(meta.primary)));
   (QUICK_CUSTOM_TAGS[quickOrderKey(groupLabel)] || []).forEach(value=>{
     const meta = makeQuickMeta(kind, value, "", value);
