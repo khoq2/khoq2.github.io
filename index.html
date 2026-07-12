@@ -2474,11 +2474,8 @@ function buildSectionSummaryBucketsV2(items, groupLabel){
   const resolvedGroupLabel = resolveQuickGroupLabelFromRow(items?.[0]?.r, groupLabel || "");
   const managedGroupLabel = resolveManagedQuickConfigGroup(resolvedGroupLabel);
   const family = getQuickGroupKind(resolvedGroupLabel);
-  const hiddenQuickValues = new Set((QUICK_HIDDEN_TAGS[quickOrderKey(managedGroupLabel)] || []).flatMap(quickHiddenAliases));
   const addBucket = (meta, countDelta=0, stockDelta=0, isFixed=false) => {
     if(!meta || meta.family === "other") return;
-    const hiddenCandidates=[meta.primary,quickMetaKey(meta),quickMetaLabel(meta)].flatMap(quickHiddenAliases);
-    if(hiddenCandidates.some(value=>hiddenQuickValues.has(value))) return;
     const key = `${meta.family}|${quickMetaKey(meta)}`;
     const current = map.get(key) || {
       key,
@@ -2871,13 +2868,13 @@ function quickHiddenAliases(value){
 function getQuickFixedCatalog(groupLabel){
   const kind = getQuickGroupKind(groupLabel);
   const groupKey = quickOrderKey(groupLabel);
-  const hidden = new Set((QUICK_HIDDEN_TAGS[groupKey] || []).flatMap(quickHiddenAliases));
-  const catalog = [...getQuickFixedCatalogBase(groupLabel)].filter(meta=>!quickHiddenAliases(meta.primary).some(value=>hidden.has(value)));
+  const hidden = new Set((QUICK_HIDDEN_TAGS[groupKey] || []).map(normalizeQuickText));
+  const catalog = [...getQuickFixedCatalogBase(groupLabel)].filter(meta=>!hidden.has(normalizeQuickText(meta.primary)));
   const seen = new Set(catalog.map(meta=>normalizeQuickText(meta.primary)));
   (QUICK_CUSTOM_TAGS[quickOrderKey(groupLabel)] || []).forEach(value=>{
     const meta = makeQuickMeta(kind, value, "", value);
     const key = meta && normalizeQuickText(meta.primary);
-    const isHidden = meta && quickHiddenAliases(meta.primary).some(alias=>hidden.has(alias));
+    const isHidden = meta && hidden.has(normalizeQuickText(meta.primary));
     if(meta && key && !isHidden && !seen.has(key)){ catalog.push(meta); seen.add(key); }
   });
   const order = QUICK_ORDER[quickOrderKey(groupLabel)] || [];
