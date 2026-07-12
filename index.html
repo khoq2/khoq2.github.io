@@ -2533,9 +2533,26 @@ function buildSectionSummaryBucketsV2(items, groupLabel){
     if(b.count !== a.count) return b.count - a.count;
     return String(a.label).localeCompare(String(b.label), "vi");
   });
-  const filtered = result.filter(bucket => bucket.isFixed || (bucket.count || 0) > 0 || (bucket.stock || 0) > 0);
-  filtered.family = family;
-  return filtered;
+  // Danh sách trong Quản trị là nguồn hiển thị duy nhất. Không cho các nhãn
+  // tự nhận diện từ tên sản phẩm mọc thêm ở bên ngoài danh sách đã quản lý.
+  const managedCatalog = getQuickFixedCatalog(resolvedGroupLabel);
+  const managedResult = managedCatalog.map(managedMeta=>{
+    const managedAliases = new Set([managedMeta.primary,quickMetaKey(managedMeta),quickMetaLabel(managedMeta)].flatMap(quickHiddenAliases));
+    const matched = result.find(bucket=>[bucket.primary,bucket.key.split("|").slice(1).join("|"),bucket.label].flatMap(quickHiddenAliases).some(value=>managedAliases.has(value)));
+    if(matched) return {...matched,label:managedMeta.label || managedMeta.primary,isFixed:true};
+    return {
+      key:`${managedMeta.family}|${quickMetaKey(managedMeta)}`,
+      family:managedMeta.family,
+      primary:managedMeta.primary || "Khác",
+      secondary:managedMeta.secondary || "",
+      label:managedMeta.label || managedMeta.primary || "Khác",
+      count:0,
+      stock:0,
+      isFixed:true
+    };
+  });
+  managedResult.family = family;
+  return managedResult;
 }
 
 function buildOverviewBucketsV2(items){
