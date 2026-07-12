@@ -769,9 +769,10 @@ html::-webkit-scrollbar-corner { background: #EAF2F8; }
   box-shadow: inset 0 3px 7px rgba(30,58,95,.18);
 }
 @media (max-width: 480px) {
-  .scroll-btns { right: max(8px, env(safe-area-inset-right)); gap: 8px; padding: 6px; border-radius: 21px; }
-  .scroll-btns .scroll-btn { width: 38px; height: 38px; }
-  .scroll-btns::before { top: 39px; bottom: 39px; }
+  .scroll-btns { right: max(7px, env(safe-area-inset-right)); bottom:max(68px,calc(env(safe-area-inset-bottom) + 54px)); gap: 5px; padding: 3px; border-radius: 12px; }
+  .scroll-btns .scroll-btn { width: 30px; height: 30px; border-radius:8px; }
+  .scroll-btns .scroll-btn svg { width:14px; height:14px; }
+  .scroll-btns::before { top: 30px; bottom: 30px; }
 }
 
 /* Hồ sơ khách hàng mở bằng thao tác chạm nhanh 5 lần trên tiêu đề. */
