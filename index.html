@@ -2472,8 +2472,9 @@ function detectPrinterPartLabel(text){
 function buildSectionSummaryBucketsV2(items, groupLabel){
   const map = new Map();
   const resolvedGroupLabel = resolveQuickGroupLabelFromRow(items?.[0]?.r, groupLabel || "");
+  const managedGroupLabel = resolveManagedQuickConfigGroup(resolvedGroupLabel);
   const family = getQuickGroupKind(resolvedGroupLabel);
-  const hiddenQuickValues = new Set((QUICK_HIDDEN_TAGS[quickOrderKey(resolvedGroupLabel)] || []).flatMap(quickHiddenAliases));
+  const hiddenQuickValues = new Set((QUICK_HIDDEN_TAGS[quickOrderKey(managedGroupLabel)] || []).flatMap(quickHiddenAliases));
   const addBucket = (meta, countDelta=0, stockDelta=0, isFixed=false) => {
     if(!meta || meta.family === "other") return;
     const hiddenCandidates=[meta.primary,quickMetaKey(meta),quickMetaLabel(meta)].flatMap(quickHiddenAliases);
@@ -2494,7 +2495,7 @@ function buildSectionSummaryBucketsV2(items, groupLabel){
     if(isFixed) current.isFixed = true;
     map.set(key, current);
   };
-  getQuickFixedCatalog(resolvedGroupLabel).forEach(meta=>addBucket(meta, 0, 0, true));
+  getQuickFixedCatalog(managedGroupLabel).forEach(meta=>addBucket(meta, 0, 0, true));
   items.forEach(({r})=>{
     const stock = Number(r[5]) || 0;
     const metas = getQuickMetaCandidates(r, resolvedGroupLabel);
@@ -2522,7 +2523,7 @@ function buildSectionSummaryBucketsV2(items, groupLabel){
   const orderIndex = new Map(order.map((key, idx)=>[key, idx]));
   // Ưu tiên tuyệt đối thứ tự admin đã lưu; danh sách mặc định chỉ dùng cho mục
   // chưa được đưa vào cấu hình (ví dụ nhãn hệ thống tự nhận diện).
-  const savedQuickOrder = QUICK_ORDER[quickOrderKey(resolvedGroupLabel)] || [];
+  const savedQuickOrder = QUICK_ORDER[quickOrderKey(managedGroupLabel)] || [];
   const savedQuickIndex = new Map(savedQuickOrder.map((key, idx)=>[normalizeQuickText(key), idx]));
   const result = [...map.values()].sort((a, b)=>{
     const aSaved = savedQuickIndex.get(normalizeQuickText(a.primary));
@@ -2535,7 +2536,7 @@ function buildSectionSummaryBucketsV2(items, groupLabel){
   });
   // Danh sách trong Quản trị là nguồn hiển thị duy nhất. Không cho các nhãn
   // tự nhận diện từ tên sản phẩm mọc thêm ở bên ngoài danh sách đã quản lý.
-  const managedCatalog = getQuickFixedCatalog(resolvedGroupLabel);
+  const managedCatalog = getQuickFixedCatalog(managedGroupLabel);
   const managedResult = managedCatalog.map(managedMeta=>{
     const managedAliases = new Set([managedMeta.primary,quickMetaKey(managedMeta),quickMetaLabel(managedMeta)].flatMap(quickHiddenAliases));
     const matched = result.find(bucket=>[bucket.primary,bucket.key.split("|").slice(1).join("|"),bucket.label].flatMap(quickHiddenAliases).some(value=>managedAliases.has(value)));
@@ -2845,6 +2846,20 @@ try {
   Object.keys(GROUP_OPTIONS).forEach(tab=>{ if(Array.isArray(savedGroupOptions[tab])) GROUP_OPTIONS[tab]=savedGroupOptions[tab]; });
 } catch(e) {}
 function quickOrderKey(groupLabel){ return normalizeQuickText(groupLabel || ""); }
+function resolveManagedQuickConfigGroup(groupLabel){
+  const directKey=quickOrderKey(groupLabel);
+  const hasManagedOrder=Array.isArray(QUICK_ORDER[directKey]) && QUICK_ORDER[directKey].length>0;
+  const hasManagedCustom=Array.isArray(QUICK_CUSTOM_TAGS[directKey]) && QUICK_CUSTOM_TAGS[directKey].length>0;
+  if(hasManagedOrder || hasManagedCustom) return groupLabel;
+  const family=getQuickGroupKind(groupLabel);
+  const candidates=[...new Set(Object.values(GROUP_OPTIONS).flat())].filter(label=>getQuickGroupKind(label)===family);
+  const configured=candidates.find(label=>{
+    const key=quickOrderKey(label);
+    return (Array.isArray(QUICK_ORDER[key]) && QUICK_ORDER[key].length>0)
+      || (Array.isArray(QUICK_CUSTOM_TAGS[key]) && QUICK_CUSTOM_TAGS[key].length>0);
+  });
+  return configured || groupLabel;
+}
 function quickHiddenAliases(value){
   const normalized=normalizeQuickText(value);
   if(!normalized) return [];
