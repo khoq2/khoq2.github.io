@@ -2849,17 +2849,8 @@ async function renameQuickOrderItem(itemIndex){
   if(!newValue || normalizeQuickText(newValue)===normalizeQuickText(oldValue)) return;
   const duplicate = metas.some((meta,index)=>index!==itemIndex && normalizeQuickText(meta.primary)===normalizeQuickText(newValue));
   if(duplicate){ alert("Tên bộ lọc này đã tồn tại!"); return; }
-  QUICK_ORDER[key] = order.map(value=>normalizeQuickText(value)===normalizeQuickText(oldValue)?newValue:value);
-  const hidden = Array.isArray(QUICK_HIDDEN_TAGS[key]) ? QUICK_HIDDEN_TAGS[key] : [];
-  if(!hidden.some(value=>normalizeQuickText(value)===normalizeQuickText(oldValue))) hidden.push(oldValue);
-  QUICK_HIDDEN_TAGS[key] = hidden;
-  const custom = Array.isArray(QUICK_CUSTOM_TAGS[key]) ? QUICK_CUSTOM_TAGS[key] : [];
-  QUICK_CUSTOM_TAGS[key] = [...custom.filter(value=>normalizeQuickText(value)!==normalizeQuickText(oldValue)),newValue];
-  DATA.forEach(row=>{
-    const belongsToSelectedGroup=getRowGroups(row[8]).some(value=>quickOrderKey(value)===quickOrderKey(group));
-    if(belongsToSelectedGroup) row[11]=joinRowQuickTags(getRowQuickTags(row[11]).map(value=>normalizeQuickText(value)===normalizeQuickText(oldValue)?newValue:value));
-  });
-  await Promise.all([saveData(),saveDisplayConfig()]);
+  await postSheet("rename_quick_tag",{group,oldName:oldValue,newName:newValue},35000);
+  await Promise.all([loadData(),loadDisplayConfig()]);
   renderQuickOrderList(); render(); showToast(`✅ Đã đổi tên thành: ${newValue}`);
 }
 function moveQuickOrder(itemIndex, delta){
@@ -2909,12 +2900,8 @@ async function renameGroupOrderItem(index){
   const newValue=String(prompt("Nhập tên nhóm mới:",oldValue) || "").trim();
   if(!newValue || groupOrderKey(newValue)===groupOrderKey(oldValue)) return;
   if(base.some(value=>groupOrderKey(value)===groupOrderKey(newValue))){ alert("Tên nhóm này đã tồn tại!"); return; }
-  GROUP_OPTIONS[tab]=base.map(value=>groupOrderKey(value)===groupOrderKey(oldValue)?newValue:value);
-  GROUP_ORDER[tab]=groups.map(value=>groupOrderKey(value)===groupOrderKey(oldValue)?groupOrderKey(newValue):groupOrderKey(value));
-  const oldQuickKey=quickOrderKey(oldValue), newQuickKey=quickOrderKey(newValue);
-  [[QUICK_ORDER,oldQuickKey,newQuickKey],[QUICK_CUSTOM_TAGS,oldQuickKey,newQuickKey],[QUICK_HIDDEN_TAGS,oldQuickKey,newQuickKey]].forEach(([store,oldKey,newKey])=>{ if(store[oldKey]!==undefined){ store[newKey]=store[oldKey]; delete store[oldKey]; } });
-  DATA.forEach(row=>{ if(row[0]===tab) row[8]=joinRowGroups(getRowGroups(row[8]).map(value=>groupOrderKey(value)===groupOrderKey(oldValue)?newValue:value)); });
-  await Promise.all([saveData(),saveDisplayConfig()]);
+  await postSheet("rename_group",{tab,oldName:oldValue,newName:newValue,groupOptions:base},35000);
+  await Promise.all([loadData(),loadDisplayConfig()]);
   openQuickOrderModalOptionsOnly();
   renderGroupOrderList(); render(); showToast(`✅ Đã đổi tên nhóm thành: ${newValue}`);
 }
