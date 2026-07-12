@@ -2861,7 +2861,7 @@ function renderQuickOrderList(){
   document.getElementById("quickOrderList").innerHTML = metas.length ? metas.map((meta,index)=>`<div class="order-row"><span class="order-row-name">${escapeHtml(meta.label || meta.primary)}</span><div class="order-row-actions"><button type="button" class="order-btn order-btn-edit" onclick="renameQuickOrderItem(${index})" title="Sửa tên">✏️</button><button type="button" class="order-btn" ${index===0?'disabled':''} onclick="moveQuickOrder(${index},-1)" title="Đưa lên">↑</button><button type="button" class="order-btn" ${index===metas.length-1?'disabled':''} onclick="moveQuickOrder(${index},1)" title="Đưa xuống">↓</button><button type="button" class="order-btn order-btn-delete" onclick="deleteQuickOrderItem(${index})" title="Xóa mục này">🗑️</button></div></div>`).join("") : '<div style="padding:14px 4px;color:#888;font-size:12px;text-align:center">Chưa có mục bộ lọc nhanh.</div>';
   QUICK_ORDER[key] = metas.map(meta=>meta.primary);
 }
-function deleteQuickOrderItem(itemIndex){
+async function deleteQuickOrderItem(itemIndex){
   if(!requireAdmin()) return;
   const group = document.getElementById("quickOrderGroup").value;
   const key = quickOrderKey(group);
@@ -2881,10 +2881,10 @@ function deleteQuickOrderItem(itemIndex){
     QUICK_CUSTOM_TAGS[key] = QUICK_CUSTOM_TAGS[key].filter(item=>normalizeQuickText(item)!==normalizeQuickText(value));
     if(!QUICK_CUSTOM_TAGS[key].length) delete QUICK_CUSTOM_TAGS[key];
   }
-  saveDisplayConfig();
+  const saved = await saveDisplayConfig();
   renderQuickOrderList();
   render();
-  showToast(`Đã xóa: ${value}`);
+  showToast(saved ? `✅ Đã xóa và đồng bộ: ${value}` : `⚠️ Đã xóa trên máy, đang chờ đồng bộ: ${value}`, saved ? 2600 : 4500);
 }
 async function renameQuickOrderItem(itemIndex){
   if(!requireAdmin()) return;
