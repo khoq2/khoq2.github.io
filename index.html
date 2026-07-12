@@ -177,6 +177,26 @@ mark.kw-hit { background: #FFEB3B; color: #1A1A1A; padding: 0 1px; border-radius
 .btn-location:active { opacity: .75; }
 .note { font-size: 12px; color: #666; margin-top: 6px; line-height: 1.35; }
 .card-actions { display: flex; gap: 6px; margin-top: 8px; border-top: 1px solid #eee; padding-top: 8px; justify-content: flex-end; }
+.view-mode-switch { position:relative; display:flex; flex-direction:column; gap:6px; margin-left:auto; padding:4px; border:1px solid transparent; border-radius:13px; background:linear-gradient(rgba(255,255,255,.94),rgba(240,246,250,.9)) padding-box,linear-gradient(145deg,#5DADE2,#F39C12,#8E44AD) border-box; box-shadow:0 5px 14px rgba(30,58,95,.14),inset 0 1px 0 #fff; }
+.view-mode-switch::before { content:""; position:absolute; z-index:0; left:50%; top:34px; bottom:34px; width:2px; border-radius:999px; background:linear-gradient(#2E86C1,#F39C12); transform:translateX(-50%); opacity:.65; pointer-events:none; }
+.view-mode-switch.hidden { display:none; }
+.category-view-bar { display:none; justify-content:flex-end; align-items:center; padding:5px 10px 7px; background:#fff; border-top:1px solid #E5ECF1; }
+.category-view-bar.show { display:flex; }
+.view-mode-btn { position:relative; z-index:1; width:34px; height:34px; display:flex; align-items:center; justify-content:center; padding:0; border:1px solid rgba(255,255,255,.9); border-radius:9px; background:linear-gradient(145deg,#fff,#D6EAF8); color:#1A5276; box-shadow:0 3px 8px rgba(30,58,95,.15),inset 0 1px 0 #fff; cursor:pointer; transition:transform .2s ease,box-shadow .2s ease,background .2s ease,color .2s ease; }
+.view-mode-btn svg { width:16px; height:16px; fill:none; stroke:currentColor; stroke-width:2.1; stroke-linecap:round; stroke-linejoin:round; }
+.view-mode-btn:last-child { background:linear-gradient(145deg,#FFFDF7,#FDEBD0); color:#A04000; }
+.view-mode-btn:hover { transform:translateY(-2px) scale(1.05); box-shadow:0 0 0 3px rgba(93,173,226,.16),0 7px 15px rgba(30,58,95,.22); }
+.view-mode-btn:active { transform:scale(.9); box-shadow:inset 0 3px 7px rgba(30,58,95,.18); }
+.view-mode-btn.active { color:#fff; border-color:rgba(255,255,255,.75); background:linear-gradient(145deg,#2E86C1,#1E3A5F); box-shadow:0 0 0 3px rgba(46,134,193,.17),0 6px 14px rgba(30,58,95,.28),inset 0 1px 0 rgba(255,255,255,.3); }
+.view-mode-btn:last-child.active { background:linear-gradient(145deg,#F39C12,#A04000); box-shadow:0 0 0 3px rgba(243,156,18,.17),0 6px 14px rgba(160,64,0,.25),inset 0 1px 0 rgba(255,255,255,.3); }
+.product-list-row { width:100%; min-height:52px; display:flex; align-items:center; gap:10px; margin:7px 0; padding:9px 11px; border:1.5px solid #C9D6E2; border-left:5px solid var(--list-color,#1E3A5F); border-radius:11px; background:#fff; box-shadow:0 2px 6px rgba(30,58,95,.08); color:#243B53; text-align:left; cursor:pointer; }
+.product-list-row:active { transform:scale(.992); background:#F2F7FA; }
+.product-list-title { flex:1; min-width:0; font-size:13px; font-weight:900; line-height:1.35; overflow-wrap:anywhere; }
+.product-list-stock { flex:0 0 auto; padding:5px 8px; border-radius:8px; font-size:11px; font-weight:950; white-space:nowrap; }
+.product-list-stock.con { background:#D5F5E3; color:#1E8449; }
+.product-list-stock.sap { background:#FEF3CD; color:#8A6700; }
+.product-list-stock.het { background:#FADBD8; color:#A93226; }
+@media(max-width:480px){ .view-mode-switch{margin-left:auto;padding:4px;gap:6px;border-radius:13px}.view-mode-switch::before{top:36px;bottom:36px}.view-mode-btn{width:36px;height:36px}.product-list-row{min-height:56px;margin:6px 0;padding:10px}.product-list-title{font-size:14px}.product-list-stock{padding:5px 7px;font-size:11px} }
 .btn-edit { background: #EBF5FB; color: #1A5276; border: none; border-radius: 8px; padding: 5px 12px; font-size: 12px; cursor: pointer; font-weight: bold; }
 .btn-delete { background: #FADBD8; color: #922B21; border: none; border-radius: 8px; padding: 5px 12px; font-size: 12px; cursor: pointer; font-weight: bold; }
 .bulk-btn { border: none; border-radius: 18px; padding: 5px 10px; font-size: 12px; cursor: pointer; font-weight: bold; align-items: center; gap: 4px; }
@@ -465,10 +485,12 @@ body.fab-menu-open .scroll-btns { opacity: 0; transform: translateX(18px); point
 #headerFilterBtn:active { transform: scale(.96); }
 @media (max-width: 420px) {
   .form-2col { grid-template-columns: 1fr; }
+  .search-box { width:100%; max-width:100%; padding:7px 8px; gap:5px; overflow:hidden; }
+  #headerToggleText { display:none; }
+  #headerToggleBtn { flex:0 0 auto; padding:5px; min-width:32px; }
   .admin-bar { flex-wrap: wrap; justify-content: flex-start; }
   .sync-badge { margin-right: 0; }
   #lastSyncText { margin-right: auto; }
-  #headerToggleBtn { padding: 7px 9px; font-size: 11px; }
   .filters { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
   .tabs { overflow-x: visible; width: 100%; }
   .tab-btn { flex: 1 1 20%; min-width: 0; padding: 9px 2px; font-size: 10px; text-align: center; }
@@ -855,6 +877,12 @@ html::-webkit-scrollbar-corner { background: #EAF2F8; }
     <button class="bulk-btn bulk-btn-select admin-only" id="bulkModeBtn" onclick="toggleBulkSelectMode()">☑️ Chọn nhiều</button>
     <button class="bulk-btn bulk-btn-delete admin-only" id="bulkDeleteBtn" onclick="deleteSelectedItems()" disabled>🗑️ Xóa đã chọn</button>
     <span class="count-badge" id="count">0 kết quả</span>
+  </div>
+  <div class="category-view-bar" id="categoryViewBar">
+    <div class="view-mode-switch" role="group" aria-label="Kiểu hiển thị sản phẩm">
+      <button class="view-mode-btn" id="productGridBtn" type="button" onclick="setProductViewMode('card')" title="Grid - Dạng thẻ" aria-label="Hiển thị dạng Grid"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"></rect><rect x="14" y="3" width="7" height="7" rx="1.5"></rect><rect x="3" y="14" width="7" height="7" rx="1.5"></rect><rect x="14" y="14" width="7" height="7" rx="1.5"></rect></svg></button>
+      <button class="view-mode-btn" id="productListBtn" type="button" onclick="setProductViewMode('list')" title="List - Tiêu đề và tồn kho" aria-label="Hiển thị dạng List"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6h12M9 12h12M9 18h12"></path><circle cx="4.5" cy="6" r="1"></circle><circle cx="4.5" cy="12" r="1"></circle><circle cx="4.5" cy="18" r="1"></circle></svg></button>
+    </div>
   </div>
 </div>
 
@@ -1486,6 +1514,7 @@ let restockOnly = false;
 let totalStockView = false;
 let searchQ = "";
 let quickGroupFilter = null;
+let productViewMode = "card";
 let importRows = [];
 let bulkSelectMode = false;
 const selectedItems = new Set();
@@ -3220,6 +3249,10 @@ function renderCard(r,i,displayNo){
   const stBg=isHet?"#FADBD8":isSap?"#FEF9E7":"#D5F5E3";
   const stFg=isHet?"#922B21":isSap?"#7D6608":"#1E8449";
   const stTxt=getStockStatusLabel(ton, sapHet);
+  if(productViewMode==="list" && currentTab!=="ALL"){
+    const listStockClass=isHet?"het":isSap?"sap":"con";
+    return `<div class="product-list-row" style="--list-color:${cfg.c}" title="${escapeHtml(ten)}"><span class="product-list-title">${highlightMatch(ten,kwTokens)}</span><span class="product-list-stock ${listStockClass}">Tồn: ${Number(ton)||0}</span></div>`;
+  }
   const condition = detectConditionLabel([ten, th, ghi].filter(Boolean).join(" "));
   const productTransactions = getTransactionsForProduct(r);
   const latestTransaction = productTransactions[0];
@@ -3291,6 +3324,18 @@ function renderCard(r,i,displayNo){
       </div>
     </div>
   </div>`;
+}
+
+function syncProductViewModeButton(){
+  const list=productViewMode==="list";
+  const gridBtn=document.getElementById("productGridBtn"), listBtn=document.getElementById("productListBtn");
+  document.getElementById("categoryViewBar")?.classList.toggle("show",currentTab!=="ALL");
+  gridBtn?.classList.toggle("active",!list); listBtn?.classList.toggle("active",list);
+  gridBtn?.setAttribute("aria-pressed",String(!list)); listBtn?.setAttribute("aria-pressed",String(list));
+}
+function setProductViewMode(mode){
+  productViewMode=mode==="list"?"list":"card";
+  render();
 }
 
 const NO_GROUP = "🆕 Khác";
@@ -3482,6 +3527,7 @@ function renderRestockOverview(el){
   el.innerHTML = html;
 }
 function render(){
+  syncProductViewModeButton();
   syncLatestItemsTickerVisibility();
   openSummaryListKey = "";
   initKPI();
