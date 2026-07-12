@@ -3209,7 +3209,7 @@ function openZaloContact(btn){
   const location = btn?.dataset?.location || "Chưa ghi vị trí";
   const image = btn?.dataset?.image || "";
   const imageLine = image ? `\nLink hình ảnh: ${image}` : "";
-  const message = `Mã: ${code}\nTên: ${title}\nChi nhánh: ${branch}\nTồn hiện tại: ${stock}\nVị trí: ${location}${imageLine}\nKế toán: 094 8300735\n\nNhờ anh/chị báo giá hàng này giúp em.`;
+  const message = `Mã: ${code}\nTên: ${title}\nChi nhánh: ${branch}\nTồn hiện tại: ${stock}\nVị trí: ${location}${imageLine}\nLiên hệ: 094 8300735\n\nNhờ anh/chị báo giá hàng này giúp em.`;
   const url = `https://zalo.me/0375111112?text=${encodeURIComponent(message)}`;
   const copied = copyContactMessage(message);
   showToast(copied ? "✅ Đã copy mẫu hỏi giá — đang mở Zalo" : "⚠️ Đang mở Zalo — nếu chưa có nội dung, hãy quay lại copy thủ công.", 4000);
