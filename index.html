@@ -233,6 +233,12 @@ mark.kw-hit { background: #FFEB3B; color: #1A1A1A; padding: 0 1px; border-radius
 .image-lightbox.open { display:flex; }
 .image-lightbox img { display:block; max-width:100%; max-height:calc(100dvh - 36px); object-fit:contain; border-radius:10px; box-shadow:0 12px 42px rgba(0,0,0,.5); cursor:default; }
 .image-lightbox-close { position:absolute; top:max(14px, env(safe-area-inset-top)); right:max(14px, env(safe-area-inset-right)); width:42px; height:42px; border:0; border-radius:50%; background:rgba(255,255,255,.16); color:#fff; font-size:28px; line-height:1; cursor:pointer; }
+.image-lightbox-nav { display:none; position:absolute; z-index:2; top:50%; width:46px; height:58px; margin-top:-29px; border:0; border-radius:14px; background:rgba(255,255,255,.16); color:#fff; font-size:30px; cursor:pointer; backdrop-filter:blur(8px); }
+.image-lightbox-nav.show { display:block; }
+.image-lightbox-prev { left:max(12px,env(safe-area-inset-left)); }
+.image-lightbox-next { right:max(12px,env(safe-area-inset-right)); }
+.image-lightbox-count { display:none; position:absolute; left:50%; bottom:max(14px,env(safe-area-inset-bottom)); transform:translateX(-50%); padding:6px 11px; border-radius:999px; background:rgba(0,0,0,.48); color:#fff; font-size:12px; font-weight:850; }
+.image-lightbox-count.show { display:block; }
 .group-checkboxes { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:7px; max-height:190px; overflow-y:auto; padding:9px; border:1.5px solid #ddd; border-radius:10px; background:#fafafa; }
 .group-check { display:flex; align-items:flex-start; gap:6px; padding:6px; border-radius:7px; font-size:12px; line-height:1.3; cursor:pointer; }
 .group-check:has(input:checked) { background:#EAF2F8; color:#1A5276; font-weight:bold; }
@@ -738,7 +744,6 @@ html::-webkit-scrollbar-corner { background: #EAF2F8; }
 .customer-primary,.customer-secondary { border:0; border-radius:10px; padding:9px 12px; cursor:pointer; font-size:12px; font-weight:900; }
 .customer-primary { background:linear-gradient(135deg,#1E3A5F,#2E86C1); color:#fff; box-shadow:0 4px 10px rgba(30,58,95,.2); }
 .customer-secondary { background:#EAF2F8; color:#1A5276; }
-body.admin-mode .customer-admin-login { display:none; }
 .customer-results { display:grid; gap:7px; max-height:34dvh; overflow:auto; overscroll-behavior:contain; }
 .customer-result { width:100%; display:grid; gap:3px; padding:11px 12px; border:1px solid #D6EAF8; border-radius:12px; background:#fff; color:#2C3E50; text-align:left; cursor:pointer; }
 .customer-result-phone { color:#1A5276; font-size:14px; font-weight:950; }
@@ -755,8 +760,16 @@ body.admin-mode .customer-admin-login { display:none; }
 .customer-record.cancelled { opacity:.62; }
 .customer-record-head { display:flex; justify-content:space-between; gap:8px; color:#607D8B; font-size:10px; font-weight:850; }
 .customer-record-device { margin-top:7px; color:#1E3A5F; font-size:14px; font-weight:950; }
+.customer-record-specs { display:flex; flex-wrap:wrap; gap:5px; margin-top:6px; }
+.customer-record-spec { padding:4px 7px; border-radius:999px; background:#EAF2F8; color:#1A5276; font-size:10px; font-weight:850; }
+.customer-record-spec.amount { background:#E8F8F0; color:#1E8449; }
 .customer-record-work { margin-top:5px; color:#34495E; font-size:12px; line-height:1.45; white-space:pre-wrap; }
 .customer-record-note { margin-top:7px; padding:7px 9px; border-radius:9px; background:#FFF8E7; color:#7D5A12; font-size:11px; line-height:1.4; white-space:pre-wrap; }
+.trash-item { display:flex; align-items:center; gap:9px; margin-bottom:7px; padding:10px; border:1px solid #E5E8E8; border-radius:11px; background:#fff; }
+.trash-item-main { flex:1; min-width:0; }
+.trash-item-title { color:#2C3E50; font-size:12px; font-weight:900; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.trash-item-meta { margin-top:3px; color:#7B8A97; font-size:10px; }
+.trash-restore { border:0; border-radius:9px; padding:8px 10px; background:#D5F5E3; color:#1E8449; font-size:11px; font-weight:900; cursor:pointer; }
 .customer-bill-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:7px; margin-top:9px; }
 .customer-bill-img { width:100%; aspect-ratio:4/3; object-fit:cover; border-radius:10px; border:1px solid #E3E8EC; background:#F4F6F7; cursor:zoom-in; }
 .customer-editor { display:none; margin-top:11px; padding:12px; border:1px solid #D6EAF8; border-radius:14px; background:#fff; }
@@ -764,6 +777,7 @@ body.admin-mode .customer-admin-login { display:none; }
 .customer-editor-grid { display:grid; grid-template-columns:1fr 1fr; gap:9px; }
 .customer-editor label { display:grid; gap:4px; color:#52606D; font-size:11px; font-weight:850; }
 .customer-editor input,.customer-editor textarea,.customer-editor select { width:100%; min-height:42px; padding:9px 10px; border:1.5px solid #D5DBDB; border-radius:9px; background:#fff; color:#2C3E50; font-size:16px; outline:none; }
+.customer-editor input[readonly] { background:#F2F5F7; color:#52606D; }
 .customer-editor textarea { min-height:76px; resize:vertical; }
 .customer-editor textarea.customer-drive-links { min-height:238px; line-height:1.55; }
 .customer-editor .wide { grid-column:1/-1; }
@@ -847,6 +861,7 @@ body.admin-mode .customer-admin-login { display:none; }
     <button class="fab fab-add admin-only" onclick="openAddModal()">➕ Thêm thiết bị</button>
     <button class="fab admin-only" style="background:#8E44AD;color:#fff" onclick="openNVModal()">👥 Nhân viên</button>
     <button class="fab admin-only" style="background:#21618C;color:#fff" onclick="openCustomerPanel()">👤 Khách hàng</button>
+    <button class="fab admin-only" style="background:#A04000;color:#fff" onclick="openTrashModal()">♻️ Thùng rác</button>
     <button class="fab admin-only" style="background:#5B2C6F;color:#fff" onclick="openQuickOrderModal()">↕️ Sắp xếp lọc</button>
     <button class="fab admin-only" style="background:#1A5276;color:#fff" onclick="openGroupOrderModal()">↕️ Sắp xếp nhóm</button>
     <button class="fab admin-only" style="background:#117864;color:#fff" onclick="backupDataToExcel()">💾 Sao lưu Excel</button>
@@ -1098,7 +1113,6 @@ body.admin-mode .customer-admin-login { display:none; }
     </div>
     <div style="margin:6px 3px 0;color:#718096;font-size:10px;line-height:1.35;">Có thể nhập 0901234567, 0901 234 567, 0901.234.567, +84901… hoặc chỉ 4 số cuối.</div>
     <div class="customer-toolbar">
-      <button type="button" class="customer-secondary customer-admin-login" onclick="onAdminBtnClick()">🔐 Đăng nhập Admin để chỉnh sửa</button>
       <button type="button" class="customer-primary admin-only" onclick="openCustomerEditor()">＋ Thêm khách hàng</button>
     </div>
     <div id="customerResults" class="customer-results"></div>
@@ -1115,7 +1129,12 @@ body.admin-mode .customer-admin-login { display:none; }
     <div id="customerRecordEditor" class="customer-editor">
       <input type="hidden" id="customerRecordId">
       <div class="customer-editor-grid">
+        <label>Tên khách hàng<input id="customerRecordCustomerName" type="text" readonly></label>
+        <label>Số điện thoại<input id="customerRecordPhone" type="tel" readonly></label>
         <label>Thiết bị<input id="customerRecordDevice" type="text" placeholder="VD: Laptop Dell Inspiron"></label>
+        <label>Model<input id="customerRecordModel" type="text" placeholder="VD: Inspiron 15 3511"></label>
+        <label>Serial / Service Tag<input id="customerRecordSerialTag" type="text" placeholder="Serial hoặc Service Tag"></label>
+        <label>Giá tiền<input id="customerRecordAmount" type="text" inputmode="numeric" placeholder="VD: 1.500.000"></label>
         <label>Chi nhánh<select id="customerRecordBranch"><option value="Q2">Q2</option><option value="Q5">Q5</option></select></label>
         <label class="wide">Ngày giờ khách đến / thực hiện *<input id="customerRecordTime" type="datetime-local"></label>
         <label class="wide">Đã làm / sửa gì *<textarea id="customerRecordWork" placeholder="VD: Thay SSD 256GB, cài Windows..."></textarea></label>
@@ -1156,7 +1175,19 @@ body.admin-mode .customer-admin-login { display:none; }
 
 <div id="imageLightbox" class="image-lightbox" role="dialog" aria-modal="true" aria-label="Xem ảnh phóng to" onclick="closeImageViewer(event)">
   <button type="button" class="image-lightbox-close" aria-label="Đóng ảnh" onclick="closeImageViewer()">×</button>
-  <img id="imageLightboxImg" src="" alt="Ảnh phóng to" referrerpolicy="no-referrer" onclick="event.stopPropagation()">
+  <button type="button" id="imageLightboxPrev" class="image-lightbox-nav image-lightbox-prev" aria-label="Ảnh trước" onclick="event.stopPropagation();navigateCustomerGallery(-1)">‹</button>
+  <img id="imageLightboxImg" src="" alt="Ảnh phóng to" referrerpolicy="no-referrer" onclick="onLightboxImageClick(event)">
+  <button type="button" id="imageLightboxNext" class="image-lightbox-nav image-lightbox-next" aria-label="Ảnh tiếp theo" onclick="event.stopPropagation();navigateCustomerGallery(1)">›</button>
+  <div id="imageLightboxCount" class="image-lightbox-count"></div>
+</div>
+
+<div class="overlay" id="trashOverlay" onclick="overlayClose(event,'trashOverlay')">
+  <div class="modal" onclick="event.stopPropagation()" style="max-height:88dvh;overflow-y:auto;">
+    <div class="modal-title">♻️ THÙNG RÁC DỮ LIỆU</div>
+    <div style="font-size:11px;color:#718096;line-height:1.45;margin-bottom:10px;">Dữ liệu xóa được giữ tại Google Sheet và có thể khôi phục. Mỗi thao tác đều được ghi vào Nhật ký hệ thống.</div>
+    <div id="trashList"></div>
+    <button class="btn-cancel" onclick="closeOverlay('trashOverlay')">Đóng</button>
+  </div>
 </div>
 
 <div class="overlay" id="groupOrderOverlay" onclick="overlayClose(event,'groupOrderOverlay')">
@@ -1924,7 +1955,7 @@ function setVndInputValue(id, value){
   if(el) el.value = Number(value)>0 ? formatVndNumber(value) : "";
 }
 function setupVndInputs(){
-  ["fGia","fGiaBan","saleGia"].forEach(id=>{
+  ["fGia","fGiaBan","saleGia","customerRecordAmount"].forEach(id=>{
     const el = document.getElementById(id);
     if(!el) return;
     el.addEventListener("input", function(){
@@ -4289,8 +4320,19 @@ function editTX(id){ if(!requireAdmin()) return;
   document.getElementById("saleImgFile").value = "";
   document.getElementById("saleOverlay").classList.add("open");
 }
-function openImageViewer(src, alt="Ảnh phóng to"){
+let customerGalleryImages = [];
+let customerGalleryIndex = 0;
+let customerGalleryTouchX = null;
+function updateCustomerGalleryControls(){
+  const hasGallery=customerGalleryImages.length>1;
+  document.getElementById("imageLightboxPrev")?.classList.toggle("show",hasGallery);
+  document.getElementById("imageLightboxNext")?.classList.toggle("show",hasGallery);
+  const count=document.getElementById("imageLightboxCount");
+  if(count){ count.classList.toggle("show",hasGallery); count.textContent=hasGallery?`${customerGalleryIndex+1} / ${customerGalleryImages.length}`:""; }
+}
+function openImageViewer(src, alt="Ảnh phóng to", keepGallery=false){
   if(!src) return;
+  if(!keepGallery){ customerGalleryImages=[]; customerGalleryIndex=0; }
   const box = document.getElementById("imageLightbox");
   const img = document.getElementById("imageLightboxImg");
   img.referrerPolicy = "no-referrer";
@@ -4302,18 +4344,40 @@ function openImageViewer(src, alt="Ảnh phóng to"){
   img.src = src;
   img.alt = alt || "Ảnh phóng to";
   box.classList.add("open");
+  updateCustomerGalleryControls();
   document.body.style.overflow = "hidden";
+}
+function navigateCustomerGallery(delta){
+  if(customerGalleryImages.length<2) return;
+  customerGalleryIndex=(customerGalleryIndex+delta+customerGalleryImages.length)%customerGalleryImages.length;
+  const img=document.getElementById("imageLightboxImg");
+  img.src=customerGalleryImages[customerGalleryIndex];
+  updateCustomerGalleryControls();
+}
+function onLightboxImageClick(event){
+  event.stopPropagation();
+  if(customerGalleryImages.length>1 && window.matchMedia("(hover:hover) and (pointer:fine)").matches) navigateCustomerGallery(1);
 }
 function closeImageViewer(event){
   if(event && event.target !== document.getElementById("imageLightbox")) return;
   const box = document.getElementById("imageLightbox");
   box.classList.remove("open");
   document.getElementById("imageLightboxImg").src = "";
-  document.body.style.overflow = "";
+  customerGalleryImages=[]; customerGalleryIndex=0; updateCustomerGalleryControls();
+  document.body.style.overflow = document.getElementById("customerOverlay")?.classList.contains("open") ? "hidden" : "";
 }
 document.addEventListener("keydown", event=>{
   if(event.key === "Escape" && document.getElementById("imageLightbox").classList.contains("open")) closeImageViewer();
+  if(event.key === "ArrowLeft" && document.getElementById("imageLightbox").classList.contains("open")) navigateCustomerGallery(-1);
+  if(event.key === "ArrowRight" && document.getElementById("imageLightbox").classList.contains("open")) navigateCustomerGallery(1);
 });
+document.getElementById("imageLightbox").addEventListener("touchstart",event=>{ customerGalleryTouchX=event.changedTouches?.[0]?.clientX ?? null; },{passive:true});
+document.getElementById("imageLightbox").addEventListener("touchend",event=>{
+  if(customerGalleryTouchX===null || customerGalleryImages.length<2) return;
+  const endX=event.changedTouches?.[0]?.clientX;
+  if(Number.isFinite(endX) && Math.abs(endX-customerGalleryTouchX)>45) navigateCustomerGallery(endX<customerGalleryTouchX?1:-1);
+  customerGalleryTouchX=null;
+},{passive:true});
 async function deleteTX(id){ if(!requireAdmin()) return;
   const tx = TX_DATA.find(t=>String(t.id)===String(id));
   if(!tx){ showToast("Không tìm thấy giao dịch"); return; }
@@ -4985,29 +5049,56 @@ function splitCustomerImages(value){
   return String(value || "").split(/\r?\n/).map(v=>v.trim()).filter(Boolean).slice(0,10);
 }
 function customerNowLocalValue(){
-  const now=new Date();
-  return new Date(now.getTime()-now.getTimezoneOffset()*60000).toISOString().slice(0,16);
+  const parts=new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Ho_Chi_Minh",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",hourCycle:"h23"}).formatToParts(new Date());
+  const get=type=>parts.find(part=>part.type===type)?.value || "";
+  return `${get("year")}-${get("month")}-${get("day")}T${get("hour")}:${get("minute")}`;
 }
 function customerTimeInputValue(value){
   const text=String(value || "").trim();
   const match=text.match(/^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2})/);
-  return match ? `${match[1]}-${match[2]}-${match[3]}T${match[4]}:${match[5]}` : customerNowLocalValue();
+  if(match) return `${match[1]}-${match[2]}-${match[3]}T${match[4]}:${match[5]}`;
+  const parsed=new Date(text);
+  if(!Number.isNaN(parsed.getTime())){
+    const parts=new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Ho_Chi_Minh",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",hourCycle:"h23"}).formatToParts(parsed);
+    const get=type=>parts.find(part=>part.type===type)?.value || "";
+    return `${get("year")}-${get("month")}-${get("day")}T${get("hour")}:${get("minute")}`;
+  }
+  return customerNowLocalValue();
 }
 function formatCustomerRecordTime(value){
   const text=String(value || "").trim();
   const match=text.match(/^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2})/);
-  return match ? `${match[3]}/${match[2]}/${match[1]} · ${match[4]}:${match[5]}` : (text || "Chưa rõ thời gian");
+  let year,month,day,hour,minute;
+  if(match){
+    [year,month,day,hour,minute]=[match[1],match[2],match[3],match[4],match[5]];
+  }else{
+    const parsed=new Date(text);
+    if(Number.isNaN(parsed.getTime())) return text || "Chưa rõ thời gian";
+    const parts=new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Ho_Chi_Minh",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",hourCycle:"h23"}).formatToParts(parsed);
+    const get=type=>parts.find(part=>part.type===type)?.value || "";
+    [year,month,day,hour,minute]=[get("year"),get("month"),get("day"),get("hour"),get("minute")];
+  }
+  const hour24=Number(hour);
+  const period=hour24>=12?"PM":"AM";
+  const hour12=String(hour24%12 || 12).padStart(2,"0");
+  return `${day}/${month}/${year} ${hour12}:${minute}${period}`;
 }
 function renderCustomerDetail(loading=false){
   if(!selectedCustomer) return;
   const c=selectedCustomer;
   const recordsHtml = loading ? '<div class="customer-empty">⏳ Đang tải lịch sử bill...</div>' : (CUSTOMER_RECORDS.length ? CUSTOMER_RECORDS.map(record=>{
     const images=splitCustomerImages(record.images);
-    return `<article class="customer-record ${record.status==="CANCELLED"?"cancelled":""}"><div class="customer-record-head"><span>🕒 ${escapeHtml(formatCustomerRecordTime(record.time))} · ${escapeHtml(record.branch || "Q2")}</span><span>${escapeHtml(record.employee || "")}${record.status==="CANCELLED"?" · ĐÃ HỦY":""}</span></div><div class="customer-record-device">${escapeHtml(record.device || "Thiết bị chưa ghi tên")}</div><div class="customer-record-work">${escapeHtml(record.work || "Chưa ghi nội dung đã làm")}</div>${record.note?`<div class="customer-record-note">📝 ${escapeHtml(record.note)}</div>`:""}${images.length?`<div class="customer-bill-grid">${images.map(url=>`<img class="customer-bill-img" src="${escapeHtml(resolveImageUrl(url))}" data-full="${escapeHtml(resolveImageUrl(url))}" alt="Ảnh bill" loading="lazy" referrerpolicy="no-referrer" onclick="openCustomerBillImage(this)">`).join("")}</div>`:""}<div class="customer-toolbar admin-only"><button type="button" class="customer-secondary" data-record-id="${escapeHtml(record.id)}" onclick="openCustomerRecordEditor(this.dataset.recordId)">✏️ Sửa hồ sơ</button></div></article>`;
+    return `<article class="customer-record ${record.status==="CANCELLED"?"cancelled":""}"><div class="customer-record-head"><span>🕒 ${escapeHtml(formatCustomerRecordTime(record.time))} · ${escapeHtml(record.branch || "Q2")}</span><span>${escapeHtml(record.employee || "")}${record.status==="CANCELLED"?" · ĐÃ HỦY":""}</span></div><div class="customer-record-device">${escapeHtml(record.device || "Thiết bị chưa ghi tên")}</div><div class="customer-record-specs">${record.model?`<span class="customer-record-spec">Model: ${escapeHtml(record.model)}</span>`:""}${record.serialTag?`<span class="customer-record-spec">Serial: ${escapeHtml(record.serialTag)}</span>`:""}${Number(record.amount)>0?`<span class="customer-record-spec amount">💰 ${formatVndNumber(record.amount)} VND</span>`:""}</div><div class="customer-record-work">${escapeHtml(record.work || "Chưa ghi nội dung đã làm")}</div>${record.note?`<div class="customer-record-note">📝 ${escapeHtml(record.note)}</div>`:""}${images.length?`<div class="customer-bill-grid">${images.map(url=>`<img class="customer-bill-img" src="${escapeHtml(resolveImageUrl(url))}" data-full="${escapeHtml(resolveImageUrl(url))}" alt="Ảnh bill" loading="lazy" referrerpolicy="no-referrer" onclick="openCustomerBillImage(this)">`).join("")}</div>`:""}<div class="customer-toolbar admin-only"><button type="button" class="customer-secondary" data-record-id="${escapeHtml(record.id)}" onclick="openCustomerRecordEditor(this.dataset.recordId)">✏️ Sửa hồ sơ</button><button type="button" class="btn-delete" data-record-id="${escapeHtml(record.id)}" onclick="deleteCustomerRecord(this.dataset.recordId)">🗑️ Xóa</button></div></article>`;
   }).join("") : '<div class="customer-empty">Khách này chưa có bill hoặc lịch sử sửa chữa.</div>');
-  document.getElementById("customerDetail").innerHTML=`<div class="customer-profile"><div class="customer-profile-name">${escapeHtml(c.name || "KHÁCH CHƯA GHI TÊN")}</div><div class="customer-profile-phone">☎ ${escapeHtml(formatCustomerPhone(c.phone))}</div>${c.note?`<div class="customer-profile-note">${escapeHtml(c.note)}</div>`:""}</div><div class="customer-toolbar admin-only"><button type="button" class="customer-secondary" onclick="openCustomerEditor('${c.phone}')">✏️ Sửa khách</button><button type="button" class="customer-primary" onclick="openCustomerRecordEditor()">＋ Thêm bill / lần sửa</button></div><div class="customer-records">${recordsHtml}</div>`;
+  document.getElementById("customerDetail").innerHTML=`<div class="customer-profile"><div class="customer-profile-name">${escapeHtml(c.name || "KHÁCH CHƯA GHI TÊN")}</div><div class="customer-profile-phone">☎ ${escapeHtml(formatCustomerPhone(c.phone))}</div>${c.note?`<div class="customer-profile-note">${escapeHtml(c.note)}</div>`:""}</div><div class="customer-toolbar admin-only"><button type="button" class="customer-secondary" onclick="openCustomerEditor('${c.phone}')">✏️ Sửa khách</button><button type="button" class="customer-primary" onclick="openCustomerRecordEditor()">＋ Thêm bill / lần sửa</button><button type="button" class="btn-delete" onclick="deleteSelectedCustomer()">🗑️ Xóa khách</button></div><div class="customer-records">${recordsHtml}</div>`;
 }
-function openCustomerBillImage(img){ openImageViewer(img?.dataset?.full || img?.src || "","Ảnh bill khách hàng"); }
+function openCustomerBillImage(img){
+  const record=img?.closest?.(".customer-record");
+  customerGalleryImages=record ? [...record.querySelectorAll(".customer-bill-img")].map(item=>item.dataset.full || item.src).filter(Boolean) : [img?.dataset?.full || img?.src || ""].filter(Boolean);
+  const current=img?.dataset?.full || img?.src || "";
+  customerGalleryIndex=Math.max(0,customerGalleryImages.indexOf(current));
+  openImageViewer(current,"Ảnh bill khách hàng",true);
+}
 function closeCustomerEditors(){
   document.getElementById("customerEditor")?.classList.remove("open");
   document.getElementById("customerRecordEditor")?.classList.remove("open");
@@ -5044,7 +5135,12 @@ function openCustomerRecordEditor(recordId=""){
   const record=CUSTOMER_RECORDS.find(item=>String(item.id)===String(recordId));
   closeCustomerEditors();
   document.getElementById("customerRecordId").value=record?.id || "";
+  document.getElementById("customerRecordCustomerName").value=record?.customerName || selectedCustomer.name || "";
+  document.getElementById("customerRecordPhone").value=formatCustomerPhone(selectedCustomer.phone);
   document.getElementById("customerRecordDevice").value=record?.device || "";
+  document.getElementById("customerRecordModel").value=record?.model || "";
+  document.getElementById("customerRecordSerialTag").value=record?.serialTag || "";
+  document.getElementById("customerRecordAmount").value=Number(record?.amount)>0 ? formatVndNumber(record.amount) : "";
   document.getElementById("customerRecordWork").value=record?.work || "";
   document.getElementById("customerRecordImages").value=record?.images || "";
   document.getElementById("customerRecordNote").value=record?.note || "";
@@ -5064,12 +5160,72 @@ async function saveCustomerRecord(){
   if(!recordTime){ alert("Vui lòng chọn ngày giờ khách đến hoặc thực hiện!"); return; }
   customerSaving=true;
   try{
-    await postSheet("upsert_customer_record",{id:document.getElementById("customerRecordId").value,phone:selectedCustomer.phone,device:document.getElementById("customerRecordDevice").value.trim(),work,images:imageLinks.join("\n"),note:document.getElementById("customerRecordNote").value.trim(),employee:document.getElementById("customerRecordEmployee").value.trim(),branch:document.getElementById("customerRecordBranch").value,time:recordTime.replace("T"," ")},35000);
+    await postSheet("upsert_customer_record",{id:document.getElementById("customerRecordId").value,phone:selectedCustomer.phone,customerName:selectedCustomer.name || "",device:document.getElementById("customerRecordDevice").value.trim(),model:document.getElementById("customerRecordModel").value.trim(),serialTag:document.getElementById("customerRecordSerialTag").value.trim(),amount:parseVndInput(document.getElementById("customerRecordAmount").value),work,images:imageLinks.join("\n"),note:document.getElementById("customerRecordNote").value.trim(),employee:document.getElementById("customerRecordEmployee").value.trim(),branch:document.getElementById("customerRecordBranch").value,time:recordTime.replace("T"," ")},35000);
     closeCustomerEditors();
     await openCustomerDetail(selectedCustomer.phone);
     showToast("✅ Đã lưu hồ sơ khách hàng");
   }catch(e){ showToast("⚠️ Không lưu được hồ sơ: "+String(e),4500); }
   finally{ customerSaving=false; }
+}
+async function deleteCustomerRecord(id){
+  if(!requireAdmin() || !id) return;
+  if(!confirm("Xóa hồ sơ/bill này? Dữ liệu sẽ được chuyển vào Thùng rác và có thể khôi phục.")) return;
+  try{
+    await postSheet("delete_customer_record",{id},35000);
+    await openCustomerDetail(selectedCustomer.phone);
+    showToast("Đã chuyển hồ sơ vào Thùng rác");
+  }catch(e){ showToast("⚠️ Không xóa được hồ sơ: "+String(e),4500); }
+}
+async function deleteSelectedCustomer(){
+  if(!requireAdmin() || !selectedCustomer) return;
+  if(!confirm(`Xóa khách "${selectedCustomer.name || selectedCustomer.phone}" và toàn bộ bill? Dữ liệu có thể khôi phục từ Thùng rác.`)) return;
+  try{
+    await postSheet("delete_customer",{id:selectedCustomer.id,phone:selectedCustomer.phone},35000);
+    CUSTOMER_DATA=CUSTOMER_DATA.filter(item=>item.phone!==selectedCustomer.phone);
+    safeLocalStorageSet(CUSTOMER_CACHE_KEY,JSON.stringify(CUSTOMER_DATA));
+    selectedCustomer=null; CUSTOMER_RECORDS=[];
+    document.getElementById("customerDetail").innerHTML="";
+    document.getElementById("customerSearch").value="";
+    renderCustomerSearch();
+    showToast("Đã chuyển khách hàng vào Thùng rác");
+  }catch(e){ showToast("⚠️ Không xóa được khách hàng: "+String(e),4500); }
+}
+async function openTrashModal(){
+  if(!requireAdmin()) return;
+  document.getElementById("trashOverlay").classList.add("open");
+  const list=document.getElementById("trashList");
+  list.innerHTML='<div class="customer-empty">⏳ Đang tải thùng rác...</div>';
+  try{
+    const json=await fetchSheetJson(sheetUrl({type:"trash",_ts:Date.now()}),{},35000);
+    renderTrashList(Array.isArray(json.trash)?json.trash:[]);
+  }catch(e){ list.innerHTML=`<div class="customer-empty">⚠️ ${escapeHtml(String(e))}</div>`; }
+}
+function trashItemLabel(item){
+  try{
+    const data=JSON.parse(item.data || "null");
+    if(item.type==="SAN_PHAM") return `${data?.[1] || item.key} · ${data?.[2] || "Sản phẩm"}`;
+    if(item.type==="HO_SO_KHACH_HANG") return `${data?.[3] || "Hồ sơ sửa chữa"} · ${data?.[2] || ""}`;
+    if(item.type==="KHACH_HANG"){ const customer=Array.isArray(data)?data:data?.customer; return `${customer?.[2] || "Khách hàng"} · ${formatCustomerPhone(customer?.[1] || item.key)}`; }
+    if(item.type==="GIAO_DICH") return `${data?.[1] || "Giao dịch"} · ${data?.[2] || item.key}`;
+    if(item.type==="NHAN_VIEN") return `Nhân viên: ${data?.[0] || item.key}`;
+  }catch(e){}
+  return item.key || item.type;
+}
+function renderTrashList(items){
+  const list=document.getElementById("trashList");
+  if(!items.length){ list.innerHTML='<div class="customer-empty">Thùng rác đang trống.</div>'; return; }
+  list.innerHTML=items.map(item=>`<div class="trash-item"><div class="trash-item-main"><div class="trash-item-title">${escapeHtml(trashItemLabel(item))}</div><div class="trash-item-meta">${escapeHtml(item.type)} · ${escapeHtml(formatCustomerRecordTime(item.deletedAt))}</div></div><button type="button" class="trash-restore" data-trash-id="${escapeHtml(item.id)}" onclick="restoreTrashItem(this.dataset.trashId)">↩ Khôi phục</button></div>`).join("");
+}
+async function restoreTrashItem(id){
+  if(!requireAdmin() || !id) return;
+  if(!confirm("Khôi phục dữ liệu này?")) return;
+  try{
+    await postSheet("restore_trash",{id},35000);
+    await Promise.all([loadData(),loadCustomers(true),loadTXFromSheet(),loadNVFromSheet(),loadDisplayConfig()]);
+    render();
+    await openTrashModal();
+    showToast("✅ Đã khôi phục dữ liệu");
+  }catch(e){ showToast("⚠️ Không khôi phục được: "+String(e),4500); }
 }
 function setupCustomerSecretHold(){
   const icon=document.querySelector(".title-icon");
