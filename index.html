@@ -5885,11 +5885,10 @@ function startBackgroundSync(){
   await loadData();
   // Hiện ngay thiết bị mới nhất sau khi DATA đã có dữ liệu, không phải đợi chu kỳ 3 giây.
   refreshLatestItemsTicker();
-  setLoadingUI(65, "Đang đồng bộ giao dịch từ máy chủ...");
-  await loadTXFromSheet();
-  setLoadingUI(85, "Đang đồng bộ nhân viên từ máy chủ...");
-  await loadNVFromSheet();
-  await loadDisplayConfig();
+  setLoadingUI(70, "Đang đồng bộ giao dịch, nhân viên và cấu hình...");
+  // Ba nguồn này độc lập, tải song song để không phải cộng dồn thời gian chờ
+  // Google Apps Script. Mỗi hàm vẫn giữ cơ chế chống ghi đè dữ liệu đang chờ.
+  await Promise.all([loadTXFromSheet(),loadNVFromSheet(),loadDisplayConfig()]);
   refreshLatestItemsTicker();
   // Nếu lần lưu sản phẩm trước bị mất mạng, loadData đã giữ bản cục bộ mới nhất;
   // tự gửi lại ngay thay vì buộc người dùng bấm "Đẩy lên Sheet".
@@ -5898,7 +5897,6 @@ function startBackgroundSync(){
   if(hasAuxPendingSync(PENDING_NV_SYNC_KEY)) await saveNV();
   if(hasAuxPendingSync(PENDING_CONFIG_SYNC_KEY)) await saveDisplayConfig();
   setLoadingUI(100, "Hoàn tất! Đang hiển thị kho hàng...");
-  await new Promise(r => setTimeout(r, 400));
   syncStatusButtons(totalStockView ? currentStatus : "");
   render();
   startBackgroundSync();
