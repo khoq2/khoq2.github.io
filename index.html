@@ -181,8 +181,9 @@ mark.kw-hit { background: #FFEB3B; color: #1A1A1A; padding: 0 1px; border-radius
 .view-mode-switch { position:relative; display:flex; flex-direction:column; gap:6px; margin-left:auto; padding:4px; border:1px solid transparent; border-radius:13px; background:linear-gradient(rgba(255,255,255,.94),rgba(240,246,250,.9)) padding-box,linear-gradient(145deg,#5DADE2,#F39C12,#8E44AD) border-box; box-shadow:0 5px 14px rgba(30,58,95,.14),inset 0 1px 0 #fff; }
 .view-mode-switch::before { content:""; position:absolute; z-index:0; left:50%; top:34px; bottom:34px; width:2px; border-radius:999px; background:linear-gradient(#2E86C1,#F39C12); transform:translateX(-50%); opacity:.65; pointer-events:none; }
 .view-mode-switch.hidden { display:none; }
-.category-view-bar { display:none; justify-content:flex-end; align-items:center; padding:5px 10px 7px; background:#fff; border-top:1px solid #E5ECF1; }
-.category-view-bar.show { display:flex; }
+.category-view-bar { display:none; position:fixed; right:max(12px,env(safe-area-inset-right)); bottom:max(205px,calc(env(safe-area-inset-bottom) + 188px)); z-index:205; pointer-events:none; }
+.category-view-bar.show { display:block; }
+.category-view-bar .view-mode-switch { pointer-events:auto; }
 .view-mode-btn { position:relative; z-index:1; width:34px; height:34px; display:flex; align-items:center; justify-content:center; padding:0; border:1px solid rgba(255,255,255,.9); border-radius:9px; background:linear-gradient(145deg,#fff,#D6EAF8); color:#1A5276; box-shadow:0 3px 8px rgba(30,58,95,.15),inset 0 1px 0 #fff; cursor:pointer; transition:transform .2s ease,box-shadow .2s ease,background .2s ease,color .2s ease; }
 .view-mode-btn svg { width:16px; height:16px; fill:none; stroke:currentColor; stroke-width:2.1; stroke-linecap:round; stroke-linejoin:round; }
 .view-mode-btn:last-child { background:linear-gradient(145deg,#FFFDF7,#FDEBD0); color:#A04000; }
@@ -879,15 +880,16 @@ html::-webkit-scrollbar-corner { background: #EAF2F8; }
     <button class="bulk-btn bulk-btn-delete admin-only" id="bulkDeleteBtn" onclick="deleteSelectedItems()" disabled>🗑️ Xóa đã chọn</button>
     <span class="count-badge" id="count">0 kết quả</span>
   </div>
-  <div class="category-view-bar" id="categoryViewBar">
-    <div class="view-mode-switch" role="group" aria-label="Kiểu hiển thị sản phẩm">
-      <button class="view-mode-btn" id="productGridBtn" type="button" onclick="setProductViewMode('card')" title="Grid - Dạng thẻ" aria-label="Hiển thị dạng Grid"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"></rect><rect x="14" y="3" width="7" height="7" rx="1.5"></rect><rect x="3" y="14" width="7" height="7" rx="1.5"></rect><rect x="14" y="14" width="7" height="7" rx="1.5"></rect></svg></button>
-      <button class="view-mode-btn" id="productListBtn" type="button" onclick="setProductViewMode('list')" title="List - Tiêu đề và tồn kho" aria-label="Hiển thị dạng List"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6h12M9 12h12M9 18h12"></path><circle cx="4.5" cy="6" r="1"></circle><circle cx="4.5" cy="12" r="1"></circle><circle cx="4.5" cy="18" r="1"></circle></svg></button>
-    </div>
-  </div>
 </div>
 
 <div id="results"></div>
+
+<div class="category-view-bar" id="categoryViewBar">
+  <div class="view-mode-switch" role="group" aria-label="Kiểu hiển thị sản phẩm">
+    <button class="view-mode-btn" id="productGridBtn" type="button" onclick="setProductViewMode('card')" title="Grid - Dạng thẻ" aria-label="Hiển thị dạng Grid"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"></rect><rect x="14" y="3" width="7" height="7" rx="1.5"></rect><rect x="3" y="14" width="7" height="7" rx="1.5"></rect><rect x="14" y="14" width="7" height="7" rx="1.5"></rect></svg></button>
+    <button class="view-mode-btn" id="productListBtn" type="button" onclick="setProductViewMode('list')" title="List - Tiêu đề và tồn kho" aria-label="Hiển thị dạng List"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6h12M9 12h12M9 18h12"></path><circle cx="4.5" cy="6" r="1"></circle><circle cx="4.5" cy="12" r="1"></circle><circle cx="4.5" cy="18" r="1"></circle></svg></button>
+  </div>
+</div>
 
 <div class="latest-items-ticker" id="latestItemsTicker" aria-live="polite" aria-label="Thiết bị mới thêm, bấm để mở" role="button" tabindex="0" onclick="openLatestItemFromTicker()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openLatestItemFromTicker();}">
   <span class="latest-items-label">Cập nhật mới:</span>
