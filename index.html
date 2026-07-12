@@ -181,9 +181,12 @@ mark.kw-hit { background: #FFEB3B; color: #1A1A1A; padding: 0 1px; border-radius
 .view-mode-switch { position:relative; display:flex; flex-direction:column; gap:6px; margin-left:auto; padding:4px; border:1px solid transparent; border-radius:13px; background:linear-gradient(rgba(255,255,255,.94),rgba(240,246,250,.9)) padding-box,linear-gradient(145deg,#5DADE2,#F39C12,#8E44AD) border-box; box-shadow:0 5px 14px rgba(30,58,95,.14),inset 0 1px 0 #fff; }
 .view-mode-switch::before { content:""; position:absolute; z-index:0; left:50%; top:34px; bottom:34px; width:2px; border-radius:999px; background:linear-gradient(#2E86C1,#F39C12); transform:translateX(-50%); opacity:.65; pointer-events:none; }
 .view-mode-switch.hidden { display:none; }
-.category-view-bar { display:none; position:fixed; right:max(12px,env(safe-area-inset-right)); top:215px; bottom:auto; z-index:205; pointer-events:none; }
+.category-view-bar { display:none; position:fixed; right:max(12px,env(safe-area-inset-right)); top:215px; bottom:auto; z-index:205; opacity:1; transform:translateX(0); pointer-events:none; transition:opacity .22s ease,transform .22s ease; }
 .category-view-bar.show { display:block; }
 .category-view-bar .view-mode-switch { pointer-events:auto; }
+.category-view-bar.is-hidden { opacity:0; transform:translateX(18px); }
+.category-view-bar.is-hidden .view-mode-switch { pointer-events:none; }
+.mobile-tools-toggle { display:none; }
 .view-mode-btn { position:relative; z-index:1; width:34px; height:34px; display:flex; align-items:center; justify-content:center; padding:0; border:1px solid rgba(255,255,255,.9); border-radius:9px; background:linear-gradient(145deg,#fff,#D6EAF8); color:#1A5276; box-shadow:0 3px 8px rgba(30,58,95,.15),inset 0 1px 0 #fff; cursor:pointer; transition:transform .2s ease,box-shadow .2s ease,background .2s ease,color .2s ease; }
 .view-mode-btn svg { width:16px; height:16px; fill:none; stroke:currentColor; stroke-width:2.1; stroke-linecap:round; stroke-linejoin:round; }
 .view-mode-btn:last-child { background:linear-gradient(145deg,#FFFDF7,#FDEBD0); color:#A04000; }
@@ -198,7 +201,15 @@ mark.kw-hit { background: #FFEB3B; color: #1A1A1A; padding: 0 1px; border-radius
 .product-list-stock.con { background:#D5F5E3; color:#1E8449; }
 .product-list-stock.sap { background:#FEF3CD; color:#8A6700; }
 .product-list-stock.het { background:#FADBD8; color:#A93226; }
-@media(max-width:480px){ .category-view-bar{right:max(8px,env(safe-area-inset-right));top:215px}.view-mode-switch{margin-left:auto;padding:4px;gap:6px;border-radius:13px}.view-mode-switch::before{top:36px;bottom:36px}.view-mode-btn{width:36px;height:36px}.product-list-row{min-height:56px;margin:6px 0;padding:10px}.product-list-title{font-size:14px}.product-list-stock{padding:5px 7px;font-size:11px} }
+@media(max-width:480px){
+  .category-view-bar{right:max(8px,env(safe-area-inset-right));top:215px}.view-mode-switch{margin-left:auto;padding:4px;gap:6px;border-radius:13px}.view-mode-switch::before{top:36px;bottom:36px}.view-mode-btn{width:36px;height:36px}.product-list-row{min-height:56px;margin:6px 0;padding:10px}.product-list-title{font-size:14px}.product-list-stock{padding:5px 7px;font-size:11px}
+  .mobile-tools-toggle { position:fixed; right:0; top:50%; z-index:207; display:flex; align-items:center; justify-content:center; width:27px; height:48px; padding:0; border:1px solid rgba(255,255,255,.85); border-right:0; border-radius:13px 0 0 13px; background:linear-gradient(145deg,#2E86C1,#1E3A5F); color:#fff; box-shadow:-4px 5px 14px rgba(30,58,95,.24),inset 0 1px 0 rgba(255,255,255,.3); transform:translateY(-50%); cursor:pointer; transition:background .2s ease,transform .2s ease; }
+  .mobile-tools-toggle svg { width:14px; height:14px; fill:none; stroke:currentColor; stroke-width:2.5; stroke-linecap:round; stroke-linejoin:round; transition:transform .25s ease; }
+  body.mobile-tools-open .mobile-tools-toggle svg { transform:rotate(180deg); }
+  body:not(.mobile-tools-open) .category-view-bar,
+  body:not(.mobile-tools-open) .scroll-btns { opacity:0; transform:translateX(22px); pointer-events:none; }
+  body:not(.mobile-tools-open) .category-view-bar .view-mode-switch { pointer-events:none; }
+}
 .btn-edit { background: #EBF5FB; color: #1A5276; border: none; border-radius: 8px; padding: 5px 12px; font-size: 12px; cursor: pointer; font-weight: bold; }
 .btn-delete { background: #FADBD8; color: #922B21; border: none; border-radius: 8px; padding: 5px 12px; font-size: 12px; cursor: pointer; font-weight: bold; }
 .bulk-btn { border: none; border-radius: 18px; padding: 5px 10px; font-size: 12px; cursor: pointer; font-weight: bold; align-items: center; gap: 4px; }
@@ -890,6 +901,8 @@ html::-webkit-scrollbar-corner { background: #EAF2F8; }
     <button class="view-mode-btn" id="productListBtn" type="button" onclick="setProductViewMode('list')" title="List - Tiêu đề và tồn kho" aria-label="Hiển thị dạng List"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6h12M9 12h12M9 18h12"></path><circle cx="4.5" cy="6" r="1"></circle><circle cx="4.5" cy="12" r="1"></circle><circle cx="4.5" cy="18" r="1"></circle></svg></button>
   </div>
 </div>
+
+<button type="button" class="mobile-tools-toggle" id="mobileToolsToggle" onclick="toggleMobileTools()" aria-expanded="false" aria-label="Mở các nút công cụ" title="Mở/thu các nút công cụ"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 5-7 7 7 7"></path></svg></button>
 
 <div class="latest-items-ticker" id="latestItemsTicker" aria-live="polite" aria-label="Thiết bị mới thêm, bấm để mở" role="button" tabindex="0" onclick="openLatestItemFromTicker()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openLatestItemFromTicker();}">
   <span class="latest-items-label">Cập nhật mới:</span>
@@ -3346,6 +3359,12 @@ function setProductViewMode(mode){
   productViewMode=mode==="list"?"list":"card";
   render();
 }
+function toggleMobileTools(){
+  const open=document.body.classList.toggle("mobile-tools-open");
+  const btn=document.getElementById("mobileToolsToggle");
+  btn?.setAttribute("aria-expanded",String(open));
+  btn?.setAttribute("aria-label",open?"Thu các nút công cụ":"Mở các nút công cụ");
+}
 
 const NO_GROUP = "🆕 Khác";
 function jumpToGroup(id){
@@ -5777,12 +5796,12 @@ setupHeaderAutoCollapse();
 
 let scrollBtnsTimer;
 function setupScrollButtonsAutoHide(){
-  const nav = document.querySelector(".scroll-btns");
-  if(!nav) return;
+  const controls = [...document.querySelectorAll(".scroll-btns, .category-view-bar")];
+  if(!controls.length) return;
   window.addEventListener("scroll", ()=>{
-    nav.classList.add("is-hidden");
+    controls.forEach(control=>control.classList.add("is-hidden"));
     clearTimeout(scrollBtnsTimer);
-    scrollBtnsTimer = setTimeout(()=>nav.classList.remove("is-hidden"), 520);
+    scrollBtnsTimer = setTimeout(()=>controls.forEach(control=>control.classList.remove("is-hidden")), 520);
   }, {passive: true});
 }
 setupScrollButtonsAutoHide();
