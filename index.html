@@ -41,6 +41,7 @@ body { font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif
 .kpi-product-main { min-width: 0; display: grid; gap: 2px; }
 .kpi-product-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; font-weight: 800; }
 .kpi-product-meta { font-size: 10px; color: #718096; }
+.kpi-product-path { font-size: 10px; color:#2E6F9E; font-weight:800; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .kpi-product-stock { flex-shrink: 0; color: #1E8449; font-size: 11px; font-weight: 900; white-space: nowrap; }
 .kpi-v { font-size: 13px; font-weight: bold; color: #fff; }
 .kpi-l { font-size: 9px; color: rgba(255,255,255,.85); }
@@ -1916,10 +1917,16 @@ async function manualSync(){
   }
 }
 
-function renderKpiProductLinks(entries, statusText=""){
+function cleanKpiPathLabel(value){ return String(value || "").replace(/^[^\p{L}\p{N}]+/u,"").trim(); }
+function getKpiProductPath(row){
+  const category=({MT:"Máy Tính",MI:"Máy In",CAM:"Camera",INT:"Internet"})[row?.[0]] || cleanKpiPathLabel(row?.[0]);
+  const group=cleanKpiPathLabel(getPrimaryRowGroup(row?.[8] || ""));
+  return group ? `${category} → ${group}` : category;
+}
+function renderKpiProductLinks(entries, compactStock=false){
   return entries.map(({r,i})=>`<button type="button" class="kpi-product-link" onclick="openKpiProduct(${i})">
-    <span class="kpi-product-main"><span class="kpi-product-name">${escapeHtml(r[2] || "Chưa có tên")}</span><span class="kpi-product-meta">${escapeHtml(r[1] || "")} · ${escapeHtml((BRANCH_CFG[r[13] || "Q2"] || BRANCH_CFG.Q2).label)}</span></span>
-    <span class="kpi-product-stock">${statusText || `Tồn: ${Number(r[5]) || 0}`} ›</span>
+    <span class="kpi-product-main"><span class="kpi-product-name">${escapeHtml(r[2] || "Chưa có tên")}</span><span class="kpi-product-path">${escapeHtml(getKpiProductPath(r))}</span><span class="kpi-product-meta">${escapeHtml(r[1] || "")} · ${escapeHtml((BRANCH_CFG[r[13] || "Q2"] || BRANCH_CFG.Q2).label)}</span></span>
+    <span class="kpi-product-stock">${compactStock ? `(${Number(r[5]) || 0})` : `Tồn: ${Number(r[5]) || 0}`} ›</span>
   </button>`).join("");
 }
 function toggleKpiCategory(listId, button){
@@ -1955,14 +1962,14 @@ function showKpiDetail(type){
       return `<div class="kpi-category"><button type="button" class="kpi-category-toggle" onclick="toggleKpiCategory('${listId}',this)" aria-expanded="false">
         <span class="kpi-detail-sh"><span class="kpi-detail-badge" style="background:${c.c};">${c.label}</span></span>
         <span class="kpi-detail-count"${type==="ton"?' style="color:#1E8449;"':''}>${value}<span class="kpi-expand-mark">+</span></span>
-      </button><div id="${listId}" class="kpi-product-list">${entries.length ? renderKpiProductLinks(entries) : '<div style="padding:8px;color:#888;font-size:12px;">Chưa có thiết bị</div>'}</div></div>`;
+      </button><div id="${listId}" class="kpi-product-list">${entries.length ? renderKpiProductLinks(entries,type==="ton") : '<div style="padding:8px;color:#888;font-size:12px;">Chưa có thiết bị</div>'}</div></div>`;
     }).join("");
     const total = type === "all" ? DATA.length : DATA.reduce((sum,r)=>sum+(Number(r[5])||0),0);
     html += `<div class="kpi-detail-row" style="font-weight:bold;background:#f8f8f8;border-radius:6px;padding:8px;"><span>Tổng cộng</span><span${type==="ton"?' style="color:#1E8449;"':''}>${type==="all" ? `${total} mặt hàng` : `${total.toLocaleString("vi-VN")} tồn`}</span></div>`;
   } else {
     const entries = DATA.map((r,i)=>({r,i})).filter(({r})=>type === "het" ? getStockState(r[5], r[12]) === "HET" : r[5] > 0 && r[5] <= Math.max(1, Number(r[12]) || 2));
     if(!entries.length) html = `<div style="text-align:center;padding:20px;color:#888;">✅ ${type==="het" ? "Không có mặt hàng nào hết hàng" : "Không có mặt hàng nào sắp hết"}</div>`;
-    else html = renderKpiProductLinks(entries, type === "het" ? "Hết hàng" : "Sắp hết");
+    else html = renderKpiProductLinks(entries, true);
   }
   document.getElementById("kpiModalBody").innerHTML = html;
   document.getElementById("kpiOverlay").classList.add("open");
@@ -3209,7 +3216,7 @@ function openZaloContact(btn){
   const location = btn?.dataset?.location || "Chưa ghi vị trí";
   const image = btn?.dataset?.image || "";
   const imageLine = image ? `\nLink hình ảnh: ${image}` : "";
-  const message = `Mã: ${code}\nTên: ${title}\nChi nhánh: ${branch}\nTồn hiện tại: ${stock}\nVị trí: ${location}${imageLine}\nLiên hệ: 094 8300735\n\nNhờ anh/chị báo giá hàng này giúp em.`;
+  const message = `Mã: ${code}\nTên: ${title}\nChi nhánh: ${branch}\nTồn hiện tại: ${stock}\nVị trí: ${location}${imageLine}\nKế toán: 094 8300735\n\nNhờ anh/chị báo giá hàng này giúp em.`;
   const url = `https://zalo.me/0375111112?text=${encodeURIComponent(message)}`;
   const copied = copyContactMessage(message);
   showToast(copied ? "✅ Đã copy mẫu hỏi giá — đang mở Zalo" : "⚠️ Đang mở Zalo — nếu chưa có nội dung, hãy quay lại copy thủ công.", 4000);
