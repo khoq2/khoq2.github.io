@@ -155,6 +155,15 @@ body { font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif
 .tx-edit { color: #1A5276; }
 .tx-delete { color: #C0392B; }
 .tx-action:active { transform: scale(.96); }
+.order-list { display:flex; flex-direction:column; gap:8px; margin-top:8px; }
+.order-row { display:flex; align-items:center; min-height:52px; background:#F8FAFC; border:1.5px solid #CBD5E1; border-left:5px solid #5B8DB8; border-radius:10px; overflow:hidden; box-shadow:0 1px 3px rgba(30,58,95,.08); }
+.order-row-name { flex:1; min-width:0; padding:10px 12px; font-size:13px; font-weight:700; color:#243B53; overflow-wrap:anywhere; }
+.order-row-actions { display:flex; align-self:stretch; align-items:center; gap:5px; padding:7px 8px; border-left:2px solid #B8C5D1; background:#EDF2F7; }
+.order-btn { min-width:36px; min-height:34px; padding:5px 8px; border:1px solid #AAB8C5; border-radius:7px; background:#fff; color:#1E3A5F; font-weight:800; cursor:pointer; }
+.order-btn-edit { color:#7D3C98; border-color:#C39BD3; }
+.order-btn-delete { color:#A93226; border-color:#E6B0AA; }
+.order-btn:disabled { opacity:.3; cursor:not-allowed; }
+@media(max-width:480px){ .order-row-name{padding:9px 8px;font-size:12px}.order-row-actions{gap:3px;padding:6px 5px}.order-btn{min-width:32px;padding:4px 6px;font-size:12px} }
 .card.highlight { box-shadow: 0 0 0 3px #F39C12; animation: flash 1.6s ease; }
 mark.kw-hit { background: #FFEB3B; color: #1A1A1A; padding: 0 1px; border-radius: 3px; font-weight: 800; }
 @keyframes flash { from { background: #FFF9E6; } to { background: #fff; } }
@@ -1046,7 +1055,7 @@ html::-webkit-scrollbar-corner { background: #EAF2F8; }
       </select>
     </div>
     <div class="form-row"><label>Số lượng xuất</label><input type="number" id="saleQty" value="1" min="1"></div>
-    <div class="form-row"><label>Ngày giờ giao dịch</label><input type="datetime-local" id="saleTime" step="1"></div>
+    <div class="form-row"><label>Ngày giờ giao dịch (dd/mm/yyyy HH:mm:ss)</label><input type="text" id="saleTime" inputmode="numeric" placeholder="VD: 12/07/2026 09:54:07"></div>
     <div class="form-row"><label>Giá bán (Vnd)</label><input type="text" id="saleGia" inputmode="numeric" placeholder="VD: 3.500.000"></div>
     <div class="form-row"><label>Ghi chú</label><input type="text" id="saleGhi" placeholder="VD: Khách lẻ, bảo hành 12 tháng..."></div>
     <div class="form-row">
@@ -1195,7 +1204,7 @@ html::-webkit-scrollbar-corner { background: #EAF2F8; }
   <div class="modal" onclick="event.stopPropagation()">
     <div class="modal-title">↕️ Sắp xếp nhóm lớn</div>
     <div class="form-row"><label>Danh mục</label><select id="groupOrderTab" onchange="renderGroupOrderList()"><option value="MT">💻 Máy Tính</option><option value="MI">🖨️ Máy In</option><option value="CAM">📷 Camera</option><option value="INT">🌐 Internet</option></select></div>
-    <div id="groupOrderList"></div>
+    <div id="groupOrderList" class="order-list"></div>
     <div style="font-size:11px;color:#777;margin:10px 0;line-height:1.45;">Đổi thứ tự hiển thị của các nhóm như RAM, SSD, HDD. Nhóm 0 sản phẩm vẫn được giữ nguyên.</div>
     <button class="btn-cancel" onclick="resetGroupOrderForTab()">Khôi phục thứ tự mặc định</button>
     <button class="btn-cancel" onclick="closeOverlay('groupOrderOverlay')">Đóng</button>
@@ -1206,7 +1215,7 @@ html::-webkit-scrollbar-corner { background: #EAF2F8; }
   <div class="modal" onclick="event.stopPropagation()">
     <div class="modal-title">↕️ Sắp xếp bộ lọc nhanh</div>
     <div class="form-row"><label>Nhóm sản phẩm</label><select id="quickOrderGroup" onchange="renderQuickOrderList()"></select></div>
-    <div id="quickOrderList"></div>
+    <div id="quickOrderList" class="order-list"></div>
     <div style="font-size:11px;color:#777;margin:10px 0;line-height:1.45;">Dùng ↑ ↓ để đổi thứ tự hoặc Xóa mục không cần dùng. Nút khôi phục mặc định sẽ hiện lại các mục cố định đã xóa.</div>
     <button class="btn-cancel" onclick="resetQuickOrderForGroup()">Khôi phục thứ tự mặc định</button>
     <button class="btn-cancel" onclick="closeOverlay('quickOrderOverlay')">Đóng</button>
@@ -2283,9 +2292,10 @@ function saveDisplayConfig(){
     localStorage.setItem(QUICK_CUSTOM_TAGS_KEY, JSON.stringify(QUICK_CUSTOM_TAGS));
     localStorage.setItem(QUICK_HIDDEN_TAGS_KEY, JSON.stringify(QUICK_HIDDEN_TAGS));
     localStorage.setItem(ITEM_CREATED_AT_KEY, JSON.stringify(ITEM_CREATED_AT));
+    localStorage.setItem("kho_cntt_group_options", JSON.stringify(GROUP_OPTIONS));
   }catch(e){}
   if(!SHEET_API_URL) return Promise.resolve(true);
-  const snapshot = {quickOrder: QUICK_ORDER, groupOrder: GROUP_ORDER, customQuickTags: QUICK_CUSTOM_TAGS, hiddenQuickTags: QUICK_HIDDEN_TAGS, itemCreatedAt: ITEM_CREATED_AT};
+  const snapshot = {quickOrder: QUICK_ORDER, groupOrder: GROUP_ORDER, customQuickTags: QUICK_CUSTOM_TAGS, hiddenQuickTags: QUICK_HIDDEN_TAGS, itemCreatedAt: ITEM_CREATED_AT, groupOptions: GROUP_OPTIONS};
   const seq = ++configSaveSeq;
   setAuxPendingSync(PENDING_CONFIG_SYNC_KEY, true);
   configSaveChain = configSaveChain.then(async ()=>{
@@ -2321,12 +2331,16 @@ async function loadDisplayConfig(){
     if(json.config?.customQuickTags && typeof json.config.customQuickTags === "object") QUICK_CUSTOM_TAGS = json.config.customQuickTags;
     if(json.config?.hiddenQuickTags && typeof json.config.hiddenQuickTags === "object") QUICK_HIDDEN_TAGS = json.config.hiddenQuickTags;
     if(json.config?.itemCreatedAt && typeof json.config.itemCreatedAt === "object") ITEM_CREATED_AT = json.config.itemCreatedAt;
+    if(json.config?.groupOptions && typeof json.config.groupOptions === "object"){
+      Object.keys(GROUP_OPTIONS).forEach(tab=>{ if(Array.isArray(json.config.groupOptions[tab])) GROUP_OPTIONS[tab]=json.config.groupOptions[tab]; });
+    }
     try{
       localStorage.setItem(QUICK_ORDER_KEY, JSON.stringify(QUICK_ORDER));
       localStorage.setItem(GROUP_ORDER_KEY, JSON.stringify(GROUP_ORDER));
       localStorage.setItem(QUICK_CUSTOM_TAGS_KEY, JSON.stringify(QUICK_CUSTOM_TAGS));
       localStorage.setItem(QUICK_HIDDEN_TAGS_KEY, JSON.stringify(QUICK_HIDDEN_TAGS));
       localStorage.setItem(ITEM_CREATED_AT_KEY, JSON.stringify(ITEM_CREATED_AT));
+      localStorage.setItem("kho_cntt_group_options", JSON.stringify(GROUP_OPTIONS));
     }catch(e){}
   }catch(e){ console.warn("Lỗi tải thứ tự hiển thị:",e); }
 }
@@ -2754,6 +2768,10 @@ try { GROUP_ORDER = JSON.parse(localStorage.getItem(GROUP_ORDER_KEY) || "{}"); }
 try { QUICK_CUSTOM_TAGS = JSON.parse(localStorage.getItem(QUICK_CUSTOM_TAGS_KEY) || "{}"); } catch(e) { QUICK_CUSTOM_TAGS = {}; }
 try { QUICK_HIDDEN_TAGS = JSON.parse(localStorage.getItem(QUICK_HIDDEN_TAGS_KEY) || "{}"); } catch(e) { QUICK_HIDDEN_TAGS = {}; }
 try { ITEM_CREATED_AT = JSON.parse(localStorage.getItem(ITEM_CREATED_AT_KEY) || "{}"); } catch(e) { ITEM_CREATED_AT = {}; }
+try {
+  const savedGroupOptions=JSON.parse(localStorage.getItem("kho_cntt_group_options") || "{}");
+  Object.keys(GROUP_OPTIONS).forEach(tab=>{ if(Array.isArray(savedGroupOptions[tab])) GROUP_OPTIONS[tab]=savedGroupOptions[tab]; });
+} catch(e) {}
 function quickOrderKey(groupLabel){ return normalizeQuickText(groupLabel || ""); }
 function getQuickFixedCatalog(groupLabel){
   const kind = getQuickGroupKind(groupLabel);
@@ -2790,7 +2808,7 @@ function renderQuickOrderList(){
   const order = QUICK_ORDER[key] || base.map(meta=>meta.primary);
   const rank = new Map(order.map((value,index)=>[value,index]));
   const metas = [...base].sort((a,b)=>(rank.get(a.primary)??9999)-(rank.get(b.primary)??9999));
-  document.getElementById("quickOrderList").innerHTML = metas.length ? metas.map((meta,index)=>`<div style="display:flex;align-items:center;gap:8px;padding:8px 4px;border-bottom:1px solid #eee"><span style="flex:1;font-size:13px">${escapeHtml(meta.label || meta.primary)}</span><button type="button" class="btn-img-pick" ${index===0?'disabled':''} onclick="moveQuickOrder(${index},-1)">↑</button><button type="button" class="btn-img-pick" ${index===metas.length-1?'disabled':''} onclick="moveQuickOrder(${index},1)">↓</button><button type="button" class="btn-img-remove" onclick="deleteQuickOrderItem(${index})" title="Xóa mục này">🗑️ Xóa</button></div>`).join("") : '<div style="padding:14px 4px;color:#888;font-size:12px;text-align:center">Chưa có mục bộ lọc nhanh.</div>';
+  document.getElementById("quickOrderList").innerHTML = metas.length ? metas.map((meta,index)=>`<div class="order-row"><span class="order-row-name">${escapeHtml(meta.label || meta.primary)}</span><div class="order-row-actions"><button type="button" class="order-btn order-btn-edit" onclick="renameQuickOrderItem(${index})" title="Sửa tên">✏️</button><button type="button" class="order-btn" ${index===0?'disabled':''} onclick="moveQuickOrder(${index},-1)" title="Đưa lên">↑</button><button type="button" class="order-btn" ${index===metas.length-1?'disabled':''} onclick="moveQuickOrder(${index},1)" title="Đưa xuống">↓</button><button type="button" class="order-btn order-btn-delete" onclick="deleteQuickOrderItem(${index})" title="Xóa mục này">🗑️</button></div></div>`).join("") : '<div style="padding:14px 4px;color:#888;font-size:12px;text-align:center">Chưa có mục bộ lọc nhanh.</div>';
   QUICK_ORDER[key] = metas.map(meta=>meta.primary);
 }
 function deleteQuickOrderItem(itemIndex){
@@ -2817,6 +2835,32 @@ function deleteQuickOrderItem(itemIndex){
   renderQuickOrderList();
   render();
   showToast(`Đã xóa: ${value}`);
+}
+async function renameQuickOrderItem(itemIndex){
+  if(!requireAdmin()) return;
+  const group = document.getElementById("quickOrderGroup").value;
+  const key = quickOrderKey(group), catalog = getQuickFixedCatalog(group);
+  const order = QUICK_ORDER[key] || catalog.map(meta=>meta.primary);
+  const rank = new Map(order.map((value,index)=>[value,index]));
+  const metas = [...catalog].sort((a,b)=>(rank.get(a.primary)??9999)-(rank.get(b.primary)??9999));
+  const oldValue = metas[itemIndex]?.primary;
+  if(!oldValue) return;
+  const newValue = cleanQuickLabel(prompt("Nhập tên bộ lọc mới:", oldValue));
+  if(!newValue || normalizeQuickText(newValue)===normalizeQuickText(oldValue)) return;
+  const duplicate = metas.some((meta,index)=>index!==itemIndex && normalizeQuickText(meta.primary)===normalizeQuickText(newValue));
+  if(duplicate){ alert("Tên bộ lọc này đã tồn tại!"); return; }
+  QUICK_ORDER[key] = order.map(value=>normalizeQuickText(value)===normalizeQuickText(oldValue)?newValue:value);
+  const hidden = Array.isArray(QUICK_HIDDEN_TAGS[key]) ? QUICK_HIDDEN_TAGS[key] : [];
+  if(!hidden.some(value=>normalizeQuickText(value)===normalizeQuickText(oldValue))) hidden.push(oldValue);
+  QUICK_HIDDEN_TAGS[key] = hidden;
+  const custom = Array.isArray(QUICK_CUSTOM_TAGS[key]) ? QUICK_CUSTOM_TAGS[key] : [];
+  QUICK_CUSTOM_TAGS[key] = [...custom.filter(value=>normalizeQuickText(value)!==normalizeQuickText(oldValue)),newValue];
+  DATA.forEach(row=>{
+    const belongsToSelectedGroup=getRowGroups(row[8]).some(value=>quickOrderKey(value)===quickOrderKey(group));
+    if(belongsToSelectedGroup) row[11]=joinRowQuickTags(getRowQuickTags(row[11]).map(value=>normalizeQuickText(value)===normalizeQuickText(oldValue)?newValue:value));
+  });
+  await Promise.all([saveData(),saveDisplayConfig()]);
+  renderQuickOrderList(); render(); showToast(`✅ Đã đổi tên thành: ${newValue}`);
 }
 function moveQuickOrder(itemIndex, delta){
   const group = document.getElementById("quickOrderGroup").value;
@@ -2852,7 +2896,34 @@ function renderGroupOrderList(){
   const rank = new Map(keys.map((key,index)=>[key,index]));
   const groups = [...base].sort((a,b)=>(rank.get(groupOrderKey(a))??9999)-(rank.get(groupOrderKey(b))??9999));
   GROUP_ORDER[tab] = groups.map(groupOrderKey);
-  document.getElementById("groupOrderList").innerHTML = groups.map((group,index)=>`<div style="display:flex;align-items:center;gap:8px;padding:8px 4px;border-bottom:1px solid #eee"><span style="flex:1;font-size:13px">${escapeHtml(group)}</span><button type="button" class="btn-img-pick" ${index===0?'disabled':''} onclick="moveGroupOrder(${index},-1)">↑</button><button type="button" class="btn-img-pick" ${index===groups.length-1?'disabled':''} onclick="moveGroupOrder(${index},1)">↓</button></div>`).join("");
+  document.getElementById("groupOrderList").innerHTML = groups.map((group,index)=>`<div class="order-row"><span class="order-row-name">${escapeHtml(group)}</span><div class="order-row-actions"><button type="button" class="order-btn order-btn-edit" onclick="renameGroupOrderItem(${index})" title="Sửa tên nhóm">✏️</button><button type="button" class="order-btn" ${index===0?'disabled':''} onclick="moveGroupOrder(${index},-1)" title="Đưa lên">↑</button><button type="button" class="order-btn" ${index===groups.length-1?'disabled':''} onclick="moveGroupOrder(${index},1)" title="Đưa xuống">↓</button></div></div>`).join("");
+}
+async function renameGroupOrderItem(index){
+  if(!requireAdmin()) return;
+  const tab=document.getElementById("groupOrderTab").value;
+  const base=GROUP_OPTIONS[tab] || [], keys=GROUP_ORDER[tab] || base.map(groupOrderKey);
+  const rank=new Map(keys.map((key,i)=>[key,i]));
+  const groups=[...base].sort((a,b)=>(rank.get(groupOrderKey(a))??9999)-(rank.get(groupOrderKey(b))??9999));
+  const oldValue=groups[index];
+  if(!oldValue) return;
+  const newValue=String(prompt("Nhập tên nhóm mới:",oldValue) || "").trim();
+  if(!newValue || groupOrderKey(newValue)===groupOrderKey(oldValue)) return;
+  if(base.some(value=>groupOrderKey(value)===groupOrderKey(newValue))){ alert("Tên nhóm này đã tồn tại!"); return; }
+  GROUP_OPTIONS[tab]=base.map(value=>groupOrderKey(value)===groupOrderKey(oldValue)?newValue:value);
+  GROUP_ORDER[tab]=groups.map(value=>groupOrderKey(value)===groupOrderKey(oldValue)?groupOrderKey(newValue):groupOrderKey(value));
+  const oldQuickKey=quickOrderKey(oldValue), newQuickKey=quickOrderKey(newValue);
+  [[QUICK_ORDER,oldQuickKey,newQuickKey],[QUICK_CUSTOM_TAGS,oldQuickKey,newQuickKey],[QUICK_HIDDEN_TAGS,oldQuickKey,newQuickKey]].forEach(([store,oldKey,newKey])=>{ if(store[oldKey]!==undefined){ store[newKey]=store[oldKey]; delete store[oldKey]; } });
+  DATA.forEach(row=>{ if(row[0]===tab) row[8]=joinRowGroups(getRowGroups(row[8]).map(value=>groupOrderKey(value)===groupOrderKey(oldValue)?newValue:value)); });
+  await Promise.all([saveData(),saveDisplayConfig()]);
+  openQuickOrderModalOptionsOnly();
+  renderGroupOrderList(); render(); showToast(`✅ Đã đổi tên nhóm thành: ${newValue}`);
+}
+function openQuickOrderModalOptionsOnly(){
+  const select=document.getElementById("quickOrderGroup");
+  if(!select) return;
+  const current=select.value, groups=[...new Set(Object.values(GROUP_OPTIONS).flat())];
+  select.innerHTML=groups.map(group=>`<option value="${escapeHtml(group)}">${escapeHtml(group)}</option>`).join("");
+  if(groups.includes(current)) select.value=current;
 }
 function moveGroupOrder(index, delta){
   const tab = document.getElementById("groupOrderTab").value, order = GROUP_ORDER[tab] || [], target=index+delta;
@@ -3983,7 +4054,7 @@ function openSaleModal(idx){ if(!requireAdmin()) return;
   refreshNVSelect();
   document.getElementById("saleQty").value = "1";
   document.getElementById("saleQty").disabled = false;
-  document.getElementById("saleTime").value = txTimeInputValue(new Date());
+  document.getElementById("saleTime").value = formatTxTime(new Date());
   setVndInputValue("saleGia", r[10] || r[4] || 0);
   document.getElementById("saleGhi").value = "";
   setTxImagePreview("");
@@ -4030,6 +4101,7 @@ async function saveSale(){ if(!requireAdmin()) return;
   if(!nv){ alert("Vui lòng nhập tên nhân viên!"); return; }
   if(!timeInput){ alert("Vui lòng chọn ngày giờ giao dịch!"); return; }
   const transactionTime = formatTxTimeFromInput(timeInput);
+  if(!transactionTime){ alert("Ngày giờ không hợp lệ! Vui lòng nhập theo dạng dd/mm/yyyy HH:mm:ss, ví dụ 12/07/2026 09:54:07"); return; }
   if(txId){
     const tx = TX_DATA.find(t=>String(t.id)===String(txId));
     if(!tx){ alert("Không tìm thấy giao dịch cần sửa!"); return; }
@@ -4089,9 +4161,18 @@ function txTimeInputValue(value){
 }
 
 function formatTxTimeFromInput(value){
-  const m = String(value || "").match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})(?::(\d{2}))?$/);
-  if(!m) return formatTxTime(value);
-  return `${m[3]}/${m[2]}/${m[1]} ${m[4]}:${m[5]}:${m[6] || "00"}`;
+  const text = String(value || "").trim();
+  let m = text.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})\s+(\d{1,2}):(\d{2})(?::(\d{2}))?$/);
+  if(m){
+    const day=Number(m[1]), month=Number(m[2]), year=Number(m[3]);
+    const hour=Number(m[4]), minute=Number(m[5]), second=Number(m[6] || 0);
+    const d = new Date(year, month-1, day, hour, minute, second);
+    if(d.getFullYear()!==year || d.getMonth()!==month-1 || d.getDate()!==day || hour>23 || minute>59 || second>59) return "";
+    return formatTxTime(d);
+  }
+  m = text.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})(?::(\d{2}))?$/);
+  if(!m) return "";
+  return formatTxTimeFromInput(`${m[3]}/${m[2]}/${m[1]} ${m[4]}:${m[5]}:${m[6] || "00"}`);
 }
 
 function getTransactionKind(tx){
@@ -4334,7 +4415,7 @@ function editTX(id){ if(!requireAdmin()) return;
   nvSel.value = tx.nv || "";
   document.getElementById("saleQty").value = tx.qty || 1;
   document.getElementById("saleQty").disabled = true;
-  document.getElementById("saleTime").value = txTimeInputValue(tx.time || new Date());
+  document.getElementById("saleTime").value = formatTxTime(tx.time || new Date());
   setVndInputValue("saleGia", tx.gia || 0);
   document.getElementById("saleGhi").value = tx.ghi || "";
   setTxImagePreview(tx.img || "");
@@ -5925,4 +6006,3 @@ function startBackgroundSync(){
 </script>
 </body>
 </html>
-
