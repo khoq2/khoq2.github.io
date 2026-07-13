@@ -156,6 +156,15 @@ body { font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif
 .tx-edit { color: #1A5276; }
 .tx-delete { color: #C0392B; }
 .tx-action:active { transform: scale(.96); }
+#txOverlay { overscroll-behavior: contain; }
+.tx-history-modal { max-height: 80vh; max-height: 80svh; overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
+html.tx-overlay-open, body.tx-overlay-open { overflow: hidden; }
+@media (max-width: 520px) {
+  .tx-history-modal { max-height: 82vh; max-height: 82svh; }
+  .tx-history-modal .tx-filter { grid-template-columns: 1fr; }
+  .tx-history-modal .tx-header { min-width: 0; }
+  .tx-history-modal .tx-head-right { max-width: 58%; flex-wrap: wrap; justify-content: flex-end; }
+}
 .order-list { display:flex; flex-direction:column; gap:8px; margin-top:8px; }
 .order-row { display:flex; align-items:center; min-height:52px; background:#F8FAFC; border:1.5px solid #CBD5E1; border-left:5px solid #5B8DB8; border-radius:10px; overflow:hidden; box-shadow:0 1px 3px rgba(30,58,95,.08); }
 .order-row-name { flex:1; min-width:0; padding:10px 12px; font-size:13px; font-weight:700; color:#243B53; overflow-wrap:anywhere; }
@@ -1139,7 +1148,7 @@ html::-webkit-scrollbar-corner { background: #EAF2F8; }
 </div>
 
 <div class="overlay" id="txOverlay" onclick="overlayClose(event,'txOverlay')">
-  <div class="modal" onclick="event.stopPropagation()" style="max-height: 80vh; overflow-y: auto;">
+  <div class="modal tx-history-modal" onclick="event.stopPropagation()">
     <div class="modal-title" id="txModalTitle">📋 Lịch sử giao dịch</div>
     <div id="txModalBody"></div>
     <button class="btn-cancel" onclick="closeOverlay('txOverlay')">Đóng</button>
@@ -3272,7 +3281,7 @@ function renderCard(r,i,displayNo){
   const stTxt=getStockStatusLabel(ton, sapHet);
   if(productViewMode==="list" && currentTab!=="ALL"){
     const listStockClass=isHet?"het":isSap?"sap":"con";
-    return `<div class="product-list-row" style="--list-color:${cfg.c}" title="${escapeHtml(ten)}"><span class="product-list-title">${highlightMatch(ten,kwTokens)}</span><span class="product-list-stock ${listStockClass}">Tồn: ${Number(ton)||0}</span></div>`;
+    return `<button type="button" class="product-list-row" style="--list-color:${cfg.c}" title="Mở ${escapeHtml(ten)}" onclick="openProductFromList(${i})"><span class="product-list-title">${highlightMatch(ten,kwTokens)}</span><span class="product-list-stock ${listStockClass}">Tồn: ${Number(ton)||0}</span></button>`;
   }
   const condition = detectConditionLabel([ten, th, ghi].filter(Boolean).join(" "));
   const productTransactions = getTransactionsForProduct(r);
@@ -3357,6 +3366,11 @@ function syncProductViewModeButton(){
 function setProductViewMode(mode){
   productViewMode=mode==="list"?"list":"card";
   render();
+}
+function openProductFromList(idx){
+  productViewMode="card";
+  render();
+  requestAnimationFrame(()=>requestAnimationFrame(()=>jumpToInventoryItem(idx)));
 }
 
 const NO_GROUP = "🆕 Khác";
@@ -4452,6 +4466,8 @@ function showTxHistory(idx){
   TX_HISTORY_STATE.nv = "";
   TX_HISTORY_STATE.sort = "newest";
   renderTxHistory();
+  document.documentElement.classList.add("tx-overlay-open");
+  document.body.classList.add("tx-overlay-open");
   document.getElementById("txOverlay").classList.add("open");
 }
 function editTX(id){ if(!requireAdmin()) return;
@@ -5417,6 +5433,10 @@ function setupCustomerSecretHold(){
 function closeOverlay(id){
   if(id==="customerOverlay"){ closeCustomerPanel(); return; }
   document.getElementById(id).classList.remove("open");
+  if(id==="txOverlay"){
+    document.documentElement.classList.remove("tx-overlay-open");
+    document.body.classList.remove("tx-overlay-open");
+  }
 }
 function overlayClose(e,id){ if(e.target===document.getElementById(id)) closeOverlay(id); }
 let toastTimer;
