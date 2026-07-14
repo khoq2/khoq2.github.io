@@ -1991,8 +1991,20 @@ function showKpiDetail(type){
     html += `<div class="kpi-detail-row" style="font-weight:bold;background:#f8f8f8;border-radius:6px;padding:8px;"><span>Tổng cộng</span><span${type==="ton"?' style="color:#1E8449;"':''}>${type==="all" ? `${total} mặt hàng` : `${total.toLocaleString("vi-VN")} tồn`}</span></div>`;
   } else {
     const entries = DATA.map((r,i)=>({r,i})).filter(({r})=>type === "het" ? getStockState(r[5], r[12]) === "HET" : r[5] > 0 && r[5] <= Math.max(1, Number(r[12]) || 2));
-    if(!entries.length) html = `<div style="text-align:center;padding:20px;color:#888;">✅ ${type==="het" ? "Không có mặt hàng nào hết hàng" : "Không có mặt hàng nào sắp hết"}</div>`;
-    else html = renderKpiProductLinks(entries, true);
+    if(!entries.length){
+      html = `<div style="text-align:center;padding:20px;color:#888;">✅ ${type==="het" ? "Không có mặt hàng nào hết hàng" : "Không có mặt hàng nào sắp hết"}</div>`;
+    }else{
+      html = shOrder.map(sh=>{
+        const categoryEntries = entries.filter(item=>item.r[0]===sh);
+        const c = cfg[sh];
+        const listId = `kpi-${type}-${sh}`;
+        return `<div class="kpi-category"><button type="button" class="kpi-category-toggle" onclick="toggleKpiCategory('${listId}',this)" aria-expanded="false">
+          <span class="kpi-detail-sh"><span class="kpi-detail-badge" style="background:${c.c};">${c.label}</span></span>
+          <span class="kpi-detail-count">${categoryEntries.length} mặt hàng<span class="kpi-expand-mark">+</span></span>
+        </button><div id="${listId}" class="kpi-product-list">${categoryEntries.length ? renderKpiProductLinks(categoryEntries,true) : `<div style="padding:8px;color:#888;font-size:12px;">${type==="het" ? "Không có mặt hàng hết" : "Không có mặt hàng sắp hết"}</div>`}</div></div>`;
+      }).join("");
+      html += `<div class="kpi-detail-row" style="font-weight:bold;background:#f8f8f8;border-radius:6px;padding:8px;"><span>Tổng cộng</span><span>${entries.length} mặt hàng</span></div>`;
+    }
   }
   document.getElementById("kpiModalBody").innerHTML = html;
   document.getElementById("kpiOverlay").classList.add("open");
