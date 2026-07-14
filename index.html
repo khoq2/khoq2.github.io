@@ -45,6 +45,15 @@ body { font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif
 .kpi-product-stock { flex-shrink: 0; color: #1E8449; font-size: 11px; font-weight: 900; white-space: nowrap; }
 .kpi-v { font-size: 13px; font-weight: bold; color: #fff; }
 .kpi-l { font-size: 9px; color: rgba(255,255,255,.85); }
+.kpi-icon { display:inline-block; margin-right:3px; transform-origin:center; will-change:transform,filter,opacity; }
+.kpi-icon-box { animation:kpiBoxFloat 1.35s ease-in-out infinite; }
+.kpi-icon-stock { animation:kpiStockPulse 1.15s ease-in-out infinite .12s; }
+.kpi-icon-out { animation:kpiRedBlink 1.15s ease-in-out infinite .15s; }
+.kpi-icon-low { animation:kpiYellowBlink 1.15s ease-in-out infinite .48s; }
+@keyframes kpiBoxFloat { 0%,100% { transform:translateY(1px) rotate(-5deg) scale(1); filter:drop-shadow(0 0 0 rgba(255,255,255,0)); } 50% { transform:translateY(-2px) rotate(5deg) scale(1.16); filter:drop-shadow(0 0 3px rgba(255,255,255,.8)); } }
+@keyframes kpiStockPulse { 0%,100% { transform:scale(.98); filter:brightness(1); } 50% { transform:scale(1.2); filter:brightness(1.45) drop-shadow(0 0 3px rgba(255,255,255,.8)); } }
+@keyframes kpiRedBlink { 0%,100% { opacity:.45; filter:brightness(.72) drop-shadow(0 0 0 rgba(255,0,0,0)); } 50% { opacity:1; filter:brightness(1.7) saturate(1.5) drop-shadow(0 0 5px #ff2b2b); } }
+@keyframes kpiYellowBlink { 0%,100% { opacity:.45; filter:brightness(.75) drop-shadow(0 0 0 rgba(255,215,0,0)); } 50% { opacity:1; filter:brightness(1.65) saturate(1.45) drop-shadow(0 0 5px #ffd700); } }
 .search-box { position: relative; display: flex; align-items: center; background: #FFFDE7; border: 2.5px solid #F39C12; border-radius: 12px; padding: 8px 12px; gap: 8px; }
 .search-icon { display: inline-flex; align-items: center; justify-content: center; color: #1A237E; flex: 0 0 auto; }
 .search-icon svg { display: block; }
@@ -856,13 +865,13 @@ html::-webkit-scrollbar-corner { background: #EAF2F8; }
     </div>
     <div class="title"><span class="title-icon">🏪</span><span class="title-text"><span class="title-base">KHO Q2 (HOÀNG GIA COMPUTER)</span><span class="title-shine" aria-hidden="true"></span></span></div>
     <div class="kpi-row">
-      <div class="kpi" style="background: #2E86C1;" onclick="showKpiDetail('all')"><div class="kpi-v" id="kpi-mh">0</div><div class="kpi-l">mặt hàng <span class="kpi-hint">▼</span></div></div>
-      <div class="kpi" style="background: #1E8449;" onclick="showKpiDetail('ton')"><div class="kpi-v" id="kpi-ton">0</div><div class="kpi-l">tổng tồn <span class="kpi-hint">▼</span></div></div>
+      <div class="kpi" style="background: #2E86C1;" onclick="showKpiDetail('all')"><div class="kpi-v"><span class="kpi-icon kpi-icon-box" aria-hidden="true">📦</span><span id="kpi-mh">0</span></div><div class="kpi-l">mặt hàng <span class="kpi-hint">▼</span></div></div>
+      <div class="kpi" style="background: #1E8449;" onclick="showKpiDetail('ton')"><div class="kpi-v"><span class="kpi-icon kpi-icon-stock" aria-hidden="true">📊</span><span id="kpi-ton">0</span></div><div class="kpi-l">tổng tồn <span class="kpi-hint">▼</span></div></div>
      <div class="kpi" style="background: #C0392B;" onclick="showKpiDetail('het')">
-    <div class="kpi-v" id="kpi-het">0</div>
+    <div class="kpi-v"><span class="kpi-icon kpi-icon-out" aria-hidden="true">🔴</span><span id="kpi-het">0</span></div>
     <div class="kpi-l">hết hàng <span class="kpi-hint">▼</span></div>
 </div>
-      <div class="kpi" style="background: #B7950B;" onclick="showKpiDetail('sap')"><div class="kpi-v" id="kpi-sap">0</div><div class="kpi-l">sắp hết <span class="kpi-hint">▼</span></div></div>
+      <div class="kpi" style="background: #B7950B;" onclick="showKpiDetail('sap')"><div class="kpi-v"><span class="kpi-icon kpi-icon-low" aria-hidden="true">🟡</span><span id="kpi-sap">0</span></div><div class="kpi-l">sắp hết <span class="kpi-hint">▼</span></div></div>
     </div>
     <div class="search-box">
       <span class="search-icon" aria-hidden="true">
@@ -2011,10 +2020,10 @@ function showKpiDetail(type){
 }
 
 function initKPI(){
-  document.getElementById("kpi-mh").textContent = "📦 " + DATA.length;
-  document.getElementById("kpi-ton").textContent = "📊 " + DATA.reduce((s,r)=>s+r[5],0).toLocaleString("vi-VN");
-  document.getElementById("kpi-het").textContent = "🔴 " + DATA.filter(r=>getStockState(r[5], r[12])==="HET").length;
-  document.getElementById("kpi-sap").textContent = "🟡 " + DATA.filter(r=>getStockState(r[5], r[12])==="SAP").length;
+  document.getElementById("kpi-mh").textContent = DATA.length;
+  document.getElementById("kpi-ton").textContent = DATA.reduce((s,r)=>s+r[5],0).toLocaleString("vi-VN");
+  document.getElementById("kpi-het").textContent = DATA.filter(r=>getStockState(r[5], r[12])==="HET").length;
+  document.getElementById("kpi-sap").textContent = DATA.filter(r=>getStockState(r[5], r[12])==="SAP").length;
 }
 
 function formatVndNumber(n){
