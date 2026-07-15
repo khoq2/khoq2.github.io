@@ -8,6 +8,7 @@
 <meta http-equiv="Expires" content="0" />
 <title>🏪 KHO Q2 (HOÀNG GIA COMPUTER) [v-fix2]</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <style>
 /* CSS đầy đủ của bạn */
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -1016,8 +1017,8 @@ html::-webkit-scrollbar-corner { background: #EAF2F8; }
     <button class="fab admin-only" style="background:#5B2C6F;color:#fff" onclick="openQuickOrderModal()">↕️ Sắp xếp lọc</button>
     <button class="fab admin-only" style="background:#1A5276;color:#fff" onclick="openGroupOrderModal()">↕️ Sắp xếp nhóm</button>
     <button class="fab admin-only" style="background:#117864;color:#fff" onclick="backupDataToExcel()">💾 Sao lưu Excel</button>
-    <button class="fab admin-only" style="background:#1F618D;color:#fff" onclick="exportMonthlyAccountingExcel()">🧾 Kế toán tháng Excel</button>
-    <button class="fab admin-only" style="background:#922B21;color:#fff" onclick="exportMonthlyAccountingPdf()">📄 Kế toán tháng PDF</button>
+    <button class="fab admin-only" style="background:#1F618D;color:#fff" onclick="exportMonthlyAccountingExcel()">🧾 Xuất File Excel</button>
+    <button class="fab admin-only" style="background:#922B21;color:#fff" onclick="exportMonthlyAccountingPdf()">📄 Xuất File PDF</button>
   </div>
   <button class="fab admin-only" id="fabToggleBtn" style="background:#1E3A5F;color:#fff;" onclick="toggleFabMenu()">⚙️ Quản trị</button>
 </div>
@@ -5914,36 +5915,63 @@ function chooseAccountingMonth(){
   return value.trim();
 }
 function getMonthlyAccountingReport(month){
-  const sales=normalizeTxList(TX_DATA).filter(t=>getTransactionKind(t)==="SALE" && parseTxDateKey(t.time).startsWith(month));
-  const rows=sales.map(t=>{
+  const tx=normalizeTxList(TX_DATA).filter(t=>parseTxDateKey(t.time).startsWith(month));
+  const makeTxRow=t=>{
     const qty=Math.abs(Number(t.qty)||0), totalAfter=(Number(t.gia)||0)*qty;
     const unitBefore=Number(t.basePrice)||Number(t.gia)||0, totalBefore=unitBefore*qty;
     return {time:formatTxTime(t.time),branch:t.branch||"Q2",id:t.id,code:t.ma,name:t.ten,employee:t.nv,qty,unitBefore,vatRate:Number(t.vatRate)||0,vat:totalAfter-totalBefore,totalAfter,note:t.ghi||""};
-  });
-  return {month,rows,count:rows.length,qty:rows.reduce((s,r)=>s+r.qty,0),before:rows.reduce((s,r)=>s+r.totalBefore,0),vat:rows.reduce((s,r)=>s+r.vat,0),after:rows.reduce((s,r)=>s+r.totalAfter,0)};
+  };
+  const sales=tx.filter(t=>getTransactionKind(t)==="SALE").map(makeTxRow);
+  const imports=tx.filter(t=>getTransactionKind(t)==="IMPORT").map(makeTxRow);
+  const inventory=DATA.map(r=>{ const qty=Number(r[5])||0, low=Number(r[12])||0; return {branch:r[13]||"Q2",code:r[1]||"",name:r[2]||"",category:r[0]||"",qty,low,status:getStockStatusLabel(qty,low),location:splitNoteLocation(r[7]).location||"",salePrice:Number(r[10])||0}; });
+  const lowStock=inventory.filter(r=>getStockState(r.qty,r.low)==="SAP");
+  const outStock=inventory.filter(r=>getStockState(r.qty,r.low)==="HET");
+  const sum=(rows,key)=>rows.reduce((s,r)=>s+(Number(r[key])||0),0);
+  return {month,generatedAt:formatTxTime(new Date()),sales,imports,inventory,lowStock,outStock,saleCount:sales.length,saleQty:sum(sales,"qty"),importCount:imports.length,importQty:sum(imports,"qty"),before:sum(sales,"totalBefore"),vat:sum(sales,"vat"),after:sum(sales,"totalAfter")};
 }
 function exportMonthlyAccountingExcel(){
   if(!requireAdmin()) return;
   if(typeof XLSX==="undefined"){ showToast("⚠️ Chưa tải được công cụ Excel.",4000); return; }
   const month=chooseAccountingMonth(); if(!month) return;
   const report=getMonthlyAccountingReport(month);
-  const summary=[["BÁO CÁO KẾ TOÁN THÁNG",month],["Số giao dịch",report.count],["Số lượng đã bán",report.qty],["Doanh thu trước VAT",report.before],["VAT đầu ra",report.vat],["Tổng thanh toán",report.after]];
-  const headers=["Thời gian","Chi nhánh","Mã giao dịch","Mã hàng","Tên sản phẩm","Nhân viên","Số lượng","Đơn giá trước VAT","VAT (%)","Tiền VAT","Tổng thanh toán","Ghi chú"];
-  const details=report.rows.map(r=>[r.time,r.branch,r.id,r.code,r.name,r.employee,r.qty,r.unitBefore,r.vatRate,r.vat,r.totalAfter,r.note]);
-  const wb=XLSX.utils.book_new(), wsSummary=XLSX.utils.aoa_to_sheet(summary), wsDetails=XLSX.utils.aoa_to_sheet([headers,...details]);
-  wsSummary['!cols']=[{wch:28},{wch:20}]; wsDetails['!cols']=[20,10,22,16,38,20,10,18,10,16,18,34].map(w=>({wch:w}));
-  wsDetails['!autofilter']={ref:`A1:L${Math.max(details.length+1,1)}`};
-  XLSX.utils.book_append_sheet(wb,wsSummary,"Tổng hợp tháng"); XLSX.utils.book_append_sheet(wb,wsDetails,"Chi tiết bán hàng");
-  XLSX.writeFile(wb,`Bao-cao-ke-toan-${month}.xlsx`); showToast(`✅ Đã tạo báo cáo Excel tháng ${month}`);
+  const summary=[["BÁO CÁO KIỂM KÊ THÁNG",month],["Thời điểm xuất báo cáo",report.generatedAt],["Phạm vi giao dịch",`Từ 01/${month.slice(5,7)}/${month.slice(0,4)} đến hết tháng`],["Lưu ý tồn kho","Là tồn hiện tại tại thời điểm xuất, không phải tồn lịch sử cuối tháng"],[],["Giao dịch bán",report.saleCount],["Số lượng đã bán",report.saleQty],["Doanh thu trước VAT",report.before],["VAT đầu ra",report.vat],["Tổng tiền bán",report.after],["Giao dịch nhập",report.importCount],["Số lượng đã nhập",report.importQty],["Tổng mặt hàng hiện tại",report.inventory.length],["Sắp hết hiện tại",report.lowStock.length],["Hết hàng hiện tại",report.outStock.length]];
+  const txHeaders=["Thời gian","Chi nhánh","Mã giao dịch","Mã hàng","Tên sản phẩm","Nhân viên","Số lượng","Đơn giá trước VAT","VAT (%)","Tiền VAT","Tổng thanh toán","Ghi chú"];
+  const txRows=rows=>rows.map(r=>[r.time,r.branch,r.id,r.code,r.name,r.employee,r.qty,r.unitBefore,r.vatRate,r.vat,r.totalAfter,r.note]);
+  const stockHeaders=["Chi nhánh","Mã hàng","Tên sản phẩm","Nhóm hàng","Tồn hiện tại","Ngưỡng sắp hết","Trạng thái","Vị trí","Giá bán hiện tại"];
+  const stockRows=rows=>rows.map(r=>[r.branch,r.code,r.name,r.category,r.qty,r.low,r.status,r.location,r.salePrice]);
+  const wb=XLSX.utils.book_new();
+  const addSheet=(name,rows,widths,filter=true)=>{ const ws=XLSX.utils.aoa_to_sheet(rows); ws['!cols']=widths.map(w=>({wch:w})); if(filter&&rows.length) ws['!autofilter']={ref:`A1:${XLSX.utils.encode_col(rows[0].length-1)}${Math.max(rows.length,1)}`}; XLSX.utils.book_append_sheet(wb,ws,name); };
+  addSheet("Tổng hợp",summary,[34,55],false);
+  addSheet("Hàng bán tháng",[txHeaders,...txRows(report.sales)],[20,10,22,16,38,20,10,19,10,16,18,34]);
+  addSheet("Hàng nhập tháng",[txHeaders,...txRows(report.imports)],[20,10,22,16,38,20,10,19,10,16,18,34]);
+  addSheet("Tồn hiện tại",[stockHeaders,...stockRows(report.inventory)],[12,16,40,18,12,15,18,24,18]);
+  addSheet("Sắp hết",[stockHeaders,...stockRows(report.lowStock)],[12,16,40,18,12,15,18,24,18]);
+  addSheet("Hết hàng",[stockHeaders,...stockRows(report.outStock)],[12,16,40,18,12,15,18,24,18]);
+  XLSX.writeFile(wb,`Bao-cao-kiem-ke-${month}.xlsx`); showToast(`✅ Đã tạo file Excel kiểm kê tháng ${month}`);
 }
-function exportMonthlyAccountingPdf(){
+async function exportMonthlyAccountingPdf(){
   if(!requireAdmin()) return;
   const month=chooseAccountingMonth(); if(!month) return;
-  const report=getMonthlyAccountingReport(month), popup=window.open("","_blank");
-  if(!popup){ alert("Trình duyệt đang chặn cửa sổ in. Hãy cho phép pop-up rồi thử lại."); return; }
-  const rows=report.rows.map(r=>`<tr><td>${escapeHtml(r.time)}</td><td>${escapeHtml(r.branch)}</td><td>${escapeHtml(r.code)}</td><td>${escapeHtml(r.name)}</td><td>${escapeHtml(r.employee)}</td><td>${r.qty}</td><td>${fmt(r.unitBefore)}</td><td>${r.vatRate}%</td><td>${fmt(r.vat)}</td><td>${fmt(r.totalAfter)}</td></tr>`).join("");
-  popup.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>Báo cáo kế toán ${month}</title><style>@page{size:A4 landscape;margin:10mm}body{font-family:Arial,sans-serif;color:#17202A}h1{text-align:center;font-size:20px}.summary{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:14px 0}.box{border:1px solid #aaa;border-radius:7px;padding:9px}.box b{display:block;margin-top:5px;font-size:16px}table{width:100%;border-collapse:collapse;font-size:9px}th,td{border:1px solid #999;padding:5px;text-align:left}th{background:#D6EAF8}tr:nth-child(even){background:#F8F9F9}.note{margin-top:10px;font-size:9px;color:#666}</style></head><body><h1>BÁO CÁO KẾ TOÁN THÁNG ${month}</h1><div class="summary"><div class="box">Giao dịch<b>${report.count}</b></div><div class="box">Doanh thu trước VAT<b>${fmt(report.before)}</b></div><div class="box">VAT đầu ra<b>${fmt(report.vat)}</b></div><div class="box">Số lượng bán<b>${report.qty}</b></div><div class="box">Tổng thanh toán<b>${fmt(report.after)}</b></div></div><table><thead><tr><th>Thời gian</th><th>CN</th><th>Mã</th><th>Sản phẩm</th><th>Nhân viên</th><th>SL</th><th>Trước VAT</th><th>VAT</th><th>Tiền VAT</th><th>Thanh toán</th></tr></thead><tbody>${rows||`<tr><td colspan="10">Không có giao dịch trong tháng</td></tr>`}</tbody></table><div class="note">Báo cáo lấy từ lịch sử giao dịch đã đồng bộ trên hệ thống.</div><script>window.onload=()=>setTimeout(()=>window.print(),300)<\/script></body></html>`);
-  popup.document.close();
+  if(typeof html2pdf!=="function"){ showToast("⚠️ Chưa tải được công cụ tạo PDF. Kiểm tra mạng rồi thử lại.",4500); return; }
+  const report=getMonthlyAccountingReport(month);
+  const txRows=items=>items.map(r=>`<tr><td>${escapeHtml(r.time)}</td><td>${escapeHtml(r.branch)}</td><td>${escapeHtml(r.code)}</td><td>${escapeHtml(r.name)}</td><td>${escapeHtml(r.employee)}</td><td>${r.qty}</td><td>${fmt(r.unitBefore)}</td><td>${r.vatRate||0}%</td><td>${fmt(r.vat)}</td><td>${fmt(r.totalAfter)}</td></tr>`).join("")||`<tr><td colspan="10">Không có dữ liệu</td></tr>`;
+  const stockRows=items=>items.map(r=>`<tr><td>${escapeHtml(r.branch)}</td><td>${escapeHtml(r.code)}</td><td>${escapeHtml(r.name)}</td><td>${r.qty}</td><td>${r.low}</td><td>${escapeHtml(r.status)}</td><td>${escapeHtml(r.location)}</td><td>${fmt(r.salePrice)}</td></tr>`).join("")||`<tr><td colspan="8">Không có dữ liệu</td></tr>`;
+  const txTable=(title,items)=>`<h2>${title}</h2><table><thead><tr><th>Thời gian</th><th>CN</th><th>Mã hàng</th><th>Sản phẩm</th><th>Nhân viên</th><th>SL</th><th>Đơn giá trước VAT</th><th>VAT</th><th>Tiền VAT</th><th>Thanh toán</th></tr></thead><tbody>${txRows(items)}</tbody></table>`;
+  const stockTable=(title,items)=>`<h2>${title}</h2><table><thead><tr><th>CN</th><th>Mã hàng</th><th>Sản phẩm</th><th>Tồn</th><th>Ngưỡng</th><th>Trạng thái</th><th>Vị trí</th><th>Giá bán</th></tr></thead><tbody>${stockRows(items)}</tbody></table>`;
+  const reportEl=document.createElement("div");
+  reportEl.style.cssText="position:fixed;left:-12000px;top:0;width:1050px;padding:24px;background:#fff;color:#17202A;font-family:Arial,sans-serif";
+  reportEl.innerHTML=`<style>h1{margin:0;text-align:center;font-size:24px}h2{font-size:16px;margin:18px 0 6px;padding:6px;background:#D6EAF8;page-break-after:avoid}table{width:100%;border-collapse:collapse;font-size:9px}th,td{border:1px solid #999;padding:5px;text-align:left;vertical-align:top}thead{display:table-header-group}tr{page-break-inside:avoid}</style><h1>BÁO CÁO KIỂM KÊ THÁNG ${month}</h1><p style="text-align:center">Xuất lúc: <b>${escapeHtml(report.generatedAt)}</b></p><div style="display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin:12px 0"><div>Bán: <b>${report.saleCount} giao dịch / ${report.saleQty} SP</b></div><div>Nhập: <b>${report.importCount} giao dịch / ${report.importQty} SP</b></div><div>Trước VAT: <b>${fmt(report.before)}</b></div><div>VAT: <b>${fmt(report.vat)}</b></div><div>Tổng bán: <b>${fmt(report.after)}</b></div><div>Tổng mã hàng: <b>${report.inventory.length}</b></div><div>Sắp hết: <b>${report.lowStock.length}</b></div><div>Hết hàng: <b>${report.outStock.length}</b></div></div><p style="font-size:10px;color:#555"><b>Phạm vi:</b> Bán/nhập là giao dịch trong tháng ${month}. Tồn kho, sắp hết và hết hàng là số lượng hiện tại lúc xuất báo cáo, không phải tồn lịch sử cuối tháng.</p>${txTable("1. HÀNG ĐÃ BÁN TRONG THÁNG",report.sales)}${txTable("2. HÀNG ĐÃ NHẬP TRONG THÁNG",report.imports)}${stockTable("3. SẮP HẾT HIỆN TẠI",report.lowStock)}${stockTable("4. HẾT HÀNG HIỆN TẠI",report.outStock)}${stockTable("5. TOÀN BỘ TỒN KHO HIỆN TẠI",report.inventory)}<div style="margin-top:12px;font-size:9px;color:#666">Số liệu giao dịch lấy nguyên từ lịch sử đã đồng bộ. Báo cáo không tự thêm giá vốn hoặc lợi nhuận.</div>`;
+  reportEl.querySelectorAll("th,td").forEach(cell=>cell.style.cssText="border:1px solid #999;padding:6px;text-align:left;vertical-align:top");
+  document.body.appendChild(reportEl);
+  showToast(`⏳ Đang tạo PDF tháng ${month}...`,3500);
+  try{
+    await html2pdf().set({margin:7,filename:`Bao-cao-kiem-ke-${month}.pdf`,image:{type:"jpeg",quality:.96},html2canvas:{scale:1.5,useCORS:true},jsPDF:{unit:"mm",format:"a4",orientation:"landscape"},pagebreak:{mode:["css","legacy"],avoid:"tr"}}).from(reportEl).save();
+    showToast(`✅ Đã tải PDF kiểm kê tháng ${month}`);
+  }catch(e){
+    showToast("⚠️ Không tạo được PDF: "+String(e),5000);
+  }finally{
+    reportEl.remove();
+  }
 }
 let searchRenderTimer = null;
 let searchSuggestionItems = [];
