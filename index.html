@@ -13,6 +13,7 @@
 <style>
 /* CSS đầy đủ của bạn */
 * { box-sizing: border-box; margin: 0; padding: 0; }
+html { -webkit-text-size-adjust:100%; text-size-adjust:100%; }
 body { font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif; background: #F2F3F4; color: #1a1a1a; }
 .sticky { position: sticky; top: 0; z-index: 100; }
 .header { background: #1E3A5F; color: #fff; padding: 12px 14px 10px; box-shadow: 0 2px 8px rgba(0,0,0,.3); }
@@ -322,7 +323,21 @@ mark.kw-hit { background: #FFEB3B; color: #1A1A1A; padding: 0 1px; border-radius
 .group-check input { width:auto!important; margin:2px 0 0; accent-color:#1A5276; flex-shrink:0; }
 @media (max-width:480px){ .group-checkboxes { grid-template-columns:1fr; max-height:180px; } .image-lightbox { padding:calc(66px + env(safe-area-inset-top)) 10px calc(12px + env(safe-area-inset-bottom)); } .image-lightbox img { max-height:calc(100dvh - 78px - env(safe-area-inset-top) - env(safe-area-inset-bottom)); border-radius:7px; } .image-lightbox-close { top:calc(10px + env(safe-area-inset-top)); right:calc(10px + env(safe-area-inset-right)); } }
 @media (max-width:480px) {
+  .image-lightbox-close { display:none; }
+  .fab-wrap { left:max(8px,env(safe-area-inset-left)); right:max(8px,env(safe-area-inset-right)); bottom:max(10px,calc(env(safe-area-inset-bottom) + 8px)); width:auto; align-items:stretch; }
+  #fabMenuItems { width:100%; display:grid!important; grid-template-columns:repeat(2,minmax(0,1fr)); align-items:stretch!important; gap:8px!important; overflow-x:hidden!important; overflow-y:auto!important; }
+  body.fab-menu-open #fabMenuItems { max-height:min(62dvh,520px)!important; padding:8px; border-radius:16px; background:rgba(255,255,255,.96); box-shadow:0 8px 28px rgba(0,0,0,.28); }
+  #fabMenuItems .fab { width:100%; min-width:0; min-height:46px; justify-content:center; border-radius:12px; padding:9px 8px; font-size:12px; line-height:1.25; text-align:center; white-space:normal; overflow-wrap:anywhere; }
+  #fabToggleBtn { align-self:flex-end; max-width:calc(100vw - 24px); }
   .modal { max-height:94dvh; padding:16px 12px max(26px,calc(env(safe-area-inset-bottom) + 16px)); }
+  #editOverlay .modal { width:100%; max-height:calc(100dvh - env(safe-area-inset-top)); padding:14px 12px max(22px,calc(env(safe-area-inset-bottom) + 12px)); }
+  #editOverlay .modal-title { font-size:18px; margin-bottom:12px; }
+  #editOverlay .form-row { margin-bottom:9px; }
+  #editOverlay .form-row label { font-size:12px; }
+  #editOverlay .form-row input,#editOverlay .form-row select,#editOverlay .form-row textarea { min-height:44px; padding:9px 10px; font-size:16px; }
+  #editOverlay .code-existing-hint { max-height:58px; overflow:auto; font-size:10px; }
+  #editOverlay .group-checkboxes { max-height:150px; padding:6px; }
+  #editOverlay .group-check { padding:5px; font-size:12px; }
   .prod-media { width:68px; flex-basis:68px; gap:4px; }
   .prod-media .prod-img { width:68px; height:68px; }
   .prod-extra-image { min-height:30px; display:flex; align-items:center; justify-content:center; padding:5px 2px; border-radius:7px; background:#EBF5FB; font-size:11px; font-weight:800; line-height:1.2; text-decoration:none; touch-action:manipulation; }
@@ -930,6 +945,10 @@ html::-webkit-scrollbar-corner { background: #EAF2F8; }
 .customer-editor textarea { min-height:76px; resize:vertical; }
 .customer-editor textarea.customer-drive-links { min-height:238px; line-height:1.55; }
 .customer-editor .wide { grid-column:1/-1; }
+#customerOverlay.combined-new #customerProfileToolbar { display:none; }
+#customerOverlay.combined-new .customer-record-identity { display:none; }
+#customerOverlay.combined-new #customerEditor { margin-bottom:0; border-radius:14px 14px 0 0; }
+#customerOverlay.combined-new #customerRecordEditor { margin-top:0; border-top:0; border-radius:0 0 14px 14px; }
 @media (max-width:520px) {
   .customer-modal { max-height:94dvh; padding-left:11px; padding-right:11px; }
   .customer-editor-grid { grid-template-columns:1fr; }
@@ -1302,13 +1321,13 @@ html::-webkit-scrollbar-corner { background: #EAF2F8; }
         <label>Tên khách hàng<input id="customerEditName" type="text" autocomplete="off" placeholder="Tên khách"></label>
         <label class="wide">Ghi chú chung<textarea id="customerEditNote" placeholder="Khách quen, loại thiết bị thường sửa..."></textarea></label>
       </div>
-      <div class="customer-toolbar"><button type="button" class="customer-secondary" onclick="closeCustomerEditors()">Hủy</button><button type="button" class="customer-primary" onclick="saveCustomerProfile()">💾 Lưu khách hàng</button></div>
+      <div class="customer-toolbar" id="customerProfileToolbar"><button type="button" class="customer-secondary" onclick="closeCustomerEditors()">Hủy</button><button type="button" class="customer-primary" onclick="saveCustomerProfile()">💾 Lưu khách hàng</button></div>
     </div>
     <div id="customerRecordEditor" class="customer-editor">
       <input type="hidden" id="customerRecordId">
       <div class="customer-editor-grid">
-        <label>Tên khách hàng<input id="customerRecordCustomerName" type="text" readonly></label>
-        <label>Số điện thoại<input id="customerRecordPhone" type="tel" readonly></label>
+        <label class="customer-record-identity">Tên khách hàng<input id="customerRecordCustomerName" type="text" readonly></label>
+        <label class="customer-record-identity">Số điện thoại<input id="customerRecordPhone" type="tel" readonly></label>
         <label>Thiết bị<input id="customerRecordDevice" type="text" placeholder="VD: Laptop Dell Inspiron"></label>
         <label>Model<input id="customerRecordModel" type="text" placeholder="VD: Inspiron 15 3511"></label>
         <label>Serial / Service Tag<input id="customerRecordSerialTag" type="text" placeholder="Serial hoặc Service Tag"></label>
@@ -1321,7 +1340,7 @@ html::-webkit-scrollbar-corner { background: #EAF2F8; }
         <label>Nhân viên<input id="customerRecordEmployee" type="text" list="customerEmployeeSuggestions" placeholder="Người thực hiện"></label>
         <datalist id="customerEmployeeSuggestions"></datalist>
       </div>
-      <div class="customer-toolbar"><button type="button" class="customer-secondary" onclick="closeCustomerEditors()">Hủy</button><button type="button" class="customer-primary" onclick="saveCustomerRecord()">💾 Lưu hồ sơ</button></div>
+      <div class="customer-toolbar"><button type="button" class="customer-secondary" onclick="closeCustomerEditors()">Hủy</button><button type="button" class="customer-primary" id="customerRecordSaveBtn" onclick="saveCustomerRecord()">💾 Lưu hồ sơ</button></div>
     </div>
   </div>
 </div>
@@ -5071,7 +5090,7 @@ document.getElementById("imageLightbox").addEventListener("touchend",event=>{
   const endX=touch?.clientX, endY=touch?.clientY;
   const dx=Number.isFinite(endX)&&customerGalleryTouchX!==null ? endX-customerGalleryTouchX : 0;
   const dy=Number.isFinite(endY)&&customerGalleryTouchY!==null ? endY-customerGalleryTouchY : 0;
-  if(dy>75 && dy>Math.abs(dx)*1.15){
+  if(Math.abs(dy)>75 && Math.abs(dy)>Math.abs(dx)*1.15){
     closeImageViewer();
   }else if(customerGalleryImages.length>1 && Math.abs(dx)>45 && Math.abs(dx)>Math.abs(dy)){
     navigateCustomerGallery(dx<0?1:-1);
@@ -5710,6 +5729,7 @@ let customerHoldStartX = 0;
 let customerHoldStartY = 0;
 let suppressOwnerTapOnce = false;
 let customerSaving = false;
+let customerCreatingCombined = false;
 
 function normalizeCustomerPhone(value){
   let phone = String(value || "").replace(/\D/g, "");
@@ -5857,6 +5877,8 @@ function openCustomerBillImage(img){
 function closeCustomerEditors(){
   document.getElementById("customerEditor")?.classList.remove("open");
   document.getElementById("customerRecordEditor")?.classList.remove("open");
+  document.getElementById("customerOverlay")?.classList.remove("combined-new");
+  customerCreatingCombined=false;
 }
 function openCustomerEditor(phone=""){
   if(!requireAdmin()) return;
@@ -5867,6 +5889,14 @@ function openCustomerEditor(phone=""){
   document.getElementById("customerEditName").value=customer?.name || "";
   document.getElementById("customerEditNote").value=customer?.note || "";
   document.getElementById("customerEditor").classList.add("open");
+  if(!customer){
+    customerCreatingCombined=true;
+    selectedCustomer={id:"",phone:normalizeCustomerPhone(document.getElementById("customerEditPhone").value),name:"",note:""};
+    document.getElementById("customerOverlay").classList.add("combined-new");
+    fillCustomerRecordEditor();
+    document.getElementById("customerRecordEditor").classList.add("open");
+    document.getElementById("customerRecordSaveBtn").textContent="💾 Lưu khách hàng và hồ sơ";
+  }
   setTimeout(()=>document.getElementById("customerEditPhone")?.focus(),60);
 }
 async function saveCustomerProfile(){
@@ -5885,10 +5915,7 @@ async function saveCustomerProfile(){
   }catch(e){ showToast("⚠️ Không lưu được khách hàng: "+String(e),4500); }
   finally{ customerSaving=false; }
 }
-function openCustomerRecordEditor(recordId=""){
-  if(!requireAdmin() || !selectedCustomer) return;
-  const record=CUSTOMER_RECORDS.find(item=>String(item.id)===String(recordId));
-  closeCustomerEditors();
+function fillCustomerRecordEditor(record=null){
   document.getElementById("customerRecordId").value=record?.id || "";
   document.getElementById("customerRecordCustomerName").value=record?.customerName || selectedCustomer.name || "";
   document.getElementById("customerRecordPhone").value=formatCustomerPhone(selectedCustomer.phone);
@@ -5903,10 +5930,24 @@ function openCustomerRecordEditor(recordId=""){
   document.getElementById("customerRecordBranch").value=record?.branch || "Q2";
   document.getElementById("customerRecordTime").value=customerTimeInputValue(record?.time);
   document.getElementById("customerEmployeeSuggestions").innerHTML=NV_LIST.map(n=>`<option value="${escapeHtml(getNVName(n))}"></option>`).join("");
+}
+function openCustomerRecordEditor(recordId=""){
+  if(!requireAdmin() || !selectedCustomer) return;
+  const record=CUSTOMER_RECORDS.find(item=>String(item.id)===String(recordId));
+  closeCustomerEditors();
+  fillCustomerRecordEditor(record);
+  document.getElementById("customerRecordSaveBtn").textContent="💾 Lưu hồ sơ";
   document.getElementById("customerRecordEditor").classList.add("open");
 }
 async function saveCustomerRecord(){
   if(!requireAdmin() || customerSaving || !selectedCustomer) return;
+  let recordPhone=selectedCustomer.phone;
+  let recordCustomerName=selectedCustomer.name || "";
+  if(customerCreatingCombined){
+    recordPhone=normalizeCustomerPhone(document.getElementById("customerEditPhone").value);
+    recordCustomerName=document.getElementById("customerEditName").value.trim();
+    if(recordPhone.length<9){ alert("Số điện thoại không hợp lệ!"); return; }
+  }
   const work=document.getElementById("customerRecordWork").value.trim();
   if(!work){ alert("Vui lòng ghi nội dung đã làm hoặc sửa chữa!"); return; }
   const imageLinks=String(document.getElementById("customerRecordImages").value || "").split(/\r?\n/).map(v=>v.trim()).filter(Boolean);
@@ -5915,9 +5956,17 @@ async function saveCustomerRecord(){
   if(!recordTime){ alert("Vui lòng chọn ngày giờ khách đến hoặc thực hiện!"); return; }
   customerSaving=true;
   try{
-    await postSheet("upsert_customer_record",{id:document.getElementById("customerRecordId").value,phone:selectedCustomer.phone,customerName:selectedCustomer.name || "",device:document.getElementById("customerRecordDevice").value.trim(),model:document.getElementById("customerRecordModel").value.trim(),serialTag:document.getElementById("customerRecordSerialTag").value.trim(),amount:parseVndInput(document.getElementById("customerRecordAmount").value),work,images:imageLinks.join("\n"),note:document.getElementById("customerRecordNote").value.trim(),employee:document.getElementById("customerRecordEmployee").value.trim(),branch:document.getElementById("customerRecordBranch").value,time:recordTime.replace("T"," ")},35000);
+    if(customerCreatingCombined){
+      const profile=await postSheet("upsert_customer",{id:"",phone:recordPhone,name:recordCustomerName,note:document.getElementById("customerEditNote").value.trim()},35000);
+      recordPhone=profile.customer.phone;
+      recordCustomerName=profile.customer.name || recordCustomerName;
+      selectedCustomer=profile.customer;
+    }
+    await postSheet("upsert_customer_record",{id:document.getElementById("customerRecordId").value,phone:recordPhone,customerName:recordCustomerName,device:document.getElementById("customerRecordDevice").value.trim(),model:document.getElementById("customerRecordModel").value.trim(),serialTag:document.getElementById("customerRecordSerialTag").value.trim(),amount:parseVndInput(document.getElementById("customerRecordAmount").value),work,images:imageLinks.join("\n"),note:document.getElementById("customerRecordNote").value.trim(),employee:document.getElementById("customerRecordEmployee").value.trim(),branch:document.getElementById("customerRecordBranch").value,time:recordTime.replace("T"," ")},35000);
+    await loadCustomers(true);
     closeCustomerEditors();
-    await openCustomerDetail(selectedCustomer.phone);
+    document.getElementById("customerSearch").value=recordPhone;
+    await openCustomerDetail(recordPhone);
     showToast("✅ Đã lưu hồ sơ khách hàng");
   }catch(e){ showToast("⚠️ Không lưu được hồ sơ: "+String(e),4500); }
   finally{ customerSaving=false; }
@@ -6458,7 +6507,6 @@ function setupHeaderAutoCollapse(){
     if(downwardSwipeCount>=2){
       downwardSwipeCount=0;
       setHeaderCollapsed(false,false);
-      showToast('Đã mở rộng thanh công cụ');
     }
   }, {passive:true});
 }
