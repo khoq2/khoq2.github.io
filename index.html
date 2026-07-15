@@ -329,6 +329,11 @@ mark.kw-hit { background: #FFEB3B; color: #1A1A1A; padding: 0 1px; border-radius
 .nv-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .nv-avatar.has-preview { cursor: zoom-in; transition: transform .16s ease, box-shadow .16s ease; }
 .nv-avatar.has-preview:hover { transform: scale(1.08); box-shadow: 0 0 0 2px rgba(46,134,193,.2); }
+.nv-role-badge { display:inline-flex; align-items:center; gap:3px; max-width:92px; padding:2px 6px; border-radius:999px; font-size:8px; font-weight:950; line-height:1.2; vertical-align:middle; white-space:nowrap; box-shadow:inset 0 0 0 1px rgba(255,255,255,.35); }
+.nv-role-badge.admin { background:linear-gradient(135deg,#922B21,#E74C3C); color:#fff; }
+.nv-role-badge.mod { background:linear-gradient(135deg,#1A5276,#3498DB); color:#fff; }
+.nv-role-badge.staff { background:#E8F8F5; color:#117864; border:1px solid #A3E4D7; }
+.nv-role-icon { width:12px; height:12px; border-radius:50%; object-fit:cover; flex:0 0 auto; }
 .tx-nv { display: inline-flex; align-items: center; gap: 6px; }
 .tx-nv .nv-avatar { width: 24px; height: 24px; font-size: 11px; }
 .btn-submit { width: 100%; background: #1E3A5F; color: #fff; border: none; border-radius: 12px; padding: 14px; font-size: 15px; font-weight: bold; cursor: pointer; margin-top: 8px; }
@@ -1140,6 +1145,10 @@ html::-webkit-scrollbar-corner { background: #EAF2F8; }
         onchange="useImageLink('nvAvatarLink', setNVAvatarPreview)"
         onkeydown="if(event.key==='Enter'){event.preventDefault(); useImageLink('nvAvatarLink', setNVAvatarPreview);}">
     </div>
+    <div class="form-2col" style="margin-top:8px">
+      <div class="form-row"><label>Vai trò / huy hiệu</label><select id="nvRole"><option value="STAFF">👤 Nhân viên</option><option value="MOD">🛡️ Mod</option><option value="ADMIN">👑 Admin</option></select></div>
+      <div class="form-row"><label>Icon huy hiệu Google Drive</label><input type="text" id="nvBadgeIconLink" placeholder="Dán link icon riêng (không bắt buộc)"></div>
+    </div>
     <div id="nvList" style="margin-top: 10px;"></div>
     <button class="btn-cancel" onclick="closeOverlay('nvOverlay')">Đóng</button>
   </div>
@@ -1691,7 +1700,7 @@ function checkAdminSession(){
 
 // Dòng URL duy nhất
 const SHEET_API_URL = "https://script.google.com/macros/s/AKfycby6YH69F7sfO1ZoUJsDm4BeX6Luj2GrhUfYWWJWNvqjraAEhkBck16EphrPBBm1BT3YqA/exec";
-const REQUIRED_API_VERSION = "2026.07.15-atomic-1";
+const REQUIRED_API_VERSION = "2026.07.15-atomic-2";
 const SHEET_TIMEOUT_MS = 12000;
 const PENDING_SYNC_KEY = "kho_cntt_pending_sync";
 const PENDING_TX_SYNC_KEY = "kho_cntt_pending_tx_sync";
@@ -3409,6 +3418,39 @@ function focusFirstQuickMatch(){
 function isProductViewModeAvailable(){
   return currentTab!=="ALL" || totalStockView || currentStatus==="AUDIT" || restockOnly;
 }
+function getListSpecSortValue(row){
+  const text = removeAccents(String(row?.[2] || "")).toLowerCase();
+  const group = normalizeQuickText(getPrimaryRowGroup(row?.[8]) || "");
+  let m;
+  if(isPsuGroupLabel(group)){
+    m=text.match(/(\d+(?:[.,]\d+)?)\s*w\b/);
+    if(m) return Number(m[1].replace(",","."));
+  }
+  if(isStorageGroupLabel(group)){
+    m=text.match(/(\d+(?:[.,]\d+)?)\s*tb\b/);
+    if(m) return Number(m[1].replace(",","."))*1024;
+    m=text.match(/(\d+(?:[.,]\d+)?)\s*gb\b/);
+    if(m) return Number(m[1].replace(",","."));
+  }
+  if(isRamGroupLabel(group)){
+    m=text.match(/(\d+(?:[.,]\d+)?)\s*gb\b/);
+    if(m) return Number(m[1].replace(",","."));
+  }
+  if(isMonitorGroupLabel(group)){
+    m=text.match(/(\d+(?:[.,]\d+)?)\s*(?:inch|\")/);
+    if(m) return Number(m[1].replace(",","."));
+  }
+  m=text.match(/\d+(?:[.,]\d+)?/);
+  return m ? Number(m[0].replace(",",".")) : Number.POSITIVE_INFINITY;
+}
+function sortProductItemsForView(items){
+  if(productViewMode!=="list") return items;
+  return items.slice().sort((a,b)=>{
+    const diff=getListSpecSortValue(a.r)-getListSpecSortValue(b.r);
+    if(Number.isFinite(diff) && diff) return diff;
+    return String(a.r[2]||"").localeCompare(String(b.r[2]||""),"vi",{numeric:true,sensitivity:"base"});
+  });
+}
 function renderCard(r,i,displayNo){
   const [sh,ma,ten,th,giaNhap,ton,tt,ghi,,img,giaBan,,sapHet,branch]=r;
   const kw = removeAccents(searchQ.trim());
@@ -3435,7 +3477,7 @@ function renderCard(r,i,displayNo){
     ? `${latestTransaction.nv || "Chưa rõ nhân viên"} · ${formatTxTime(latestTransaction.time) || "Chưa rõ thời gian"}`
     : "Xem lịch sử ›";
   const latestTransactionHtml = latestTransaction
-    ? `${renderNVAvatar(latestTransaction.nv, "nv-avatar-latest")}<span class="nguoi-ban-latest-text">${escapeHtml(latestTransactionText)}</span>`
+    ? `${renderNVAvatar(latestTransaction.nv, "nv-avatar-latest")}${renderNVRoleBadge(latestTransaction.nv)}<span class="nguoi-ban-latest-text">${escapeHtml(latestTransactionText)}</span>`
     : escapeHtml(latestTransactionText);
   const imgHtml = img
     ? `<img class="prod-img" src="${escapeHtml(img)}" alt="${escapeHtml(ten)}" referrerpolicy="no-referrer" onclick="openImageViewer(this.src, this.alt)" onerror="this.outerHTML='<div class=\\'prod-img prod-img-ph\\' title=\\'Không tải được ảnh\\'>💻</div>';" />`
@@ -3936,7 +3978,7 @@ function render(){
           <span class="group-header-count">${groupSummary}</span>
         </div>
         ${renderQuickSummary(buckets[g], g)}
-        ${buckets[g].map((item,itemIdx)=>renderCard(item.r,item.i,itemIdx+1)).join("")}
+        ${sortProductItemsForView(buckets[g]).map((item,itemIdx)=>renderCard(item.r,item.i,itemIdx+1)).join("")}
       </section>`;
     }).join("");
     el.innerHTML = html;
@@ -4075,19 +4117,23 @@ function normalizeNVItem(nv){
       if(loose) return normalizeNVItem(loose);
     }
     const name = raw;
-    return name ? { name, avatar: "" } : null;
+    return name ? { name, avatar:"", role:"STAFF", badgeIcon:"" } : null;
   }
   if(Array.isArray(nv)){
     const name = String(nv[0] || nv[1] || nv.ten || nv.nv || "").trim();
     if(!name) return null;
-    return { name, avatar: String(nv[1] || nv[2] || nv.avatar || nv.img || "") };
+    return { name, avatar:String(nv[1] || nv.avatar || nv.img || ""), role:normalizeNVRole(nv[2] || nv.role), badgeIcon:String(nv[3] || nv.badgeIcon || nv.roleIcon || "") };
   }
   if(nv && typeof nv === "object"){
     const name = String(nv.name || nv.ten || nv.nv || "").trim();
     if(!name) return null;
-    return { name, avatar: String(nv.avatar || nv.img || "") };
+    return { name, avatar:String(nv.avatar || nv.img || ""), role:normalizeNVRole(nv.role), badgeIcon:String(nv.badgeIcon || nv.roleIcon || "") };
   }
   return null;
+}
+function normalizeNVRole(value){
+  const role=String(value || "STAFF").trim().toUpperCase();
+  return ["ADMIN","MOD","STAFF"].includes(role) ? role : "STAFF";
 }
 function normalizeNVList(list){
   if(!Array.isArray(list)) return [];
@@ -4115,6 +4161,14 @@ function renderNVAvatar(name, extraClass=""){
   const initial = label ? escapeHtml(label.charAt(0).toUpperCase()) : "👤";
   if(avatar) return `<span class="nv-avatar has-preview ${extraClass}" title="Bấm để phóng to avatar" onclick="event.stopPropagation();openImageViewer(this.querySelector('img').src,this.querySelector('img').alt)"><img src="${escapeHtml(avatar)}" alt="Avatar ${escapeHtml(label)}" referrerpolicy="no-referrer" onerror="this.parentElement.outerHTML='<span class=\\'nv-avatar ${extraClass}\\' title=\\'${escapeHtml(label)}\\'>${initial}</span>';"></span>`;
   return `<span class="nv-avatar ${extraClass}" title="${escapeHtml(label)}">${initial}</span>`;
+}
+function renderNVRoleBadge(name){
+  const nv=findNVByName(name);
+  if(!nv) return "";
+  const role=normalizeNVRole(nv.role);
+  const cfg={ADMIN:{label:"ADMIN",icon:"👑",cls:"admin"},MOD:{label:"MOD",icon:"🛡️",cls:"mod"},STAFF:{label:"NHÂN VIÊN",icon:"👤",cls:"staff"}}[role];
+  const custom=nv.badgeIcon ? `<img class="nv-role-icon" src="${escapeHtml(resolveImageUrl(nv.badgeIcon))}" alt="" referrerpolicy="no-referrer" onerror="this.style.display='none'">` : `<span aria-hidden="true">${cfg.icon}</span>`;
+  return `<span class="nv-role-badge ${cfg.cls}" title="Vai trò: ${cfg.label}">${custom}<span>${cfg.label}</span></span>`;
 }
 function setNVAvatarPreview(dataUrl){
   const input = document.getElementById("nvAvatar");
@@ -4158,7 +4212,7 @@ async function loadNVFromSheet(){
   }catch(e){ console.warn("Lỗi tải NV:", e); setSyncBadge("error", String(e)); }
 }
 
-function openNVModal(){ if(!requireAdmin()) return; renderNVList(); document.getElementById("nvOverlay").classList.add("open"); document.getElementById("nvInput").value=""; document.getElementById("nvAvatarFile").value=""; setNVAvatarPreview(""); }
+function openNVModal(){ if(!requireAdmin()) return; renderNVList(); document.getElementById("nvOverlay").classList.add("open"); document.getElementById("nvInput").value=""; document.getElementById("nvAvatarFile").value=""; document.getElementById("nvRole").value="STAFF"; document.getElementById("nvBadgeIconLink").value=""; setNVAvatarPreview(""); }
 function renderNVList(){
   NV_LIST = normalizeNVList(NV_LIST);
   const el = document.getElementById("nvList");
@@ -4170,12 +4224,14 @@ function renderNVList(){
       </div>
       <input type="file" id="nvRowFile_${i}" accept="image/*" style="display:none" onchange="handleNVRowAvatarPick(${i}, this)">
       <div style="flex:1; min-width:0;">
-        <div style="font-size:13px; font-weight:bold; margin-bottom:3px;">${escapeHtml(nv.name)}</div>
+        <div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;font-size:13px;font-weight:bold;margin-bottom:4px;">${escapeHtml(nv.name)} ${renderNVRoleBadge(nv.name)}</div>
+        <select style="font-size:11px;padding:5px 7px;margin-bottom:4px" onchange="applyNVRole(${i},this.value)"><option value="STAFF" ${nv.role==="STAFF"?"selected":""}>👤 Nhân viên</option><option value="MOD" ${nv.role==="MOD"?"selected":""}>🛡️ Mod</option><option value="ADMIN" ${nv.role==="ADMIN"?"selected":""}>👑 Admin</option></select>
         <input type="text" class="img-link-input" style="font-size:11px; padding:5px 8px;"
           placeholder="Dán link ảnh Google Drive cho avatar..."
           value="${nv.avatar && nv.avatar.startsWith('http') ? escapeHtml(nv.avatar) : ''}"
           oninput="debounceNVRowLink(this, ${i})"
           onchange="applyNVRowLink(${i}, this.value)">
+        <input type="text" class="img-link-input" style="font-size:11px;padding:5px 8px;margin-top:4px" placeholder="Link icon huy hiệu Google Drive..." value="${escapeHtml(nv.badgeIcon || "")}" onchange="applyNVBadgeIcon(${i},this.value)">
       </div>
       <button onclick="removeNV(${i})" style="background:#FADBD8;border:none;border-radius:6px;padding:5px 10px;color:#C0392B;cursor:pointer;font-size:12px;flex-shrink:0;">Xóa</button>
     </div>`).join("");
@@ -4187,6 +4243,17 @@ function applyNVRowLink(i, value){
   NV_LIST[i].avatar = val ? resolveImageUrl(val) : "";
   saveNV();
   renderNVList();
+}
+function applyNVRole(i,value){
+  if(!NV_LIST[i]) return;
+  NV_LIST[i].role=normalizeNVRole(value);
+  saveNV(); renderNVList(); render();
+}
+function applyNVBadgeIcon(i,value){
+  if(!NV_LIST[i]) return;
+  const val=String(value || "").trim();
+  NV_LIST[i].badgeIcon=val ? resolveImageUrl(val) : "";
+  saveNV(); renderNVList(); render();
 }
 const __nvRowLinkTimers = {};
 function debounceNVRowLink(el, i){
@@ -4220,9 +4287,12 @@ function handleNVRowAvatarPick(i, input){
 function addNV(){ if(!requireAdmin()) return;
   const val = document.getElementById("nvInput").value.trim();
   const avatar = document.getElementById("nvAvatar").value || "";
+  const role = normalizeNVRole(document.getElementById("nvRole").value);
+  const badgeRaw = document.getElementById("nvBadgeIconLink").value.trim();
+  const badgeIcon = badgeRaw ? resolveImageUrl(badgeRaw) : "";
   if(!val){ alert("Nhập tên nhân viên!"); return; }
   if(findNVByName(val)){ alert("Nhân viên này đã có trong danh sách!"); return; }
-  NV_LIST.push({ name: val, avatar }); saveNV(); document.getElementById("nvInput").value=""; document.getElementById("nvAvatarFile").value=""; setNVAvatarPreview(""); renderNVList(); showToast("Đã thêm: "+val);
+  NV_LIST.push({ name:val, avatar, role, badgeIcon }); saveNV(); document.getElementById("nvInput").value=""; document.getElementById("nvAvatarFile").value=""; document.getElementById("nvRole").value="STAFF"; document.getElementById("nvBadgeIconLink").value=""; setNVAvatarPreview(""); renderNVList(); showToast("Đã thêm: "+val);
 }
 function removeNV(i){ if(!requireAdmin()) return;
   NV_LIST = normalizeNVList(NV_LIST);
@@ -4642,7 +4712,7 @@ function renderTxHistory(){
   const rows = filtered.length ? filtered.map(t=>`
         <div class="tx-row">
           <div class="tx-header">
-            <span class="tx-nv">${renderNVAvatar(t.nv)} ${escapeHtml(t.nv || "")} <span class="tx-pill" style="margin-left:4px;${getTransactionKind(t)==="IMPORT" ? "background:#E8F8F0;color:#1E8449;" : getTransactionKind(t)==="ADJUST" ? "background:#FEF9E7;color:#7D6608;" : ""}">${getTransactionKindLabel(t)}</span></span>
+            <span class="tx-nv">${renderNVAvatar(t.nv)} ${escapeHtml(t.nv || "")} ${renderNVRoleBadge(t.nv)} <span class="tx-pill" style="margin-left:4px;${getTransactionKind(t)==="IMPORT" ? "background:#E8F8F0;color:#1E8449;" : getTransactionKind(t)==="ADJUST" ? "background:#FEF9E7;color:#7D6608;" : ""}">${getTransactionKindLabel(t)}</span></span>
             <div class="tx-head-right">
               <span class="tx-time">${formatTxTime(t.time)}</span>
               ${document.body.classList.contains("admin-mode")?`<button class="tx-action tx-edit" title="Sửa ngày giờ và thông tin giao dịch" onclick="event.stopPropagation(); editTX('${escapeHtml(t.id)}')">📅 Sửa ngày giờ</button><button class="tx-action tx-delete" title="Xóa giao dịch" onclick="event.stopPropagation(); deleteTX('${escapeHtml(t.id)}')">🗑️</button>`:""}
@@ -5683,8 +5753,8 @@ function backupDataToExcel(){
   const khoRows = normalizeSheetRows(DATA).map(r=>[r[13]||"Q2",r[0],r[1],r[2],r[3],r[4],r[5],r[6],r[12]||2,r[8],r[11],r[7],r[9],r[10]]);
   const txHeaders = ["Chi nhánh","Mã hàng","Tên sản phẩm","Danh mục","Nhân viên","Số lượng","Giá bán","Ghi chú","Link ảnh","Thời gian","Mã giao dịch"];
   const txRows = normalizeTxList(TX_DATA).map(t=>[t.branch||"Q2",t.ma,t.ten,t.sh,t.nv,t.qty,t.gia,t.ghi,t.img,t.time,t.id]);
-  const nvHeaders = ["Tên nhân viên","Link avatar"];
-  const nvRows = normalizeNVList(NV_LIST).map(n=>[n.name,n.avatar]);
+  const nvHeaders = ["Tên nhân viên","Link avatar","Vai trò","Link icon huy hiệu"];
+  const nvRows = normalizeNVList(NV_LIST).map(n=>[n.name,n.avatar,n.role,n.badgeIcon]);
   const wsData = XLSX.utils.aoa_to_sheet([khoHeaders,...khoRows]);
   const wsTx = XLSX.utils.aoa_to_sheet([txHeaders,...txRows]);
   const wsNv = XLSX.utils.aoa_to_sheet([nvHeaders,...nvRows]);
