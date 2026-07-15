@@ -502,6 +502,26 @@ body.fab-menu-open .scroll-btns { opacity: 0; transform: translateX(18px); point
 .summary-product-link b { color: #1A5276; }
 .summary-product-path { color:#2E6F9E; font-size:10px; font-weight:900; }
 .summary-product-info { color:#2C3E50; }
+.summary-category { margin-top:9px; border:1px solid #DCE6ED; border-radius:11px; overflow:hidden; background:#fff; }
+.summary-category-head { display:flex; justify-content:space-between; align-items:center; gap:10px; padding:9px 10px; color:#fff; font-size:12px; font-weight:950; }
+.summary-category-head small { font-size:10px; font-weight:800; text-align:right; opacity:.92; }
+.summary-group { border-top:1px solid #E8EDF2; }
+.summary-group > summary { display:flex; justify-content:space-between; align-items:center; gap:10px; padding:9px 10px; cursor:pointer; list-style:none; background:#F8FAFC; color:#2C3E50; font-size:11px; font-weight:900; }
+.summary-group > summary::-webkit-details-marker { display:none; }
+.summary-group > summary::after { content:"＋"; flex:0 0 auto; color:#2E6F9E; font-size:15px; }
+.summary-group[open] > summary::after { content:"−"; }
+.summary-group-name { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.summary-group-total { margin-left:auto; color:#52697D; font-size:10px; white-space:nowrap; }
+.summary-group-products { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:5px; padding:7px; background:#fff; }
+@media (max-width:560px) {
+  .summary-product-list { padding:8px; }
+  .summary-category-head { align-items:flex-start; }
+  .summary-category-head small { max-width:48%; white-space:normal; }
+  .summary-group > summary { padding:10px 8px; }
+  .summary-group-total { font-size:9px; }
+  .summary-group-products { grid-template-columns:1fr; padding:6px; }
+  .summary-product-link { padding:9px 8px; }
+}
 .restock-level { margin: 12px 0 8px; padding: 8px 11px; border-radius: 10px; font-size: 13px; font-weight: 900; display: flex; justify-content: space-between; gap: 8px; align-items: center; }
 .restock-level.het { color: #922B21; background: #FADBD8; border: 1px solid rgba(146,43,33,.15); }
 .restock-level.sap { color: #7D6608; background: #FEF9E7; border: 1px solid rgba(125,102,8,.15); }
@@ -3482,7 +3502,30 @@ function toggleSummaryProductList(key,title){
   if(openSummaryListKey===key){ openSummaryListKey=""; box.innerHTML=""; return; }
   openSummaryListKey=key;
   const safeItems = getSummaryProductItems(key);
-  box.innerHTML = `<div class="summary-product-list"><div class="summary-product-list-title">${escapeHtml(title)} · ${safeItems.length} mặt hàng</div><div class="summary-product-list-grid">${safeItems.map(item=>`<button type="button" class="summary-product-link" onclick="jumpToInventoryItem(${item.i})"><span class="summary-product-path">${escapeHtml(getKpiProductPath(item.r))}</span><span class="summary-product-info"><b>${escapeHtml(item.r[1]||"Chưa có mã")}</b> · ${escapeHtml(item.r[2]||"Chưa có tên")} · Tồn ${Number(item.r[5])||0} · ${escapeHtml(item.r[13]||"Q2")}</span></button>`).join("")}</div></div>`;
+  const categoryOrder = ["MT","MI","CAM","INT"];
+  const categoryMap = new Map();
+  safeItems.forEach(item=>{
+    const sh = categoryOrder.includes(item.r[0]) ? item.r[0] : "OTHER";
+    if(!categoryMap.has(sh)) categoryMap.set(sh,[]);
+    categoryMap.get(sh).push(item);
+  });
+  const orderedCategories = [...categoryMap.entries()].sort((a,b)=>(categoryOrder.indexOf(a[0])<0?99:categoryOrder.indexOf(a[0]))-(categoryOrder.indexOf(b[0])<0?99:categoryOrder.indexOf(b[0])));
+  const hierarchyHtml = orderedCategories.map(([sh,categoryItems])=>{
+    const cfg = SHEET_CFG[sh] || {label:sh==="OTHER"?"📦 KHÁC":sh,c:"#566573"};
+    const categoryQty = categoryItems.reduce((sum,item)=>sum+(Number(item.r[5])||0),0);
+    const groupMap = new Map();
+    categoryItems.forEach(item=>{
+      const group = getPrimaryRowGroup(item.r[8]) || NO_GROUP;
+      if(!groupMap.has(group)) groupMap.set(group,[]);
+      groupMap.get(group).push(item);
+    });
+    const groupsHtml = [...groupMap.entries()].sort((a,b)=>cleanKpiPathLabel(a[0]).localeCompare(cleanKpiPathLabel(b[0]),"vi")).map(([group,groupItems])=>{
+      const groupQty = groupItems.reduce((sum,item)=>sum+(Number(item.r[5])||0),0);
+      return `<details class="summary-group"><summary><span class="summary-group-name">${escapeHtml(cleanKpiPathLabel(group) || "Khác")}</span><span class="summary-group-total">${groupItems.length} mặt hàng · Tồn ${groupQty.toLocaleString("vi-VN")}</span></summary><div class="summary-group-products">${groupItems.map(item=>`<button type="button" class="summary-product-link" onclick="jumpToInventoryItem(${item.i})"><span class="summary-product-info"><b>${escapeHtml(item.r[1]||"Chưa có mã")}</b> · ${escapeHtml(item.r[2]||"Chưa có tên")}</span><span class="summary-product-path">Tồn ${Number(item.r[5])||0} · ${escapeHtml(item.r[13]||"Q2")}</span></button>`).join("")}</div></details>`;
+    }).join("");
+    return `<section class="summary-category"><div class="summary-category-head" style="background:${cfg.c}"><span>${escapeHtml(cfg.label)}</span><small>${categoryItems.length} mặt hàng · Tổng tồn ${categoryQty.toLocaleString("vi-VN")}</small></div>${groupsHtml}</section>`;
+  }).join("");
+  box.innerHTML = `<div class="summary-product-list"><div class="summary-product-list-title">${escapeHtml(title)} · ${safeItems.length} mặt hàng · Bấm nhóm để xem sản phẩm</div>${hierarchyHtml || '<div class="empty-sub">Không có dữ liệu phù hợp</div>'}</div>`;
 }
 function renderTotalStockOverview(el){
   const inStock = DATA.map((r,i)=>({r,i})).filter(({r})=>Number(r[5]) > 0);
