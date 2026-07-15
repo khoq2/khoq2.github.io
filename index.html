@@ -233,6 +233,9 @@ mark.kw-hit { background: #FFEB3B; color: #1A1A1A; padding: 0 1px; border-radius
 .product-list-stock.con { background:#D5F5E3; color:#1E8449; }
 .product-list-stock.sap { background:#FEF3CD; color:#8A6700; }
 .product-list-stock.het { background:#FADBD8; color:#A93226; }
+@media(min-width:481px){
+  .category-view-bar{top:160px}
+}
 @media(max-width:480px){
   .category-view-bar{right:max(7px,env(safe-area-inset-right));top:215px}
   .view-mode-switch{margin-left:auto;padding:3px;gap:5px;border-radius:11px}
@@ -3644,8 +3647,23 @@ function syncProductViewModeButton(){
   gridBtn?.setAttribute("aria-pressed",String(!list)); listBtn?.setAttribute("aria-pressed",String(list));
 }
 function setProductViewMode(mode){
+  const sticky=document.querySelector(".sticky");
+  const probeY=Math.min(window.innerHeight-20,(sticky?.getBoundingClientRect().bottom||0)+18);
+  const visibleItems=[...document.querySelectorAll("#results .card[data-index],#results .product-list-row[data-index]")];
+  const anchorItem=visibleItems.find(el=>el.getBoundingClientRect().bottom>probeY);
+  const visibleGroups=[...document.querySelectorAll("#results .group-header[id]")];
+  const anchorGroup=visibleGroups.filter(el=>el.getBoundingClientRect().top<=probeY).pop()||visibleGroups.find(el=>el.getBoundingClientRect().bottom>probeY);
+  const anchorIndex=anchorItem?.dataset.index||"";
+  const anchorGroupId=anchorGroup?.id||"";
+  const anchorTop=(anchorItem||anchorGroup)?.getBoundingClientRect().top??probeY;
   productViewMode=mode==="list"?"list":"card";
   render();
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    const target=(anchorIndex&&document.querySelector(`#results .card[data-index="${anchorIndex}"],#results .product-list-row[data-index="${anchorIndex}"]`))||(anchorGroupId&&document.getElementById(anchorGroupId));
+    if(!target) return;
+    const delta=target.getBoundingClientRect().top-anchorTop;
+    if(Math.abs(delta)>1) window.scrollBy({top:delta,left:0,behavior:"auto"});
+  }));
 }
 function openProductFromList(idx){
   productViewMode="card";
