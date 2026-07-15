@@ -331,10 +331,14 @@ mark.kw-hit { background: #FFEB3B; color: #1A1A1A; padding: 0 1px; border-radius
 .nv-avatar.has-preview:hover { transform: scale(1.08); box-shadow: 0 0 0 2px rgba(46,134,193,.2); }
 .nv-role-badge { --role-neon:#fff; position:relative; overflow:hidden; isolation:isolate; display:inline-flex; align-items:center; gap:3px; max-width:92px; padding:2px 6px; border:1px solid var(--role-neon); border-radius:999px; font-size:8px; font-weight:950; line-height:1.2; vertical-align:middle; white-space:nowrap; animation:nvRoleNeon 1.7s ease-in-out infinite alternate; }
 .nv-role-badge::after { content:""; position:absolute; z-index:2; top:-70%; bottom:-70%; left:-65%; width:38%; pointer-events:none; background:linear-gradient(90deg,transparent,rgba(255,255,255,.98),transparent); filter:blur(.2px); transform:skewX(-20deg); animation:nvRoleShine 2.35s ease-in-out infinite; }
+.nv-role-badge::before { content:"✦"; position:absolute; z-index:4; top:-3px; left:8%; color:#fff; font-size:7px; line-height:1; pointer-events:none; opacity:0; text-shadow:0 0 3px #fff,0 0 7px var(--role-neon),0 0 11px var(--role-neon); animation:nvRoleSparkle 1.45s linear infinite; }
 .nv-role-badge > * { position:relative; z-index:1; }
+.nv-role-badge > span:first-child,.nv-role-badge .nv-role-icon { animation:nvRoleIconTwinkle 1.05s ease-in-out infinite alternate; }
+.nv-role-badge > span:last-child { text-shadow:0 0 3px rgba(255,255,255,.95),0 0 7px var(--role-neon); }
 @keyframes nvRoleShine { 0%,38% { left:-65%; opacity:0; } 45% { opacity:1; } 72%,100% { left:145%; opacity:0; } }
 @keyframes nvRoleNeon { from { box-shadow:0 0 2px var(--role-neon),inset 0 0 2px rgba(255,255,255,.4); } to { box-shadow:0 0 5px var(--role-neon),0 0 9px var(--role-neon),inset 0 0 4px rgba(255,255,255,.65); } }
-@media (prefers-reduced-motion:reduce) { .nv-role-badge { animation:none; } .nv-role-badge::after { animation:none; display:none; } }
+@keyframes nvRoleSparkle { 0%,18% { left:5%; top:55%; opacity:0; transform:scale(.25) rotate(0); } 28% { opacity:1; transform:scale(1.35) rotate(90deg); } 48% { left:48%; top:-2px; opacity:.35; transform:scale(.55) rotate(180deg); } 67% { left:82%; top:45%; opacity:1; transform:scale(1.15) rotate(270deg); } 82%,100% { left:92%; top:0; opacity:0; transform:scale(.2) rotate(360deg); } }
+@keyframes nvRoleIconTwinkle { from { filter:brightness(1); transform:scale(1); } to { filter:brightness(1.7) drop-shadow(0 0 3px var(--role-neon)); transform:scale(1.12); } }
 .nv-role-badge.admin { --role-neon:#ff453a; background:linear-gradient(135deg,#922B21,#E74C3C); color:#fff; }
 .nv-role-badge.mod { --role-neon:#35bfff; background:linear-gradient(135deg,#1A5276,#3498DB); color:#fff; }
 .nv-role-badge.ceo { --role-neon:#d98cff; background:linear-gradient(135deg,#512E5F,#AF7AC5); color:#fff; }
