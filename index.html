@@ -172,8 +172,11 @@ html.tx-overlay-open, body.tx-overlay-open { overflow: hidden; }
 @media (max-width: 520px) {
   .tx-history-modal { max-height: 82vh; max-height: 82svh; }
   .tx-history-modal .tx-filter { grid-template-columns: 1fr; }
-  .tx-history-modal .tx-header { min-width: 0; }
-  .tx-history-modal .tx-head-right { max-width: 58%; flex-wrap: wrap; justify-content: flex-end; }
+  .tx-history-modal .tx-header { min-width:0; flex-direction:column; align-items:stretch; gap:7px; }
+  .tx-history-modal .tx-nv { width:100%; flex:none; flex-wrap:wrap; row-gap:5px; }
+  .tx-history-modal .tx-kind-pill { margin-left:0 !important; flex-shrink:0; white-space:nowrap; }
+  .tx-history-modal .tx-head-right { width:100%; max-width:none; flex-wrap:wrap; justify-content:flex-end; align-items:center; }
+  .tx-history-modal .tx-time { margin-right:auto; text-align:left; white-space:nowrap; }
 }
 .order-list { display:flex; flex-direction:column; gap:8px; margin-top:8px; }
 .order-row { display:flex; align-items:center; min-height:52px; background:#F8FAFC; border:1.5px solid #CBD5E1; border-left:5px solid #5B8DB8; border-radius:10px; overflow:hidden; box-shadow:0 1px 3px rgba(30,58,95,.08); }
@@ -330,7 +333,7 @@ mark.kw-hit { background: #FFEB3B; color: #1A1A1A; padding: 0 1px; border-radius
 .nv-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .nv-avatar.has-preview { cursor: zoom-in; transition: transform .16s ease, box-shadow .16s ease; }
 .nv-avatar.has-preview:hover { transform: scale(1.08); box-shadow: 0 0 0 2px rgba(46,134,193,.2); }
-.nv-role-badge { --role-neon:#fff; position:relative; overflow:hidden; isolation:isolate; display:inline-flex; align-items:center; gap:3px; max-width:92px; padding:2px 6px; border:1px solid var(--role-neon); border-radius:999px; font-size:8px; font-weight:950; line-height:1.2; vertical-align:middle; white-space:nowrap; animation:nvRoleNeon 1.7s ease-in-out infinite alternate; }
+.nv-role-badge { --role-neon:#fff; position:relative; overflow:hidden; isolation:isolate; display:inline-flex; align-items:center; gap:3px; max-width:92px; padding:2px 6px; border:1px solid var(--role-neon); border-radius:999px; font-size:8px; font-weight:950; line-height:1.2; vertical-align:middle; white-space:nowrap; flex-shrink:0; animation:nvRoleNeon 1.7s ease-in-out infinite alternate; }
 .nv-role-badge::after { content:""; position:absolute; z-index:2; top:-70%; bottom:-70%; left:-65%; width:38%; pointer-events:none; background:linear-gradient(90deg,transparent,rgba(255,255,255,.98),transparent); filter:blur(.2px); transform:skewX(-20deg); animation:nvRoleShine 2.35s ease-in-out infinite; }
 .nv-role-badge::before { content:"✦"; position:absolute; z-index:4; top:-3px; left:8%; color:#fff; font-size:7px; line-height:1; pointer-events:none; opacity:0; text-shadow:0 0 3px #fff,0 0 7px var(--role-neon),0 0 11px var(--role-neon); animation:nvRoleSparkle 1.45s linear infinite; }
 .nv-role-badge > * { position:relative; z-index:1; }
@@ -4738,7 +4741,7 @@ function renderTxHistory(){
   const rows = filtered.length ? filtered.map(t=>`
         <div class="tx-row">
           <div class="tx-header">
-            <span class="tx-nv">${renderNVAvatar(t.nv)} ${escapeHtml(t.nv || "")} ${renderNVRoleBadge(t.nv)} <span class="tx-pill" style="margin-left:4px;${getTransactionKind(t)==="IMPORT" ? "background:#E8F8F0;color:#1E8449;border:1px solid #A9DFBF;" : getTransactionKind(t)==="ADJUST" ? "background:#FEF9E7;color:#7D6608;border:1px solid #F7DC6F;" : "background:#FDEDEC;color:#C0392B;border:1px solid #F5B7B1;"}">${getTransactionKindLabel(t)}</span></span>
+            <span class="tx-nv">${renderNVAvatar(t.nv)} ${escapeHtml(t.nv || "")} ${renderNVRoleBadge(t.nv)} <span class="tx-pill tx-kind-pill" style="margin-left:4px;${getTransactionKind(t)==="IMPORT" ? "background:#E8F8F0;color:#1E8449;border:1px solid #A9DFBF;" : getTransactionKind(t)==="ADJUST" ? "background:#FEF9E7;color:#7D6608;border:1px solid #F7DC6F;" : "background:#FDEDEC;color:#C0392B;border:1px solid #F5B7B1;"}">${getTransactionKindLabel(t)}</span></span>
             <div class="tx-head-right">
               <span class="tx-time">${formatTxTime(t.time)}</span>
               ${document.body.classList.contains("admin-mode")?`<button class="tx-action tx-edit" title="Sửa ngày giờ và thông tin giao dịch" onclick="event.stopPropagation(); editTX('${escapeHtml(t.id)}')">📅 Sửa ngày giờ</button><button class="tx-action tx-delete" title="Xóa giao dịch" onclick="event.stopPropagation(); deleteTX('${escapeHtml(t.id)}')">🗑️</button>`:""}
