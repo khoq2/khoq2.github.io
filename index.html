@@ -113,6 +113,8 @@ body { font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif
 .card-main { flex: 1; min-width: 0; }
 .prod-img { width: 64px; height: 64px; border-radius: 10px; object-fit: cover; flex-shrink: 0; border: 1px solid #eee; background: #fafafa; cursor: zoom-in; }
 .prod-img-ph { display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: bold; }
+.prod-media { width:64px; flex:0 0 64px; display:flex; flex-direction:column; align-items:stretch; gap:3px; }
+.prod-extra-image { border:0; padding:0; background:transparent; color:#2471A3; font-size:9px; line-height:1.25; text-align:center; cursor:pointer; text-decoration:underline; }
 .product-name-row { display: block; max-width: 100%; margin-bottom: 5px; cursor: copy; user-select: none; }
 .product-name { font-size: 14px; font-weight: bold; line-height: 1.35; margin-bottom: 0; display: inline; }
 .card-footer { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px; }
@@ -172,11 +174,8 @@ html.tx-overlay-open, body.tx-overlay-open { overflow: hidden; }
 @media (max-width: 520px) {
   .tx-history-modal { max-height: 82vh; max-height: 82svh; }
   .tx-history-modal .tx-filter { grid-template-columns: 1fr; }
-  .tx-history-modal .tx-header { min-width:0; flex-direction:column; align-items:stretch; gap:7px; }
-  .tx-history-modal .tx-nv { width:100%; flex:none; flex-wrap:wrap; row-gap:5px; }
-  .tx-history-modal .tx-kind-pill { margin-left:0 !important; flex-shrink:0; white-space:nowrap; }
-  .tx-history-modal .tx-head-right { width:100%; max-width:none; flex-wrap:wrap; justify-content:flex-end; align-items:center; }
-  .tx-history-modal .tx-time { margin-right:auto; text-align:left; white-space:nowrap; }
+  .tx-history-modal .tx-header { min-width: 0; }
+  .tx-history-modal .tx-head-right { max-width: 58%; flex-wrap: wrap; justify-content: flex-end; }
 }
 .order-list { display:flex; flex-direction:column; gap:8px; margin-top:8px; }
 .order-row { display:flex; align-items:center; min-height:52px; background:#F8FAFC; border:1.5px solid #CBD5E1; border-left:5px solid #5B8DB8; border-radius:10px; overflow:hidden; box-shadow:0 1px 3px rgba(30,58,95,.08); }
@@ -295,7 +294,7 @@ mark.kw-hit { background: #FFEB3B; color: #1A1A1A; padding: 0 1px; border-radius
 .image-lightbox { display:none; position:fixed; inset:0; z-index:1000; align-items:center; justify-content:center; padding:18px; background:rgba(0,0,0,.88); cursor:zoom-out; }
 .image-lightbox.open { display:flex; }
 .image-lightbox img { display:block; max-width:100%; max-height:calc(100dvh - 36px); object-fit:contain; border-radius:10px; box-shadow:0 12px 42px rgba(0,0,0,.5); cursor:default; }
-.image-lightbox-close { position:absolute; top:max(14px, env(safe-area-inset-top)); right:max(14px, env(safe-area-inset-right)); width:42px; height:42px; border:0; border-radius:50%; background:rgba(255,255,255,.16); color:#fff; font-size:28px; line-height:1; cursor:pointer; }
+.image-lightbox-close { position:absolute; z-index:10; top:max(14px, env(safe-area-inset-top)); right:max(14px, env(safe-area-inset-right)); width:46px; height:46px; border:2px solid rgba(255,255,255,.9); border-radius:50%; background:rgba(0,0,0,.72); color:#fff; font-size:30px; line-height:1; cursor:pointer; touch-action:manipulation; box-shadow:0 3px 14px rgba(0,0,0,.55); }
 .image-lightbox-nav { display:none; position:absolute; z-index:2; top:50%; width:46px; height:58px; margin-top:-29px; border:0; border-radius:14px; background:rgba(255,255,255,.16); color:#fff; font-size:30px; cursor:pointer; backdrop-filter:blur(8px); }
 .image-lightbox-nav.show { display:block; }
 .image-lightbox-prev { left:max(12px,env(safe-area-inset-left)); }
@@ -306,7 +305,18 @@ mark.kw-hit { background: #FFEB3B; color: #1A1A1A; padding: 0 1px; border-radius
 .group-check { display:flex; align-items:flex-start; gap:6px; padding:6px; border-radius:7px; font-size:12px; line-height:1.3; cursor:pointer; }
 .group-check:has(input:checked) { background:#EAF2F8; color:#1A5276; font-weight:bold; }
 .group-check input { width:auto!important; margin:2px 0 0; accent-color:#1A5276; flex-shrink:0; }
-@media (max-width:480px){ .group-checkboxes { grid-template-columns:1fr; max-height:180px; } .image-lightbox { padding:10px; } .image-lightbox img { max-height:calc(100dvh - 20px); border-radius:7px; } }
+@media (max-width:480px){ .group-checkboxes { grid-template-columns:1fr; max-height:180px; } .image-lightbox { padding:calc(66px + env(safe-area-inset-top)) 10px calc(12px + env(safe-area-inset-bottom)); } .image-lightbox img { max-height:calc(100dvh - 78px - env(safe-area-inset-top) - env(safe-area-inset-bottom)); border-radius:7px; } .image-lightbox-close { top:calc(10px + env(safe-area-inset-top)); right:calc(10px + env(safe-area-inset-right)); } }
+@media (max-width:480px) {
+  .modal { max-height:94dvh; padding:16px 12px max(26px,calc(env(safe-area-inset-bottom) + 16px)); }
+  .prod-media { width:68px; flex-basis:68px; gap:4px; }
+  .prod-media .prod-img { width:68px; height:68px; }
+  .prod-extra-image { min-height:30px; display:flex; align-items:center; justify-content:center; padding:5px 2px; border-radius:7px; background:#EBF5FB; font-size:11px; font-weight:800; line-height:1.2; text-decoration:none; touch-action:manipulation; }
+  .img-link-row { margin-top:10px; }
+  .img-link-input { min-height:44px; padding:10px 11px; font-size:16px; }
+  .img-link-hint { font-size:11px; line-height:1.5; }
+  #saleVatPreview { overflow-wrap:anywhere; font-size:13px!important; line-height:1.6!important; padding:10px 11px!important; }
+  #saleVat8 { width:20px!important; height:20px; flex:0 0 20px; }
+}
 .modal-title { font-size: 17px; font-weight: bold; margin-bottom: 16px; color: #1E3A5F; }
 .form-row { margin-bottom: 12px; }
 .form-row label { font-size: 12px; color: #555; font-weight: bold; display: block; margin-bottom: 4px; }
@@ -333,7 +343,7 @@ mark.kw-hit { background: #FFEB3B; color: #1A1A1A; padding: 0 1px; border-radius
 .nv-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .nv-avatar.has-preview { cursor: zoom-in; transition: transform .16s ease, box-shadow .16s ease; }
 .nv-avatar.has-preview:hover { transform: scale(1.08); box-shadow: 0 0 0 2px rgba(46,134,193,.2); }
-.nv-role-badge { --role-neon:#fff; position:relative; overflow:hidden; isolation:isolate; display:inline-flex; align-items:center; gap:3px; max-width:92px; padding:2px 6px; border:1px solid var(--role-neon); border-radius:999px; font-size:8px; font-weight:950; line-height:1.2; vertical-align:middle; white-space:nowrap; flex-shrink:0; animation:nvRoleNeon 1.7s ease-in-out infinite alternate; }
+.nv-role-badge { --role-neon:#fff; position:relative; overflow:hidden; isolation:isolate; display:inline-flex; align-items:center; gap:3px; max-width:92px; padding:2px 6px; border:1px solid var(--role-neon); border-radius:999px; font-size:8px; font-weight:950; line-height:1.2; vertical-align:middle; white-space:nowrap; animation:nvRoleNeon 1.7s ease-in-out infinite alternate; }
 .nv-role-badge::after { content:""; position:absolute; z-index:2; top:-70%; bottom:-70%; left:-65%; width:38%; pointer-events:none; background:linear-gradient(90deg,transparent,rgba(255,255,255,.98),transparent); filter:blur(.2px); transform:skewX(-20deg); animation:nvRoleShine 2.35s ease-in-out infinite; }
 .nv-role-badge::before { content:"✦"; position:absolute; z-index:4; top:-3px; left:8%; color:#fff; font-size:7px; line-height:1; pointer-events:none; opacity:0; text-shadow:0 0 3px #fff,0 0 7px var(--role-neon),0 0 11px var(--role-neon); animation:nvRoleSparkle 1.45s linear infinite; }
 .nv-role-badge > * { position:relative; z-index:1; }
@@ -1083,7 +1093,8 @@ html::-webkit-scrollbar-corner { background: #EAF2F8; }
     </div>
     <div class="form-row">
       <label>Vị trí trong kho</label>
-      <input type="text" id="fVitri" list="fLocationSuggestions" placeholder="VD: Kệ A1 - Tầng 2">
+      <input type="text" id="fVitri" list="fLocationSuggestions" placeholder="Nhập vị trí hoặc dán link ảnh Google Drive">
+      <div style="margin-top:5px;font-size:11px;color:#777;line-height:1.4;">Có thể nhập chữ (VD: Kệ A1 - Tầng 2) hoặc dán link ảnh vị trí trên Google Drive.</div>
       <datalist id="fLocationSuggestions"></datalist>
     </div>
     <div class="form-row">
@@ -1104,6 +1115,14 @@ html::-webkit-scrollbar-corner { background: #EAF2F8; }
           onchange="useImageLink('fImgLink', setImagePreview)"
           onkeydown="if(event.key==='Enter'){event.preventDefault(); useImageLink('fImgLink', setImagePreview);}">
         <div class="img-link-hint">Trên Drive: bấm chuột phải ảnh → Chia sẻ → Bất kỳ ai có link → dán link vào đây.</div>
+      </div>
+      <div class="img-link-row">
+        <label for="fWarrantyImg1">Hình ảnh 1 (bảo hành)</label>
+        <input type="text" id="fWarrantyImg1" class="img-link-input" placeholder="Dán URL Google Drive của Hình ảnh 1">
+      </div>
+      <div class="img-link-row">
+        <label for="fWarrantyImg2">Hình ảnh 2 (bảo hành)</label>
+        <input type="text" id="fWarrantyImg2" class="img-link-input" placeholder="Dán URL Google Drive của Hình ảnh 2">
       </div>
     </div>
     <button class="btn-submit" onclick="saveItem()">💾 Lưu</button>
@@ -1183,7 +1202,11 @@ html::-webkit-scrollbar-corner { background: #EAF2F8; }
     </div>
     <div class="form-row"><label>Số lượng xuất</label><input type="number" id="saleQty" value="1" min="1"></div>
     <div class="form-row"><label>Ngày giờ giao dịch (dd/mm/yyyy HH:mm:ss)</label><input type="text" id="saleTime" inputmode="numeric" placeholder="VD: 12/07/2026 09:54:07"></div>
-    <div class="form-row"><label>Giá bán (Vnd)</label><input type="text" id="saleGia" inputmode="numeric" placeholder="VD: 3.500.000"></div>
+    <div class="form-row"><label>Giá bán chưa VAT (Vnd/cái)</label><input type="text" id="saleGia" inputmode="numeric" placeholder="VD: 900.000" oninput="updateSaleVatPreview()"></div>
+    <div class="form-row">
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="checkbox" id="saleVat8" style="width:auto" onchange="updateSaleVatPreview()"> Xuất hóa đơn VAT 8%</label>
+      <div id="saleVatPreview" style="display:none;margin-top:7px;padding:9px 11px;border-radius:9px;background:#EBF5FB;color:#1A5276;font-size:12px;font-weight:700;line-height:1.5"></div>
+    </div>
     <div class="form-row"><label>Ghi chú</label><input type="text" id="saleGhi" placeholder="VD: Khách lẻ, bảo hành 12 tháng..."></div>
     <div class="form-row">
       <label>Ảnh giao dịch (tuỳ chọn)</label>
@@ -1716,7 +1739,7 @@ function checkAdminSession(){
 
 // Dòng URL duy nhất
 const SHEET_API_URL = "https://script.google.com/macros/s/AKfycby6YH69F7sfO1ZoUJsDm4BeX6Luj2GrhUfYWWJWNvqjraAEhkBck16EphrPBBm1BT3YqA/exec";
-const REQUIRED_API_VERSION = "2026.07.15-atomic-4";
+const REQUIRED_API_VERSION = "2026.07.15-atomic-7";
 const SHEET_TIMEOUT_MS = 12000;
 const PENDING_SYNC_KEY = "kho_cntt_pending_sync";
 const PENDING_TX_SYNC_KEY = "kho_cntt_pending_tx_sync";
@@ -1847,7 +1870,7 @@ function inventoryValidationMessage(issues, context="Dữ liệu kho"){
 function normalizeSheetRows(rows){
   if(!Array.isArray(rows)) return [];
   return rows.filter(Array.isArray).map(r=>{
-    const row = Array.from({length:14}, (_,i) => r[i] !== undefined ? r[i] : "");
+    const row = Array.from({length:16}, (_,i) => r[i] !== undefined ? r[i] : "");
     row[4] = parseVndInput(row[4]);
     row[5] = Math.max(0, Number(row[5]) || 0);
     row[10] = parseVndInput(row[10]);
@@ -1862,6 +1885,8 @@ function normalizeSheetRows(rows){
     row[11] = joinRowQuickTags(row[11] || "");
     row[12] = Math.max(1, Number(row[12]) || 2);
     row[13] = String(row[13] || "Q2").trim().toUpperCase() === "Q5" ? "Q5" : "Q2";
+    row[14] = String(row[14] || "").trim();
+    row[15] = String(row[15] || "").trim();
     return row;
   }).filter(r=>r[1] && r[2]);
 }
@@ -1919,9 +1944,11 @@ async function ensureAtomicApi(){
 function cacheAtomicInventoryState(){
   safeLocalStorageSet("kho_cntt_data",JSON.stringify(normalizeSheetRows(DATA)));
   safeLocalStorageSet("kho_cntt_tx",JSON.stringify(normalizeTxList(TX_DATA)));
-  setPendingSync(false);
-  setAuxPendingSync(PENDING_TX_SYNC_KEY,false);
-  setSyncBadge("synced");
+  if(hasPendingSync() || hasAuxPendingSync(PENDING_TX_SYNC_KEY) || hasAuxPendingSync(PENDING_NV_SYNC_KEY) || hasAuxPendingSync(PENDING_CONFIG_SYNC_KEY)){
+    setSyncBadge("pending","Một số thay đổi khác vẫn đang chờ đồng bộ");
+  }else{
+    setSyncBadge("synced");
+  }
   markLastSync();
 }
 async function commitInventoryTransaction(mode,row,tx,options={}){
@@ -2077,7 +2104,7 @@ async function manualSync(){
   try{
     let dataOk = true;
     const [dataPushOk, nvOk, txOk, configOk] = await Promise.all([
-      pushToSheet().then(()=>true).catch(e=>{ dataOk=false; throw e; }),
+      (hasPendingSync() ? pushToSheet() : Promise.resolve()).then(()=>true).catch(e=>{ dataOk=false; throw e; }),
       saveNV(),
       saveTX(),
       saveDisplayConfig()
@@ -2327,13 +2354,25 @@ function mergeNoteLocation(note, location){
 function updateLocationSuggestions(){
   const list = document.getElementById("fLocationSuggestions");
   if(!list) return;
-  const locations = [...new Set(DATA.map(r=>splitNoteLocation(r[7]||"").location).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"vi"));
+  const locations = [...new Set(DATA.map(r=>splitNoteLocation(r[7]||"").location).filter(location=>location && !getWarehouseLocationImageUrl(location)))].sort((a,b)=>a.localeCompare(b,"vi"));
   list.innerHTML = locations.map(location=>`<option value="${escapeHtml(location)}"></option>`).join("");
+}
+function getWarehouseLocationImageUrl(value){
+  const raw = String(value || "").trim();
+  if(!raw) return "";
+  const isDrive = /(?:drive|docs)\.google\.com\//i.test(raw) || /\/file\/d\/[a-zA-Z0-9_-]{10,}/.test(raw);
+  const isDirectImage = /^https?:\/\/\S+\.(?:jpe?g|png|gif|webp|bmp|avif)(?:[?#].*)?$/i.test(raw);
+  return isDrive || isDirectImage ? resolveImageUrl(raw) : "";
 }
 function showWarehouseLocation(idx){
   const r = DATA[idx];
   if(!r) return;
   const { location } = splitNoteLocation(r[7] || "");
+  const locationImage = getWarehouseLocationImageUrl(location);
+  if(locationImage){
+    openImageViewer(locationImage, `Vị trí trong kho - ${r[2] || r[1] || "sản phẩm"}`);
+    return;
+  }
   if(location){
     showToast(`📍 ${r[2]}: ${location}`);
   } else {
@@ -3468,7 +3507,7 @@ function sortProductItemsForView(items){
   });
 }
 function renderCard(r,i,displayNo){
-  const [sh,ma,ten,th,giaNhap,ton,tt,ghi,,img,giaBan,,sapHet,branch]=r;
+  const [sh,ma,ten,th,giaNhap,ton,tt,ghi,,img,giaBan,,sapHet,branch,warrantyImg1,warrantyImg2]=r;
   const kw = removeAccents(searchQ.trim());
   const kwTokens = kw ? kw.split(/\s+/).filter(Boolean) : [];
   const cfg=SHEET_CFG[sh]||SHEET_CFG.MT;
@@ -3479,6 +3518,7 @@ function renderCard(r,i,displayNo){
   const isHet = stockState === "HET";
   const isSap = stockState === "SAP";
   const { note, location } = splitNoteLocation(ghi || "");
+  const locationImage = getWarehouseLocationImageUrl(location);
   const stBg=isHet?"#FADBD8":isSap?"#FEF9E7":"#D5F5E3";
   const stFg=isHet?"#922B21":isSap?"#7D6608":"#1E8449";
   const stTxt=getStockStatusLabel(ton, sapHet);
@@ -3498,6 +3538,10 @@ function renderCard(r,i,displayNo){
   const imgHtml = img
     ? `<img class="prod-img" src="${escapeHtml(img)}" alt="${escapeHtml(ten)}" referrerpolicy="no-referrer" onclick="openImageViewer(this.src, this.alt)" onerror="this.outerHTML='<div class=\\'prod-img prod-img-ph\\' title=\\'Không tải được ảnh\\'>💻</div>';" />`
     : `<div class="prod-img prod-img-ph" title="Chưa có ảnh sản phẩm">💻</div>`;
+  const extraImagesHtml = `<div class="prod-media">${imgHtml}
+    ${warrantyImg1?`<button type="button" class="prod-extra-image" data-url="${escapeHtml(warrantyImg1)}" data-title="${escapeHtml(ten)} - Hình ảnh 1" onclick="openImageViewer(this.dataset.url,this.dataset.title)">Hình ảnh 1</button>`:""}
+    ${warrantyImg2?`<button type="button" class="prod-extra-image" data-url="${escapeHtml(warrantyImg2)}" data-title="${escapeHtml(ten)} - Hình ảnh 2" onclick="openImageViewer(this.dataset.url,this.dataset.title)">Hình ảnh 2</button>`:""}
+  </div>`;
   const isAdmin = document.body.classList.contains("admin-mode");
   const isSelected = selectedItems.has(i);
   const selectHtml = isAdmin && bulkSelectMode
@@ -3528,7 +3572,7 @@ function renderCard(r,i,displayNo){
       <span class="status-badge" style="background: ${stBg}; color: ${stFg};">${stTxt}</span>
     </div>
       <div class="card-body card-body-flex">
-      ${imgHtml}
+      ${extraImagesHtml}
       <div class="card-main">
       <div class="product-name-row" data-copy-text="${escapeHtml(ten)}" data-copy-label="tiêu đề" title="Nhấp đúp để copy tiêu đề" ondblclick="copyFromElement(this)">
         ${condition ? `<span class="item-cond-badge item-cond-old">${condition}</span>` : ""}
@@ -3542,7 +3586,7 @@ function renderCard(r,i,displayNo){
       <div class="ton-ctrl">
         <span class="ton-label">📦 Tồn kho:</span>
         <span class="ton-val" style="color: ${isHet?"#C0392B":"#1a1a1a"};">${ton}</span>
-        <button class="btn-location" type="button" title="${escapeHtml(location ? location : "Chưa có vị trí trong kho")}" onclick="showWarehouseLocation(${i})">📍 Vị trí trong kho${location ? `: ${escapeHtml(location)}` : ""}</button>
+        <button class="btn-location" type="button" title="${escapeHtml(locationImage ? "Bấm để xem hình vị trí trong kho" : (location || "Chưa có vị trí trong kho"))}" onclick="showWarehouseLocation(${i})">${locationImage ? "📷 Vị trí trong kho: Xem hình" : `📍 Vị trí trong kho${location ? `: ${escapeHtml(location)}` : ""}`}</button>
         <button class="btn-ton btn-minus admin-only" onclick="openSaleModal(${i})">−</button>
         <button class="btn-ton btn-plus admin-only" title="Nhập thêm hàng" aria-label="Nhập thêm hàng" onclick="openRestockModal(${i})">+</button>
       </div>
@@ -4357,7 +4401,8 @@ function normalizeTxItem(tx){
       gia: Number(tx[6]) || 0,
       ghi: String(tx[7] || "").trim(),
       img: String(tx[8] || ""),
-      time: String(tx[9] || ""), branch: String(tx[10] || "Q2")
+      time: String(tx[9] || ""), branch: String(tx[10] || "Q2"),
+      vatRate: Number(tx[11]) || 0, basePrice: Number(tx[12]) || Number(tx[6]) || 0
     };
   }
   if(tx && typeof tx === "object"){
@@ -4371,7 +4416,8 @@ function normalizeTxItem(tx){
       gia: Number(tx.gia || tx.price || 0) || 0,
       ghi: String(tx.ghi || tx.note || "").trim(),
       img: String(tx.img || tx.image || ""),
-      time: String(tx.time || tx.createdAt || ""), branch: String(tx.branch || "Q2")
+      time: String(tx.time || tx.createdAt || ""), branch: String(tx.branch || "Q2"),
+      vatRate: Number(tx.vatRate || 0) || 0, basePrice: Number(tx.basePrice || tx.gia || tx.price || 0) || 0
     };
   }
   return null;
@@ -4419,6 +4465,17 @@ function loadTXFromSheet(){
     });
 }
 
+function updateSaleVatPreview(){
+  const box = document.getElementById("saleVatPreview");
+  const checked = document.getElementById("saleVat8")?.checked;
+  if(!box) return;
+  if(!checked){ box.style.display="none"; box.textContent=""; return; }
+  const basePrice = Math.max(0,parseVndInput(document.getElementById("saleGia")?.value || "0"));
+  const vatAmount = Math.round(basePrice * 0.08);
+  const finalPrice = basePrice + vatAmount;
+  box.textContent = `${fmt(basePrice)}/cái + 8% VAT: ${fmt(vatAmount)} = ${fmt(finalPrice)}/cái`;
+  box.style.display="block";
+}
 function openSaleModal(idx){ if(!requireAdmin()) return;
   const r = DATA[idx];
   document.getElementById("saleModalTitle").textContent = "🛒 Ghi nhận giao dịch";
@@ -4429,6 +4486,8 @@ function openSaleModal(idx){ if(!requireAdmin()) return;
   document.getElementById("saleQty").disabled = false;
   document.getElementById("saleTime").value = formatTxTime(new Date());
   setVndInputValue("saleGia", r[10] || r[4] || 0);
+  document.getElementById("saleVat8").checked = false;
+  updateSaleVatPreview();
   document.getElementById("saleGhi").value = "";
   setTxImagePreview("");
   document.getElementById("saleImgFile").value = "";
@@ -4469,7 +4528,10 @@ async function saveSale(){ if(!requireAdmin()) return;
   const nv  = document.getElementById("saleNV").value.trim();
   const qtyRaw = document.getElementById("saleQty").value.trim();
   const qty = Number(qtyRaw);
-  const gia = parseVndInput(document.getElementById("saleGia").value);
+  const basePrice = parseVndInput(document.getElementById("saleGia").value);
+  const vatRate = document.getElementById("saleVat8").checked ? 8 : 0;
+  const vatAmount = vatRate ? Math.round(basePrice * vatRate / 100) : 0;
+  const gia = basePrice + vatAmount;
   const ghi = document.getElementById("saleGhi").value.trim();
   const img = document.getElementById("saleImg").value || "";
   const timeInput = document.getElementById("saleTime").value;
@@ -4485,22 +4547,27 @@ async function saveSale(){ if(!requireAdmin()) return;
   if(txId){
     const tx = TX_DATA.find(t=>String(t.id)===String(txId));
     if(!tx){ alert("Không tìm thấy giao dịch cần sửa!"); return; }
-    tx.nv = nv;
-    tx.gia = gia;
-    tx.ghi = ghi;
-    tx.img = img;
-    tx.time = transactionTime;
-    closeOverlay("saleOverlay");
-    await saveTX();
-    renderTxHistory();
-    render();
-    showToast("✅ Đã sửa giao dịch");
+    try{
+      await ensureAtomicApi();
+      const updated = {...tx,nv,gia,ghi,img,time:transactionTime,vatRate,basePrice};
+      await postSheet("update_transaction",updated,35000);
+      Object.assign(tx,updated);
+      safeLocalStorageSet("kho_cntt_tx",JSON.stringify(normalizeTxList(TX_DATA)));
+      closeOverlay("saleOverlay");
+      setSyncBadge("synced"); markLastSync();
+      renderTxHistory();
+      render();
+      showToast("✅ Đã sửa giao dịch");
+    }catch(e){
+      setSyncBadge("error",String(e));
+      showToast("⚠️ Không sửa được giao dịch: "+String(e),5000);
+    }
     return;
   }
   const r = DATA[idx];
   if(!r){ alert("Không tìm thấy sản phẩm cần xuất!"); return; }
   if(r[5] < qty){ alert(`Tồn kho chỉ còn ${r[5]}, không đủ xuất ${qty}!`); return; }
-  const tx = { id:Date.now(), ma:r[1], ten:r[2], sh:r[0], nv, qty, gia, ghi, img, time:transactionTime, branch:r[13]||"Q2" };
+  const tx = { id:Date.now(), ma:r[1], ten:r[2], sh:r[0], nv, qty, gia, ghi, img, time:transactionTime, branch:r[13]||"Q2", vatRate, basePrice };
   try{
     const result = await commitInventoryTransaction("SALE",r,tx,{qty});
     DATA[idx][5] = Number(result.stock);
@@ -4741,7 +4808,7 @@ function renderTxHistory(){
   const rows = filtered.length ? filtered.map(t=>`
         <div class="tx-row">
           <div class="tx-header">
-            <span class="tx-nv">${renderNVAvatar(t.nv)} ${escapeHtml(t.nv || "")} ${renderNVRoleBadge(t.nv)} <span class="tx-pill tx-kind-pill" style="margin-left:4px;${getTransactionKind(t)==="IMPORT" ? "background:#E8F8F0;color:#1E8449;border:1px solid #A9DFBF;" : getTransactionKind(t)==="ADJUST" ? "background:#FEF9E7;color:#7D6608;border:1px solid #F7DC6F;" : "background:#FDEDEC;color:#C0392B;border:1px solid #F5B7B1;"}">${getTransactionKindLabel(t)}</span></span>
+            <span class="tx-nv">${renderNVAvatar(t.nv)} ${escapeHtml(t.nv || "")} ${renderNVRoleBadge(t.nv)} <span class="tx-pill" style="margin-left:4px;${getTransactionKind(t)==="IMPORT" ? "background:#E8F8F0;color:#1E8449;border:1px solid #A9DFBF;" : getTransactionKind(t)==="ADJUST" ? "background:#FEF9E7;color:#7D6608;border:1px solid #F7DC6F;" : "background:#FDEDEC;color:#C0392B;border:1px solid #F5B7B1;"}">${getTransactionKindLabel(t)}</span></span>
             <div class="tx-head-right">
               <span class="tx-time">${formatTxTime(t.time)}</span>
               ${document.body.classList.contains("admin-mode")?`<button class="tx-action tx-edit" title="Sửa ngày giờ và thông tin giao dịch" onclick="event.stopPropagation(); editTX('${escapeHtml(t.id)}')">📅 Sửa ngày giờ</button><button class="tx-action tx-delete" title="Xóa giao dịch" onclick="event.stopPropagation(); deleteTX('${escapeHtml(t.id)}')">🗑️</button>`:""}
@@ -4749,7 +4816,7 @@ function renderTxHistory(){
           </div>
           <div class="tx-meta">
             <span class="tx-pill">${getTransactionKind(t)==="IMPORT" ? "Nhập" : getTransactionKind(t)==="ADJUST" ? "Điều chỉnh" : "Xuất"}: <b>${Math.abs(Number(t.qty) || 0)}</b></span>
-            ${getTransactionKind(t)==="SALE" ? `<span class="tx-pill tx-price-pill">${t.gia>0?fmt(t.gia)+"/cái":"Không ghi giá"}</span>` : ""}
+            ${getTransactionKind(t)==="SALE" ? `<span class="tx-pill tx-price-pill">${t.gia>0?fmt(t.gia)+"/cái":"Không ghi giá"}${Number(t.vatRate)===8?` (đã gồm VAT 8%)`:""}</span>` : ""}
           </div>
           ${t.ghi?`<span class="tx-note">📝 ${escapeHtml(t.ghi)}</span>`:""}
           ${renderSameDayEmployeeLinks(t, r)}
@@ -4800,7 +4867,9 @@ function editTX(id){ if(!requireAdmin()) return;
   document.getElementById("saleQty").value = tx.qty || 1;
   document.getElementById("saleQty").disabled = true;
   document.getElementById("saleTime").value = formatTxTime(tx.time || new Date());
-  setVndInputValue("saleGia", tx.gia || 0);
+  setVndInputValue("saleGia", tx.basePrice || tx.gia || 0);
+  document.getElementById("saleVat8").checked = Number(tx.vatRate) === 8;
+  updateSaleVatPreview();
   document.getElementById("saleGhi").value = tx.ghi || "";
   setTxImagePreview(tx.img || "");
   document.getElementById("saleImgFile").value = "";
@@ -5190,7 +5259,7 @@ function openAddModal(){ if(!requireAdmin()) return;
   document.getElementById("fBranch").value = "Q2"; document.getElementById("fSheet").value = "MT"; document.getElementById("fMa").value = ""; document.getElementById("fTen").value = "";
   document.getElementById("fTH").value = ""; setVndInputValue("fGia", 0); setVndInputValue("fGiaBan", 0);
   document.getElementById("fTon").value = "0"; document.getElementById("fSapHet").value = "2"; document.getElementById("fTT").value = "HẾT HÀNG";
-  document.getElementById("fGhi").value = ""; document.getElementById("fVitri").value = ""; document.getElementById("fImgFile").value = ""; setImagePreview(""); updateLocationSuggestions(); updateGroupOptions(""); updateBrandSuggestions(); checkProductCodeDuplicate();
+  document.getElementById("fGhi").value = ""; document.getElementById("fVitri").value = ""; document.getElementById("fImgFile").value = ""; document.getElementById("fWarrantyImg1").value = ""; document.getElementById("fWarrantyImg2").value = ""; setImagePreview(""); updateLocationSuggestions(); updateGroupOptions(""); updateBrandSuggestions(); checkProductCodeDuplicate();
   document.getElementById("editOverlay").classList.add("open");
 }
 function openEditModal(idx){ if(!requireAdmin()) return;
@@ -5202,10 +5271,10 @@ function openEditModal(idx){ if(!requireAdmin()) return;
   setVndInputValue("fGia", r[4]); setVndInputValue("fGiaBan", r[10]||0);
   document.getElementById("fTon").value = r[5]; document.getElementById("fSapHet").value = r[12] || 2; document.getElementById("fTT").value = getStockStatusValue(r[5], r[12]);
   document.getElementById("fGhi").value = parts.note || ""; document.getElementById("fVitri").value = parts.location || ""; document.getElementById("fImgFile").value = ""; document.getElementById("fQuickTagNew").value = "";
-  setImagePreview(r[9]||""); updateLocationSuggestions(); updateGroupOptions(r[8]||""); updateQuickTagOptions(r[11]||""); updateBrandSuggestions(); checkProductCodeDuplicate(); document.getElementById("editOverlay").classList.add("open");
+  document.getElementById("fWarrantyImg1").value = r[14] || ""; document.getElementById("fWarrantyImg2").value = r[15] || ""; setImagePreview(r[9]||""); updateLocationSuggestions(); updateGroupOptions(r[8]||""); updateQuickTagOptions(r[11]||""); updateBrandSuggestions(); checkProductCodeDuplicate(); document.getElementById("editOverlay").classList.add("open");
 }
 async function saveItem(){ if(!requireAdmin()) return;
-  const sh = document.getElementById("fSheet").value.trim(), ma = document.getElementById("fMa").value.trim(), ten = document.getElementById("fTen").value.trim(), th = document.getElementById("fTH").value.trim(), gia = parseVndInput(document.getElementById("fGia").value), giaBan = parseVndInput(document.getElementById("fGiaBan").value), ton = Math.max(0, parseInt(document.getElementById("fTon").value)||0), sapHet = Math.max(1, parseInt(document.getElementById("fSapHet").value)||2), tt = document.getElementById("fTT").value, ghiNote = document.getElementById("fGhi").value.trim(), vitri = document.getElementById("fVitri").value.trim(), img = document.getElementById("fImg").value || "", idx = document.getElementById("editIdx").value, grp = joinRowGroups(getSelectedFormGroups()), quickTag = joinRowQuickTags(getSelectedQuickTags());
+  const sh = document.getElementById("fSheet").value.trim(), ma = document.getElementById("fMa").value.trim(), ten = document.getElementById("fTen").value.trim(), th = document.getElementById("fTH").value.trim(), gia = parseVndInput(document.getElementById("fGia").value), giaBan = parseVndInput(document.getElementById("fGiaBan").value), ton = Math.max(0, parseInt(document.getElementById("fTon").value)||0), sapHet = Math.max(1, parseInt(document.getElementById("fSapHet").value)||2), tt = document.getElementById("fTT").value, ghiNote = document.getElementById("fGhi").value.trim(), vitri = document.getElementById("fVitri").value.trim(), img = document.getElementById("fImg").value || "", warrantyImg1 = resolveImageUrl(document.getElementById("fWarrantyImg1").value), warrantyImg2 = resolveImageUrl(document.getElementById("fWarrantyImg2").value), idx = document.getElementById("editIdx").value, grp = joinRowGroups(getSelectedFormGroups()), quickTag = joinRowQuickTags(getSelectedQuickTags());
   if(!ma||!ten){alert("Vui lòng nhập Mã hàng và Tên sản phẩm!"); return;}
   const idxNum = idx === "" ? -1 : parseInt(idx);
   const dupIdx = DATA.findIndex((row,i) => normalizeProductCode(row[1]) === normalizeProductCode(ma) && (row[13]||"Q2") === document.getElementById("fBranch").value && i !== idxNum);
@@ -5220,7 +5289,7 @@ async function saveItem(){ if(!requireAdmin()) return;
     alert(`⚠️ Mã hàng "${ma}" đã tồn tại trong lịch sử giao dịch. Không thể dùng lại mã này cho sản phẩm khác để tránh sai tồn kho.`);
     return;
   }
-  const row = normalizeSheetRows([[sh,ma,ten,th,gia,ton,getStockStatusValue(ton, sapHet),mergeNoteLocation(ghiNote, vitri),grp,img,giaBan,quickTag,sapHet,document.getElementById("fBranch").value]])[0];
+  const row = normalizeSheetRows([[sh,ma,ten,th,gia,ton,getStockStatusValue(ton, sapHet),mergeNoteLocation(ghiNote, vitri),grp,img,giaBan,quickTag,sapHet,document.getElementById("fBranch").value,warrantyImg1,warrantyImg2]])[0];
 if(idx===""){
   DATA.unshift(row);
   ITEM_CREATED_AT[getItemCreatedAtKey(row)] = Date.now();
@@ -5267,11 +5336,11 @@ function handleFile(input){ if(!requireAdmin()) return;
             read(r,"Danh mục","MT"), read(r,"Mã hàng"), read(r,"Tên sản phẩm"), read(r,"Thương hiệu"),
             read(r,"Giá nhập",0), read(r,"Tồn kho",0), read(r,"Trạng thái","CÒN HÀNG"), read(r,"Vị trí / ghi chú"),
             read(r,"Nhóm sản phẩm"), read(r,"Link ảnh"), read(r,"Giá bán",0), read(r,"Phân loại nhanh"),
-            read(r,"Mức sắp hết",2), read(r,"Chi nhánh","Q2")
+            read(r,"Mức sắp hết",2), read(r,"Chi nhánh","Q2"), read(r,"Hình ảnh 1"), read(r,"Hình ảnh 2")
           ];
         }
         // Tương thích mẫu Excel cũ A:H và cột giá bán K.
-        return [(r[0]||"MT"),r[1],r[2],r[3],r[4],r[5],r[6]||"CÒN HÀNG",r[7]||"","","",r[10]||0,"",2,"Q2"];
+        return [(r[0]||"MT"),r[1],r[2],r[3],r[4],r[5],r[6]||"CÒN HÀNG",r[7]||"","","",r[10]||0,"",2,"Q2","",""];
       });
       const importValidationIssues = validateInventoryRows(mappedRows);
       if(importValidationIssues.length){
@@ -5780,10 +5849,10 @@ function backupDataToExcel(){
   if(!requireAdmin()) return;
   if(typeof XLSX === "undefined"){ showToast("⚠️ Chưa tải được công cụ sao lưu. Kiểm tra kết nối mạng rồi thử lại.", 4000); return; }
   const wb = XLSX.utils.book_new();
-  const khoHeaders = ["Chi nhánh","Danh mục","Mã hàng","Tên sản phẩm","Thương hiệu","Giá nhập","Tồn kho","Trạng thái","Mức sắp hết","Nhóm sản phẩm","Phân loại nhanh","Vị trí / ghi chú","Link ảnh","Giá bán"];
-  const khoRows = normalizeSheetRows(DATA).map(r=>[r[13]||"Q2",r[0],r[1],r[2],r[3],r[4],r[5],r[6],r[12]||2,r[8],r[11],r[7],r[9],r[10]]);
-  const txHeaders = ["Chi nhánh","Mã hàng","Tên sản phẩm","Danh mục","Nhân viên","Số lượng","Giá bán","Ghi chú","Link ảnh","Thời gian","Mã giao dịch"];
-  const txRows = normalizeTxList(TX_DATA).map(t=>[t.branch||"Q2",t.ma,t.ten,t.sh,t.nv,t.qty,t.gia,t.ghi,t.img,t.time,t.id]);
+  const khoHeaders = ["Chi nhánh","Danh mục","Mã hàng","Tên sản phẩm","Thương hiệu","Giá nhập","Tồn kho","Trạng thái","Mức sắp hết","Nhóm sản phẩm","Phân loại nhanh","Vị trí / ghi chú","Link ảnh","Giá bán","Hình ảnh 1","Hình ảnh 2"];
+  const khoRows = normalizeSheetRows(DATA).map(r=>[r[13]||"Q2",r[0],r[1],r[2],r[3],r[4],r[5],r[6],r[12]||2,r[8],r[11],r[7],r[9],r[10],r[14],r[15]]);
+  const txHeaders = ["Chi nhánh","Mã hàng","Tên sản phẩm","Danh mục","Nhân viên","Số lượng","Giá bán đã VAT","VAT (%)","Giá trước VAT","Ghi chú","Link ảnh","Thời gian","Mã giao dịch"];
+  const txRows = normalizeTxList(TX_DATA).map(t=>[t.branch||"Q2",t.ma,t.ten,t.sh,t.nv,t.qty,t.gia,t.vatRate||0,t.basePrice||t.gia,t.ghi,t.img,t.time,t.id]);
   const nvHeaders = ["Tên nhân viên","Link avatar","Vai trò","Link icon huy hiệu"];
   const nvRows = normalizeNVList(NV_LIST).map(n=>[n.name,n.avatar,n.role,n.badgeIcon]);
   const wsData = XLSX.utils.aoa_to_sheet([khoHeaders,...khoRows]);
