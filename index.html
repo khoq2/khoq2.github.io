@@ -158,8 +158,9 @@ body { font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif
 .tx-img { display: block; width: 74px; height: 74px; object-fit: cover; border-radius: 8px; border: 1px solid #E5E8E8; margin-top: 8px; background: #fafafa; cursor: zoom-in; }
 .tx-related { margin-top: 7px; padding: 7px 8px; border-radius: 8px; background: #F8FAFC; border: 1px solid #E5EAF0; }
 .tx-related-label { display: block; margin-bottom: 5px; color: #607D8B; font-size: 10px; font-weight: 800; }
-.tx-related-links { display: flex; flex-wrap: wrap; gap: 5px; }
-.tx-related-link { max-width: 100%; border: 1px solid #D6EAF8; background: #fff; color: #1A5276; border-radius: 999px; padding: 4px 8px; font-size: 10px; font-weight: 800; line-height: 1.2; cursor: pointer; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tx-related-links { display:grid; grid-template-columns:minmax(0,1fr); gap:5px; counter-reset:related-item; }
+.tx-related-link { width:100%; min-width:0; display:flex; align-items:flex-start; gap:6px; text-align:left; border:1px solid #D6EAF8; background:#fff; color:#1A5276; border-radius:8px; padding:5px 7px; font-size:10px; font-weight:800; line-height:1.3; cursor:pointer; white-space:normal; overflow-wrap:anywhere; }
+.tx-related-number { display:inline-flex; align-items:center; justify-content:center; flex:0 0 17px; width:17px; height:17px; border-radius:50%; background:#1A5276; color:#fff; font-size:9px; line-height:1; box-shadow:0 1px 3px rgba(26,82,118,.24); }
 .tx-related-link:active { background: #EBF5FB; transform: scale(.98); }
 .tx-action { background: none; border: none; font-size: 12px; cursor: pointer; padding: 2px 6px; border-radius: 6px; }
 .tx-edit { color: #1A5276; }
@@ -4684,7 +4685,7 @@ function openRelatedHistoryProduct(idx){
 function renderSameDayEmployeeLinks(tx, currentRow){
   const links = getSameDayEmployeeProductLinks(tx, currentRow);
   if(!links.length) return "";
-  return `<div class="tx-related"><span class="tx-related-label">Cùng ngày, ${escapeHtml(tx.nv || "nhân viên này")} đã bán thêm:</span><div class="tx-related-links">${links.map(({other,index})=>`<button type="button" class="tx-related-link" title="Mở ${escapeHtml(other.ten || other.ma || "sản phẩm")}" onclick="openRelatedHistoryProduct(${index})">${escapeHtml(other.ten || other.ma || "Sản phẩm")}</button>`).join("")}</div></div>`;
+  return `<div class="tx-related"><span class="tx-related-label">Cùng ngày, ${escapeHtml(tx.nv || "nhân viên này")} đã bán thêm:</span><div class="tx-related-links">${links.map(({other,index},order)=>`<button type="button" class="tx-related-link" title="Mở ${escapeHtml(other.ten || other.ma || "sản phẩm")}" onclick="openRelatedHistoryProduct(${index})"><span class="tx-related-number">${order+1}</span><span>${escapeHtml(other.ten || other.ma || "Sản phẩm")}</span></button>`).join("")}</div></div>`;
 }
 
 function renderTxHistory(){
@@ -4737,7 +4738,7 @@ function renderTxHistory(){
   const rows = filtered.length ? filtered.map(t=>`
         <div class="tx-row">
           <div class="tx-header">
-            <span class="tx-nv">${renderNVAvatar(t.nv)} ${escapeHtml(t.nv || "")} ${renderNVRoleBadge(t.nv)} <span class="tx-pill" style="margin-left:4px;${getTransactionKind(t)==="IMPORT" ? "background:#E8F8F0;color:#1E8449;" : getTransactionKind(t)==="ADJUST" ? "background:#FEF9E7;color:#7D6608;" : ""}">${getTransactionKindLabel(t)}</span></span>
+            <span class="tx-nv">${renderNVAvatar(t.nv)} ${escapeHtml(t.nv || "")} ${renderNVRoleBadge(t.nv)} <span class="tx-pill" style="margin-left:4px;${getTransactionKind(t)==="IMPORT" ? "background:#E8F8F0;color:#1E8449;border:1px solid #A9DFBF;" : getTransactionKind(t)==="ADJUST" ? "background:#FEF9E7;color:#7D6608;border:1px solid #F7DC6F;" : "background:#FDEDEC;color:#C0392B;border:1px solid #F5B7B1;"}">${getTransactionKindLabel(t)}</span></span>
             <div class="tx-head-right">
               <span class="tx-time">${formatTxTime(t.time)}</span>
               ${document.body.classList.contains("admin-mode")?`<button class="tx-action tx-edit" title="Sửa ngày giờ và thông tin giao dịch" onclick="event.stopPropagation(); editTX('${escapeHtml(t.id)}')">📅 Sửa ngày giờ</button><button class="tx-action tx-delete" title="Xóa giao dịch" onclick="event.stopPropagation(); deleteTX('${escapeHtml(t.id)}')">🗑️</button>`:""}
@@ -5216,7 +5217,7 @@ async function saveItem(){ if(!requireAdmin()) return;
     alert(`⚠️ Mã hàng "${ma}" đã tồn tại trong lịch sử giao dịch. Không thể dùng lại mã này cho sản phẩm khác để tránh sai tồn kho.`);
     return;
   }
-  const row = [sh,ma,ten,th,gia,ton,getStockStatusValue(ton, sapHet),mergeNoteLocation(ghiNote, vitri),grp,img,giaBan,quickTag,sapHet,document.getElementById("fBranch").value];
+  const row = normalizeSheetRows([[sh,ma,ten,th,gia,ton,getStockStatusValue(ton, sapHet),mergeNoteLocation(ghiNote, vitri),grp,img,giaBan,quickTag,sapHet,document.getElementById("fBranch").value]])[0];
 if(idx===""){
   DATA.unshift(row);
   ITEM_CREATED_AT[getItemCreatedAtKey(row)] = Date.now();
@@ -5241,7 +5242,9 @@ closeOverlay("editOverlay");
 currentBranch = row[13] || "Q2";
 document.querySelectorAll('.filter-btn[data-branch]').forEach(b=>b.classList.toggle('active', b.dataset.branch===currentBranch));
 goToTab(sh);
-render(); 
+// Dựng lại sau một frame để số mục/tồn của bộ lọc phản ánh ngay dòng vừa chuẩn hóa,
+// kể cả trên trình duyệt điện thoại cập nhật DOM chậm hơn.
+requestAnimationFrame(()=>render());
 }
 function openImportModal(){ if(!requireAdmin()) return; document.getElementById("importPreview").innerHTML=""; document.getElementById("importInfo").textContent=""; document.getElementById("importMode").style.display="none"; document.getElementById("btnImport").style.display="none"; document.getElementById("fileInput").value=""; importRows=[]; document.getElementById("importOverlay").classList.add("open"); }
 function handleFile(input){ if(!requireAdmin()) return;
