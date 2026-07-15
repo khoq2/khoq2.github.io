@@ -332,6 +332,8 @@ mark.kw-hit { background: #FFEB3B; color: #1A1A1A; padding: 0 1px; border-radius
 .nv-role-badge { display:inline-flex; align-items:center; gap:3px; max-width:92px; padding:2px 6px; border-radius:999px; font-size:8px; font-weight:950; line-height:1.2; vertical-align:middle; white-space:nowrap; box-shadow:inset 0 0 0 1px rgba(255,255,255,.35); }
 .nv-role-badge.admin { background:linear-gradient(135deg,#922B21,#E74C3C); color:#fff; }
 .nv-role-badge.mod { background:linear-gradient(135deg,#1A5276,#3498DB); color:#fff; }
+.nv-role-badge.ceo { background:linear-gradient(135deg,#512E5F,#AF7AC5); color:#fff; }
+.nv-role-badge.accountant { background:linear-gradient(135deg,#7D6608,#D4AC0D); color:#fff; }
 .nv-role-badge.staff { background:#E8F8F5; color:#117864; border:1px solid #A3E4D7; }
 .nv-role-icon { width:12px; height:12px; border-radius:50%; object-fit:cover; flex:0 0 auto; }
 .tx-nv { display: inline-flex; align-items: center; gap: 6px; }
@@ -1146,7 +1148,7 @@ html::-webkit-scrollbar-corner { background: #EAF2F8; }
         onkeydown="if(event.key==='Enter'){event.preventDefault(); useImageLink('nvAvatarLink', setNVAvatarPreview);}">
     </div>
     <div class="form-2col" style="margin-top:8px">
-      <div class="form-row"><label>Vai trò / huy hiệu</label><select id="nvRole"><option value="STAFF">👤 Nhân viên</option><option value="MOD">🛡️ Mod</option><option value="ADMIN">👑 Admin</option></select></div>
+      <div class="form-row"><label>Vai trò / huy hiệu</label><select id="nvRole"><option value="STAFF">👤 Nhân viên</option><option value="ACCOUNTANT">🧾 Kế toán</option><option value="MOD">🛡️ Mod</option><option value="ADMIN">🔑 Admin</option><option value="CEO">👑 CEO</option></select></div>
       <div class="form-row"><label>Icon huy hiệu Google Drive</label><input type="text" id="nvBadgeIconLink" placeholder="Dán link icon riêng (không bắt buộc)"></div>
     </div>
     <div id="nvList" style="margin-top: 10px;"></div>
@@ -1700,7 +1702,7 @@ function checkAdminSession(){
 
 // Dòng URL duy nhất
 const SHEET_API_URL = "https://script.google.com/macros/s/AKfycby6YH69F7sfO1ZoUJsDm4BeX6Luj2GrhUfYWWJWNvqjraAEhkBck16EphrPBBm1BT3YqA/exec";
-const REQUIRED_API_VERSION = "2026.07.15-atomic-2";
+const REQUIRED_API_VERSION = "2026.07.15-atomic-3";
 const SHEET_TIMEOUT_MS = 12000;
 const PENDING_SYNC_KEY = "kho_cntt_pending_sync";
 const PENDING_TX_SYNC_KEY = "kho_cntt_pending_tx_sync";
@@ -4133,7 +4135,7 @@ function normalizeNVItem(nv){
 }
 function normalizeNVRole(value){
   const role=String(value || "STAFF").trim().toUpperCase();
-  return ["ADMIN","MOD","STAFF"].includes(role) ? role : "STAFF";
+  return ["CEO","ADMIN","MOD","ACCOUNTANT","STAFF"].includes(role) ? role : "STAFF";
 }
 function normalizeNVList(list){
   if(!Array.isArray(list)) return [];
@@ -4166,7 +4168,7 @@ function renderNVRoleBadge(name){
   const nv=findNVByName(name);
   if(!nv) return "";
   const role=normalizeNVRole(nv.role);
-  const cfg={ADMIN:{label:"ADMIN",icon:"👑",cls:"admin"},MOD:{label:"MOD",icon:"🛡️",cls:"mod"},STAFF:{label:"NHÂN VIÊN",icon:"👤",cls:"staff"}}[role];
+  const cfg={CEO:{label:"CEO",icon:"👑",cls:"ceo"},ADMIN:{label:"ADMIN",icon:"🔑",cls:"admin"},MOD:{label:"MOD",icon:"🛡️",cls:"mod"},ACCOUNTANT:{label:"KẾ TOÁN",icon:"🧾",cls:"accountant"},STAFF:{label:"NHÂN VIÊN",icon:"👤",cls:"staff"}}[role];
   const custom=nv.badgeIcon ? `<img class="nv-role-icon" src="${escapeHtml(resolveImageUrl(nv.badgeIcon))}" alt="" referrerpolicy="no-referrer" onerror="this.style.display='none'">` : `<span aria-hidden="true">${cfg.icon}</span>`;
   return `<span class="nv-role-badge ${cfg.cls}" title="Vai trò: ${cfg.label}">${custom}<span>${cfg.label}</span></span>`;
 }
@@ -4225,7 +4227,7 @@ function renderNVList(){
       <input type="file" id="nvRowFile_${i}" accept="image/*" style="display:none" onchange="handleNVRowAvatarPick(${i}, this)">
       <div style="flex:1; min-width:0;">
         <div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;font-size:13px;font-weight:bold;margin-bottom:4px;">${escapeHtml(nv.name)} ${renderNVRoleBadge(nv.name)}</div>
-        <select style="font-size:11px;padding:5px 7px;margin-bottom:4px" onchange="applyNVRole(${i},this.value)"><option value="STAFF" ${nv.role==="STAFF"?"selected":""}>👤 Nhân viên</option><option value="MOD" ${nv.role==="MOD"?"selected":""}>🛡️ Mod</option><option value="ADMIN" ${nv.role==="ADMIN"?"selected":""}>👑 Admin</option></select>
+        <select style="font-size:11px;padding:5px 7px;margin-bottom:4px" onchange="applyNVRole(${i},this.value)"><option value="STAFF" ${nv.role==="STAFF"?"selected":""}>👤 Nhân viên</option><option value="ACCOUNTANT" ${nv.role==="ACCOUNTANT"?"selected":""}>🧾 Kế toán</option><option value="MOD" ${nv.role==="MOD"?"selected":""}>🛡️ Mod</option><option value="ADMIN" ${nv.role==="ADMIN"?"selected":""}>🔑 Admin</option><option value="CEO" ${nv.role==="CEO"?"selected":""}>👑 CEO</option></select>
         <input type="text" class="img-link-input" style="font-size:11px; padding:5px 8px;"
           placeholder="Dán link ảnh Google Drive cho avatar..."
           value="${nv.avatar && nv.avatar.startsWith('http') ? escapeHtml(nv.avatar) : ''}"
