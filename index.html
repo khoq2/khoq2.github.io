@@ -1691,6 +1691,7 @@ function checkAdminSession(){
 
 // Dòng URL duy nhất
 const SHEET_API_URL = "https://script.google.com/macros/s/AKfycby6YH69F7sfO1ZoUJsDm4BeX6Luj2GrhUfYWWJWNvqjraAEhkBck16EphrPBBm1BT3YqA/exec";
+const REQUIRED_API_VERSION = "2026.07.15-atomic-1";
 const SHEET_TIMEOUT_MS = 12000;
 const PENDING_SYNC_KEY = "kho_cntt_pending_sync";
 const PENDING_TX_SYNC_KEY = "kho_cntt_pending_tx_sync";
@@ -1789,6 +1790,35 @@ function flushDataSaveQueue(){
   return dataSaveChain.catch(()=>{});
 }
 
+function validateInventoryRows(rows){
+  const issues = [];
+  if(!Array.isArray(rows)) return ["Dữ liệu kho không phải là một danh sách"];
+  const seen = new Map();
+  rows.forEach((r,index)=>{
+    if(!Array.isArray(r)){ issues.push(`Dòng ${index+1}: cấu trúc không hợp lệ`); return; }
+    const code = String(r[1] ?? "").trim();
+    const name = String(r[2] ?? "").trim();
+    const qtyRaw = r[5];
+    const qty = Number(qtyRaw);
+    const category = String(r[0] || "MT").trim().toUpperCase();
+    const branchRaw = String(r[13] || "Q2").trim().toUpperCase();
+    if(!code) issues.push(`Dòng ${index+1}: thiếu mã hàng`);
+    if(!name) issues.push(`Dòng ${index+1}${code?` (${code})`:""}: thiếu tên sản phẩm`);
+    if(String(qtyRaw ?? "").trim()==="" || !Number.isFinite(qty) || !Number.isInteger(qty) || qty<0) issues.push(`Dòng ${index+1}${code?` (${code})`:""}: tồn kho phải là số nguyên từ 0 trở lên`);
+    if(!["MT","MI","CAM","INT"].includes(category)) issues.push(`Dòng ${index+1}${code?` (${code})`:""}: danh mục "${category}" không hợp lệ`);
+    if(!["Q2","Q5"].includes(branchRaw)) issues.push(`Dòng ${index+1}${code?` (${code})`:""}: chi nhánh "${branchRaw}" không hợp lệ`);
+    if(code){
+      const key = `${branchRaw}|${code.toUpperCase().replace(/\s+/g,"")}`;
+      if(seen.has(key)) issues.push(`Dòng ${index+1} và dòng ${seen.get(key)+1}: trùng mã ${code} tại ${branchRaw}`);
+      else seen.set(key,index);
+    }
+  });
+  return issues;
+}
+function inventoryValidationMessage(issues, context="Dữ liệu kho"){
+  const shown = issues.slice(0,5).join("; ");
+  return `${context} có ${issues.length} lỗi: ${shown}${issues.length>5?`; và ${issues.length-5} lỗi khác`:""}`;
+}
 function normalizeSheetRows(rows){
   if(!Array.isArray(rows)) return [];
   return rows.filter(Array.isArray).map(r=>{
@@ -1837,13 +1867,51 @@ function sheetUrl(params){
 }
 
 async function postSheet(action, data, timeoutMs=SHEET_TIMEOUT_MS){
-  return fetchSheetJson(SHEET_API_URL, {
-    method: "POST",
-    headers: {"Content-Type": "text/plain;charset=utf-8"},
-    body: JSON.stringify({action, data})
-  }, timeoutMs);
+  const send = auth=>fetchSheetJson(SHEET_API_URL, {
+    method:"POST",
+    headers:{"Content-Type":"text/plain;charset=utf-8"},
+    body:JSON.stringify({action,data,auth:auth||""})
+  },timeoutMs);
+  const savedKey = sessionStorage.getItem("kho_api_write_key") || "";
+  try{ return await send(savedKey); }
+  catch(e){
+    if(!String(e).includes("AUTH_REQUIRED")) throw e;
+    const entered = prompt("Nhập khóa ghi API của kho:","");
+    if(!entered) throw new Error("Đã hủy vì chưa có khóa ghi API");
+    const result = await send(entered.trim());
+    sessionStorage.setItem("kho_api_write_key",entered.trim());
+    return result;
+  }
+}
+let atomicApiVersionChecked = false;
+async function ensureAtomicApi(){
+  if(atomicApiVersionChecked) return true;
+  const json = await fetchSheetJson(sheetUrl({type:"version",_ts:Date.now()}),{},20000);
+  if(json.version !== REQUIRED_API_VERSION) throw new Error(`API chưa đúng phiên bản ${REQUIRED_API_VERSION}. Hãy triển khai Code.gs mới trước khi giao dịch.`);
+  atomicApiVersionChecked = true;
+  return true;
+}
+function cacheAtomicInventoryState(){
+  safeLocalStorageSet("kho_cntt_data",JSON.stringify(normalizeSheetRows(DATA)));
+  safeLocalStorageSet("kho_cntt_tx",JSON.stringify(normalizeTxList(TX_DATA)));
+  setPendingSync(false);
+  setAuxPendingSync(PENDING_TX_SYNC_KEY,false);
+  setSyncBadge("synced");
+  markLastSync();
+}
+async function commitInventoryTransaction(mode,row,tx,options={}){
+  await ensureAtomicApi();
+  return postSheet("commit_inventory_transaction",{mode,code:row[1],branch:row[13]||"Q2",qty:options.qty,delta:options.delta,tx},35000);
 }
 async function saveProductRow(row, oldCode="", oldBranch="Q2"){
+  const validationIssues = validateInventoryRows(DATA);
+  if(validationIssues.length){
+    safeLocalStorageSet("kho_cntt_data", JSON.stringify(DATA));
+    setPendingSync(true, "Dữ liệu kho có lỗi, chưa được phép đồng bộ");
+    setSyncBadge("error", inventoryValidationMessage(validationIssues));
+    showToast("⚠️ "+inventoryValidationMessage(validationIssues,"Không thể lưu"),5000);
+    return false;
+  }
   try{ safeLocalStorageSet("kho_cntt_data", JSON.stringify(normalizeSheetRows(DATA))); }catch(e){}
   if(!SHEET_API_URL) return true;
   setPendingSync(true, "Đang chờ đồng bộ sản phẩm");
@@ -1869,6 +1937,8 @@ async function loadData(){
     try{
       const json = await fetchSheetJson(sheetUrl({type:"data", _ts: Date.now()}));
       if(!Array.isArray(json.data)) throw new Error("Sheet không có mảng dữ liệu sản phẩm");
+      const validationIssues = validateInventoryRows(json.data);
+      if(validationIssues.length) throw new Error(inventoryValidationMessage(validationIssues,"Google Sheet"));
       const sheetRows = normalizeSheetRows(json.data);
       if(localHasPending){
         DATA = localSnapshot;
@@ -1913,11 +1983,21 @@ function loadLocal(){
 
 async function pushToSheet(){
   if(!SHEET_API_URL) return;
+  const validationIssues = validateInventoryRows(DATA);
+  if(validationIssues.length) throw new Error(inventoryValidationMessage(validationIssues,"Không thể đẩy dữ liệu"));
   const safeData = normalizeSheetRows(DATA);
   await postSheet("replace_all", safeData);
 }
 
 async function saveData(){
+  const validationIssues = validateInventoryRows(DATA);
+  if(validationIssues.length){
+    safeLocalStorageSet("kho_cntt_data", JSON.stringify(DATA));
+    setPendingSync(true, "Dữ liệu kho có lỗi, chưa được phép đồng bộ");
+    setSyncBadge("error", inventoryValidationMessage(validationIssues));
+    showToast("⚠️ "+inventoryValidationMessage(validationIssues,"Không thể đồng bộ"),5000);
+    return false;
+  }
   const snapshot = normalizeSheetRows(JSON.parse(JSON.stringify(DATA)));
   try { safeLocalStorageSet("kho_cntt_data", JSON.stringify(snapshot)); } catch(e){}
   if(!SHEET_API_URL){
@@ -3346,7 +3426,7 @@ function renderCard(r,i,displayNo){
   const stTxt=getStockStatusLabel(ton, sapHet);
   if(productViewMode==="list" && isProductViewModeAvailable()){
     const listStockClass=isHet?"het":isSap?"sap":"con";
-    return `<button type="button" class="product-list-row" style="--list-color:${cfg.c}" title="Mở ${escapeHtml(ten)}" onclick="openProductFromList(${i})"><span class="product-list-title">${highlightMatch(ten,kwTokens)}</span><span class="product-list-stock ${listStockClass}">Tồn: ${Number(ton)||0}</span></button>`;
+    return `<button type="button" class="product-list-row" data-index="${i}" style="--list-color:${cfg.c}" title="Mở ${escapeHtml(ten)}" onclick="openProductFromList(${i})"><span class="product-list-title">${highlightMatch(ten,kwTokens)}</span><span class="product-list-stock ${listStockClass}">Tồn: ${Number(ton)||0}</span></button>`;
   }
   const condition = detectConditionLabel([ten, th, ghi].filter(Boolean).join(" "));
   const productTransactions = getTransactionsForProduct(r);
@@ -3461,7 +3541,7 @@ const GROUP_STRONG_COLORS = ["#1A5276","#B7950B","#1E8449","#C0392B","#8E44AD","
 let openSummaryListKey = "";
 let summaryProductSets = {};
 function jumpToInventoryItem(idx){
-  const target = document.querySelector(`#results .card[data-index="${idx}"]`);
+  const target = document.querySelector(`#results .card[data-index="${idx}"], #results .product-list-row[data-index="${idx}"]`);
   if(!target) return;
   const sticky = document.querySelector(".sticky");
   const stickyHeight = sticky ? sticky.getBoundingClientRect().height : 0;
@@ -3501,8 +3581,11 @@ function getSummaryHierarchyGroup(row){
   const groupNorm = normalizeQuickText(baseGroup);
   if(/\b(hdd|o cung co)\b/.test(groupNorm)){
     const detailNorm = normalizeQuickText([row?.[2],row?.[3],row?.[7],row?.[8]].filter(Boolean).join(" "));
-    if(/\b(hdd lt|hdd laptop|laptop|notebook|2[ .-]?5)\b/.test(detailNorm)) return "🗄️ HDD Laptop — 2.5 inch";
-    if(/\b(hdd pc|desktop|may ban|3[ .-]?5)\b/.test(detailNorm)) return "🗄️ HDD PC/Desktop — 3.5 inch";
+    const laptopSignal = /\b(hdd\s*(lt|lap|laptop)|laptop|notebook|sff|2(?:[.,]|\s+|-)5)\b/.test(detailNorm);
+    const pcSignal = /\b(hdd\s*(pc|desktop)|desktop|may ban|3(?:[.,]|\s+|-)5)\b/.test(detailNorm);
+    if(laptopSignal && pcSignal) return "⚠️ HDD xung đột PC/Laptop — cần kiểm tra";
+    if(laptopSignal) return "🗄️ HDD Laptop — 2.5 inch";
+    if(pcSignal) return "🗄️ HDD PC/Desktop — 3.5 inch";
     return "🗄️ HDD chưa rõ PC/Laptop";
   }
   return baseGroup;
@@ -3928,15 +4011,16 @@ async function changeTon(idx, delta){
   const newTon = Math.max(0, r[5] + delta);
   const actualDelta = newTon - r[5];
   if(!actualDelta) return;
-  DATA[idx][5] = newTon;
-  DATA[idx][6] = getStockStatusValue(newTon, DATA[idx][12]);
-  TX_DATA.unshift({ id: Date.now(), ma: r[1], ten: r[2], sh: r[0], nv: "Điều chỉnh kho", qty: -actualDelta, gia: 0, ghi: `[ĐIỀU CHỈNH] ${reason.trim() || "Không ghi lý do"}`, img: "", time: formatTxTime(new Date()), branch: r[13] || "Q2" });
-  const [dataSaved, txSaved] = await Promise.all([
-    saveProductRow(DATA[idx], r[1], r[13] || "Q2"),
-    saveTX()
-  ]);
-  render();
-  showToast(dataSaved && txSaved ? `${actualDelta > 0 ? "+" : ""}${actualDelta} tồn kho: ${r[2]}` : "⚠️ Đã lưu trên máy, đang chờ đồng bộ lại.", 4200);
+  const tx = { id: Date.now(), ma:r[1], ten:r[2], sh:r[0], nv:"Điều chỉnh kho", qty:-actualDelta, gia:0, ghi:`[ĐIỀU CHỈNH] ${reason.trim() || "Không ghi lý do"}`, img:"", time:formatTxTime(new Date()), branch:r[13]||"Q2" };
+  try{
+    const result = await commitInventoryTransaction("ADJUST",r,tx,{delta:actualDelta});
+    DATA[idx][5] = Number(result.stock);
+    DATA[idx][6] = getStockStatusValue(DATA[idx][5],DATA[idx][12]);
+    TX_DATA.unshift(tx);
+    cacheAtomicInventoryState();
+    render();
+    showToast(`✅ ${actualDelta > 0 ? "+" : ""}${actualDelta} tồn kho: ${r[2]}`);
+  }catch(e){ setSyncBadge("error",String(e)); showToast("⚠️ Không điều chỉnh tồn: "+String(e),5000); }
 }
 
 async function deleteItem(idx){
@@ -4263,31 +4347,38 @@ async function saveRestock(){ if(!requireAdmin()) return;
   const idx = Number(document.getElementById("restockIdx").value);
   const r = DATA[idx];
   const nv = document.getElementById("restockNV").value.trim();
-  const qty = Math.max(0, parseInt(document.getElementById("restockQty").value) || 0);
+  const qty = Number(document.getElementById("restockQty").value.trim());
   const ghi = document.getElementById("restockGhi").value.trim();
   if(!r) return;
   if(!nv){ alert("Vui lòng chọn người nhập!"); return; }
-  if(!qty){ alert("Số lượng nhập phải lớn hơn 0!"); return; }
-  DATA[idx][5] = (Number(r[5]) || 0) + qty;
-  DATA[idx][6] = getStockStatusValue(DATA[idx][5], DATA[idx][12]);
-  TX_DATA.unshift({ id: Date.now(), ma:r[1], ten:r[2], sh:r[0], nv, qty:-qty, gia:0, ghi:`[NHẬP HÀNG] ${ghi || "Nhập thêm vào kho"}`, img:"", time:formatTxTime(new Date()), branch:r[13] || "Q2" });
-  closeOverlay("restockOverlay");
-  const [dataSaved, txSaved] = await Promise.all([
-    saveProductRow(DATA[idx], r[1], r[13] || "Q2"),
-    saveTX()
-  ]);
-  render();
-  showToast(dataSaved && txSaved ? `✅ Đã nhập thêm ${qty}: ${r[2]}` : "⚠️ Phiếu nhập đã lưu trên máy và đang chờ đồng bộ lên Sheet.", 4200);
+  if(!Number.isInteger(qty) || qty<=0){ alert("Số lượng nhập phải là số nguyên lớn hơn 0!"); return; }
+  const tx = { id:Date.now(), ma:r[1], ten:r[2], sh:r[0], nv, qty:-qty, gia:0, ghi:`[NHẬP HÀNG] ${ghi || "Nhập thêm vào kho"}`, img:"", time:formatTxTime(new Date()), branch:r[13]||"Q2" };
+  try{
+    const result = await commitInventoryTransaction("RESTOCK",r,tx,{qty});
+    DATA[idx][5] = Number(result.stock);
+    DATA[idx][6] = getStockStatusValue(DATA[idx][5],DATA[idx][12]);
+    TX_DATA.unshift(tx);
+    cacheAtomicInventoryState();
+    closeOverlay("restockOverlay");
+    render();
+    showToast(`✅ Đã nhập thêm ${qty}: ${r[2]}`);
+  }catch(e){ setSyncBadge("error",String(e)); showToast("⚠️ Không nhập hàng: "+String(e),5000); }
 }
 async function saveSale(){ if(!requireAdmin()) return;
   const idx = parseInt(document.getElementById("saleIdx").value);
   const txId = document.getElementById("saleTxId").value;
   const nv  = document.getElementById("saleNV").value.trim();
-  const qty = parseInt(document.getElementById("saleQty").value)||1;
+  const qtyRaw = document.getElementById("saleQty").value.trim();
+  const qty = Number(qtyRaw);
   const gia = parseVndInput(document.getElementById("saleGia").value);
   const ghi = document.getElementById("saleGhi").value.trim();
   const img = document.getElementById("saleImg").value || "";
   const timeInput = document.getElementById("saleTime").value;
+  if(!txId && (!Number.isInteger(qty) || qty <= 0)){
+    alert("Số lượng xuất phải là số nguyên lớn hơn 0!");
+    document.getElementById("saleQty").focus();
+    return;
+  }
   if(!nv){ alert("Vui lòng nhập tên nhân viên!"); return; }
   if(!timeInput){ alert("Vui lòng chọn ngày giờ giao dịch!"); return; }
   const transactionTime = formatTxTimeFromInput(timeInput);
@@ -4308,17 +4399,19 @@ async function saveSale(){ if(!requireAdmin()) return;
     return;
   }
   const r = DATA[idx];
+  if(!r){ alert("Không tìm thấy sản phẩm cần xuất!"); return; }
   if(r[5] < qty){ alert(`Tồn kho chỉ còn ${r[5]}, không đủ xuất ${qty}!`); return; }
-  DATA[idx][5] = r[5] - qty;
-  DATA[idx][6] = getStockStatusValue(DATA[idx][5], DATA[idx][12]);
-  TX_DATA.unshift({ id: Date.now(), ma: r[1], ten: r[2], sh: r[0], nv, qty, gia, ghi, img, time: transactionTime, branch: r[13] || "Q2" });
-  closeOverlay("saleOverlay");
-  const [dataSaved, txSaved] = await Promise.all([
-    saveProductRow(DATA[idx], r[1], r[13] || "Q2"),
-    saveTX()
-  ]);
-  render();
-  showToast(dataSaved && txSaved ? `✅ Đã ghi giao dịch: ${r[2]} x${qty}` : "⚠️ Giao dịch đã lưu trên máy và đang chờ đồng bộ lên Sheet.", 4200);
+  const tx = { id:Date.now(), ma:r[1], ten:r[2], sh:r[0], nv, qty, gia, ghi, img, time:transactionTime, branch:r[13]||"Q2" };
+  try{
+    const result = await commitInventoryTransaction("SALE",r,tx,{qty});
+    DATA[idx][5] = Number(result.stock);
+    DATA[idx][6] = getStockStatusValue(DATA[idx][5],DATA[idx][12]);
+    TX_DATA.unshift(tx);
+    cacheAtomicInventoryState();
+    closeOverlay("saleOverlay");
+    render();
+    showToast(`✅ Đã ghi giao dịch: ${r[2]} x${qty}`);
+  }catch(e){ setSyncBadge("error",String(e)); showToast("⚠️ Không ghi giao dịch: "+String(e),5000); }
 }
 
 function formatTxTime(value){
@@ -4678,20 +4771,34 @@ async function deleteTX(id){ if(!requireAdmin()) return;
   const txBranch = String(tx.branch || "Q2").trim().toUpperCase() === "Q5" ? "Q5" : "Q2";
   const idx = DATA.findIndex(r=>r[1]===tx.ma && (r[13]||"Q2")===txBranch);
   const qty = Number(tx.qty) || 0;
-  const confirmMsg = idx >= 0 && qty > 0
-    ? `Xóa giao dịch này? Tồn kho "${DATA[idx][2]}" sẽ được cộng lại +${qty}.`
-    : "Xóa giao dịch này?";
-  if(!confirm(confirmMsg)) return;
-  TX_DATA = TX_DATA.filter(t=>String(t.id)!==String(id));
-  if(idx >= 0 && qty > 0){
-    DATA[idx][5] = (Number(DATA[idx][5]) || 0) + qty;
-    DATA[idx][6] = getStockStatusValue(DATA[idx][5], DATA[idx][12]);
-    await saveProductRow(DATA[idx], DATA[idx][1], DATA[idx][13] || "Q2");
-    render();
+  const currentStock = idx >= 0 ? Number(DATA[idx][5]) || 0 : 0;
+  const reversedStock = currentStock + qty;
+  if(idx >= 0 && qty !== 0 && reversedStock < 0){
+    alert(`Không thể xóa giao dịch này vì tồn kho hiện chỉ còn ${currentStock}. Hoàn tác giao dịch sẽ làm tồn kho thành ${reversedStock}. Vui lòng kiểm kê hoặc điều chỉnh tồn trước.`);
+    return;
   }
-  await saveTX();
-  renderTxHistory();
-  showToast(idx >= 0 && qty > 0 ? `Đã xóa giao dịch, hoàn lại +${qty} tồn kho` : "Đã xóa giao dịch");
+  const stockChangeText = qty > 0
+    ? `Tồn kho "${DATA[idx]?.[2] || tx.ten}" sẽ được cộng lại +${qty}.`
+    : qty < 0
+      ? `Tồn kho "${DATA[idx]?.[2] || tx.ten}" sẽ bị trừ ${Math.abs(qty)} để hoàn tác lượng đã nhập.`
+      : "Giao dịch này không làm thay đổi số lượng tồn.";
+  const confirmMsg = idx >= 0
+    ? `Xóa giao dịch này? ${stockChangeText}`
+    : `Không tìm thấy mã hàng ${tx.ma} trong kho. Không thể hoàn tác an toàn giao dịch này.`;
+  if(idx < 0){ alert(confirmMsg); return; }
+  if(!confirm(confirmMsg)) return;
+  try{
+    await ensureAtomicApi();
+    const result = await postSheet("delete_inventory_transaction",{id},35000);
+    TX_DATA = TX_DATA.filter(t=>String(t.id)!==String(id));
+    DATA[idx][5] = Number(result.stock);
+    DATA[idx][6] = getStockStatusValue(DATA[idx][5],DATA[idx][12]);
+    cacheAtomicInventoryState();
+    render();
+    renderTxHistory();
+    const doneText = qty===0 ? "Đã xóa giao dịch" : qty>0 ? `Đã xóa giao dịch, cộng lại +${qty} tồn kho` : `Đã xóa giao dịch, trừ ${Math.abs(qty)} tồn kho đã nhập`;
+    showToast(doneText);
+  }catch(e){ setSyncBadge("error",String(e)); showToast("⚠️ Không xóa giao dịch: "+String(e),5000); }
 }
 // Nhận link chia sẻ Google Drive (hoặc File ID dán trực tiếp) và quy đổi về
 // dạng URL hiển thị ảnh trực tiếp được (dùng cho thẻ <img>). Nếu không nhận
@@ -5065,6 +5172,11 @@ function handleFile(input){ if(!requireAdmin()) return;
         // Tương thích mẫu Excel cũ A:H và cột giá bán K.
         return [(r[0]||"MT"),r[1],r[2],r[3],r[4],r[5],r[6]||"CÒN HÀNG",r[7]||"","","",r[10]||0,"",2,"Q2"];
       });
+      const importValidationIssues = validateInventoryRows(mappedRows);
+      if(importValidationIssues.length){
+        alert("⚠️ Không thể nhập file vì dữ liệu chưa hợp lệ. "+inventoryValidationMessage(importValidationIssues,"File Excel"));
+        return;
+      }
       const normalizedImportRows = normalizeSheetRows(mappedRows);
       const importKeys = new Set();
       let duplicateFileCount = 0;
