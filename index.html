@@ -1007,6 +1007,8 @@ html::-webkit-scrollbar-corner { background: #EAF2F8; }
     <button class="fab admin-only" style="background:#5B2C6F;color:#fff" onclick="openQuickOrderModal()">↕️ Sắp xếp lọc</button>
     <button class="fab admin-only" style="background:#1A5276;color:#fff" onclick="openGroupOrderModal()">↕️ Sắp xếp nhóm</button>
     <button class="fab admin-only" style="background:#117864;color:#fff" onclick="backupDataToExcel()">💾 Sao lưu Excel</button>
+    <button class="fab admin-only" style="background:#1F618D;color:#fff" onclick="exportMonthlyAccountingExcel()">🧾 Kế toán tháng Excel</button>
+    <button class="fab admin-only" style="background:#922B21;color:#fff" onclick="exportMonthlyAccountingPdf()">📄 Kế toán tháng PDF</button>
   </div>
   <button class="fab admin-only" id="fabToggleBtn" style="background:#1E3A5F;color:#fff;" onclick="toggleFabMenu()">⚙️ Quản trị</button>
 </div>
@@ -1194,6 +1196,7 @@ html::-webkit-scrollbar-corner { background: #EAF2F8; }
     <div class="modal-title" id="saleModalTitle">🛒 Ghi nhận giao dịch</div>
     <input type="hidden" id="saleIdx">
     <input type="hidden" id="saleTxId">
+    <input type="hidden" id="saleRequestId">
     <div class="form-row">
       <label>Nhân viên bán</label>
       <select id="saleNV" style="width:100%;padding:9px;border-radius:8px;border:1.5px solid #ddd;font-size:14px">
@@ -1237,6 +1240,7 @@ html::-webkit-scrollbar-corner { background: #EAF2F8; }
   <div class="modal" onclick="event.stopPropagation()">
     <div class="modal-title">📥 Nhập thêm hàng</div>
     <input type="hidden" id="restockIdx">
+    <input type="hidden" id="restockRequestId">
     <div class="form-row"><label>Người nhập</label><select id="restockNV" style="width:100%;padding:9px;border-radius:8px;border:1.5px solid #ddd;font-size:14px"><option value="">-- Chọn người nhập --</option></select></div>
     <div class="form-row"><label>Số lượng nhập thêm *</label><input type="number" id="restockQty" value="1" min="1" inputmode="numeric"></div>
     <div class="form-row"><label>Ghi chú</label><input type="text" id="restockGhi" placeholder="VD: Nhập NCC A, bổ sung kho, kiểm kê..."></div>
@@ -1739,7 +1743,7 @@ function checkAdminSession(){
 
 // Dòng URL duy nhất
 const SHEET_API_URL = "https://script.google.com/macros/s/AKfycby6YH69F7sfO1ZoUJsDm4BeX6Luj2GrhUfYWWJWNvqjraAEhkBck16EphrPBBm1BT3YqA/exec";
-const REQUIRED_API_VERSION = "2026.07.15-atomic-7";
+const REQUIRED_API_VERSION = "2026.07.15-atomic-8";
 const SHEET_TIMEOUT_MS = 12000;
 const PENDING_SYNC_KEY = "kho_cntt_pending_sync";
 const PENDING_TX_SYNC_KEY = "kho_cntt_pending_tx_sync";
@@ -1753,6 +1757,7 @@ let configSaveChain = Promise.resolve();
 let txSaveSeq = 0;
 let nvSaveSeq = 0;
 let configSaveSeq = 0;
+let SERVER_DATA_FINGERPRINT = "";
 
 function setSyncBadge(state, detail){
   const el = document.getElementById("syncBadge");
@@ -1953,9 +1958,20 @@ function cacheAtomicInventoryState(){
 }
 async function commitInventoryTransaction(mode,row,tx,options={}){
   await ensureAtomicApi();
-  return postSheet("commit_inventory_transaction",{mode,code:row[1],branch:row[13]||"Q2",qty:options.qty,delta:options.delta,tx},35000);
+  const payload={mode,code:row[1],branch:row[13]||"Q2",qty:options.qty,delta:options.delta,tx};
+  try{
+    const result=await postSheet("commit_inventory_transaction",payload,35000);
+    if(result.fingerprint) SERVER_DATA_FINGERPRINT=result.fingerprint;
+    return result;
+  }catch(firstError){
+    if(!navigator.onLine) throw firstError;
+    const result=await postSheet("commit_inventory_transaction",payload,35000);
+    if(result.fingerprint) SERVER_DATA_FINGERPRINT=result.fingerprint;
+    return result;
+  }
 }
 async function saveProductRow(row, oldCode="", oldBranch="Q2"){
+  const hadPendingBefore = hasPendingSync();
   const validationIssues = validateInventoryRows(DATA);
   if(validationIssues.length){
     safeLocalStorageSet("kho_cntt_data", JSON.stringify(DATA));
@@ -1968,15 +1984,17 @@ async function saveProductRow(row, oldCode="", oldBranch="Q2"){
   if(!SHEET_API_URL) return true;
   setPendingSync(true, "Đang chờ đồng bộ sản phẩm");
   try{
-    await postSheet("upsert_product", {row: normalizeSheetRows([row])[0], oldCode, oldBranch});
-    setPendingSync(false); setSyncBadge("synced"); markLastSync();
+    const result=await postSheet("upsert_product", {row: normalizeSheetRows([row])[0], oldCode, oldBranch});
+    if(result.fingerprint) SERVER_DATA_FINGERPRINT=result.fingerprint;
+    setPendingSync(hadPendingBefore,hadPendingBefore?"Vẫn còn thay đổi khác đang chờ đồng bộ":""); setSyncBadge(hadPendingBefore?"pending":"synced"); markLastSync();
     return true;
   }catch(e){ setSyncBadge("error", String(e)); return false; }
 }
 async function deleteProductRow(code, branch){
   if(!SHEET_API_URL) return true;
+  const hadPendingBefore = hasPendingSync();
   setPendingSync(true, "Đang chờ xóa sản phẩm");
-  try{ await postSheet("delete_product", {code, branch}); setPendingSync(false); setSyncBadge("synced"); markLastSync(); return true; }
+  try{ const result=await postSheet("delete_product", {code, branch}); if(result.fingerprint) SERVER_DATA_FINGERPRINT=result.fingerprint; setPendingSync(hadPendingBefore,hadPendingBefore?"Vẫn còn thay đổi khác đang chờ đồng bộ":""); setSyncBadge(hadPendingBefore?"pending":"synced"); markLastSync(); return true; }
   catch(e){ setSyncBadge("error", String(e)); return false; }
 }
 
@@ -1992,6 +2010,7 @@ async function loadData(){
       const validationIssues = validateInventoryRows(json.data);
       if(validationIssues.length) throw new Error(inventoryValidationMessage(validationIssues,"Google Sheet"));
       const sheetRows = normalizeSheetRows(json.data);
+      SERVER_DATA_FINGERPRINT = String(json.fingerprint || "");
       if(localHasPending){
         DATA = localSnapshot;
         setSyncBadge("pending", "Dữ liệu mới trên máy đang chờ đồng bộ lại lên Google Sheet");
@@ -2038,7 +2057,8 @@ async function pushToSheet(){
   const validationIssues = validateInventoryRows(DATA);
   if(validationIssues.length) throw new Error(inventoryValidationMessage(validationIssues,"Không thể đẩy dữ liệu"));
   const safeData = normalizeSheetRows(DATA);
-  await postSheet("replace_all", safeData);
+  const result=await postSheet("replace_all", {rows:safeData,baseFingerprint:SERVER_DATA_FINGERPRINT});
+  if(result.fingerprint) SERVER_DATA_FINGERPRINT=result.fingerprint;
 }
 
 async function saveData(){
@@ -2061,7 +2081,8 @@ async function saveData(){
   dataSaveChain = dataSaveChain.then(async ()=>{
     setSyncBadge("syncing");
     try{
-      await postSheet("replace_all", snapshot);
+      const result=await postSheet("replace_all", {rows:snapshot,baseFingerprint:SERVER_DATA_FINGERPRINT});
+      if(result.fingerprint) SERVER_DATA_FINGERPRINT=result.fingerprint;
       if(seq === dataSaveSeq){
         setSyncBadge("synced"); markLastSync();
         setPendingSync(false);
@@ -2078,7 +2099,8 @@ async function saveData(){
   }, async ()=>{
     setSyncBadge("syncing");
     try{
-      await postSheet("replace_all", snapshot);
+      const result=await postSheet("replace_all", {rows:snapshot,baseFingerprint:SERVER_DATA_FINGERPRINT});
+      if(result.fingerprint) SERVER_DATA_FINGERPRINT=result.fingerprint;
       if(seq === dataSaveSeq){
         setSyncBadge("synced"); markLastSync();
         setPendingSync(false);
@@ -2110,6 +2132,7 @@ async function manualSync(){
       saveDisplayConfig()
     ]);
     if(dataOk && dataPushOk && nvOk && txOk && configOk){
+      setPendingSync(false);
       setSyncBadge("synced");
       showToast("✅ Đã đẩy dữ liệu hiện tại lên Google Sheet");
     }else{
@@ -3779,10 +3802,9 @@ function renderTotalStockOverview(el){
 function getInventoryAuditReasons(r){
   const reasons = [];
   const ton = Number(r[5]) || 0;
-  if(ton <= 0) return reasons;
   const lowLimit = Math.max(1,Number(r[12]) || 2);
   const location = splitNoteLocation(r[7] || "").location;
-  if(ton <= lowLimit) reasons.push(`Tồn thấp: ${ton}/${lowLimit}`);
+  if(ton > 0 && ton <= lowLimit) reasons.push(`Tồn thấp: ${ton}/${lowLimit}`);
   if(!location) reasons.push("Chưa có vị trí kho");
   if(!(Number(r[10]) > 0)) reasons.push("Chưa có giá bán");
   if(!getPrimaryRowGroup(r[8])) reasons.push("Chưa phân nhóm");
@@ -3790,7 +3812,7 @@ function getInventoryAuditReasons(r){
   const code = String(r[1] || "").trim();
   const branch = r[13] || "Q2";
   if(!code) reasons.push("Thiếu mã hàng");
-  else if(DATA.filter(row=>String(row[1] || "").trim()===code && (row[13]||"Q2")===branch).length > 1) reasons.push("Trùng mã trong chi nhánh");
+  else if(DATA.filter(row=>normalizeProductCode(row[1])===normalizeProductCode(code) && (row[13]||"Q2")===branch).length > 1) reasons.push("Trùng mã trong chi nhánh");
   if(!String(r[2] || "").trim()) reasons.push("Thiếu tên sản phẩm");
   return reasons;
 }
@@ -3806,7 +3828,7 @@ function renderInventoryAudit(el, results){
   summaryProductSets = {"audit-all":results,"audit-low":lowItems,"audit-location":locationItems,"audit-price":priceItems,"audit-group":groupItems,"audit-brand":brandItems,"audit-code":codeItems,"audit-name":nameItems};
   document.getElementById("count").textContent = results.length + " mặt hàng cần kiểm tra";
   if(!results.length){
-    el.innerHTML = `<div class="empty"><div class="empty-icon">✅</div><div class="empty-title">Không có mặt hàng cần kiểm tra</div><div class="empty-sub">Dữ liệu hàng đang có tồn trong phạm vi này đã đầy đủ</div></div>`;
+    el.innerHTML = `<div class="empty"><div class="empty-icon">✅</div><div class="empty-title">Không có mặt hàng cần kiểm tra</div><div class="empty-sub">Dữ liệu sản phẩm trong phạm vi này đã đầy đủ</div></div>`;
     return;
   }
   el.innerHTML = `<div class="audit-head"><div class="audit-title">⚠️ KIỂM TRA DỮ LIỆU KHO</div><div class="audit-sub">Bấm từng loại lỗi để mở nhanh các mặt hàng cần xử lý</div><div class="restock-summary"><button class="metric-card metric-yellow summary-click" onclick="toggleSummaryProductList('audit-all','Toàn bộ mặt hàng cần kiểm tra')"><span class="metric-number">${results.length}</span><span class="metric-label">Mặt hàng có ít nhất một lỗi</span></button><button class="metric-card metric-red summary-click" onclick="toggleSummaryProductList('audit-low','Mặt hàng tồn thấp')"><span class="metric-number">${lowItems.length}</span><span class="metric-label">Tồn thấp</span></button><button class="metric-card metric-blue summary-click" onclick="toggleSummaryProductList('audit-location','Mặt hàng chưa có vị trí')"><span class="metric-number">${locationItems.length}</span><span class="metric-label">Thiếu vị trí kho</span></button><button class="metric-card metric-purple summary-click" onclick="toggleSummaryProductList('audit-price','Mặt hàng chưa có giá bán')"><span class="metric-number">${priceItems.length}</span><span class="metric-label">Thiếu giá bán</span></button></div><div class="management-issues"><button class="management-issue summary-click" onclick="toggleSummaryProductList('audit-group','Mặt hàng chưa phân nhóm')"><span>Chưa phân nhóm</span><b>${groupItems.length}</b></button><button class="management-issue summary-click" onclick="toggleSummaryProductList('audit-brand','Mặt hàng thiếu thương hiệu')"><span>Thiếu thương hiệu</span><b>${brandItems.length}</b></button><button class="management-issue summary-click" onclick="toggleSummaryProductList('audit-code','Mặt hàng lỗi mã')"><span>Thiếu / trùng mã</span><b>${codeItems.length}</b></button><button class="management-issue summary-click" onclick="toggleSummaryProductList('audit-name','Mặt hàng thiếu tên')"><span>Thiếu tên sản phẩm</span><b>${nameItems.length}</b></button></div></div><div class="summary-product-list-host"></div>` + results.map(({r,i},idx)=>{
@@ -4476,11 +4498,13 @@ function updateSaleVatPreview(){
   box.textContent = `${fmt(basePrice)}/cái + 8% VAT: ${fmt(vatAmount)} = ${fmt(finalPrice)}/cái`;
   box.style.display="block";
 }
+function newTransactionId(){ return (crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`); }
 function openSaleModal(idx){ if(!requireAdmin()) return;
   const r = DATA[idx];
   document.getElementById("saleModalTitle").textContent = "🛒 Ghi nhận giao dịch";
   document.getElementById("saleIdx").value = idx;
   document.getElementById("saleTxId").value = "";
+  document.getElementById("saleRequestId").value = newTransactionId();
   refreshNVSelect();
   document.getElementById("saleQty").value = "1";
   document.getElementById("saleQty").disabled = false;
@@ -4496,6 +4520,7 @@ function openSaleModal(idx){ if(!requireAdmin()) return;
 function openRestockModal(idx){ if(!requireAdmin()) return;
   if(!DATA[idx]) return;
   document.getElementById("restockIdx").value = idx;
+  document.getElementById("restockRequestId").value = newTransactionId();
   refreshNVSelect("restockNV");
   document.getElementById("restockQty").value = "1";
   document.getElementById("restockGhi").value = "";
@@ -4510,7 +4535,7 @@ async function saveRestock(){ if(!requireAdmin()) return;
   if(!r) return;
   if(!nv){ alert("Vui lòng chọn người nhập!"); return; }
   if(!Number.isInteger(qty) || qty<=0){ alert("Số lượng nhập phải là số nguyên lớn hơn 0!"); return; }
-  const tx = { id:Date.now(), ma:r[1], ten:r[2], sh:r[0], nv, qty:-qty, gia:0, ghi:`[NHẬP HÀNG] ${ghi || "Nhập thêm vào kho"}`, img:"", time:formatTxTime(new Date()), branch:r[13]||"Q2" };
+  const tx = { id:document.getElementById("restockRequestId").value || newTransactionId(), ma:r[1], ten:r[2], sh:r[0], nv, qty:-qty, gia:0, ghi:`[NHẬP HÀNG] ${ghi || "Nhập thêm vào kho"}`, img:"", time:formatTxTime(new Date()), branch:r[13]||"Q2" };
   try{
     const result = await commitInventoryTransaction("RESTOCK",r,tx,{qty});
     DATA[idx][5] = Number(result.stock);
@@ -4567,7 +4592,7 @@ async function saveSale(){ if(!requireAdmin()) return;
   const r = DATA[idx];
   if(!r){ alert("Không tìm thấy sản phẩm cần xuất!"); return; }
   if(r[5] < qty){ alert(`Tồn kho chỉ còn ${r[5]}, không đủ xuất ${qty}!`); return; }
-  const tx = { id:Date.now(), ma:r[1], ten:r[2], sh:r[0], nv, qty, gia, ghi, img, time:transactionTime, branch:r[13]||"Q2", vatRate, basePrice };
+  const tx = { id:document.getElementById("saleRequestId").value || newTransactionId(), ma:r[1], ten:r[2], sh:r[0], nv, qty, gia, ghi, img, time:transactionTime, branch:r[13]||"Q2", vatRate, basePrice };
   try{
     const result = await commitInventoryTransaction("SALE",r,tx,{qty});
     DATA[idx][5] = Number(result.stock);
@@ -4958,6 +4983,7 @@ async function deleteTX(id){ if(!requireAdmin()) return;
   try{
     await ensureAtomicApi();
     const result = await postSheet("delete_inventory_transaction",{id},35000);
+    if(result.fingerprint) SERVER_DATA_FINGERPRINT=result.fingerprint;
     TX_DATA = TX_DATA.filter(t=>String(t.id)!==String(id));
     DATA[idx][5] = Number(result.stock);
     DATA[idx][6] = getStockStatusValue(DATA[idx][5],DATA[idx][12]);
@@ -5858,18 +5884,57 @@ function backupDataToExcel(){
   const wsData = XLSX.utils.aoa_to_sheet([khoHeaders,...khoRows]);
   const wsTx = XLSX.utils.aoa_to_sheet([txHeaders,...txRows]);
   const wsNv = XLSX.utils.aoa_to_sheet([nvHeaders,...nvRows]);
-  wsData['!cols'] = [10,10,16,42,18,14,10,14,13,26,24,38,46,14].map(w=>({wch:w}));
-  wsTx['!cols'] = [10,16,42,12,20,10,14,34,46,21,17].map(w=>({wch:w}));
-  wsNv['!cols'] = [{wch:24},{wch:52}];
-  wsData['!autofilter'] = {ref:`A1:N${Math.max(khoRows.length+1,1)}`};
-  wsTx['!autofilter'] = {ref:`A1:K${Math.max(txRows.length+1,1)}`};
-  wsNv['!autofilter'] = {ref:`A1:B${Math.max(nvRows.length+1,1)}`};
+  wsData['!cols'] = [10,10,16,42,18,14,10,14,13,26,24,38,46,14,46,46].map(w=>({wch:w}));
+  wsTx['!cols'] = [10,16,42,12,20,10,16,10,16,34,46,21,20].map(w=>({wch:w}));
+  wsNv['!cols'] = [{wch:24},{wch:52},{wch:16},{wch:52}];
+  wsData['!autofilter'] = {ref:`A1:P${Math.max(khoRows.length+1,1)}`};
+  wsTx['!autofilter'] = {ref:`A1:M${Math.max(txRows.length+1,1)}`};
+  wsNv['!autofilter'] = {ref:`A1:D${Math.max(nvRows.length+1,1)}`};
   XLSX.utils.book_append_sheet(wb, wsData, "Kho hàng");
   XLSX.utils.book_append_sheet(wb, wsTx, "Giao dịch");
   XLSX.utils.book_append_sheet(wb, wsNv, "Nhân viên");
   const stamp = new Date().toISOString().slice(0,19).replace(/[:T]/g,"-");
   XLSX.writeFile(wb, `Sao-luu-kho-${stamp}.xlsx`);
   showToast("✅ Đang tạo file sao lưu Excel.");
+}
+function chooseAccountingMonth(){
+  const now=new Date(), def=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,"0")}`;
+  const value=prompt("Nhập tháng báo cáo theo dạng YYYY-MM:",def);
+  if(value===null) return "";
+  if(!/^\d{4}-(0[1-9]|1[0-2])$/.test(value.trim())){ alert("Tháng không hợp lệ. Ví dụ: 2026-07"); return ""; }
+  return value.trim();
+}
+function getMonthlyAccountingReport(month){
+  const sales=normalizeTxList(TX_DATA).filter(t=>getTransactionKind(t)==="SALE" && parseTxDateKey(t.time).startsWith(month));
+  const rows=sales.map(t=>{
+    const qty=Math.abs(Number(t.qty)||0), totalAfter=(Number(t.gia)||0)*qty;
+    const unitBefore=Number(t.basePrice)||Number(t.gia)||0, totalBefore=unitBefore*qty;
+    return {time:formatTxTime(t.time),branch:t.branch||"Q2",id:t.id,code:t.ma,name:t.ten,employee:t.nv,qty,unitBefore,vatRate:Number(t.vatRate)||0,vat:totalAfter-totalBefore,totalAfter,note:t.ghi||""};
+  });
+  return {month,rows,count:rows.length,qty:rows.reduce((s,r)=>s+r.qty,0),before:rows.reduce((s,r)=>s+r.totalBefore,0),vat:rows.reduce((s,r)=>s+r.vat,0),after:rows.reduce((s,r)=>s+r.totalAfter,0)};
+}
+function exportMonthlyAccountingExcel(){
+  if(!requireAdmin()) return;
+  if(typeof XLSX==="undefined"){ showToast("⚠️ Chưa tải được công cụ Excel.",4000); return; }
+  const month=chooseAccountingMonth(); if(!month) return;
+  const report=getMonthlyAccountingReport(month);
+  const summary=[["BÁO CÁO KẾ TOÁN THÁNG",month],["Số giao dịch",report.count],["Số lượng đã bán",report.qty],["Doanh thu trước VAT",report.before],["VAT đầu ra",report.vat],["Tổng thanh toán",report.after]];
+  const headers=["Thời gian","Chi nhánh","Mã giao dịch","Mã hàng","Tên sản phẩm","Nhân viên","Số lượng","Đơn giá trước VAT","VAT (%)","Tiền VAT","Tổng thanh toán","Ghi chú"];
+  const details=report.rows.map(r=>[r.time,r.branch,r.id,r.code,r.name,r.employee,r.qty,r.unitBefore,r.vatRate,r.vat,r.totalAfter,r.note]);
+  const wb=XLSX.utils.book_new(), wsSummary=XLSX.utils.aoa_to_sheet(summary), wsDetails=XLSX.utils.aoa_to_sheet([headers,...details]);
+  wsSummary['!cols']=[{wch:28},{wch:20}]; wsDetails['!cols']=[20,10,22,16,38,20,10,18,10,16,18,34].map(w=>({wch:w}));
+  wsDetails['!autofilter']={ref:`A1:L${Math.max(details.length+1,1)}`};
+  XLSX.utils.book_append_sheet(wb,wsSummary,"Tổng hợp tháng"); XLSX.utils.book_append_sheet(wb,wsDetails,"Chi tiết bán hàng");
+  XLSX.writeFile(wb,`Bao-cao-ke-toan-${month}.xlsx`); showToast(`✅ Đã tạo báo cáo Excel tháng ${month}`);
+}
+function exportMonthlyAccountingPdf(){
+  if(!requireAdmin()) return;
+  const month=chooseAccountingMonth(); if(!month) return;
+  const report=getMonthlyAccountingReport(month), popup=window.open("","_blank");
+  if(!popup){ alert("Trình duyệt đang chặn cửa sổ in. Hãy cho phép pop-up rồi thử lại."); return; }
+  const rows=report.rows.map(r=>`<tr><td>${escapeHtml(r.time)}</td><td>${escapeHtml(r.branch)}</td><td>${escapeHtml(r.code)}</td><td>${escapeHtml(r.name)}</td><td>${escapeHtml(r.employee)}</td><td>${r.qty}</td><td>${fmt(r.unitBefore)}</td><td>${r.vatRate}%</td><td>${fmt(r.vat)}</td><td>${fmt(r.totalAfter)}</td></tr>`).join("");
+  popup.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>Báo cáo kế toán ${month}</title><style>@page{size:A4 landscape;margin:10mm}body{font-family:Arial,sans-serif;color:#17202A}h1{text-align:center;font-size:20px}.summary{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:14px 0}.box{border:1px solid #aaa;border-radius:7px;padding:9px}.box b{display:block;margin-top:5px;font-size:16px}table{width:100%;border-collapse:collapse;font-size:9px}th,td{border:1px solid #999;padding:5px;text-align:left}th{background:#D6EAF8}tr:nth-child(even){background:#F8F9F9}.note{margin-top:10px;font-size:9px;color:#666}</style></head><body><h1>BÁO CÁO KẾ TOÁN THÁNG ${month}</h1><div class="summary"><div class="box">Giao dịch<b>${report.count}</b></div><div class="box">Doanh thu trước VAT<b>${fmt(report.before)}</b></div><div class="box">VAT đầu ra<b>${fmt(report.vat)}</b></div><div class="box">Số lượng bán<b>${report.qty}</b></div><div class="box">Tổng thanh toán<b>${fmt(report.after)}</b></div></div><table><thead><tr><th>Thời gian</th><th>CN</th><th>Mã</th><th>Sản phẩm</th><th>Nhân viên</th><th>SL</th><th>Trước VAT</th><th>VAT</th><th>Tiền VAT</th><th>Thanh toán</th></tr></thead><tbody>${rows||`<tr><td colspan="10">Không có giao dịch trong tháng</td></tr>`}</tbody></table><div class="note">Báo cáo lấy từ lịch sử giao dịch đã đồng bộ trên hệ thống.</div><script>window.onload=()=>setTimeout(()=>window.print(),300)<\/script></body></html>`);
+  popup.document.close();
 }
 let searchRenderTimer = null;
 let searchSuggestionItems = [];
@@ -6191,6 +6256,9 @@ function restoreHeaderState(){
 function setupHeaderAutoCollapse(){
   let previousY = window.scrollY;
   let ticking = false;
+  let touchStartY = null;
+  let downwardSwipeCount = 0;
+  let lastDownwardSwipeAt = 0;
   window.addEventListener('scroll', ()=>{
     if(ticking) return;
     ticking = true;
@@ -6206,6 +6274,29 @@ function setupHeaderAutoCollapse(){
       if(y < 40) setHeaderCollapsed(false, false);
       else if(delta > 0 && y > 150) setHeaderCollapsed(true, false);
     });
+  }, {passive:true});
+  // Trên điện thoại, nhận diện theo từng cử chỉ touchstart/touchend để một lần vuốt
+  // không bị đếm thành nhiều sự kiện scroll. Hai lần vuốt xuống liên tiếp sẽ mở header.
+  window.addEventListener('touchstart', e=>{
+    touchStartY = e.changedTouches?.[0]?.clientY ?? null;
+  }, {passive:true});
+  window.addEventListener('touchend', e=>{
+    if(touchStartY===null || window.innerWidth>768) return;
+    const endY = e.changedTouches?.[0]?.clientY;
+    const distance = Number.isFinite(endY) ? endY-touchStartY : 0;
+    touchStartY = null;
+    const sticky = document.querySelector('.sticky');
+    if(!sticky?.classList.contains('collapsed')){ downwardSwipeCount=0; return; }
+    if(document.activeElement===document.getElementById('search') || document.querySelector('.search-suggestions.open') || document.querySelector('.overlay.open')) return;
+    if(distance < 45){ if(distance < -45) downwardSwipeCount=0; return; }
+    const now = Date.now();
+    downwardSwipeCount = now-lastDownwardSwipeAt <= 1800 ? downwardSwipeCount+1 : 1;
+    lastDownwardSwipeAt = now;
+    if(downwardSwipeCount>=2){
+      downwardSwipeCount=0;
+      setHeaderCollapsed(false,false);
+      showToast('Đã mở rộng thanh công cụ');
+    }
   }, {passive:true});
 }
 restoreHeaderState();
