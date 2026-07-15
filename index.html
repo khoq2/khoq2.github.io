@@ -3496,6 +3496,26 @@ function getSummaryProductItems(key){
     return false;
   }).sort((a,b)=>(Number(a.r[5])||0)-(Number(b.r[5])||0) || String(a.r[2]||"").localeCompare(String(b.r[2]||""),"vi"));
 }
+function getSummaryHierarchyGroup(row){
+  const baseGroup = getPrimaryRowGroup(row?.[8]) || NO_GROUP;
+  const groupNorm = normalizeQuickText(baseGroup);
+  if(/\b(hdd|o cung co)\b/.test(groupNorm)){
+    const detailNorm = normalizeQuickText([row?.[2],row?.[3],row?.[7],row?.[8]].filter(Boolean).join(" "));
+    if(/\b(hdd lt|hdd laptop|laptop|notebook|2[ .-]?5)\b/.test(detailNorm)) return "🗄️ HDD Laptop — 2.5 inch";
+    if(/\b(hdd pc|desktop|may ban|3[ .-]?5)\b/.test(detailNorm)) return "🗄️ HDD PC/Desktop — 3.5 inch";
+    return "🗄️ HDD chưa rõ PC/Laptop";
+  }
+  return baseGroup;
+}
+function scrollSummaryResultIntoView(box){
+  requestAnimationFrame(()=>{
+    if(!box || !box.innerHTML) return;
+    const sticky = document.querySelector(".sticky");
+    const stickyHeight = sticky ? sticky.getBoundingClientRect().height : 0;
+    const top = box.getBoundingClientRect().top + window.pageYOffset - stickyHeight - 8;
+    window.scrollTo({top:Math.max(0,top),behavior:window.matchMedia("(hover: none), (pointer: coarse)").matches?"auto":"smooth"});
+  });
+}
 function toggleSummaryProductList(key,title){
   const box = document.querySelector(".summary-product-list-host");
   if(!box) return;
@@ -3515,7 +3535,7 @@ function toggleSummaryProductList(key,title){
     const categoryQty = categoryItems.reduce((sum,item)=>sum+(Number(item.r[5])||0),0);
     const groupMap = new Map();
     categoryItems.forEach(item=>{
-      const group = getPrimaryRowGroup(item.r[8]) || NO_GROUP;
+      const group = getSummaryHierarchyGroup(item.r);
       if(!groupMap.has(group)) groupMap.set(group,[]);
       groupMap.get(group).push(item);
     });
@@ -3526,6 +3546,7 @@ function toggleSummaryProductList(key,title){
     return `<section class="summary-category"><div class="summary-category-head" style="background:${cfg.c}"><span>${escapeHtml(cfg.label)}</span><small>${categoryItems.length} mặt hàng · Tổng tồn ${categoryQty.toLocaleString("vi-VN")}</small></div>${groupsHtml}</section>`;
   }).join("");
   box.innerHTML = `<div class="summary-product-list"><div class="summary-product-list-title">${escapeHtml(title)} · ${safeItems.length} mặt hàng · Bấm nhóm để xem sản phẩm</div>${hierarchyHtml || '<div class="empty-sub">Không có dữ liệu phù hợp</div>'}</div>`;
+  scrollSummaryResultIntoView(box);
 }
 function renderTotalStockOverview(el){
   const inStock = DATA.map((r,i)=>({r,i})).filter(({r})=>Number(r[5]) > 0);
@@ -3543,7 +3564,7 @@ function renderTotalStockOverview(el){
   const totalCost = inStock.reduce((sum,{r})=>sum+(Number(r[5])||0)*(Number(r[4])||0),0);
   const totalSaleValue = inStock.reduce((sum,{r})=>sum+(Number(r[5])||0)*(Number(r[10])||0),0);
   const branchReport = [{code:"Q2",items:q2Items},{code:"Q5",items:q5Items}].map(({code,items})=>({code,items:items.length,qty:items.reduce((s,{r})=>s+(Number(r[5])||0),0),cost:items.reduce((s,{r})=>s+(Number(r[5])||0)*(Number(r[4])||0),0),sale:items.reduce((s,{r})=>s+(Number(r[5])||0)*(Number(r[10])||0),0)}));
-  let html = `<div class="total-stock-head"><div class="total-stock-title">📦 BÁO CÁO TỒN KHO</div><div class="total-stock-sub">Tổng quan số lượng và giá trị hàng đang còn trong kho</div><div class="restock-summary"><button class="metric-card metric-green summary-click" onclick="toggleSummaryProductList('total-all','Toàn bộ hàng đang có')"><span class="metric-number">${inStock.length}</span><span class="metric-label">Mã hàng đang có tồn</span></button><div class="metric-card metric-blue"><span class="metric-number">${totalQty.toLocaleString("vi-VN")}</span><span class="metric-label">Tổng sản phẩm trong kho</span></div><div class="metric-card metric-purple"><span class="metric-number">${formatVndNumber(totalCost)}</span><span class="metric-label">Giá trị vốn · VND</span></div><div class="metric-card metric-green"><span class="metric-number">${formatVndNumber(totalSaleValue)}</span><span class="metric-label">Giá trị bán dự kiến · VND</span></div></div><table class="management-table"><thead><tr><th>Chi nhánh</th><th>Mã hàng</th><th>Số lượng</th><th>Giá vốn</th><th>Giá bán</th></tr></thead><tbody>${branchReport.map(x=>`<tr><td>📍 ${x.code}</td><td>${x.items}</td><td>${x.qty.toLocaleString("vi-VN")}</td><td>${formatVndNumber(x.cost)}</td><td>${formatVndNumber(x.sale)}</td></tr>`).join("")}</tbody></table></div><div class="summary-product-list-host"></div>`;
+  let html = `<div class="total-stock-head"><div class="total-stock-title">📦 BÁO CÁO TỒN KHO</div><div class="total-stock-sub">Tổng quan số lượng và giá trị hàng đang còn trong kho</div><div class="restock-summary"><button class="metric-card metric-green summary-click" onclick="toggleSummaryProductList('total-all','Toàn bộ hàng đang có')"><span class="metric-number">${inStock.length}</span><span class="metric-label">Mã hàng đang có tồn</span></button><button class="metric-card metric-blue summary-click" onclick="toggleSummaryProductList('total-all','Toàn bộ số lượng đang tồn')"><span class="metric-number">${totalQty.toLocaleString("vi-VN")}</span><span class="metric-label">Tổng sản phẩm trong kho</span></button><div class="metric-card metric-purple"><span class="metric-number">${formatVndNumber(totalCost)}</span><span class="metric-label">Giá trị vốn · VND</span></div><div class="metric-card metric-green"><span class="metric-number">${formatVndNumber(totalSaleValue)}</span><span class="metric-label">Giá trị bán dự kiến · VND</span></div></div><table class="management-table"><thead><tr><th>Chi nhánh</th><th>Mã hàng</th><th>Số lượng</th><th>Giá vốn</th><th>Giá bán</th></tr></thead><tbody>${branchReport.map(x=>`<tr><td>📍 ${x.code}</td><td>${x.items}</td><td>${x.qty.toLocaleString("vi-VN")}</td><td>${formatVndNumber(x.cost)}</td><td>${formatVndNumber(x.sale)}</td></tr>`).join("")}</tbody></table></div><div class="summary-product-list-host"></div>`;
   ["Q2","Q5"].forEach((branch,branchIndex)=>{
     const items = inStock.filter(({r})=>(r[13]||"Q2")===branch);
     if(!items.length) return;
