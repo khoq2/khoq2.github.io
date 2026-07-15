@@ -174,8 +174,17 @@ html.tx-overlay-open, body.tx-overlay-open { overflow: hidden; }
 @media (max-width: 520px) {
   .tx-history-modal { max-height: 82vh; max-height: 82svh; }
   .tx-history-modal .tx-filter { grid-template-columns: 1fr; }
-  .tx-history-modal .tx-header { min-width: 0; }
-  .tx-history-modal .tx-head-right { max-width: 58%; flex-wrap: wrap; justify-content: flex-end; }
+  .tx-history-modal .tx-header { min-width:0; display:grid; grid-template-columns:minmax(0,1fr); gap:5px; }
+  .tx-history-modal .tx-nv { width:100%; min-width:0; display:flex; flex-wrap:wrap; align-items:center; gap:5px; }
+  .tx-history-modal .tx-head-right { width:100%; max-width:none; display:flex; flex-wrap:wrap; justify-content:flex-start; align-items:center; gap:5px; }
+  .tx-history-modal .tx-time { text-align:left; white-space:normal; overflow-wrap:anywhere; }
+  .tx-history-modal .tx-pill { flex:0 0 auto; max-width:100%; white-space:nowrap; }
+  .tx-history-modal .tx-note { max-width:100%; overflow-wrap:anywhere; word-break:break-word; }
+  .nguoi-ban-row { flex-wrap:wrap; align-items:center; }
+  .nguoi-ban-label { flex:1 1 auto; max-width:none; line-height:1.25; }
+  .nguoi-ban-count { flex:1 1 100%; max-width:none; min-width:0; padding-left:20px; justify-content:flex-start; }
+  .nguoi-ban-count .nv-role-badge { flex:0 0 auto; }
+  .nguoi-ban-latest-text { min-width:0; flex:1 1 auto; }
 }
 .order-list { display:flex; flex-direction:column; gap:8px; margin-top:8px; }
 .order-row { display:flex; align-items:center; min-height:52px; background:#F8FAFC; border:1.5px solid #CBD5E1; border-left:5px solid #5B8DB8; border-radius:10px; overflow:hidden; box-shadow:0 1px 3px rgba(30,58,95,.08); }
