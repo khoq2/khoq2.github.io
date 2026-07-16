@@ -5459,7 +5459,10 @@ function checkProductCodeDuplicate(){
   const otherBranch = DATA.find(row=>normalizeProductCode(row[1]) === codeKey && String(row[13] || "Q2") !== branch);
   if(otherBranch){
     hint.innerHTML = `ℹ️ Mã này đang có ở ${escapeHtml(otherBranch[13] || "Q2")}: ${escapeHtml(otherBranch[2] || "Chưa có tên")}. Có thể dùng ở ${escapeHtml(branch)} nếu là hàng riêng chi nhánh.`;
+    return false;
   }
+  // Mã đã hợp lệ hoàn toàn: xóa ngay cảnh báo trùng còn sót lại từ lần nhập trước.
+  hint.textContent = "";
   return false;
 }
 
