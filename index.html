@@ -3107,10 +3107,12 @@ function getQuickFixedCatalog(groupLabel){
   });
   const order = QUICK_ORDER[quickOrderKey(groupLabel)] || [];
   if(!order.length) return catalog;
-  const rank = new Map(order.map((value,index)=>[value,index]));
+  const rank = new Map(order.map((value,index)=>[normalizeQuickText(value),index]));
   return [...catalog].sort((a,b)=>{
-    const ar = rank.has(a.primary) ? rank.get(a.primary) : Number.MAX_SAFE_INTEGER;
-    const br = rank.has(b.primary) ? rank.get(b.primary) : Number.MAX_SAFE_INTEGER;
+    const aKey = normalizeQuickText(a.primary);
+    const bKey = normalizeQuickText(b.primary);
+    const ar = rank.has(aKey) ? rank.get(aKey) : Number.MAX_SAFE_INTEGER;
+    const br = rank.has(bKey) ? rank.get(bKey) : Number.MAX_SAFE_INTEGER;
     return ar - br;
   });
 }
@@ -3127,8 +3129,8 @@ function renderQuickOrderList(){
   const base = getQuickFixedCatalog(group);
   const key = quickOrderKey(group);
   const order = QUICK_ORDER[key] || base.map(meta=>meta.primary);
-  const rank = new Map(order.map((value,index)=>[value,index]));
-  const metas = [...base].sort((a,b)=>(rank.get(a.primary)??9999)-(rank.get(b.primary)??9999));
+  const rank = new Map(order.map((value,index)=>[normalizeQuickText(value),index]));
+  const metas = [...base].sort((a,b)=>(rank.get(normalizeQuickText(a.primary))??9999)-(rank.get(normalizeQuickText(b.primary))??9999));
   document.getElementById("quickOrderList").innerHTML = metas.length ? metas.map((meta,index)=>`<div class="order-row"><span class="order-row-name">${escapeHtml(meta.label || meta.primary)}</span><div class="order-row-actions"><button type="button" class="order-btn order-btn-edit" onclick="renameQuickOrderItem(${index})" title="Sửa tên">✏️</button><button type="button" class="order-btn" ${index===0?'disabled':''} onclick="moveQuickOrder(${index},-1)" title="Đưa lên">↑</button><button type="button" class="order-btn" ${index===metas.length-1?'disabled':''} onclick="moveQuickOrder(${index},1)" title="Đưa xuống">↓</button><button type="button" class="order-btn order-btn-delete" onclick="deleteQuickOrderItem(${index})" title="Xóa mục này">🗑️</button></div></div>`).join("") : '<div style="padding:14px 4px;color:#888;font-size:12px;text-align:center">Chưa có mục bộ lọc nhanh.</div>';
   QUICK_ORDER[key] = metas.map(meta=>meta.primary);
 }
@@ -3138,8 +3140,8 @@ async function deleteQuickOrderItem(itemIndex){
   const key = quickOrderKey(group);
   const catalog = getQuickFixedCatalog(group);
   const order = QUICK_ORDER[key] || catalog.map(meta=>meta.primary);
-  const rank = new Map(order.map((value,index)=>[value,index]));
-  const metas = [...catalog].sort((a,b)=>(rank.get(a.primary)??9999)-(rank.get(b.primary)??9999));
+  const rank = new Map(order.map((value,index)=>[normalizeQuickText(value),index]));
+  const metas = [...catalog].sort((a,b)=>(rank.get(normalizeQuickText(a.primary))??9999)-(rank.get(normalizeQuickText(b.primary))??9999));
   const meta = metas[itemIndex];
   if(!meta) return;
   const value = meta.primary;
@@ -3162,8 +3164,8 @@ async function renameQuickOrderItem(itemIndex){
   const group = document.getElementById("quickOrderGroup").value;
   const key = quickOrderKey(group), catalog = getQuickFixedCatalog(group);
   const order = QUICK_ORDER[key] || catalog.map(meta=>meta.primary);
-  const rank = new Map(order.map((value,index)=>[value,index]));
-  const metas = [...catalog].sort((a,b)=>(rank.get(a.primary)??9999)-(rank.get(b.primary)??9999));
+  const rank = new Map(order.map((value,index)=>[normalizeQuickText(value),index]));
+  const metas = [...catalog].sort((a,b)=>(rank.get(normalizeQuickText(a.primary))??9999)-(rank.get(normalizeQuickText(b.primary))??9999));
   const oldValue = metas[itemIndex]?.primary;
   if(!oldValue) return;
   const newValue = cleanQuickLabel(prompt("Nhập tên bộ lọc mới:", oldValue));
@@ -3272,6 +3274,25 @@ function quickMetaLabel(meta){
   return meta.primary || "Khác";
 }
 
+function detectConfiguredCableQuickMeta(r, groupLabel){
+  const title = normalizeQuickText([r?.[2], r?.[3], r?.[7]].filter(Boolean).join(" "))
+    .replace(/display\s*port/g, "displayport")
+    .replace(/\bdp\b/g, "displayport")
+    .replace(/\b(type\s*c|usb\s*c)\b/g, "usbc");
+  if(!title) return null;
+  const ignored = new Set(["cap", "day", "chuyen", "doi", "to", "sang"]);
+  const matches = getQuickFixedCatalog(groupLabel).map(meta=>{
+    const normalized = normalizeQuickText(meta.primary)
+      .replace(/display\s*port/g, "displayport")
+      .replace(/\bdp\b/g, "displayport")
+      .replace(/\b(type\s*c|usb\s*c)\b/g, "usbc");
+    const tokens = [...new Set(normalized.split(/[^a-z0-9]+/).filter(token=>token && !ignored.has(token)))];
+    return {meta, tokens};
+  }).filter(item=>item.tokens.length >= 2 && item.tokens.every(token=>title.includes(token)));
+  matches.sort((a,b)=>b.tokens.length-a.tokens.length || b.meta.primary.length-a.meta.primary.length);
+  return matches[0]?.meta || null;
+}
+
 function getQuickMetaCandidates(r, groupLabel){
   const resolvedGroupLabel = resolveQuickGroupLabelFromRow(r, groupLabel || r?.[8] || "");
   const groupNorm = normalizeQuickText(resolvedGroupLabel);
@@ -3280,6 +3301,10 @@ function getQuickMetaCandidates(r, groupLabel){
   if(manualTags.length){
     const manualMetas = manualTags.map(tag=>makeQuickMeta(groupKind, tag, "", tag)).filter(Boolean);
     if(manualMetas.length) return manualMetas;
+  }
+  if(groupKind === "cable"){
+    const configuredCableMeta = detectConfiguredCableQuickMeta(r, resolvedGroupLabel);
+    if(configuredCableMeta) return [configuredCableMeta];
   }
   const text = [r?.[2], r?.[3]].filter(Boolean).join(" ");
   const metas = [];
