@@ -1979,6 +1979,33 @@ function normalizeSheetRows(rows){
   }).filter(r=>r[1] && r[2]);
 }
 
+function canonicalInventoryJson(rows){
+  return JSON.stringify(normalizeSheetRows(rows).sort((a,b)=>{
+    const aKey = `${a[13]||"Q2"}|${normalizeProductCode(a[1])}`;
+    const bKey = `${b[13]||"Q2"}|${normalizeProductCode(b[1])}`;
+    return aKey.localeCompare(bKey,"vi",{numeric:true});
+  }));
+}
+
+async function replaceAllInventoryRows(snapshot){
+  try{
+    const result = await postSheet("replace_all", {rows:snapshot,baseFingerprint:SERVER_DATA_FINGERPRINT});
+    if(result.fingerprint) SERVER_DATA_FINGERPRINT = result.fingerprint;
+    return result;
+  }catch(e){
+    if(!String(e).includes("SYNC_CONFLICT")) throw e;
+    // Chỉ tự xử lý khi dữ liệu hai bên THỰC SỰ giống nhau. Không tự ghi đè
+    // nếu Sheet có thay đổi nội dung từ một thiết bị khác.
+    const latest = await fetchSheetJson(sheetUrl({type:"data",_ts:Date.now()}),{},35000);
+    if(!Array.isArray(latest.data)) throw e;
+    SERVER_DATA_FINGERPRINT = String(latest.fingerprint || "");
+    if(canonicalInventoryJson(snapshot) === canonicalInventoryJson(latest.data)){
+      return {ok:true,noop:true,fingerprint:SERVER_DATA_FINGERPRINT};
+    }
+    throw new Error("SYNC_CONFLICT: Kho trên Sheet có thay đổi nội dung khác với máy này. Dữ liệu trên máy vẫn được giữ; hãy kiểm tra thiết bị vừa chỉnh sửa trước khi quyết định đồng bộ lại.");
+  }
+}
+
 async function fetchSheetJson(url, options={}, timeoutMs=SHEET_TIMEOUT_MS){
   const ctrl = new AbortController();
   const timer = setTimeout(()=>ctrl.abort(), timeoutMs);
@@ -2139,8 +2166,7 @@ async function pushToSheet(){
   const validationIssues = validateInventoryRows(DATA);
   if(validationIssues.length) throw new Error(inventoryValidationMessage(validationIssues,"Không thể đẩy dữ liệu"));
   const safeData = normalizeSheetRows(DATA);
-  const result=await postSheet("replace_all", {rows:safeData,baseFingerprint:SERVER_DATA_FINGERPRINT});
-  if(result.fingerprint) SERVER_DATA_FINGERPRINT=result.fingerprint;
+  await replaceAllInventoryRows(safeData);
 }
 
 async function saveData(){
@@ -2163,8 +2189,7 @@ async function saveData(){
   dataSaveChain = dataSaveChain.then(async ()=>{
     setSyncBadge("syncing");
     try{
-      const result=await postSheet("replace_all", {rows:snapshot,baseFingerprint:SERVER_DATA_FINGERPRINT});
-      if(result.fingerprint) SERVER_DATA_FINGERPRINT=result.fingerprint;
+      await replaceAllInventoryRows(snapshot);
       if(seq === dataSaveSeq){
         setSyncBadge("synced"); markLastSync();
         setPendingSync(false);
@@ -2181,8 +2206,7 @@ async function saveData(){
   }, async ()=>{
     setSyncBadge("syncing");
     try{
-      const result=await postSheet("replace_all", {rows:snapshot,baseFingerprint:SERVER_DATA_FINGERPRINT});
-      if(result.fingerprint) SERVER_DATA_FINGERPRINT=result.fingerprint;
+      await replaceAllInventoryRows(snapshot);
       if(seq === dataSaveSeq){
         setSyncBadge("synced"); markLastSync();
         setPendingSync(false);
