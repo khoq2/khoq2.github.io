@@ -15,6 +15,23 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html { -webkit-text-size-adjust:100%; text-size-adjust:100%; }
 body { font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif; background: #F2F3F4; color: #1a1a1a; }
+/* Con trỏ thống nhất: nhìn là biết vùng nào có thể thao tác. */
+html, body { cursor: default; }
+button:not(:disabled), a[href], label[for], select, summary,
+[role="button"], [onclick], .card[data-index], .product-list-row,
+.tab-btn, .filter-btn, .quick-nav-btn, .smart-chip, .overview-chip { cursor: pointer; }
+input[type="text"], input[type="search"], input[type="number"], input[type="url"],
+input[type="email"], input[type="password"], textarea { cursor: text; }
+input[type="checkbox"], input[type="radio"], input[type="file"] { cursor: pointer; }
+button:disabled, input:disabled, select:disabled, [aria-disabled="true"] { cursor: not-allowed !important; }
+.prod-img, .tx-img, .customer-bill-img, .nv-avatar.has-preview { cursor: zoom-in; }
+.image-lightbox { cursor: zoom-out; }
+.image-lightbox img { cursor: grab; }
+.image-lightbox img:active { cursor: grabbing; }
+.product-name-row { cursor: copy; }
+/* Vòng màu theo chuột, mô phỏng con trỏ khi trợ lý đang thao tác. */
+.cursor-halo,.cursor-dot,.cursor-click-wave { display:none !important; }
+html,body,body * { cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='26' height='32' viewBox='0 0 26 32'%3E%3Cdefs%3E%3Cfilter id='blur' x='-70%25' y='-70%25' width='240%25' height='240%25'%3E%3CfeGaussianBlur stdDeviation='2.2'/%3E%3C/filter%3E%3C/defs%3E%3Cg transform='translate(4 3)'%3E%3Cpath d='M1 1L16 15.5 10.5 16.7 14 22 11.4 23 8 17.6 3 22Z' fill='none' stroke='%235DADE2' stroke-width='5' stroke-linejoin='round' opacity='.75' filter='url(%23blur)'/%3E%3Cpath d='M1 1L16 15.5 10.5 16.7 14 22 11.4 23 8 17.6 3 22Z' fill='none' stroke='%2300C8FF' stroke-width='3.2' stroke-linejoin='round' opacity='.48'/%3E%3Cpath d='M1 1L16 15.5 10.5 16.7 14 22 11.4 23 8 17.6 3 22Z' fill='%231E3A5F' stroke='%2388E2FF' stroke-width='1.35' stroke-linejoin='round'/%3E%3Cpath d='M2.4 3.2L12.9 14.1 8.5 15 11.6 20.2' fill='none' stroke='white' stroke-width='.85' stroke-linecap='round'/%3E%3C/g%3E%3C/svg%3E") 5 4,auto !important; }
 .sticky { position: sticky; top: 0; z-index: 100; }
 .header { background: #1E3A5F; color: #fff; padding: 12px 14px 10px; box-shadow: 0 2px 8px rgba(0,0,0,.3); }
 .title { position: relative; display: flex; align-items: center; gap: 6px; width: 100%; max-width: 100%; font-size: clamp(12px, 3.8vw, 16px); font-weight: bold; margin-bottom: 8px; color: #fff; line-height: 1.2; overflow: visible; }
@@ -49,8 +66,7 @@ body { font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif
 .kpi-v { font-size: 13px; font-weight: bold; color: #fff; }
 .kpi-l { font-size: 9px; color: rgba(255,255,255,.85); }
 .kpi-icon { display:inline-block; margin-right:3px; transform-origin:center; will-change:transform,filter,opacity; }
-.kpi-icon-box { animation:kpiBoxFloat 1.35s ease-in-out infinite; }
-.kpi-icon-stock { animation:kpiStockPulse 1.15s ease-in-out infinite .12s; }
+.kpi-icon-box,.kpi-icon-stock { animation:none; transform:none; filter:none; will-change:auto; }
 .kpi-icon-out { animation:kpiRedBlink 1.15s ease-in-out infinite .15s; }
 .kpi-icon-low { animation:kpiYellowBlink 1.15s ease-in-out infinite .48s; }
 @keyframes kpiBoxFloat { 0%,100% { transform:translateY(1px) rotate(-5deg) scale(1); filter:drop-shadow(0 0 0 rgba(255,255,255,0)); } 50% { transform:translateY(-2px) rotate(5deg) scale(1.16); filter:drop-shadow(0 0 3px rgba(255,255,255,.8)); } }
@@ -95,6 +111,17 @@ body { font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif
 @keyframes searchFloat { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-7px); } }
 .empty-title { font-size: 15px; font-weight: bold; color: #555; margin-bottom: 6px; }
 .empty-sub { font-size: 13px; }
+.search-landing { position:relative; max-width:560px; margin:20px auto; padding:34px 20px 28px; background:transparent; color:#64748B; }
+.search-landing-icon { position:relative; width:64px; height:64px; margin:0 auto 18px; display:grid; place-items:center; border-radius:50%; color:#fff; background:linear-gradient(145deg,#2E86C1,#1E3A5F); box-shadow:0 0 0 7px rgba(46,134,193,.08),0 10px 24px rgba(30,58,95,.22); animation:searchBreathe 2.4s ease-in-out infinite; }
+.search-landing-icon svg { width:29px; height:29px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; }
+.search-landing-icon::after { content:""; position:absolute; width:7px; height:7px; border-radius:50%; background:#F5B041; box-shadow:0 0 9px rgba(245,176,65,.78); animation:searchOrbit 2.6s linear infinite; }
+.search-landing .empty-title { font-size:18px; color:#1E3A5F; margin-bottom:8px; }
+.search-examples { margin-top:18px; display:flex; justify-content:center; gap:8px; flex-wrap:wrap; }
+.search-example { padding:6px 11px; border:1px solid rgba(46,134,193,.26); border-radius:9px; background:#fff; color:#1A5276; font:inherit; font-size:11px; font-weight:800; box-shadow:0 3px 8px rgba(30,58,95,.07); cursor:pointer; }
+.search-example:hover { border-color:#2E86C1; color:#1E3A5F; transform:translateY(-1px); box-shadow:0 5px 12px rgba(30,58,95,.12); }
+.search-example:active { transform:scale(.96); }
+@keyframes searchBreathe { 0%,100%{transform:translateY(0);box-shadow:0 0 0 7px rgba(46,134,193,.08),0 10px 24px rgba(30,58,95,.22)} 50%{transform:translateY(-3px);box-shadow:0 0 0 10px rgba(46,134,193,.05),0 14px 28px rgba(30,58,95,.26)} }
+@keyframes searchOrbit { from{transform:rotate(0deg) translateX(40px) rotate(0deg)} to{transform:rotate(360deg) translateX(40px) rotate(-360deg)} }
 .card { background: #fff; border-radius: 12px; margin-bottom: 8px; overflow: hidden; border: 1.5px solid #E8E8E8; box-shadow: 0 1px 4px rgba(0,0,0,.06); }
 .card.het { border-color: #F1948A; }
 .card.sap { border-color: #F9E79F; }
@@ -102,7 +129,10 @@ body { font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif
 .card-top-left { display: flex; align-items: center; gap: 6px; min-width: 0; flex-wrap: wrap; }
 .sheet-badge { background: var(--c); color: #fff; font-size: 10px; font-weight: bold; padding: 2px 7px; border-radius: 6px; margin-right: 6px; }
 .ma-code { font-size: 11px; color: #666; font-weight: bold; }
-.btn-copy-code { border: 1px solid rgba(30,58,95,.16); background: rgba(255,255,255,.72); color: #1E3A5F; width: 28px; height: 28px; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; box-shadow: 0 1px 2px rgba(30,58,95,.08), inset 0 1px 0 rgba(255,255,255,.9); transition: background .18s ease, border-color .18s ease, color .18s ease, box-shadow .18s ease, transform .18s ease; }
+.btn-copy-code { display:none!important; }
+.ma-code.copy-code { cursor:copy; padding:3px 7px; border-radius:7px; transition:background .16s ease,color .16s ease,box-shadow .16s ease; user-select:none; }
+.ma-code.copy-code:hover { background:rgba(255,255,255,.88); color:#154360; box-shadow:0 1px 5px rgba(30,58,95,.16); }
+.ma-code.copy-code:active { transform:scale(.98); }
 .btn-copy-code:hover { background: #fff; border-color: rgba(30,58,95,.38); box-shadow: 0 3px 8px rgba(30,58,95,.14); transform: translateY(-1px); }
 .btn-copy-code svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
 .btn-copy-code .copy-check { opacity: 0; transform: scale(.75); transform-origin: center; transition: opacity .16s ease, transform .16s ease; }
@@ -229,7 +259,9 @@ mark.kw-hit { background: #FFEB3B; color: #1A1A1A; padding: 0 1px; border-radius
 .view-mode-btn:last-child.active { background:linear-gradient(145deg,#F39C12,#A04000); box-shadow:0 0 0 3px rgba(243,156,18,.17),0 6px 14px rgba(160,64,0,.25),inset 0 1px 0 rgba(255,255,255,.3); }
 .product-list-row { width:100%; min-height:52px; display:flex; align-items:center; gap:10px; margin:7px 0; padding:9px 11px; border:1.5px solid #C9D6E2; border-left:5px solid var(--list-color,#1E3A5F); border-radius:11px; background:#fff; box-shadow:0 2px 6px rgba(30,58,95,.08); color:#243B53; text-align:left; cursor:pointer; }
 .product-list-row:active { transform:scale(.992); background:#F2F7FA; }
-.product-list-title { flex:1; min-width:0; font-size:13px; font-weight:900; line-height:1.35; overflow-wrap:anywhere; }
+.product-list-main { flex:1; min-width:0; display:flex; flex-direction:column; gap:3px; }
+.product-list-title { min-width:0; font-size:13px; font-weight:900; line-height:1.35; overflow-wrap:anywhere; }
+.product-list-meta { color:#66788A; font-size:10px; font-weight:750; line-height:1.25; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .product-list-stock { flex:0 0 auto; padding:5px 8px; border-radius:8px; font-size:11px; font-weight:950; white-space:nowrap; }
 .product-list-stock.con { background:#D5F5E3; color:#1E8449; }
 .product-list-stock.sap { background:#FEF3CD; color:#8A6700; }
@@ -317,11 +349,15 @@ mark.kw-hit { background: #FFEB3B; color: #1A1A1A; padding: 0 1px; border-radius
 .image-lightbox-next { right:max(12px,env(safe-area-inset-right)); }
 .image-lightbox-count { display:none; position:absolute; left:50%; bottom:max(14px,env(safe-area-inset-bottom)); transform:translateX(-50%); padding:6px 11px; border-radius:999px; background:rgba(0,0,0,.48); color:#fff; font-size:12px; font-weight:850; }
 .image-lightbox-count.show { display:block; }
+.image-lightbox-save { display:none; position:absolute; z-index:12; top:max(14px,env(safe-area-inset-top)); left:max(14px,env(safe-area-inset-left)); min-height:42px; padding:8px 13px; border:1.5px solid rgba(255,255,255,.9); border-radius:999px; background:rgba(30,58,95,.9); color:#fff; font-size:12px; font-weight:900; cursor:pointer; touch-action:manipulation; box-shadow:0 5px 18px rgba(0,0,0,.42); backdrop-filter:blur(8px); }
+.image-lightbox-save.show { display:inline-flex; align-items:center; justify-content:center; gap:5px; animation:imageSaveAppear .18s ease-out; }
+#imageLightboxSave { position:absolute !important; width:auto !important; min-width:92px; max-width:calc(100vw - 28px); overflow:hidden; }
+@keyframes imageSaveAppear { from{opacity:0;transform:translateY(-5px) scale(.94)} to{opacity:1;transform:none} }
 .group-checkboxes { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:7px; max-height:190px; overflow-y:auto; padding:9px; border:1.5px solid #ddd; border-radius:10px; background:#fafafa; }
 .group-check { display:flex; align-items:flex-start; gap:6px; padding:6px; border-radius:7px; font-size:12px; line-height:1.3; cursor:pointer; }
 .group-check:has(input:checked) { background:#EAF2F8; color:#1A5276; font-weight:bold; }
 .group-check input { width:auto!important; margin:2px 0 0; accent-color:#1A5276; flex-shrink:0; }
-@media (max-width:480px){ .group-checkboxes { grid-template-columns:1fr; max-height:180px; } .image-lightbox { padding:calc(66px + env(safe-area-inset-top)) 10px calc(12px + env(safe-area-inset-bottom)); } .image-lightbox img { max-height:calc(100dvh - 78px - env(safe-area-inset-top) - env(safe-area-inset-bottom)); border-radius:7px; } .image-lightbox-close { top:calc(10px + env(safe-area-inset-top)); right:calc(10px + env(safe-area-inset-right)); } }
+@media (max-width:480px){ .group-checkboxes { grid-template-columns:1fr; max-height:180px; } .image-lightbox { padding:calc(66px + env(safe-area-inset-top)) 10px calc(12px + env(safe-area-inset-bottom)); } .image-lightbox img { max-height:calc(100dvh - 78px - env(safe-area-inset-top) - env(safe-area-inset-bottom)); border-radius:7px; } .image-lightbox-close { top:calc(10px + env(safe-area-inset-top)); right:calc(10px + env(safe-area-inset-right)); } .image-lightbox-save { top:calc(10px + env(safe-area-inset-top)); left:calc(10px + env(safe-area-inset-left)); min-height:44px; } }
 @media (max-width:480px) {
   .image-lightbox-close { display:none; }
   .fab-wrap { left:max(8px,env(safe-area-inset-left)); right:max(8px,env(safe-area-inset-right)); bottom:max(10px,calc(env(safe-area-inset-bottom) + 8px)); width:auto; align-items:stretch; }
@@ -330,6 +366,8 @@ mark.kw-hit { background: #FFEB3B; color: #1A1A1A; padding: 0 1px; border-radius
   #fabMenuItems .fab { width:100%; min-width:0; min-height:46px; justify-content:center; border-radius:12px; padding:9px 8px; font-size:12px; line-height:1.25; text-align:center; white-space:normal; overflow-wrap:anywhere; }
   #fabToggleBtn { align-self:flex-end; max-width:calc(100vw - 24px); }
   .modal { max-height:94dvh; padding:16px 12px max(26px,calc(env(safe-area-inset-bottom) + 16px)); }
+  .modal input:not([type="checkbox"]):not([type="radio"]),.modal select,.modal textarea { min-height:44px; font-size:16px; }
+  #customerOverlay select { min-height:44px !important; }
   #editOverlay .modal { width:100%; max-height:calc(100dvh - env(safe-area-inset-top)); padding:14px 12px max(22px,calc(env(safe-area-inset-bottom) + 12px)); }
   #editOverlay .modal-title { font-size:18px; margin-bottom:12px; }
   #editOverlay .form-row { margin-bottom:9px; }
@@ -417,6 +455,9 @@ body.admin-mode .admin-only { display: flex!important; }
 .sync-error-copy { background:#1E8449; color:#fff; }
 .sync-error-clear { background:#F4F6F7; color:#922B21; }
 .admin-btn { background: rgba(255,255,255,.15); color: #fff; border: 1.5px solid rgba(255,255,255,.4); border-radius: 8px; padding: 4px 10px; font-size: 11px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 4px; opacity: 0; transition: opacity .3s; }
+#syncBtn { width:18px; height:18px; flex:0 0 18px; justify-content:center; padding:0; border:0 !important; border-radius:0; background:transparent !important; color:#fff !important; box-shadow:none !important; font-size:10px; line-height:1; }
+#syncBtn:hover,#syncBtn:active { background:transparent !important; color:#fff !important; box-shadow:none !important; transform:none !important; }
+#syncBtn svg { width:13px; height:13px; display:block; fill:none; stroke:currentColor; stroke-width:2.2; stroke-linecap:round; stroke-linejoin:round; }
 #adminBtn { display: none; }
 body.admin-entry-visible #adminBtn, body.admin-mode #adminBtn { display: flex; }
 body.admin-entry-visible #adminBtn { opacity: 1; }
@@ -453,6 +494,9 @@ body.fab-menu-open .scroll-btns { opacity: 0; transform: translateX(18px); point
 .progress-bar-fill { height: 100%; border-radius: 20px; background: linear-gradient(90deg,#2E86C1,#1E8449); transition: width .25s ease; }
 .progress-pct { font-size: 20px; font-weight: bold; color: #1E3A5F; margin-bottom: 4px; }
 .progress-step { font-size: 12px; color: #888; }
+.loading-wrap { max-width:420px; background:transparent; border:0; box-shadow:none; }
+.loading-icon { width:84px; height:84px; background:linear-gradient(145deg,#fff,#EDF6FC); box-shadow:0 0 0 7px rgba(46,134,193,.06),0 12px 28px rgba(30,58,95,.16); }
+.loading-title { color:#1E3A5F; font-size:16px; }
 .cat-title { font-size: 15px; font-weight: bold; color: #fff; background: var(--c,#1E3A5F); padding: 10px 14px; border-radius: 10px; margin-bottom: 8px; }
 .quick-nav-wrap { margin-bottom: 6px; }
 .quick-nav { display: flex; gap: 6px; flex-wrap: wrap; padding: 2px 0 10px; margin-bottom: 0; border-bottom: 1.5px dashed #D7DBDD; }
@@ -631,6 +675,9 @@ body.fab-menu-open .scroll-btns { opacity: 0; transform: translateX(18px); point
   .admin-bar { flex-wrap: wrap; justify-content: flex-start; }
   .sync-badge { margin-right: 0; }
   #lastSyncText { margin-right: auto; }
+  #syncBtn { width:28px; height:28px; flex-basis:28px; }
+  .search-landing { padding:28px 12px 24px; }
+  .search-example { min-height:38px; padding:8px 12px; }
   .filters { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
   .tabs { overflow-x: visible; width: 100%; }
   .tab-btn { flex: 1 1 20%; min-width: 0; padding: 9px 2px; font-size: 10px; text-align: center; }
@@ -967,14 +1014,15 @@ html::-webkit-scrollbar-corner { background: #EAF2F8; }
 </style>
 </head>
 <body>
+<div class="cursor-halo" aria-hidden="true"></div><div class="cursor-dot" aria-hidden="true"></div>
 
 <div class="sticky">
 <div class="header-collapsible">
   <div class="header">
     <div class="admin-bar">
-      <span class="sync-badge" id="syncBadge" role="button" tabindex="0" title="Bấm để xem lỗi đồng bộ gần nhất" onclick="openSyncErrorLog()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openSyncErrorLog();}">💾 Lưu trên máy</span>
+      <span class="sync-badge" id="syncBadge" role="button" tabindex="0" aria-label="Trạng thái đồng bộ" title="Trạng thái đồng bộ" onclick="handleSyncBadgeActivation()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();handleSyncBadgeActivation();}">💾 Lưu trên máy</span>
       <span id="lastSyncText" style="font-size:10px;color:#718096"></span>
-      <button class="admin-btn admin-only" id="syncBtn" onclick="manualSync()">🔄 Đẩy lên Sheet</button>
+      <button class="admin-btn admin-only" id="syncBtn" type="button" title="Đồng bộ thủ công lên Google Sheet" aria-label="Đồng bộ thủ công lên Google Sheet" onclick="manualSync()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7h-5V2"></path><path d="M4 17h5v5"></path><path d="M5.2 9A8 8 0 0 1 18.5 5.5L20 7"></path><path d="M18.8 15A8 8 0 0 1 5.5 18.5L4 17"></path></svg></button>
       <button class="admin-btn" id="adminBtn" onclick="onAdminBtnClick()">🔒 Admin</button>
     </div>
     <div class="title"><span class="title-icon">🏪</span><span class="title-text"><span class="title-base">KHO Q2 (HOÀNG GIA COMPUTER)</span><span class="title-shine" aria-hidden="true"></span></span></div>
@@ -1407,6 +1455,7 @@ html::-webkit-scrollbar-corner { background: #EAF2F8; }
 <div class="toast" id="toast"></div>
 
 <div id="imageLightbox" class="image-lightbox" role="dialog" aria-modal="true" aria-label="Xem ảnh phóng to" onclick="closeImageViewer(event)">
+  <button type="button" id="imageLightboxSave" class="image-lightbox-save" aria-label="Lưu ảnh đang xem" onclick="event.stopPropagation();saveCurrentViewerImage()">⬇ Lưu ảnh</button>
   <button type="button" class="image-lightbox-close" aria-label="Đóng ảnh" onclick="closeImageViewer()">×</button>
   <button type="button" id="imageLightboxPrev" class="image-lightbox-nav image-lightbox-prev" aria-label="Ảnh trước" onclick="event.stopPropagation();navigateCustomerGallery(-1)">‹</button>
   <img id="imageLightboxImg" src="" alt="Ảnh phóng to" referrerpolicy="no-referrer" onclick="onLightboxImageClick(event)">
@@ -1438,6 +1487,7 @@ html::-webkit-scrollbar-corner { background: #EAF2F8; }
   <div class="modal" onclick="event.stopPropagation()">
     <div class="modal-title">↕️ Sắp xếp bộ lọc nhanh</div>
     <div class="form-row"><label>Nhóm sản phẩm</label><select id="quickOrderGroup" onchange="renderQuickOrderList()"></select></div>
+    <div class="form-row"><label>Thêm bộ lọc mới</label><div style="display:flex;gap:8px"><input id="quickOrderNewItem" type="text" placeholder="VD: 1200W" onkeydown="if(event.key==='Enter'){event.preventDefault();addQuickOrderItem();}"><button type="button" class="btn-img-pick" style="white-space:nowrap" onclick="addQuickOrderItem()">＋ Thêm</button></div></div>
     <div id="quickOrderList" class="order-list"></div>
     <div style="font-size:11px;color:#777;margin:10px 0;line-height:1.45;">Dùng ↑ ↓ để đổi thứ tự hoặc Xóa mục không cần dùng. Nút khôi phục mặc định sẽ hiện lại các mục cố định đã xóa.</div>
     <button class="btn-cancel" onclick="resetQuickOrderForGroup()">Khôi phục thứ tự mặc định</button>
@@ -1471,7 +1521,7 @@ html::-webkit-scrollbar-corner { background: #EAF2F8; }
 // ====== Tự động dọn banner/overlay lạ do hosting chèn vào ======
 (function(){
   const APP_IDS = new Set(["results","editOverlay","importOverlay","adminOverlay","toast","imageLightbox"]);
-  const APP_CLASSES = ["sticky","fab-wrap","overlay","toast","image-lightbox"];
+  const APP_CLASSES = ["sticky","fab-wrap","overlay","toast","image-lightbox","cursor-halo","cursor-dot","cursor-click-wave"];
   function isAppEl(el){
     if(el.id && APP_IDS.has(el.id)) return true;
     if(el.classList){
@@ -1729,6 +1779,26 @@ let currentBranch = "ALL";
 let restockOnly = false;
 let totalStockView = false;
 let searchQ = "";
+const SEARCH_KEYWORD_POOL = ["SSD","RAM","Nguồn","Mainboard","CPU","HP","Canon","Camera wifi","Laptop","Màn hình","Chuột","Bàn phím","Router","Switch","HDMI","Máy in"];
+let SEARCH_KEYWORDS_THIS_VISIT = [];
+function getSearchKeywordsForVisit(){
+  if(SEARCH_KEYWORDS_THIS_VISIT.length) return SEARCH_KEYWORDS_THIS_VISIT;
+  const validPool = SEARCH_KEYWORD_POOL.filter(keyword=>{
+    const tokens = removeAccents(keyword).split(/\s+/).filter(Boolean);
+    return DATA.some(r=>{
+      const hay = removeAccents((r[1]||"")+" "+(r[2]||"")+" "+(r[3]||"")+" "+(r[7]||""));
+      return tokens.every(token=>hay.includes(token));
+    });
+  });
+  const brands = [...new Set(DATA.map(r=>String(r[3]||"").trim()).filter(brand=>brand && brand.length<=18 && !/không thương hiệu/i.test(brand)))];
+  const items = [...new Set([...validPool,...brands])];
+  for(let i=items.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [items[i],items[j]] = [items[j],items[i]];
+  }
+  SEARCH_KEYWORDS_THIS_VISIT = items.slice(0,4);
+  return SEARCH_KEYWORDS_THIS_VISIT;
+}
 let quickGroupFilter = null;
 let productViewMode = "card";
 let importRows = [];
@@ -1845,7 +1915,7 @@ function checkAdminSession(){
 
 // Dòng URL duy nhất
 const SHEET_API_URL = "https://script.google.com/macros/s/AKfycby6YH69F7sfO1ZoUJsDm4BeX6Luj2GrhUfYWWJWNvqjraAEhkBck16EphrPBBm1BT3YqA/exec";
-const REQUIRED_API_VERSION = "2026.07.16-safe-sync-12";
+const REQUIRED_API_VERSION = "2026.07.16-safe-sync-13";
 const SHEET_TIMEOUT_MS = 12000;
 const PENDING_SYNC_KEY = "kho_cntt_pending_sync";
 const PENDING_BASE_FINGERPRINT_KEY = "kho_cntt_pending_base_fingerprint";
@@ -1899,6 +1969,22 @@ function openSyncErrorLog(){
   if(text) text.value = getSyncErrorText();
   document.getElementById("syncErrorOverlay")?.classList.add("open");
 }
+let syncBadgeActivationCount = 0;
+let syncBadgeActivationTimer = null;
+function handleSyncBadgeActivation(){
+  syncBadgeActivationCount += 1;
+  clearTimeout(syncBadgeActivationTimer);
+  if(syncBadgeActivationCount >= 3){
+    syncBadgeActivationCount = 0;
+    syncBadgeActivationTimer = null;
+    openSyncErrorLog();
+    return;
+  }
+  syncBadgeActivationTimer = setTimeout(()=>{
+    syncBadgeActivationCount = 0;
+    syncBadgeActivationTimer = null;
+  }, 6000);
+}
 function closeSyncErrorLog(){ document.getElementById("syncErrorOverlay")?.classList.remove("open"); }
 async function copySyncErrorLog(){
   const text = getSyncErrorText();
@@ -1922,7 +2008,7 @@ function clearSyncErrorLog(){
 function setSyncBadge(state, detail){
   const el = document.getElementById("syncBadge");
   if(state === "error") recordSyncError(detail);
-  el.title = state === "error" ? "Có lỗi đồng bộ — bấm để xem và sao chép" : "Bấm để xem lỗi đồng bộ gần nhất";
+  el.title = state === "error" ? "Có lỗi đồng bộ" : "Trạng thái đồng bộ";
   if(!SHEET_API_URL){ el.textContent = "💾 Lưu trên máy này"; return; }
   switch(state){
 case "loading":
@@ -2369,6 +2455,15 @@ function renderKpiProductLinks(entries, compactStock=false){
 function toggleKpiCategory(listId, button){
   const list = document.getElementById(listId);
   if(!list) return;
+  const willOpen = !list.classList.contains("open");
+  if(willOpen){
+    document.querySelectorAll("#kpiModalBody .kpi-product-list.open").forEach(other=>other.classList.remove("open"));
+    document.querySelectorAll("#kpiModalBody .kpi-category-toggle").forEach(otherButton=>{
+      otherButton.setAttribute("aria-expanded","false");
+      const otherMark = otherButton.querySelector(".kpi-expand-mark");
+      if(otherMark) otherMark.textContent = "+";
+    });
+  }
   const isOpen = list.classList.toggle("open");
   const mark = button?.querySelector(".kpi-expand-mark");
   if(mark) mark.textContent = isOpen ? "−" : "+";
@@ -2394,6 +2489,7 @@ function showKpiDetail(type){
       const entries = DATA.map((r,i)=>({r,i})).filter(item=>item.r[0]===sh);
       const c = cfg[sh];
       const totalStock = entries.reduce((sum,item)=>sum + (Number(item.r[5]) || 0), 0);
+      if(type === "all" ? entries.length === 0 : totalStock === 0) return "";
       const value = type === "all" ? `${entries.length} mặt hàng` : `${totalStock.toLocaleString("vi-VN")} tồn`;
       const listId = `kpi-${type}-${sh}`;
       return `<div class="kpi-category"><button type="button" class="kpi-category-toggle" onclick="toggleKpiCategory('${listId}',this)" aria-expanded="false">
@@ -2410,6 +2506,7 @@ function showKpiDetail(type){
     }else{
       html = shOrder.map(sh=>{
         const categoryEntries = entries.filter(item=>item.r[0]===sh);
+        if(!categoryEntries.length) return "";
         const c = cfg[sh];
         const listId = `kpi-${type}-${sh}`;
         return `<div class="kpi-category"><button type="button" class="kpi-category-toggle" onclick="toggleKpiCategory('${listId}',this)" aria-expanded="false">
@@ -3315,6 +3412,30 @@ function renderQuickOrderList(){
   document.getElementById("quickOrderList").innerHTML = metas.length ? metas.map((meta,index)=>`<div class="order-row"><span class="order-row-name">${escapeHtml(meta.label || meta.primary)}</span><div class="order-row-actions"><button type="button" class="order-btn order-btn-edit" onclick="renameQuickOrderItem(${index})" title="Sửa tên">✏️</button><button type="button" class="order-btn" ${index===0?'disabled':''} onclick="moveQuickOrder(${index},-1)" title="Đưa lên">↑</button><button type="button" class="order-btn" ${index===metas.length-1?'disabled':''} onclick="moveQuickOrder(${index},1)" title="Đưa xuống">↓</button><button type="button" class="order-btn order-btn-delete" onclick="deleteQuickOrderItem(${index})" title="Xóa mục này">🗑️</button></div></div>`).join("") : '<div style="padding:14px 4px;color:#888;font-size:12px;text-align:center">Chưa có mục bộ lọc nhanh.</div>';
   QUICK_ORDER[key] = metas.map(meta=>meta.primary);
 }
+async function addQuickOrderItem(){
+  if(!requireAdmin()) return;
+  const group = document.getElementById("quickOrderGroup").value;
+  const input = document.getElementById("quickOrderNewItem");
+  const value = cleanQuickLabel(input?.value || "");
+  if(!group || !value){ showToast("⚠️ Nhập tên bộ lọc mới"); input?.focus(); return; }
+  const key = quickOrderKey(group);
+  const catalog = getQuickFixedCatalog(group);
+  if(catalog.some(meta=>normalizeQuickText(meta.primary)===normalizeQuickText(value))){ showToast("Bộ lọc này đã tồn tại"); return; }
+  const custom = Array.isArray(QUICK_CUSTOM_TAGS[key]) ? QUICK_CUSTOM_TAGS[key] : [];
+  custom.push(value);
+  QUICK_CUSTOM_TAGS[key] = custom;
+  const hidden = Array.isArray(QUICK_HIDDEN_TAGS[key]) ? QUICK_HIDDEN_TAGS[key] : [];
+  QUICK_HIDDEN_TAGS[key] = hidden.filter(item=>normalizeQuickText(item)!==normalizeQuickText(value));
+  if(!QUICK_HIDDEN_TAGS[key].length) delete QUICK_HIDDEN_TAGS[key];
+  const order = Array.isArray(QUICK_ORDER[key]) ? QUICK_ORDER[key] : catalog.map(meta=>meta.primary);
+  if(!order.some(item=>normalizeQuickText(item)===normalizeQuickText(value))) order.push(value);
+  QUICK_ORDER[key] = order;
+  if(input) input.value = "";
+  renderQuickOrderList();
+  render();
+  const saved = await saveDisplayConfig();
+  showToast(saved ? `✅ Đã thêm và đồng bộ: ${value}` : `⚠️ Đã thêm trên máy, đang chờ đồng bộ: ${value}`, saved ? 2600 : 4500);
+}
 async function deleteQuickOrderItem(itemIndex){
   if(!requireAdmin()) return;
   const group = document.getElementById("quickOrderGroup").value;
@@ -3335,9 +3456,10 @@ async function deleteQuickOrderItem(itemIndex){
     QUICK_CUSTOM_TAGS[key] = QUICK_CUSTOM_TAGS[key].filter(item=>normalizeQuickText(item)!==normalizeQuickText(value));
     if(!QUICK_CUSTOM_TAGS[key].length) delete QUICK_CUSTOM_TAGS[key];
   }
-  const saved = await saveDisplayConfig();
+  // Cập nhật màn hình trước; không bắt người dùng chờ Apps Script phản hồi.
   renderQuickOrderList();
   render();
+  const saved = await saveDisplayConfig();
   showToast(saved ? `✅ Đã xóa và đồng bộ: ${value}` : `⚠️ Đã xóa trên máy, đang chờ đồng bộ: ${value}`, saved ? 2600 : 4500);
 }
 async function renameQuickOrderItem(itemIndex){
@@ -3353,9 +3475,37 @@ async function renameQuickOrderItem(itemIndex){
   if(!newValue || normalizeQuickText(newValue)===normalizeQuickText(oldValue)) return;
   const duplicate = metas.some((meta,index)=>index!==itemIndex && normalizeQuickText(meta.primary)===normalizeQuickText(newValue));
   if(duplicate){ alert("Tên bộ lọc này đã tồn tại!"); return; }
-  await postSheet("rename_quick_tag",{group,oldName:oldValue,newName:newValue},35000);
-  await Promise.all([loadData(),loadDisplayConfig()]);
-  renderQuickOrderList(); render(); showToast(`✅ Đã đổi tên thành: ${newValue}`);
+  const backup = {
+    data: JSON.parse(JSON.stringify(DATA)),
+    order: JSON.parse(JSON.stringify(QUICK_ORDER)),
+    custom: JSON.parse(JSON.stringify(QUICK_CUSTOM_TAGS)),
+    hidden: JSON.parse(JSON.stringify(QUICK_HIDDEN_TAGS))
+  };
+  const groupNorm = normalizeQuickText(group), oldNorm = normalizeQuickText(oldValue), newNorm = normalizeQuickText(newValue);
+  DATA.forEach(row=>{
+    if(!getRowGroups(row[8]).some(value=>normalizeQuickText(value)===groupNorm)) return;
+    row[11] = joinRowQuickTags(getRowQuickTags(row[11]).map(value=>normalizeQuickText(value)===oldNorm ? newValue : value));
+  });
+  QUICK_ORDER[key] = (QUICK_ORDER[key] || metas.map(meta=>meta.primary)).map(value=>normalizeQuickText(value)===oldNorm ? newValue : value);
+  const custom = Array.isArray(QUICK_CUSTOM_TAGS[key]) ? QUICK_CUSTOM_TAGS[key] : [];
+  QUICK_CUSTOM_TAGS[key] = custom.filter(value=>![oldNorm,newNorm].includes(normalizeQuickText(value))).concat([newValue]);
+  const hidden = Array.isArray(QUICK_HIDDEN_TAGS[key]) ? QUICK_HIDDEN_TAGS[key] : [];
+  if(!hidden.some(value=>normalizeQuickText(value)===oldNorm)) hidden.push(oldValue);
+  QUICK_HIDDEN_TAGS[key] = hidden;
+  renderQuickOrderList();
+  render();
+  try{
+    const result = await postSheet("rename_quick_tag",{group,oldName:oldValue,newName:newValue},35000);
+    if(result.fingerprint) SERVER_DATA_FINGERPRINT = result.fingerprint;
+    if(result.configFingerprint) SERVER_CONFIG_FINGERPRINT = result.configFingerprint;
+    saveDisplayConfig();
+    showToast(`✅ Đã đổi tên thành: ${newValue}`);
+  }catch(e){
+    DATA = backup.data; QUICK_ORDER = backup.order; QUICK_CUSTOM_TAGS = backup.custom; QUICK_HIDDEN_TAGS = backup.hidden;
+    renderQuickOrderList(); render();
+    setSyncBadge("error", String(e));
+    showToast("⚠️ Không đổi được tên trên máy chủ; giao diện đã hoàn tác. Bấm trạng thái đám mây để xem lỗi.",5000);
+  }
 }
 function moveQuickOrder(itemIndex, delta){
   const group = document.getElementById("quickOrderGroup").value;
@@ -3404,10 +3554,36 @@ async function renameGroupOrderItem(index){
   const newValue=String(prompt("Nhập tên nhóm mới:",oldValue) || "").trim();
   if(!newValue || groupOrderKey(newValue)===groupOrderKey(oldValue)) return;
   if(base.some(value=>groupOrderKey(value)===groupOrderKey(newValue))){ alert("Tên nhóm này đã tồn tại!"); return; }
-  await postSheet("rename_group",{tab,oldName:oldValue,newName:newValue,groupOptions:base},35000);
-  await Promise.all([loadData(),loadDisplayConfig()]);
-  openQuickOrderModalOptionsOnly();
-  renderGroupOrderList(); render(); showToast(`✅ Đã đổi tên nhóm thành: ${newValue}`);
+  const backup = {
+    data: JSON.parse(JSON.stringify(DATA)), groupOptions: JSON.parse(JSON.stringify(GROUP_OPTIONS)),
+    groupOrder: JSON.parse(JSON.stringify(GROUP_ORDER)), quickOrder: JSON.parse(JSON.stringify(QUICK_ORDER)),
+    custom: JSON.parse(JSON.stringify(QUICK_CUSTOM_TAGS)), hidden: JSON.parse(JSON.stringify(QUICK_HIDDEN_TAGS))
+  };
+  const oldKey=groupOrderKey(oldValue), newKey=groupOrderKey(newValue);
+  DATA.forEach(row=>{
+    if(String(row[0]||"").trim().toUpperCase()!==tab) return;
+    row[8]=joinRowGroups(getRowGroups(row[8]).map(value=>groupOrderKey(value)===oldKey ? newValue : value));
+  });
+  GROUP_OPTIONS[tab]=(GROUP_OPTIONS[tab]||[]).map(value=>groupOrderKey(value)===oldKey ? newValue : value);
+  GROUP_ORDER[tab]=(GROUP_ORDER[tab]||groups.map(groupOrderKey)).map(value=>value===oldKey ? newKey : value);
+  [QUICK_ORDER,QUICK_CUSTOM_TAGS,QUICK_HIDDEN_TAGS].forEach(store=>{
+    if(store[oldKey]!==undefined){ store[newKey]=store[oldKey]; delete store[oldKey]; }
+  });
+  if(quickGroupFilter && groupOrderKey(quickGroupFilter)===oldKey) quickGroupFilter=newValue;
+  openQuickOrderModalOptionsOnly(); renderGroupOrderList(); render();
+  try{
+    const result = await postSheet("rename_group",{tab,oldName:oldValue,newName:newValue,groupOptions:base},35000);
+    if(result.fingerprint) SERVER_DATA_FINGERPRINT = result.fingerprint;
+    if(result.configFingerprint) SERVER_CONFIG_FINGERPRINT = result.configFingerprint;
+    saveDisplayConfig();
+    showToast(`✅ Đã đổi tên nhóm thành: ${newValue}`);
+  }catch(e){
+    DATA=backup.data; GROUP_OPTIONS=backup.groupOptions; GROUP_ORDER=backup.groupOrder;
+    QUICK_ORDER=backup.quickOrder; QUICK_CUSTOM_TAGS=backup.custom; QUICK_HIDDEN_TAGS=backup.hidden;
+    openQuickOrderModalOptionsOnly(); renderGroupOrderList(); render();
+    setSyncBadge("error", String(e));
+    showToast("⚠️ Không đổi được nhóm trên máy chủ; giao diện đã hoàn tác. Bấm trạng thái đám mây để xem lỗi.",5000);
+  }
 }
 function openQuickOrderModalOptionsOnly(){
   const select=document.getElementById("quickOrderGroup");
@@ -3802,7 +3978,7 @@ function renderCard(r,i,displayNo){
   const stTxt=getStockStatusLabel(ton, sapHet);
   if(productViewMode==="list" && isProductViewModeAvailable()){
     const listStockClass=isHet?"het":isSap?"sap":"con";
-    return `<button type="button" class="product-list-row" data-index="${i}" style="--list-color:${cfg.c}" title="Mở ${escapeHtml(ten)}" onclick="openProductFromList(${i})"><span class="product-list-title">${highlightMatch(ten,kwTokens)}</span><span class="product-list-stock ${listStockClass}">Tồn: ${Number(ton)||0}</span></button>`;
+    return `<button type="button" class="product-list-row" data-index="${i}" style="--list-color:${cfg.c}" title="Mở ${escapeHtml(ten)}" onclick="openProductFromList(${i})"><span class="product-list-main"><span class="product-list-title">${highlightMatch(ten,kwTokens)}</span><span class="product-list-meta">${highlightMatch(ma,kwTokens)} · ${escapeHtml(th||"Chưa rõ hãng")} · ${escapeHtml(branch||"Q2")}</span></span><span class="product-list-stock ${listStockClass}">${escapeHtml(stTxt)} · ${Number(ton)||0}</span></button>`;
   }
   const condition = detectConditionLabel([ten, th, ghi].filter(Boolean).join(" "));
   const productTransactions = getTransactionsForProduct(r);
@@ -3846,8 +4022,7 @@ function renderCard(r,i,displayNo){
       <div class="card-top-left">
         <span class="sheet-badge" style="--c: ${cfg.c};">${cfg.label}</span>
         <span class="sheet-badge" style="--c: ${branchCfg.color};">${branchCfg.label}</span>
-        <span class="ma-code">${highlightMatch(ma, kwTokens)}</span>
-        <button class="btn-copy-code" type="button" data-code="${escapeHtml(ma)}" data-copy-label="mã hàng" title="Sao chép mã hàng" aria-label="Sao chép mã hàng" onclick="copyProductCode(this)"><svg viewBox="0 0 24 24" aria-hidden="true"><g class="copy-sheets"><rect x="8" y="8" width="10" height="11" rx="1.5"></rect><path d="M16 8V6.5A1.5 1.5 0 0 0 14.5 5H7.5A1.5 1.5 0 0 0 6 6.5v9A1.5 1.5 0 0 0 7.5 17H8"></path></g><path class="copy-check" d="m7.5 12.2 3 3 6-6.5"></path></svg></button>
+        <span class="ma-code copy-code" data-code="${escapeHtml(ma)}" data-copy-label="mã hàng" title="Nhấp đúp để sao chép mã hàng" ondblclick="event.stopPropagation();copyProductCode(this)">${highlightMatch(ma, kwTokens)}</span>
       </div>
       <span class="status-badge" style="background: ${stBg}; color: ${stFg};">${stTxt}</span>
     </div>
@@ -4045,6 +4220,8 @@ function renderTotalStockOverview(el){
   const totalSaleValue = inStock.reduce((sum,{r})=>sum+(Number(r[5])||0)*(Number(r[10])||0),0);
   const branchReport = [{code:"Q2",items:q2Items},{code:"Q5",items:q5Items}].map(({code,items})=>({code,items:items.length,qty:items.reduce((s,{r})=>s+(Number(r[5])||0),0),cost:items.reduce((s,{r})=>s+(Number(r[5])||0)*(Number(r[4])||0),0),sale:items.reduce((s,{r})=>s+(Number(r[5])||0)*(Number(r[10])||0),0)}));
   let html = `<div class="total-stock-head"><div class="total-stock-title">📦 BÁO CÁO TỒN KHO</div><div class="total-stock-sub">Tổng quan số lượng và giá trị hàng đang còn trong kho</div><div class="restock-summary"><button class="metric-card metric-green summary-click" onclick="toggleSummaryProductList('total-all','Toàn bộ hàng đang có')"><span class="metric-number">${inStock.length}</span><span class="metric-label">Mã hàng đang có tồn</span></button><button class="metric-card metric-blue summary-click" onclick="toggleSummaryProductList('total-all','Toàn bộ số lượng đang tồn')"><span class="metric-number">${totalQty.toLocaleString("vi-VN")}</span><span class="metric-label">Tổng sản phẩm trong kho</span></button><div class="metric-card metric-purple"><span class="metric-number">${formatVndNumber(totalCost)}</span><span class="metric-label">Giá trị vốn · VND</span></div><div class="metric-card metric-green"><span class="metric-number">${formatVndNumber(totalSaleValue)}</span><span class="metric-label">Giá trị bán dự kiến · VND</span></div></div><table class="management-table"><thead><tr><th>Chi nhánh</th><th>Mã hàng</th><th>Số lượng</th><th>Giá vốn</th><th>Giá bán</th></tr></thead><tbody>${branchReport.map(x=>`<tr><td>📍 ${x.code}</td><td>${x.items}</td><td>${x.qty.toLocaleString("vi-VN")}</td><td>${formatVndNumber(x.cost)}</td><td>${formatVndNumber(x.sale)}</td></tr>`).join("")}</tbody></table></div><div class="summary-product-list-host"></div>`;
+  el.innerHTML = html;
+  return;
   ["Q2","Q5"].forEach((branch,branchIndex)=>{
     const items = inStock.filter(({r})=>(r[13]||"Q2")===branch);
     if(!items.length) return;
@@ -4103,7 +4280,7 @@ function renderInventoryAudit(el, results){
     el.innerHTML = `<div class="empty"><div class="empty-icon">✅</div><div class="empty-title">Không có mặt hàng cần kiểm tra</div><div class="empty-sub">Dữ liệu sản phẩm trong phạm vi này đã đầy đủ</div></div>`;
     return;
   }
-  el.innerHTML = `<div class="audit-head"><div class="audit-title">⚠️ KIỂM TRA DỮ LIỆU KHO</div><div class="audit-sub">Bấm từng loại lỗi để mở nhanh các mặt hàng cần xử lý</div><div class="restock-summary"><button class="metric-card metric-yellow summary-click" onclick="toggleSummaryProductList('audit-all','Toàn bộ mặt hàng cần kiểm tra')"><span class="metric-number">${results.length}</span><span class="metric-label">Mặt hàng có ít nhất một lỗi</span></button><button class="metric-card metric-red summary-click" onclick="toggleSummaryProductList('audit-low','Mặt hàng tồn thấp')"><span class="metric-number">${lowItems.length}</span><span class="metric-label">Tồn thấp</span></button><button class="metric-card metric-blue summary-click" onclick="toggleSummaryProductList('audit-location','Mặt hàng chưa có vị trí')"><span class="metric-number">${locationItems.length}</span><span class="metric-label">Thiếu vị trí kho</span></button><button class="metric-card metric-purple summary-click" onclick="toggleSummaryProductList('audit-price','Mặt hàng chưa có giá bán')"><span class="metric-number">${priceItems.length}</span><span class="metric-label">Thiếu giá bán</span></button></div><div class="management-issues"><button class="management-issue summary-click" onclick="toggleSummaryProductList('audit-group','Mặt hàng chưa phân nhóm')"><span>Chưa phân nhóm</span><b>${groupItems.length}</b></button><button class="management-issue summary-click" onclick="toggleSummaryProductList('audit-brand','Mặt hàng thiếu thương hiệu')"><span>Thiếu thương hiệu</span><b>${brandItems.length}</b></button><button class="management-issue summary-click" onclick="toggleSummaryProductList('audit-code','Mặt hàng lỗi mã')"><span>Thiếu / trùng mã</span><b>${codeItems.length}</b></button><button class="management-issue summary-click" onclick="toggleSummaryProductList('audit-name','Mặt hàng thiếu tên')"><span>Thiếu tên sản phẩm</span><b>${nameItems.length}</b></button></div></div><div class="summary-product-list-host"></div>` + results.map(({r,i},idx)=>{
+  el.innerHTML = `<div class="audit-head"><div class="audit-title">⚠️ KIỂM TRA DỮ LIỆU KHO</div><div class="audit-sub">Chỉ hiện tổng quan · Bấm từng loại lỗi để mở đúng danh sách cần xử lý</div><div class="restock-summary"><button class="metric-card metric-yellow summary-click" onclick="toggleSummaryProductList('audit-all','Toàn bộ mặt hàng cần kiểm tra')"><span class="metric-number">${results.length}</span><span class="metric-label">Mặt hàng có ít nhất một lỗi</span></button><button class="metric-card metric-red summary-click" onclick="toggleSummaryProductList('audit-low','Mặt hàng tồn thấp')"><span class="metric-number">${lowItems.length}</span><span class="metric-label">Tồn thấp</span></button><button class="metric-card metric-blue summary-click" onclick="toggleSummaryProductList('audit-location','Mặt hàng chưa có vị trí')"><span class="metric-number">${locationItems.length}</span><span class="metric-label">Thiếu vị trí kho</span></button><button class="metric-card metric-purple summary-click" onclick="toggleSummaryProductList('audit-price','Mặt hàng chưa có giá bán')"><span class="metric-number">${priceItems.length}</span><span class="metric-label">Thiếu giá bán</span></button></div><div class="management-issues"><button class="management-issue summary-click" onclick="toggleSummaryProductList('audit-group','Mặt hàng chưa phân nhóm')"><span>Chưa phân nhóm</span><b>${groupItems.length}</b></button><button class="management-issue summary-click" onclick="toggleSummaryProductList('audit-brand','Mặt hàng thiếu thương hiệu')"><span>Thiếu thương hiệu</span><b>${brandItems.length}</b></button><button class="management-issue summary-click" onclick="toggleSummaryProductList('audit-code','Mặt hàng lỗi mã')"><span>Thiếu / trùng mã</span><b>${codeItems.length}</b></button><button class="management-issue summary-click" onclick="toggleSummaryProductList('audit-name','Mặt hàng thiếu tên')"><span>Thiếu tên sản phẩm</span><b>${nameItems.length}</b></button></div></div><div class="summary-product-list-host"></div>` + [].map(({r,i},idx)=>{
     const reasons = getInventoryAuditReasons(r);
     return `<div class="audit-item"><div class="audit-reasons">${reasons.map(reason=>`<span class="audit-reason">${escapeHtml(reason)}</span>`).join("")}</div>${renderCard(r,i,idx+1)}</div>`;
   }).join("");
@@ -4130,6 +4307,8 @@ function renderRestockOverview(el){
   const branchCfg = {Q2:{label:"📍 CHI NHÁNH Q2",color:"#1A5276"},Q5:{label:"📍 CHI NHÁNH Q5",color:"#7D3C98"}};
   const restockBranches = ["Q2","Q5"].map(code=>{ const items=rows.filter(item=>(item.r[13]||"Q2")===code); return {code,total:items.length,out:items.filter(item=>item.state==="HET").length,low:items.filter(item=>item.state==="SAP").length}; });
   let html = `<div class="restock-head"><div class="restock-title">📥 KẾ HOẠCH NHẬP HÀNG</div><div class="restock-sub">Đỏ cần xử lý trước · vàng cần chuẩn bị nhập</div><div class="restock-summary"><button class="metric-card metric-red summary-click" onclick="toggleSummaryProductList('restock-out','Mặt hàng đã hết')"><span class="metric-number">${outCount}</span><span class="metric-label">Hết hàng · ưu tiên ngay</span></button><button class="metric-card metric-yellow summary-click" onclick="toggleSummaryProductList('restock-low','Mặt hàng sắp hết')"><span class="metric-number">${lowCount}</span><span class="metric-label">Sắp hết · cần chuẩn bị</span></button><button class="metric-card metric-blue summary-click" onclick="toggleSummaryProductList('restock-all','Toàn bộ mặt hàng cần xử lý')"><span class="metric-number">${rows.length}</span><span class="metric-label">Tổng mặt hàng cần xử lý</span></button></div><table class="management-table"><thead><tr><th>Chi nhánh</th><th>Hết hàng</th><th>Sắp hết</th><th>Cần xử lý</th></tr></thead><tbody>${restockBranches.map(x=>`<tr><td>📍 ${x.code}</td><td style="color:#C0392B;font-weight:900">${x.out}</td><td style="color:#9A6700;font-weight:900">${x.low}</td><td><b>${x.total}</b></td></tr>`).join("")}</tbody></table></div><div class="summary-product-list-host"></div>`;
+  el.innerHTML = html;
+  return;
   ["Q2","Q5"].forEach((branch,branchIndex)=>{
     const branchItems = rows.filter(item=>(item.r[13]||"Q2")===branch);
     if(!branchItems.length) return;
@@ -4219,7 +4398,10 @@ function render(){
   }
 
   if(results.length===0){
-    el.innerHTML = `<div class="empty"><div class="empty-icon">😕</div><div class="empty-title">Không tìm thấy kết quả</div><div class="empty-sub">Thử từ khóa khác</div></div>`;
+    const hasSearch = !!kwTokens.length;
+    const emptyTitle = hasSearch ? "Không tìm thấy kết quả" : "Danh mục chưa có thiết bị";
+    const emptySub = hasSearch ? "Thử từ khóa khác hoặc xóa bộ lọc đang chọn" : "Khi thêm thiết bị vào danh mục này, sản phẩm sẽ tự động xuất hiện tại đây";
+    el.innerHTML = `<div class="empty"><div class="empty-icon">${hasSearch ? "😕" : "📭"}</div><div class="empty-title">${emptyTitle}</div><div class="empty-sub">${emptySub}</div></div>`;
     return;
   }
 
@@ -4342,7 +4524,7 @@ function render(){
     return;
   }
   if(!bulkSelectMode && !kw && currentTab==="ALL" && currentStatus==="ALL" && !restockOnly && currentBranch==="ALL"){
-    el.innerHTML = `<div class="empty"><div class="empty-icon search-float">🔎</div><div class="empty-title">Gõ từ khóa để tìm kiếm</div><div class="empty-sub">VD: "SSD", "HP", "Camera wifi", "Canon"...</div></div>`;
+    el.innerHTML = `<div class="empty search-landing"><div class="search-landing-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"></circle><path d="M15.5 15.5L21 21"></path></svg></div><div class="empty-title">Bạn muốn tìm thiết bị nào?</div><div class="empty-sub">Chọn gợi ý hoặc nhập tên, mã hàng hay thương hiệu vào ô phía trên</div><div class="search-examples">${getSearchKeywordsForVisit().map(keyword=>`<button type="button" class="search-example" onclick="applySearchExample(this.textContent)">${escapeHtml(keyword)}</button>`).join("")}</div></div>`;
     return;
   }
   el.innerHTML = results.map(({r,i},idx)=>renderCard(r,i,idx+1)).join("");
@@ -4777,12 +4959,16 @@ function updateSaleVatPreview(){
 function newTransactionId(){ return (crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`); }
 function openSaleModal(idx){ if(!requireAdmin()) return;
   const r = DATA[idx];
+  if(!r) return;
+  const availableStock = Number(r[5]) || 0;
+  if(availableStock <= 0){ showToast("⚠️ Sản phẩm đã hết tồn kho, không thể xuất thêm", 3500); return; }
   document.getElementById("saleModalTitle").textContent = "🛒 Ghi nhận giao dịch";
   document.getElementById("saleIdx").value = idx;
   document.getElementById("saleTxId").value = "";
   document.getElementById("saleRequestId").value = newTransactionId();
   refreshNVSelect();
   document.getElementById("saleQty").value = "1";
+  document.getElementById("saleQty").max = String(availableStock);
   document.getElementById("saleQty").disabled = false;
   document.getElementById("saleTime").value = formatTxTime(new Date());
   setVndInputValue("saleGia", r[10] || r[4] || 0);
@@ -5243,6 +5429,7 @@ function openImageViewer(src, alt="Ảnh phóng to", keepGallery=false){
   img.src = src;
   img.alt = alt || "Ảnh phóng to";
   resetImageViewerZoom();
+  document.getElementById("imageLightboxSave")?.classList.remove("show");
   box.classList.add("open");
   updateCustomerGalleryControls();
   document.body.style.overflow = "hidden";
@@ -5253,7 +5440,35 @@ function navigateCustomerGallery(delta){
   const img=document.getElementById("imageLightboxImg");
   resetImageViewerZoom();
   img.src=customerGalleryImages[customerGalleryIndex];
+  document.getElementById("imageLightboxSave")?.classList.remove("show");
   updateCustomerGalleryControls();
+}
+function showImageSaveButton(){
+  if(!document.getElementById("imageLightbox")?.classList.contains("open")) return;
+  document.getElementById("imageLightboxSave")?.classList.add("show");
+}
+async function saveCurrentViewerImage(){
+  const img=document.getElementById("imageLightboxImg");
+  const src=img?.currentSrc || img?.src || "";
+  if(!src) return;
+  const safeBase=String(img.alt||"anh-kho").normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-zA-Z0-9_-]+/g,"-").replace(/^-+|-+$/g,"").slice(0,60) || "anh-kho";
+  try{
+    const response=await fetch(src,{mode:"cors",cache:"no-store"});
+    if(!response.ok) throw new Error("HTTP "+response.status);
+    const blob=await response.blob();
+    const ext=(blob.type.split("/")[1]||"jpg").replace("jpeg","jpg");
+    const objectUrl=URL.createObjectURL(blob);
+    const link=document.createElement("a");
+    link.href=objectUrl; link.download=`${safeBase}.${ext}`;
+    document.body.appendChild(link); link.click(); link.remove();
+    setTimeout(()=>URL.revokeObjectURL(objectUrl),1500);
+    showToast("✅ Đã gửi ảnh tới mục tải xuống");
+  }catch(e){
+    const link=document.createElement("a");
+    link.href=src; link.target="_blank"; link.rel="noopener"; link.download=safeBase;
+    document.body.appendChild(link); link.click(); link.remove();
+    showToast("Ảnh đã được mở; hãy giữ ảnh và chọn Lưu hình ảnh",4500);
+  }
 }
 function onLightboxImageClick(event){
   event.stopPropagation();
@@ -5264,6 +5479,7 @@ function closeImageViewer(event){
   if(event && event.target !== document.getElementById("imageLightbox")) return;
   const box = document.getElementById("imageLightbox");
   box.classList.remove("open");
+  document.getElementById("imageLightboxSave")?.classList.remove("show");
   document.getElementById("imageLightboxImg").src = "";
   resetImageViewerZoom();
   customerGalleryTouchX=null; customerGalleryTouchY=null;
@@ -5344,6 +5560,22 @@ document.getElementById("imageLightbox").addEventListener("wheel",event=>{
   applyImageViewerZoom();
 },{passive:false});
 const imageViewerImg=document.getElementById("imageLightboxImg");
+let imageSaveHoldTimer=null, imageSaveHoldX=0, imageSaveHoldY=0;
+const cancelImageSaveHold=()=>{ if(imageSaveHoldTimer){ clearTimeout(imageSaveHoldTimer); imageSaveHoldTimer=null; } };
+imageViewerImg.addEventListener("touchstart",event=>{
+  cancelImageSaveHold();
+  if(event.touches?.length!==1) return;
+  const touch=event.touches[0];
+  imageSaveHoldX=touch.clientX; imageSaveHoldY=touch.clientY;
+  imageSaveHoldTimer=setTimeout(()=>{ imageSaveHoldTimer=null; showImageSaveButton(); },650);
+},{passive:true});
+imageViewerImg.addEventListener("touchmove",event=>{
+  const touch=event.touches?.[0];
+  if(!touch || event.touches.length!==1 || Math.hypot(touch.clientX-imageSaveHoldX,touch.clientY-imageSaveHoldY)>10) cancelImageSaveHold();
+},{passive:true});
+imageViewerImg.addEventListener("touchend",cancelImageSaveHold,{passive:true});
+imageViewerImg.addEventListener("touchcancel",cancelImageSaveHold,{passive:true});
+imageViewerImg.addEventListener("contextmenu",()=>showImageSaveButton());
 imageViewerImg.addEventListener("pointerdown",event=>{
   if(event.pointerType!=="mouse" || imageViewerScale<=1) return;
   event.preventDefault();
@@ -5939,6 +6171,15 @@ function setRestockFilter(){
   syncStatusButtons("");
   syncRestockButton(restockOnly);
   render();
+}
+function applySearchExample(keyword){
+  const searchEl = document.getElementById("search");
+  if(!searchEl) return;
+  searchEl.value = String(keyword || "");
+  searchEl.dispatchEvent(new Event("input",{bubbles:true}));
+  searchEl.focus({preventScroll:true});
+  const sticky = document.querySelector(".sticky");
+  if(sticky) window.scrollTo({top:Math.max(0,sticky.offsetTop),behavior:"smooth"});
 }
 function clearSearch(){ clearTimeout(searchRenderTimer); document.getElementById("search").value=""; searchQ=""; quickGroupFilter = null; closeSearchSuggestions(); document.getElementById("clear-btn").style.display="none"; render(); document.getElementById("search").focus(); }
 function filterByBrand(brand){
@@ -6654,9 +6895,20 @@ document.getElementById("search").addEventListener("keydown", function(e){
   else if(e.key==="Escape") closeSearchSuggestions();
 });
 document.getElementById("search").addEventListener("blur", ()=>{
+  // Đóng gợi ý sau một nhịp ngắn để thao tác bấm vào chính gợi ý vẫn kịp chạy.
+  setTimeout(()=>{
+    const active = document.activeElement;
+    if(!active || !active.closest || !active.closest(".search-box")) closeSearchSuggestions();
+  }, 140);
   // Khởi động lại hiệu ứng ngay sau khi người dùng rời ô trống.
   setTimeout(startSearchPlaceholderTyping, 0);
 });
+document.getElementById("search").addEventListener("focus", function(){
+  if(this.value.trim()) renderSearchSuggestions(this.value);
+});
+document.addEventListener("pointerdown", function(e){
+  if(!e.target.closest(".search-box")) closeSearchSuggestions();
+}, true);
 document.addEventListener("click", function(e){ if(!e.target.closest(".search-box")) closeSearchSuggestions(); });
 document.getElementById("adminPass").addEventListener("keydown", function(e){ if(e.key==="Enter") submitAdminPass(); });
 document.querySelector(".title").addEventListener("click", handleOwnerTap);
@@ -7014,6 +7266,26 @@ function startBackgroundSync(){
   });
 }
 
+function setupColorCursorEffect(){
+  const halo=document.querySelector(".cursor-halo"), dot=document.querySelector(".cursor-dot");
+  if(!halo || !dot) return;
+  document.addEventListener("pointermove",e=>{
+    if(e.pointerType && e.pointerType!=="mouse") return;
+    document.documentElement.classList.add("neon-cursor-active");
+    halo.style.transform=`translate3d(${e.clientX}px,${e.clientY}px,0)`;
+    halo.style.opacity="1";
+    const action=!!e.target.closest("button,a,[role='button'],[onclick],input,select,textarea,summary,.card[data-index],.product-list-row");
+    halo.classList.toggle("cursor-action",action);
+  },{passive:true});
+  document.addEventListener("pointerdown",e=>{
+    if(e.pointerType && e.pointerType!=="mouse") return;
+    halo.classList.add("cursor-down");
+  },{passive:true});
+  document.addEventListener("pointerup",()=>halo.classList.remove("cursor-down"),{passive:true});
+  document.documentElement.addEventListener("mouseleave",()=>{halo.style.opacity="0";document.documentElement.classList.remove("neon-cursor-active");});
+}
+// Con trỏ neon dùng cơ chế cursor gốc của trình duyệt để không bị trễ; không chạy lớp bám chuột bằng JavaScript.
+
 (async function init(){
   showLastSync();
   setLoadingUI(5, "Đang khởi động kho hàng...");
@@ -7023,10 +7295,13 @@ function startBackgroundSync(){
   await loadData();
   // Hiện ngay thiết bị mới nhất sau khi DATA đã có dữ liệu, không phải đợi chu kỳ 3 giây.
   refreshLatestItemsTicker();
-  setLoadingUI(70, "Đang đồng bộ giao dịch, nhân viên và cấu hình...");
+  // Dữ liệu thiết bị chính đã sẵn sàng: mở kho ngay, không che giao diện để chờ các nguồn phụ.
+  syncStatusButtons(totalStockView ? currentStatus : "");
+  render();
+  startBackgroundSync();
   // Ba nguồn này độc lập, tải song song để không phải cộng dồn thời gian chờ
   // Google Apps Script. Mỗi hàm vẫn giữ cơ chế chống ghi đè dữ liệu đang chờ.
-  await Promise.all([loadTXFromSheet(),loadNVFromSheet(),loadDisplayConfig()]);
+  await Promise.allSettled([loadTXFromSheet(),loadNVFromSheet(),loadDisplayConfig()]);
   refreshLatestItemsTicker();
   // Nếu lần lưu sản phẩm trước bị mất mạng, loadData đã giữ bản cục bộ mới nhất;
   // tự gửi lại ngay thay vì buộc người dùng bấm "Đẩy lên Sheet".
@@ -7034,10 +7309,8 @@ function startBackgroundSync(){
   if(hasAuxPendingSync(PENDING_TX_SYNC_KEY)) await saveTX();
   if(hasAuxPendingSync(PENDING_NV_SYNC_KEY)) await saveNV();
   if(hasAuxPendingSync(PENDING_CONFIG_SYNC_KEY)) await saveDisplayConfig();
-  setLoadingUI(100, "Hoàn tất! Đang hiển thị kho hàng...");
   syncStatusButtons(totalStockView ? currentStatus : "");
   render();
-  startBackgroundSync();
 })();
 </script>
 </body>
