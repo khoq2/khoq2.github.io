@@ -617,7 +617,7 @@ body.fab-menu-open .scroll-btns { opacity: 0; transform: translateX(18px); point
 #headerFilterBtn:active { transform: scale(.96); }
 @media (max-width: 420px) {
   .form-2col { grid-template-columns: 1fr; }
-  .search-box { width:100%; max-width:100%; padding:7px 8px; gap:5px; overflow:hidden; }
+  .search-box { width:100%; max-width:100%; padding:7px 8px; gap:5px; overflow:visible; }
   #headerToggleText { display:none; }
   #headerToggleBtn { flex:0 0 auto; padding:5px; min-width:32px; }
   .admin-bar { flex-wrap: wrap; justify-content: flex-start; }
@@ -1824,9 +1824,10 @@ function checkAdminSession(){
 
 // Dòng URL duy nhất
 const SHEET_API_URL = "https://script.google.com/macros/s/AKfycby6YH69F7sfO1ZoUJsDm4BeX6Luj2GrhUfYWWJWNvqjraAEhkBck16EphrPBBm1BT3YqA/exec";
-const REQUIRED_API_VERSION = "2026.07.16-product-image-titles-11";
+const REQUIRED_API_VERSION = "2026.07.16-safe-sync-12";
 const SHEET_TIMEOUT_MS = 12000;
 const PENDING_SYNC_KEY = "kho_cntt_pending_sync";
+const PENDING_BASE_FINGERPRINT_KEY = "kho_cntt_pending_base_fingerprint";
 const PENDING_TX_SYNC_KEY = "kho_cntt_pending_tx_sync";
 const PENDING_NV_SYNC_KEY = "kho_cntt_pending_nv_sync";
 const PENDING_CONFIG_SYNC_KEY = "kho_cntt_pending_config_sync";
@@ -1839,6 +1840,8 @@ let txSaveSeq = 0;
 let nvSaveSeq = 0;
 let configSaveSeq = 0;
 let SERVER_DATA_FINGERPRINT = "";
+let SERVER_NV_FINGERPRINT = "";
+let SERVER_CONFIG_FINGERPRINT = "";
 
 function setSyncBadge(state, detail){
   const el = document.getElementById("syncBadge");
@@ -1879,16 +1882,21 @@ default:
 function setPendingSync(on, reason){
   try{
     if(on){
+      if(!hasPendingSync()) localStorage.setItem(PENDING_BASE_FINGERPRINT_KEY, SERVER_DATA_FINGERPRINT || "");
       localStorage.setItem(PENDING_SYNC_KEY, JSON.stringify({time: Date.now(), reason: reason || ""}));
       setSyncBadge("pending", reason || "Có thay đổi chỉ mới lưu trên máy này");
     }else{
       localStorage.removeItem(PENDING_SYNC_KEY);
+      localStorage.removeItem(PENDING_BASE_FINGERPRINT_KEY);
     }
   }catch(e){}
 }
 
 function hasPendingSync(){
   return localStorage.getItem(PENDING_SYNC_KEY) !== null;
+}
+function getPendingBaseFingerprint(){
+  try{ return localStorage.getItem(PENDING_BASE_FINGERPRINT_KEY) || ""; }catch(e){ return ""; }
 }
 function markLastSync(){
   const text = document.getElementById("lastSyncText");
@@ -1898,8 +1906,24 @@ function markLastSync(){
   if(text) text.textContent = value;
 }
 function showLastSync(){ const text=document.getElementById("lastSyncText"); if(text) text.textContent=localStorage.getItem("kho_cntt_last_sync")||""; }
-function setAuxPendingSync(key, on){ try{ on ? localStorage.setItem(key, String(Date.now())) : localStorage.removeItem(key); }catch(e){} }
+function auxFingerprintForKey(key){
+  if(key===PENDING_NV_SYNC_KEY) return SERVER_NV_FINGERPRINT;
+  if(key===PENDING_CONFIG_SYNC_KEY) return SERVER_CONFIG_FINGERPRINT;
+  return "";
+}
+function setAuxPendingSync(key, on){
+  try{
+    if(on){
+      if(localStorage.getItem(key)===null) localStorage.setItem(key+"_base", auxFingerprintForKey(key) || "");
+      localStorage.setItem(key, String(Date.now()));
+    }else{
+      localStorage.removeItem(key);
+      localStorage.removeItem(key+"_base");
+    }
+  }catch(e){}
+}
 function hasAuxPendingSync(key){ try{ return localStorage.getItem(key) !== null; }catch(e){ return false; } }
+function getAuxPendingBase(key){ try{ return localStorage.getItem(key+"_base") || ""; }catch(e){ return ""; } }
 
 // Lưu vào localStorage một cách an toàn: nếu bộ nhớ máy đầy (thường do ảnh base64
 // của sản phẩm/giao dịch/nhân viên chiếm dung lượng), báo cho người dùng biết thay vì
@@ -2093,7 +2117,7 @@ async function saveProductRow(row, oldCode="", oldBranch="Q2"){
   if(!SHEET_API_URL) return true;
   setPendingSync(true, "Đang chờ đồng bộ sản phẩm");
   try{
-    const result=await postSheet("upsert_product", {row: normalizeSheetRows([row])[0], oldCode, oldBranch});
+    const result=await postSheet("upsert_product", {row: normalizeSheetRows([row])[0], oldCode, oldBranch, baseFingerprint:SERVER_DATA_FINGERPRINT});
     if(result.fingerprint) SERVER_DATA_FINGERPRINT=result.fingerprint;
     setPendingSync(hadPendingBefore,hadPendingBefore?"Vẫn còn thay đổi khác đang chờ đồng bộ":""); setSyncBadge(hadPendingBefore?"pending":"synced"); markLastSync();
     return true;
@@ -2103,7 +2127,7 @@ async function deleteProductRow(code, branch){
   if(!SHEET_API_URL) return true;
   const hadPendingBefore = hasPendingSync();
   setPendingSync(true, "Đang chờ xóa sản phẩm");
-  try{ const result=await postSheet("delete_product", {code, branch}); if(result.fingerprint) SERVER_DATA_FINGERPRINT=result.fingerprint; setPendingSync(hadPendingBefore,hadPendingBefore?"Vẫn còn thay đổi khác đang chờ đồng bộ":""); setSyncBadge(hadPendingBefore?"pending":"synced"); markLastSync(); return true; }
+  try{ const result=await postSheet("delete_product", {code, branch, baseFingerprint:SERVER_DATA_FINGERPRINT}); if(result.fingerprint) SERVER_DATA_FINGERPRINT=result.fingerprint; setPendingSync(hadPendingBefore,hadPendingBefore?"Vẫn còn thay đổi khác đang chờ đồng bộ":""); setSyncBadge(hadPendingBefore?"pending":"synced"); markLastSync(); return true; }
   catch(e){ setSyncBadge("error", String(e)); return false; }
 }
 
@@ -2119,12 +2143,14 @@ async function loadData(){
       const validationIssues = validateInventoryRows(json.data);
       if(validationIssues.length) throw new Error(inventoryValidationMessage(validationIssues,"Google Sheet"));
       const sheetRows = normalizeSheetRows(json.data);
-      SERVER_DATA_FINGERPRINT = String(json.fingerprint || "");
+      const latestServerFingerprint = String(json.fingerprint || "");
       if(localHasPending){
+        SERVER_DATA_FINGERPRINT = getPendingBaseFingerprint();
         DATA = localSnapshot;
         setSyncBadge("pending", "Dữ liệu mới trên máy đang chờ đồng bộ lại lên Google Sheet");
         return;
       }
+      SERVER_DATA_FINGERPRINT = latestServerFingerprint;
       if(!sheetRows.length){
         if(Array.isArray(localSnapshot) && localSnapshot.length){
           DATA = localSnapshot;
@@ -2695,7 +2721,8 @@ function saveDisplayConfig(){
   configSaveChain = configSaveChain.then(async ()=>{
     setSyncBadge("syncing");
     try{
-      await postSheet("save_config", snapshot, 35000);
+      const result = await postSheet("save_config", {config:snapshot,baseFingerprint:SERVER_CONFIG_FINGERPRINT}, 35000);
+      if(result.fingerprint) SERVER_CONFIG_FINGERPRINT = result.fingerprint;
       if(seq === configSaveSeq) setAuxPendingSync(PENDING_CONFIG_SYNC_KEY, false);
       setSyncBadge("synced"); markLastSync();
       return true;
@@ -2711,7 +2738,10 @@ function saveDisplayConfig(){
 async function loadDisplayConfig(){
   if(!SHEET_API_URL) return;
   // Không lấy cấu hình máy chủ đè lên thay đổi cục bộ chưa gửi.
-  if(hasAuxPendingSync(PENDING_CONFIG_SYNC_KEY)) return;
+  if(hasAuxPendingSync(PENDING_CONFIG_SYNC_KEY)){
+    SERVER_CONFIG_FINGERPRINT = getAuxPendingBase(PENDING_CONFIG_SYNC_KEY);
+    return;
+  }
   try{
     let json;
     try{
@@ -2728,6 +2758,7 @@ async function loadDisplayConfig(){
     if(json.config?.groupOptions && typeof json.config.groupOptions === "object"){
       Object.keys(GROUP_OPTIONS).forEach(tab=>{ if(Array.isArray(json.config.groupOptions[tab])) GROUP_OPTIONS[tab]=json.config.groupOptions[tab]; });
     }
+    SERVER_CONFIG_FINGERPRINT = String(json.fingerprint || "");
     try{
       localStorage.setItem(QUICK_ORDER_KEY, JSON.stringify(QUICK_ORDER));
       localStorage.setItem(GROUP_ORDER_KEY, JSON.stringify(GROUP_ORDER));
@@ -4437,8 +4468,9 @@ async function saveNV(){
   setAuxPendingSync(PENDING_NV_SYNC_KEY, true);
   nvSaveChain = nvSaveChain.then(async()=>{
     await ensureAtomicApi();
-    return postSheet("save_nv", snapshot);
-  }).then(()=>{
+    return postSheet("save_nv", {rows:snapshot,baseFingerprint:SERVER_NV_FINGERPRINT});
+  }).then(result=>{
+    if(result?.fingerprint) SERVER_NV_FINGERPRINT = result.fingerprint;
     if(seq === nvSaveSeq) setAuxPendingSync(PENDING_NV_SYNC_KEY, false);
     return true;
   }).catch(e=>{
@@ -4452,6 +4484,7 @@ async function loadNVFromSheet(){
   try{
     const json = await fetchSheetJson(sheetUrl({type:"nv", _ts: Date.now()}));
     if(Array.isArray(json.nv)){
+      SERVER_NV_FINGERPRINT = hasAuxPendingSync(PENDING_NV_SYNC_KEY) ? getAuxPendingBase(PENDING_NV_SYNC_KEY) : String(json.fingerprint || "");
       const sheetNV = normalizeNVList(json.nv);
       if(!hasAuxPendingSync(PENDING_NV_SYNC_KEY) && (sheetNV.length || !NV_LIST.length)){
         NV_LIST = sheetNV;
