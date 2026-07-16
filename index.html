@@ -407,7 +407,15 @@ mark.kw-hit { background: #FFEB3B; color: #1A1A1A; padding: 0 1px; border-radius
 .admin-only { display: none!important; }
 body.admin-mode .admin-only { display: flex!important; }
 .admin-bar { display: flex; justify-content: flex-end; align-items: center; gap: 6px; margin-bottom: 6px; }
-.sync-badge { font-size: 10px; color: rgba(255,255,255,.75); margin-right: auto; display: flex; align-items: center; gap: 4px; }
+.sync-badge { font-size: 10px; color: rgba(255,255,255,.75); margin-right: auto; display: flex; align-items: center; gap: 4px; cursor:pointer; user-select:none; border-radius:7px; padding:3px 5px; }
+.sync-badge:focus-visible { outline:2px solid #F5B041; outline-offset:2px; }
+.sync-error-modal { max-height:88dvh; }
+.sync-error-help { margin:-7px 0 10px; color:#607D8B; font-size:12px; line-height:1.45; }
+.sync-error-text { width:100%; min-height:220px; resize:vertical; border:1.5px solid #D5DBDB; border-radius:10px; padding:10px; background:#F8FAFC; color:#263238; font:12px/1.5 ui-monospace,SFMono-Regular,Consolas,monospace; }
+.sync-error-actions { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:10px; }
+.sync-error-actions button { min-height:42px; border:0; border-radius:9px; font-size:13px; font-weight:800; cursor:pointer; }
+.sync-error-copy { background:#1E8449; color:#fff; }
+.sync-error-clear { background:#F4F6F7; color:#922B21; }
 .admin-btn { background: rgba(255,255,255,.15); color: #fff; border: 1.5px solid rgba(255,255,255,.4); border-radius: 8px; padding: 4px 10px; font-size: 11px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 4px; opacity: 0; transition: opacity .3s; }
 #adminBtn { display: none; }
 body.admin-entry-visible #adminBtn, body.admin-mode #adminBtn { display: flex; }
@@ -964,7 +972,7 @@ html::-webkit-scrollbar-corner { background: #EAF2F8; }
 <div class="header-collapsible">
   <div class="header">
     <div class="admin-bar">
-      <span class="sync-badge" id="syncBadge">💾 Lưu trên máy</span>
+      <span class="sync-badge" id="syncBadge" role="button" tabindex="0" title="Bấm để xem lỗi đồng bộ gần nhất" onclick="openSyncErrorLog()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openSyncErrorLog();}">💾 Lưu trên máy</span>
       <span id="lastSyncText" style="font-size:10px;color:#718096"></span>
       <button class="admin-btn admin-only" id="syncBtn" onclick="manualSync()">🔄 Đẩy lên Sheet</button>
       <button class="admin-btn" id="adminBtn" onclick="onAdminBtnClick()">🔒 Admin</button>
@@ -1382,6 +1390,19 @@ html::-webkit-scrollbar-corner { background: #EAF2F8; }
 </div>
 
 <div class="footer-credit">· Design by : Pham Van Chuong · © 2026</div>
+
+<div class="overlay" id="syncErrorOverlay" onclick="if(event.target===this) closeSyncErrorLog()">
+  <div class="modal sync-error-modal">
+    <div class="modal-title">☁️ Chi tiết đồng bộ máy chủ</div>
+    <div class="sync-error-help">Nội dung lỗi gần nhất được giữ lại trên thiết bị này dù thông báo nhanh đã biến mất.</div>
+    <textarea id="syncErrorText" class="sync-error-text" readonly spellcheck="false"></textarea>
+    <div class="sync-error-actions">
+      <button type="button" class="sync-error-copy" onclick="copySyncErrorLog()">📋 Sao chép lỗi</button>
+      <button type="button" class="sync-error-clear" onclick="clearSyncErrorLog()">🗑 Xóa nhật ký</button>
+    </div>
+    <button type="button" class="btn-cancel" style="width:100%;margin-top:8px" onclick="closeSyncErrorLog()">Đóng</button>
+  </div>
+</div>
 
 <div class="toast" id="toast"></div>
 
@@ -1831,6 +1852,7 @@ const PENDING_BASE_FINGERPRINT_KEY = "kho_cntt_pending_base_fingerprint";
 const PENDING_TX_SYNC_KEY = "kho_cntt_pending_tx_sync";
 const PENDING_NV_SYNC_KEY = "kho_cntt_pending_nv_sync";
 const PENDING_CONFIG_SYNC_KEY = "kho_cntt_pending_config_sync";
+const LAST_SYNC_ERROR_KEY = "kho_cntt_last_sync_error";
 let dataSaveChain = Promise.resolve();
 let dataSaveSeq = 0;
 let txSaveChain = Promise.resolve();
@@ -1843,9 +1865,64 @@ let SERVER_DATA_FINGERPRINT = "";
 let SERVER_NV_FINGERPRINT = "";
 let SERVER_CONFIG_FINGERPRINT = "";
 
+function recordSyncError(detail){
+  const message = String(detail || "Lỗi không có nội dung chi tiết");
+  const record = {
+    time: new Date().toISOString(),
+    localTime: new Date().toLocaleString("vi-VN"),
+    message,
+    online: navigator.onLine,
+    apiVersion: REQUIRED_API_VERSION,
+    apiUrl: SHEET_API_URL,
+    page: location.href,
+    userAgent: navigator.userAgent
+  };
+  try{ localStorage.setItem(LAST_SYNC_ERROR_KEY, JSON.stringify(record)); }catch(e){}
+}
+function getSyncErrorText(){
+  let record = null;
+  try{ record = JSON.parse(localStorage.getItem(LAST_SYNC_ERROR_KEY) || "null"); }catch(e){}
+  if(!record) return "Chưa ghi nhận lỗi đồng bộ nào trên thiết bị này.";
+  return [
+    "THÔNG TIN LỖI ĐỒNG BỘ KHO",
+    "Thời gian: " + (record.localTime || record.time || "Không rõ"),
+    "Lỗi: " + (record.message || "Không rõ"),
+    "Có mạng: " + (record.online ? "Có" : "Không"),
+    "API yêu cầu: " + (record.apiVersion || "Không rõ"),
+    "API URL: " + (record.apiUrl || "Không rõ"),
+    "Trang: " + (record.page || "Không rõ"),
+    "Thiết bị/trình duyệt: " + (record.userAgent || "Không rõ")
+  ].join("\n");
+}
+function openSyncErrorLog(){
+  const text = document.getElementById("syncErrorText");
+  if(text) text.value = getSyncErrorText();
+  document.getElementById("syncErrorOverlay")?.classList.add("open");
+}
+function closeSyncErrorLog(){ document.getElementById("syncErrorOverlay")?.classList.remove("open"); }
+async function copySyncErrorLog(){
+  const text = getSyncErrorText();
+  try{
+    if(navigator.clipboard?.writeText) await navigator.clipboard.writeText(text);
+    else{
+      const box = document.getElementById("syncErrorText");
+      box?.focus(); box?.select(); document.execCommand("copy");
+    }
+    showToast("✅ Đã sao chép chi tiết lỗi");
+  }catch(e){ showToast("⚠️ Không sao chép tự động được; hãy giữ vào nội dung và chọn Sao chép",4500); }
+}
+function clearSyncErrorLog(){
+  if(!confirm("Xóa lỗi đồng bộ đã lưu trên thiết bị này?")) return;
+  try{ localStorage.removeItem(LAST_SYNC_ERROR_KEY); }catch(e){}
+  const text = document.getElementById("syncErrorText");
+  if(text) text.value = getSyncErrorText();
+  showToast("Đã xóa nhật ký lỗi đồng bộ");
+}
+
 function setSyncBadge(state, detail){
   const el = document.getElementById("syncBadge");
-  el.title = detail || "";
+  if(state === "error") recordSyncError(detail);
+  el.title = state === "error" ? "Có lỗi đồng bộ — bấm để xem và sao chép" : "Bấm để xem lỗi đồng bộ gần nhất";
   if(!SHEET_API_URL){ el.textContent = "💾 Lưu trên máy này"; return; }
   switch(state){
 case "loading":
