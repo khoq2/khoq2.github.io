@@ -3274,21 +3274,39 @@ function quickMetaLabel(meta){
   return meta.primary || "Khác";
 }
 
-function detectConfiguredCableQuickMeta(r, groupLabel){
-  const title = normalizeQuickText([r?.[2], r?.[3], r?.[7]].filter(Boolean).join(" "))
+function normalizeConfiguredQuickMatchText(value){
+  return normalizeQuickText(value)
     .replace(/display\s*port/g, "displayport")
     .replace(/\bdp\b/g, "displayport")
     .replace(/\b(type\s*c|usb\s*c)\b/g, "usbc");
+}
+
+function detectConfiguredQuickMeta(r, groupLabel){
+  const title = normalizeConfiguredQuickMatchText([r?.[2], r?.[3], r?.[7]].filter(Boolean).join(" "));
   if(!title) return null;
+  const groupKey = quickOrderKey(groupLabel);
+  const baseKeys = new Set(getQuickFixedCatalogBase(groupLabel).map(meta=>normalizeQuickText(meta.primary)));
+  const customKeys = new Set((QUICK_CUSTOM_TAGS[groupKey] || []).map(normalizeQuickText));
+  const configuredCatalog = getQuickFixedCatalog(groupLabel).filter(meta=>{
+    const key = normalizeQuickText(meta.primary);
+    return customKeys.has(key) || !baseKeys.has(key);
+  });
+  if(!configuredCatalog.length) return null;
   const ignored = new Set(["cap", "day", "chuyen", "doi", "to", "sang"]);
-  const matches = getQuickFixedCatalog(groupLabel).map(meta=>{
-    const normalized = normalizeQuickText(meta.primary)
-      .replace(/display\s*port/g, "displayport")
-      .replace(/\bdp\b/g, "displayport")
-      .replace(/\b(type\s*c|usb\s*c)\b/g, "usbc");
-    const tokens = [...new Set(normalized.split(/[^a-z0-9]+/).filter(token=>token && !ignored.has(token)))];
+  const titleTokens = title.split(/[^a-z0-9]+/).filter(Boolean);
+  const containsOrderedTokens = tokens => {
+    let cursor = 0;
+    for(const token of titleTokens){
+      if(token === tokens[cursor]) cursor++;
+      if(cursor === tokens.length) return true;
+    }
+    return false;
+  };
+  const matches = configuredCatalog.map(meta=>{
+    const normalized = normalizeConfiguredQuickMatchText(meta.primary);
+    const tokens = normalized.split(/[^a-z0-9]+/).filter(token=>token && !ignored.has(token));
     return {meta, tokens};
-  }).filter(item=>item.tokens.length >= 2 && item.tokens.every(token=>title.includes(token)));
+  }).filter(item=>item.tokens.length && containsOrderedTokens(item.tokens));
   matches.sort((a,b)=>b.tokens.length-a.tokens.length || b.meta.primary.length-a.meta.primary.length);
   return matches[0]?.meta || null;
 }
@@ -3302,10 +3320,8 @@ function getQuickMetaCandidates(r, groupLabel){
     const manualMetas = manualTags.map(tag=>makeQuickMeta(groupKind, tag, "", tag)).filter(Boolean);
     if(manualMetas.length) return manualMetas;
   }
-  if(groupKind === "cable"){
-    const configuredCableMeta = detectConfiguredCableQuickMeta(r, resolvedGroupLabel);
-    if(configuredCableMeta) return [configuredCableMeta];
-  }
+  const configuredMeta = detectConfiguredQuickMeta(r, resolvedGroupLabel);
+  if(configuredMeta) return [configuredMeta];
   const text = [r?.[2], r?.[3]].filter(Boolean).join(" ");
   const metas = [];
   const add = meta => {
