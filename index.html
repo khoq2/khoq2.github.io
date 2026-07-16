@@ -2669,7 +2669,7 @@ function joinRowQuickTags(tags){ return getRowQuickTags(Array.isArray(tags) ? ta
 
 function isKnownQuickValue(value){
   const v = cleanQuickLabel(value);
-  return v && v !== "Khác";
+  return !!v && normalizeQuickText(v) !== "khac";
 }
 
 function detectBrandFromRow(r, text){
@@ -5513,8 +5513,20 @@ function openEditModal(idx){ if(!requireAdmin()) return;
   document.getElementById("fWarrantyImg1").value = r[14] || ""; document.getElementById("fWarrantyImg2").value = r[15] || ""; setImagePreview(r[9]||""); updateLocationSuggestions(); updateGroupOptions(r[8]||""); updateQuickTagOptions(r[11]||""); updateBrandSuggestions(); checkProductCodeDuplicate(); document.getElementById("editOverlay").classList.add("open");
 }
 async function saveItem(){ if(!requireAdmin()) return;
-  const sh = document.getElementById("fSheet").value.trim(), ma = document.getElementById("fMa").value.trim(), ten = document.getElementById("fTen").value.trim(), th = document.getElementById("fTH").value.trim(), gia = parseVndInput(document.getElementById("fGia").value), giaBan = parseVndInput(document.getElementById("fGiaBan").value), ton = Math.max(0, parseInt(document.getElementById("fTon").value)||0), sapHet = Math.max(1, parseInt(document.getElementById("fSapHet").value)||2), tt = document.getElementById("fTT").value, ghiNote = document.getElementById("fGhi").value.trim(), vitri = document.getElementById("fVitri").value.trim(), img = document.getElementById("fImg").value || "", warrantyImg1 = resolveImageUrl(document.getElementById("fWarrantyImg1").value), warrantyImg2 = resolveImageUrl(document.getElementById("fWarrantyImg2").value), idx = document.getElementById("editIdx").value, grp = joinRowGroups(getSelectedFormGroups()), quickTag = joinRowQuickTags(getSelectedQuickTags());
+  const sh = document.getElementById("fSheet").value.trim(), ma = document.getElementById("fMa").value.trim(), ten = document.getElementById("fTen").value.trim(), th = document.getElementById("fTH").value.trim(), gia = parseVndInput(document.getElementById("fGia").value), giaBan = parseVndInput(document.getElementById("fGiaBan").value), ton = Math.max(0, parseInt(document.getElementById("fTon").value)||0), sapHet = Math.max(1, parseInt(document.getElementById("fSapHet").value)||2), tt = document.getElementById("fTT").value, ghiNote = document.getElementById("fGhi").value.trim(), vitri = document.getElementById("fVitri").value.trim(), img = document.getElementById("fImg").value || "", warrantyImg1 = resolveImageUrl(document.getElementById("fWarrantyImg1").value), warrantyImg2 = resolveImageUrl(document.getElementById("fWarrantyImg2").value), idx = document.getElementById("editIdx").value, grp = joinRowGroups(getSelectedFormGroups());
+  let quickTag = joinRowQuickTags(getSelectedQuickTags());
   if(!ma||!ten){alert("Vui lòng nhập Mã hàng và Tên sản phẩm!"); return;}
+  const primaryGroup = getPrimaryRowGroup(grp);
+  if(primaryGroup && !quickTag){
+    const previewRow = [sh,ma,ten,th,gia,ton,tt,ghiNote,grp,img,giaBan,"",sapHet,document.getElementById("fBranch").value,warrantyImg1,warrantyImg2];
+    const inferredTags = getQuickMetaCandidates(previewRow, primaryGroup).map(meta=>meta.primary).filter(isKnownQuickValue);
+    quickTag = joinRowQuickTags(inferredTags);
+    if(!quickTag && getQuickFixedCatalog(primaryGroup).length){
+      alert("⚠️ Chưa xác định được Phân loại nhanh cho sản phẩm này. Vui lòng chọn ít nhất một phân loại trước khi lưu để số lượng và tồn kho không bị đưa sai vào mục KHÁC.");
+      document.getElementById("fQuickTag")?.scrollIntoView({behavior:"smooth",block:"center"});
+      return;
+    }
+  }
   const idxNum = idx === "" ? -1 : parseInt(idx);
   const dupIdx = DATA.findIndex((row,i) => normalizeProductCode(row[1]) === normalizeProductCode(ma) && (row[13]||"Q2") === document.getElementById("fBranch").value && i !== idxNum);
   if(dupIdx !== -1){
