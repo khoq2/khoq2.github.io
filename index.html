@@ -1264,6 +1264,17 @@ html::-webkit-scrollbar-corner { background: #EAF2F8; }
         <div class="img-link-hint">Trên Drive: bấm chuột phải ảnh → Chia sẻ → Bất kỳ ai có link → dán link vào đây.</div>
       </div>
     </div>
+    <div class="form-row">
+      <div class="img-link-row">
+        <label for="saleWarranty1">Bảo hành 1</label>
+        <input type="text" id="saleWarranty1" class="img-link-input" placeholder="Dán URL Google Drive của Bảo hành 1">
+      </div>
+      <div class="img-link-row">
+        <label for="saleWarranty2">Bảo hành 2</label>
+        <input type="text" id="saleWarranty2" class="img-link-input" placeholder="Dán URL Google Drive của Bảo hành 2">
+      </div>
+      <div class="img-link-hint">Trên Drive: đặt quyền chia sẻ “Bất kỳ ai có liên kết” rồi dán URL vào đây.</div>
+    </div>
     <button class="btn-submit" onclick="saveSale()">💾 Lưu giao dịch</button>
     <button class="btn-cancel" onclick="closeOverlay('saleOverlay')">Huỷ</button>
   </div>
@@ -1420,10 +1431,6 @@ html::-webkit-scrollbar-corner { background: #EAF2F8; }
     if(typeof event.stopImmediatePropagation === "function") event.stopImmediatePropagation();
     return false;
   };
-
-  // Chặn menu chuột phải trên toàn trang. Không chặn click trái, chọn nội dung,
-  // nhập liệu hay các nút sao chép riêng của ứng dụng.
-  document.addEventListener("contextmenu", blockEvent, {capture:true});
 
   // Chỉ chặn đúng các tổ hợp thường dùng để mở/lưu mã nguồn và DevTools.
   // Các phím Enter, Escape, mũi tên, Ctrl+C/V/X/A và phím tắt nghiệp vụ vẫn hoạt động.
@@ -1813,7 +1820,7 @@ function checkAdminSession(){
 
 // Dòng URL duy nhất
 const SHEET_API_URL = "https://script.google.com/macros/s/AKfycby6YH69F7sfO1ZoUJsDm4BeX6Luj2GrhUfYWWJWNvqjraAEhkBck16EphrPBBm1BT3YqA/exec";
-const REQUIRED_API_VERSION = "2026.07.16-admin-session-9";
+const REQUIRED_API_VERSION = "2026.07.16-transaction-warranty-10";
 const SHEET_TIMEOUT_MS = 12000;
 const PENDING_SYNC_KEY = "kho_cntt_pending_sync";
 const PENDING_TX_SYNC_KEY = "kho_cntt_pending_tx_sync";
@@ -4549,7 +4556,8 @@ function normalizeTxItem(tx){
       ghi: String(tx[7] || "").trim(),
       img: String(tx[8] || ""),
       time: String(tx[9] || ""), branch: String(tx[10] || "Q2"),
-      vatRate: Number(tx[11]) || 0, basePrice: Number(tx[12]) || Number(tx[6]) || 0
+      vatRate: Number(tx[11]) || 0, basePrice: Number(tx[12]) || Number(tx[6]) || 0,
+      warranty1: String(tx[13] || ""), warranty2: String(tx[14] || "")
     };
   }
   if(tx && typeof tx === "object"){
@@ -4564,7 +4572,8 @@ function normalizeTxItem(tx){
       ghi: String(tx.ghi || tx.note || "").trim(),
       img: String(tx.img || tx.image || ""),
       time: String(tx.time || tx.createdAt || ""), branch: String(tx.branch || "Q2"),
-      vatRate: Number(tx.vatRate || 0) || 0, basePrice: Number(tx.basePrice || tx.gia || tx.price || 0) || 0
+      vatRate: Number(tx.vatRate || 0) || 0, basePrice: Number(tx.basePrice || tx.gia || tx.price || 0) || 0,
+      warranty1: String(tx.warranty1 || ""), warranty2: String(tx.warranty2 || "")
     };
   }
   return null;
@@ -4638,6 +4647,8 @@ function openSaleModal(idx){ if(!requireAdmin()) return;
   document.getElementById("saleVat8").checked = false;
   updateSaleVatPreview();
   document.getElementById("saleGhi").value = "";
+  document.getElementById("saleWarranty1").value = "";
+  document.getElementById("saleWarranty2").value = "";
   setTxImagePreview("");
   document.getElementById("saleImgFile").value = "";
   document.getElementById("saleOverlay").classList.add("open");
@@ -4684,6 +4695,8 @@ async function saveSale(){ if(!requireAdmin()) return;
   const gia = basePrice + vatAmount;
   const ghi = document.getElementById("saleGhi").value.trim();
   const img = document.getElementById("saleImg").value || "";
+  const warranty1 = resolveImageUrl(document.getElementById("saleWarranty1").value);
+  const warranty2 = resolveImageUrl(document.getElementById("saleWarranty2").value);
   const timeInput = document.getElementById("saleTime").value;
   if(!txId && (!Number.isInteger(qty) || qty <= 0)){
     alert("Số lượng xuất phải là số nguyên lớn hơn 0!");
@@ -4699,7 +4712,7 @@ async function saveSale(){ if(!requireAdmin()) return;
     if(!tx){ alert("Không tìm thấy giao dịch cần sửa!"); return; }
     try{
       await ensureAtomicApi();
-      const updated = {...tx,nv,gia,ghi,img,time:transactionTime,vatRate,basePrice};
+      const updated = {...tx,nv,gia,ghi,img,warranty1,warranty2,time:transactionTime,vatRate,basePrice};
       await postSheet("update_transaction",updated,35000);
       Object.assign(tx,updated);
       safeLocalStorageSet("kho_cntt_tx",JSON.stringify(normalizeTxList(TX_DATA)));
@@ -4717,7 +4730,7 @@ async function saveSale(){ if(!requireAdmin()) return;
   const r = DATA[idx];
   if(!r){ alert("Không tìm thấy sản phẩm cần xuất!"); return; }
   if(r[5] < qty){ alert(`Tồn kho chỉ còn ${r[5]}, không đủ xuất ${qty}!`); return; }
-  const tx = { id:document.getElementById("saleRequestId").value || newTransactionId(), ma:r[1], ten:r[2], sh:r[0], nv, qty, gia, ghi, img, time:transactionTime, branch:r[13]||"Q2", vatRate, basePrice };
+  const tx = { id:document.getElementById("saleRequestId").value || newTransactionId(), ma:r[1], ten:r[2], sh:r[0], nv, qty, gia, ghi, img, warranty1, warranty2, time:transactionTime, branch:r[13]||"Q2", vatRate, basePrice };
   try{
     const result = await commitInventoryTransaction("SALE",r,tx,{qty});
     DATA[idx][5] = Number(result.stock);
@@ -4971,6 +4984,10 @@ function renderTxHistory(){
           ${t.ghi?`<span class="tx-note">📝 ${escapeHtml(t.ghi)}</span>`:""}
           ${renderSameDayEmployeeLinks(t, r)}
           ${t.img?`<img class="tx-img" src="${escapeHtml(t.img)}" alt="Ảnh giao dịch" referrerpolicy="no-referrer" onclick="openImageViewer(this.src, this.alt)" onerror="this.style.display='none';">`:""}
+          ${(t.warranty1||t.warranty2)?`<div class="prod-media">
+            ${t.warranty1?`<button type="button" class="prod-extra-image" data-url="${escapeHtml(t.warranty1)}" data-title="Bảo hành 1 - ${escapeHtml(t.ten||t.ma||'Giao dịch')}" onclick="openImageViewer(this.dataset.url,this.dataset.title)">Bảo hành 1</button>`:""}
+            ${t.warranty2?`<button type="button" class="prod-extra-image" data-url="${escapeHtml(t.warranty2)}" data-title="Bảo hành 2 - ${escapeHtml(t.ten||t.ma||'Giao dịch')}" onclick="openImageViewer(this.dataset.url,this.dataset.title)">Bảo hành 2</button>`:""}
+          </div>`:""}
         </div>`).join("") : `<div style="text-align: center; padding: 20px; color: #888;">Không có giao dịch phù hợp bộ lọc</div>`;
   document.getElementById("txModalBody").innerHTML = filterBar + summary + rows;
 }
@@ -5021,6 +5038,8 @@ function editTX(id){ if(!requireAdmin()) return;
   document.getElementById("saleVat8").checked = Number(tx.vatRate) === 8;
   updateSaleVatPreview();
   document.getElementById("saleGhi").value = tx.ghi || "";
+  document.getElementById("saleWarranty1").value = tx.warranty1 || "";
+  document.getElementById("saleWarranty2").value = tx.warranty2 || "";
   setTxImagePreview(tx.img || "");
   document.getElementById("saleImgFile").value = "";
   document.getElementById("saleOverlay").classList.add("open");
@@ -6149,7 +6168,6 @@ function setupCustomerSecretHold(){
     if(Math.hypot(event.clientX-customerHoldStartX,event.clientY-customerHoldStartY)>48) cancel();
   });
   ["pointerup","pointercancel"].forEach(type=>icon.addEventListener(type,cancel));
-  icon.addEventListener("contextmenu",event=>event.preventDefault());
 }
 function closeOverlay(id){
   if(id==="customerOverlay"){ closeCustomerPanel(); return; }
