@@ -1411,6 +1411,31 @@ html::-webkit-scrollbar-corner { background: #EAF2F8; }
 
 <script>
 
+// ====== Lớp hạn chế xem/sao chép mã nguồn dành cho người dùng phổ thông ======
+// Đây chỉ là lớp răn đe ở trình duyệt; bảo mật ghi dữ liệu vẫn do Code.gs kiểm tra.
+(function setupSourceInspectionDeterrents(){
+  const blockEvent = event => {
+    event.preventDefault();
+    event.stopPropagation();
+    if(typeof event.stopImmediatePropagation === "function") event.stopImmediatePropagation();
+    return false;
+  };
+
+  // Chặn menu chuột phải trên toàn trang. Không chặn click trái, chọn nội dung,
+  // nhập liệu hay các nút sao chép riêng của ứng dụng.
+  document.addEventListener("contextmenu", blockEvent, {capture:true});
+
+  // Chỉ chặn đúng các tổ hợp thường dùng để mở/lưu mã nguồn và DevTools.
+  // Các phím Enter, Escape, mũi tên, Ctrl+C/V/X/A và phím tắt nghiệp vụ vẫn hoạt động.
+  document.addEventListener("keydown", event => {
+    const key = String(event.key || "").toLowerCase();
+    const command = event.ctrlKey || event.metaKey;
+    const devtoolsCombo = command && event.shiftKey && ["i","j","c","k"].includes(key);
+    const sourceCombo = command && !event.shiftKey && ["u","s"].includes(key);
+    if(key === "f12" || event.keyCode === 123 || devtoolsCombo || sourceCombo) blockEvent(event);
+  }, {capture:true});
+})();
+
 // ====== Tự động dọn banner/overlay lạ do hosting chèn vào ======
 (function(){
   const APP_IDS = new Set(["results","editOverlay","importOverlay","adminOverlay","toast","imageLightbox"]);
@@ -1677,10 +1702,6 @@ let productViewMode = "card";
 let importRows = [];
 let bulkSelectMode = false;
 const selectedItems = new Set();
-const ADMIN_PASSWORD_HASHES = new Set([
-  "63497c5b989530569d4c448692340a135021a377c5fa128aacdab44c529eed20",
-  "781939dc08f0ff7e770ec5019cd9bc26352a1a59aec656bbc3cd27ac87e008c5"
-]);
 let ownerTapCount = 0;
 let ownerTapTimer = null;
 
@@ -1726,6 +1747,7 @@ function setAdminMode(on){
     document.getElementById("adminBtn").textContent = "🔓 Admin (đang mở)";
   } else {
     sessionStorage.removeItem("kho_cntt_admin");
+    sessionStorage.removeItem("kho_admin_session_token");
     document.body.classList.remove("admin-mode");
     document.body.classList.remove("fab-menu-open");
     const fabMenu = document.getElementById("fabMenuItems");
@@ -1755,28 +1777,43 @@ function onAdminBtnClick(){
   }
 }
 async function submitAdminPass(){
-  const val = document.getElementById("adminPass").value;
-  const msgBuffer = new TextEncoder().encode(val);
-  const hashBuffer = await crypto.subtle.digest("SHA-256", msgBuffer);
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  const hashHex = hashArray.map(b => b.toString(16).padStart(2,"0")).join("");
-  if(ADMIN_PASSWORD_HASHES.has(hashHex)){
+  const input = document.getElementById("adminPass");
+  const val = input.value;
+  if(!val){ alert("Vui lòng nhập mật khẩu Admin!"); input.focus(); return; }
+  input.disabled = true;
+  try{
+    const result = await fetchSheetJson(SHEET_API_URL, {
+      method:"POST",
+      headers:{"Content-Type":"text/plain;charset=utf-8"},
+      body:JSON.stringify({action:"verify_admin",password:val})
+    }, 20000);
+    if(!result.token) throw new Error("Backend không cấp phiên Admin");
+    sessionStorage.setItem("kho_admin_session_token", result.token);
     setAdminMode(true);
     closeOverlay("adminOverlay");
     showToast("✅ Đã mở quyền chỉnh sửa");
-  } else {
-    alert("Sai mật khẩu!");
+  }catch(e){
+    sessionStorage.removeItem("kho_admin_session_token");
+    sessionStorage.removeItem("kho_cntt_admin");
+    alert(String(e).includes("ADMIN_LOGIN_FAILED") ? "Sai mật khẩu!" : "Không thể xác thực Admin: "+String(e));
+    input.select();
+  }finally{
+    input.disabled = false;
+    input.value = "";
   }
 }
 function checkAdminSession(){
-  if(sessionStorage.getItem("kho_cntt_admin")==="1"){
+  if(sessionStorage.getItem("kho_cntt_admin")==="1" && sessionStorage.getItem("kho_admin_session_token")){
     setAdminMode(true);
+  }else{
+    sessionStorage.removeItem("kho_cntt_admin");
+    sessionStorage.removeItem("kho_admin_session_token");
   }
 }
 
 // Dòng URL duy nhất
 const SHEET_API_URL = "https://script.google.com/macros/s/AKfycby6YH69F7sfO1ZoUJsDm4BeX6Luj2GrhUfYWWJWNvqjraAEhkBck16EphrPBBm1BT3YqA/exec";
-const REQUIRED_API_VERSION = "2026.07.15-atomic-8";
+const REQUIRED_API_VERSION = "2026.07.16-admin-session-9";
 const SHEET_TIMEOUT_MS = 12000;
 const PENDING_SYNC_KEY = "kho_cntt_pending_sync";
 const PENDING_TX_SYNC_KEY = "kho_cntt_pending_tx_sync";
@@ -1960,15 +1997,14 @@ async function postSheet(action, data, timeoutMs=SHEET_TIMEOUT_MS){
     headers:{"Content-Type":"text/plain;charset=utf-8"},
     body:JSON.stringify({action,data,auth:auth||""})
   },timeoutMs);
-  const savedKey = sessionStorage.getItem("kho_api_write_key") || "";
-  try{ return await send(savedKey); }
+  const sessionToken = sessionStorage.getItem("kho_admin_session_token") || "";
+  try{ return await send(sessionToken); }
   catch(e){
     if(!String(e).includes("AUTH_REQUIRED")) throw e;
-    const entered = prompt("Nhập khóa ghi API của kho:","");
-    if(!entered) throw new Error("Đã hủy vì chưa có khóa ghi API");
-    const result = await send(entered.trim());
-    sessionStorage.setItem("kho_api_write_key",entered.trim());
-    return result;
+    sessionStorage.removeItem("kho_admin_session_token");
+    sessionStorage.removeItem("kho_cntt_admin");
+    if(isAdminMode()) setAdminMode(false);
+    throw new Error("Phiên Admin đã hết hạn. Vui lòng đăng nhập Admin lại rồi thực hiện thao tác.");
   }
 }
 let atomicApiVersionChecked = false;
