@@ -46,6 +46,15 @@ button:disabled,input:disabled,select:disabled,[aria-disabled="true"] { cursor:n
 .title-shine { position: absolute; left: 0; top: 50%; width: 42%; height: 1.4em; z-index: 2; pointer-events: none; border-radius: 999px; background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,.15) 18%, rgba(255,255,255,.95) 50%, rgba(255,255,255,.15) 82%, rgba(255,255,255,0) 100%); filter: blur(.4px); opacity: .9; transform: translate(-140%, -50%) skewX(-18deg); animation: titleSweep 3.2s ease-in-out infinite alternate; }
 @keyframes titleSweep { from { transform: translate(-140%, -50%) skewX(-18deg); } to { transform: translate(260%, -50%) skewX(-18deg); } }
 .kpi-row { display: flex; gap: 5px; margin-bottom: 10px; }
+.kpi-export-actions { display:none; align-items:center; justify-content:center; gap:9px; margin:12px 0 4px; padding-top:10px; border-top:1px solid #E5EAF0; }
+body.admin-mode .kpi-export-actions { display:flex; }
+.kpi-export-btn { width:46px; height:38px; border:0; border-radius:9px; display:inline-flex; align-items:center; justify-content:center; color:#fff; font-size:18px; font-weight:900; box-shadow:0 3px 9px rgba(0,0,0,.16); transition:transform .15s ease,filter .15s ease; }
+.kpi-export-btn:hover { transform:translateY(-1px); filter:brightness(1.1); }
+.kpi-export-btn:active { transform:scale(.94); }
+.kpi-export-camera { background:#2471A3; }
+.kpi-export-excel { background:#1D6F42; font-size:14px; }
+.kpi-export-pdf { background:#B03A2E; font-size:11px; }
+@media (max-width:480px){ .kpi-export-btn { width:52px; } }
 .kpi-hint { font-size: 7px; opacity: .7; vertical-align: middle; }
 .kpi { flex: 1; border-radius: 8px; padding: 5px 6px; text-align: center; }
 .kpi:active { opacity: .8; }
@@ -1478,6 +1487,11 @@ html::-webkit-scrollbar-corner { background: #EAF2F8; }
   <div class="modal" onclick="event.stopPropagation()" style="max-height: 80vh; overflow-y: auto;">
     <div class="modal-title" id="kpiModalTitle">Chi tiết</div>
     <div id="kpiModalBody"></div>
+    <div class="kpi-export-actions admin-only" aria-label="Xuất đúng nội dung KPI đang xem">
+      <button type="button" class="kpi-export-btn kpi-export-camera" title="Chụp ảnh KPI này" aria-label="Chụp ảnh KPI này" onclick="captureCurrentKpi()">📷</button>
+      <button type="button" class="kpi-export-btn kpi-export-excel" title="Xuất KPI này ra Excel" aria-label="Xuất KPI này ra Excel" onclick="exportCurrentKpiExcel()">X</button>
+      <button type="button" class="kpi-export-btn kpi-export-pdf" title="Xuất KPI này ra PDF" aria-label="Xuất KPI này ra PDF" onclick="exportCurrentKpiPdf()">PDF</button>
+    </div>
     <button class="btn-cancel" onclick="closeOverlay('kpiOverlay')">Đóng</button>
   </div>
 </div>
@@ -2646,6 +2660,7 @@ function openKpiProduct(idx){
   selectSearchSuggestion(idx);
 }
 function showKpiDetail(type){
+  currentKpiExportType = type;
   const cfg = SHEET_CFG;
   const titles = {all:"📦 Chi tiết mặt hàng theo danh mục", ton:"📊 Tổng tồn kho theo danh mục", het:"🔴 Danh sách hết hàng", sap:"🟡 Danh sách sắp hết hàng"};
   const shOrder = ["MT","MI","CAM","INT"];
@@ -6760,6 +6775,43 @@ function closeOverlay(id){
 function overlayClose(e,id){ if(e.target===document.getElementById(id)) closeOverlay(id); }
 let toastTimer;
 function showToast(msg, duration=2200){ const t=document.getElementById("toast"); t.textContent=msg; t.classList.add("show"); clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove("show"),duration); }
+let currentKpiExportType="all";
+function getCurrentKpiExport(){
+  const all=DATA.map(r=>{ const qty=Number(r[5])||0, low=Number(r[12])||0; return {branch:r[13]||"Q2",code:r[1]||"",name:r[2]||"",category:r[0]||"",qty,low,status:getStockStatusLabel(qty,low),location:splitNoteLocation(r[7]).location||""}; });
+  const type=currentKpiExportType, titles={all:"CHI TIẾT MẶT HÀNG",ton:"TỔNG TỒN KHO",het:"DANH SÁCH HẾT HÀNG",sap:"DANH SÁCH SẮP HẾT HÀNG"};
+  const inventory=type==="het"?all.filter(r=>getStockState(r.qty,r.low)==="HET"):type==="sap"?all.filter(r=>getStockState(r.qty,r.low)==="SAP"):all;
+  return {type,title:titles[type],inventory,totalStock:inventory.reduce((sum,r)=>sum+r.qty,0),generatedAt:formatTxTime(new Date())};
+}
+function quickInventoryFileStamp(){
+  const d=new Date(), p=n=>String(n).padStart(2,"0");
+  return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}_${p(d.getHours())}-${p(d.getMinutes())}`;
+}
+function captureCurrentKpi(){
+  if(!requireAdmin()) return;
+  const r=getCurrentKpiExport(), canvas=document.createElement("canvas"), ctx=canvas.getContext("2d"), rowH=46;
+  canvas.width=1200; canvas.height=Math.max(430,190+r.inventory.length*rowH);
+  const grad=ctx.createLinearGradient(0,0,1200,canvas.height); grad.addColorStop(0,"#173454"); grad.addColorStop(1,"#2E6F9E"); ctx.fillStyle=grad; ctx.fillRect(0,0,1200,canvas.height);
+  ctx.fillStyle="#fff"; ctx.font="bold 40px Arial"; ctx.fillText(`KHO Q2 - ${r.title}`,50,65);
+  ctx.font="24px Arial"; ctx.fillStyle="rgba(255,255,255,.82)"; ctx.fillText(`Xuất lúc: ${r.generatedAt}`,60,125);
+  ctx.fillStyle="#fff"; ctx.fillRect(35,145,1130,canvas.height-170); ctx.fillStyle="#1E3A5F"; ctx.font="bold 21px Arial"; ctx.fillText(`Tổng cộng: ${r.inventory.length} mặt hàng${r.type==="ton"?` • ${r.totalStock.toLocaleString("vi-VN")} tồn`:""}`,55,180);
+  ctx.font="18px Arial"; r.inventory.forEach((x,i)=>{ const y=225+i*rowH; ctx.fillStyle=i%2?"#F4F7FA":"#fff"; ctx.fillRect(45,y-29,1110,rowH); ctx.fillStyle="#243B53"; ctx.fillText(`${i+1}. ${x.code} - ${x.name}`.slice(0,92),60,y); ctx.textAlign="right"; ctx.font="bold 18px Arial"; ctx.fillText(`Tồn: ${x.qty}`,1125,y); ctx.textAlign="left"; ctx.font="18px Arial"; });
+  const a=document.createElement("a"); a.download=`KPI-${r.type}-${quickInventoryFileStamp()}.png`; a.href=canvas.toDataURL("image/png"); a.click(); showToast(`✅ Đã chụp ${r.title.toLowerCase()}`);
+}
+function exportCurrentKpiExcel(){
+  if(!requireAdmin()) return;
+  if(typeof XLSX==="undefined"){ showToast("⚠️ Chưa tải được công cụ Excel.",4000); return; }
+  const r=getCurrentKpiExport(), headers=["Chi nhánh","Mã hàng","Tên sản phẩm","Nhóm hàng","Tồn hiện tại","Ngưỡng sắp hết","Trạng thái","Vị trí"], rows=list=>list.map(x=>[x.branch,x.code,x.name,x.category,x.qty,x.low,x.status,x.location]);
+  const wb=XLSX.utils.book_new(), add=(name,data,widths)=>{ const ws=XLSX.utils.aoa_to_sheet(data); ws["!cols"]=widths.map(w=>({wch:w})); ws["!autofilter"]={ref:`A1:${XLSX.utils.encode_col(data[0].length-1)}${data.length}`}; XLSX.utils.book_append_sheet(wb,ws,name); };
+  add("Tổng hợp",[[r.title,"Số lượng"],["Thời điểm xuất",r.generatedAt],["Tổng mặt hàng",r.inventory.length],["Tổng tồn",r.totalStock]],[32,28]); add("Danh sách KPI",[headers,...rows(r.inventory)],[12,16,42,20,13,16,18,28]);
+  XLSX.writeFile(wb,`KPI-${r.type}-${quickInventoryFileStamp()}.xlsx`); showToast(`✅ Đã xuất Excel ${r.title.toLowerCase()}`);
+}
+function exportCurrentKpiPdf(){
+  if(!requireAdmin()) return;
+  if(typeof pdfMake==="undefined"){ showToast("⚠️ Chưa tải được công cụ PDF.",4000); return; }
+  const r=getCurrentKpiExport(), body=[["Mã hàng","Sản phẩm","Nhóm","Tồn","Ngưỡng","Trạng thái"],...r.inventory.map(x=>[x.code,x.name,x.category,String(x.qty),String(x.low),x.status])];
+  const doc={pageSize:"A4",pageMargins:[28,30,28,30],defaultStyle:{font:"Roboto",fontSize:9},styles:{title:{fontSize:18,bold:true,alignment:"center",color:"#1E3A5F"}},content:[{text:`KHO Q2 - ${r.title}`,style:"title"},{text:`Xuất lúc: ${r.generatedAt} • Tổng cộng: ${r.inventory.length} mặt hàng${r.type==="ton"?` • ${r.totalStock} tồn`:""}`,alignment:"center",margin:[0,4,0,12]},{table:{headerRows:1,widths:[65,"*",90,38,45,65],body},layout:"lightHorizontalLines"}],footer:(p,ps)=>({text:`Trang ${p}/${ps}`,alignment:"right",fontSize:8,margin:[0,5,28,0]})};
+  pdfMake.createPdf(doc).download(`KPI-${r.type}-${quickInventoryFileStamp()}.pdf`); showToast(`✅ Đã xuất PDF ${r.title.toLowerCase()}`);
+}
 function chooseAccountingMonth(){
   const now=new Date(), def=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,"0")}`;
   const value=prompt("Nhập tháng báo cáo theo dạng YYYY-MM:",def);
