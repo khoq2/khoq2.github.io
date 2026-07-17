@@ -46,15 +46,20 @@ button:disabled,input:disabled,select:disabled,[aria-disabled="true"] { cursor:n
 .title-shine { position: absolute; left: 0; top: 50%; width: 42%; height: 1.4em; z-index: 2; pointer-events: none; border-radius: 999px; background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,.15) 18%, rgba(255,255,255,.95) 50%, rgba(255,255,255,.15) 82%, rgba(255,255,255,0) 100%); filter: blur(.4px); opacity: .9; transform: translate(-140%, -50%) skewX(-18deg); animation: titleSweep 3.2s ease-in-out infinite alternate; }
 @keyframes titleSweep { from { transform: translate(-140%, -50%) skewX(-18deg); } to { transform: translate(260%, -50%) skewX(-18deg); } }
 .kpi-row { display: flex; gap: 5px; margin-bottom: 10px; }
-.kpi-export-actions { display:none; align-items:center; justify-content:center; gap:9px; margin:12px 0 4px; padding-top:10px; border-top:1px solid #E5EAF0; }
+.kpi-export-actions { display:none; align-items:center; justify-content:center; gap:7px; margin:10px 0 3px; padding-top:9px; border-top:1px solid #E5EAF0; }
 body.admin-mode .kpi-export-actions { display:flex; }
-.kpi-export-btn { width:46px; height:38px; border:0; border-radius:9px; display:inline-flex; align-items:center; justify-content:center; color:#fff; font-size:18px; font-weight:900; box-shadow:0 3px 9px rgba(0,0,0,.16); transition:transform .15s ease,filter .15s ease; }
+.kpi-export-btn { width:40px; height:34px; flex:0 0 40px; padding:0; border:0; border-radius:8px; display:inline-flex; align-items:center; justify-content:center; color:#fff; font-size:16px; font-weight:900; box-shadow:0 2px 7px rgba(0,0,0,.15); transition:transform .15s ease,filter .15s ease; }
+.kpi-export-btn svg { width:19px; height:19px; display:block; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; pointer-events:none; }
 .kpi-export-btn:hover { transform:translateY(-1px); filter:brightness(1.1); }
 .kpi-export-btn:active { transform:scale(.94); }
 .kpi-export-camera { background:#2471A3; }
-.kpi-export-excel { background:#1D6F42; font-size:14px; }
-.kpi-export-pdf { background:#B03A2E; font-size:11px; }
-@media (max-width:480px){ .kpi-export-btn { width:52px; } }
+.kpi-export-excel { background:#1D6F42; }
+.kpi-export-pdf { background:#B03A2E; font-size:10px; letter-spacing:-.2px; }
+@media (max-width:480px){
+  .kpi-export-actions { gap:6px; margin-top:9px; padding-top:8px; }
+  .kpi-export-btn { width:38px; height:34px; flex-basis:38px; border-radius:8px; }
+  .kpi-export-btn svg { width:18px; height:18px; }
+}
 .kpi-hint { font-size: 7px; opacity: .7; vertical-align: middle; }
 .kpi { flex: 1; border-radius: 8px; padding: 5px 6px; text-align: center; }
 .kpi:active { opacity: .8; }
@@ -1489,7 +1494,7 @@ html::-webkit-scrollbar-corner { background: #EAF2F8; }
     <div id="kpiModalBody"></div>
     <div class="kpi-export-actions admin-only" aria-label="Xuất đúng nội dung KPI đang xem">
       <button type="button" class="kpi-export-btn kpi-export-camera" title="Chụp ảnh KPI này" aria-label="Chụp ảnh KPI này" onclick="captureCurrentKpi()">📷</button>
-      <button type="button" class="kpi-export-btn kpi-export-excel" title="Xuất KPI này ra Excel" aria-label="Xuất KPI này ra Excel" onclick="exportCurrentKpiExcel()">X</button>
+      <button type="button" class="kpi-export-btn kpi-export-excel" title="Xuất KPI này ra Excel" aria-label="Xuất KPI này ra Excel" onclick="exportCurrentKpiExcel()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 3.5h10v17H4z"></path><path d="M14 6.5h6v14h-6M7 9l4 6M11 9l-4 6M16.5 10h2M16.5 14h2M16.5 18h2"></path></svg></button>
       <button type="button" class="kpi-export-btn kpi-export-pdf" title="Xuất KPI này ra PDF" aria-label="Xuất KPI này ra PDF" onclick="exportCurrentKpiPdf()">PDF</button>
     </div>
     <button class="btn-cancel" onclick="closeOverlay('kpiOverlay')">Đóng</button>
