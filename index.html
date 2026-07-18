@@ -2178,8 +2178,12 @@ function selectWarehouseBranch(branch){
   try{ localStorage.setItem("kho_active_warehouse",branch); }catch(_){}
   totalStockView=false; restockOnly=false;
   const formBranch=document.getElementById("fBranch"); if(formBranch && !document.getElementById("editOverlay")?.classList.contains("open")) formBranch.value=branch;
+  closeSearchSuggestions();
+  latestItemsTickerIndex=0; latestItemsTickerKey=""; latestItemsTickerHasShown=false;
   syncWarehouseBranchUI();
   render();
+  if(searchQ.trim()) renderSearchSuggestions(searchQ);
+  refreshLatestItemsTicker();
 }
 let restockOnly = false;
 let totalStockView = false;
@@ -5071,6 +5075,10 @@ function render(){
     setupQuickNavScrollIndicators();
     return;
   }
+  if(!results.length && !bulkSelectMode && !kw && currentTab==="ALL" && currentStatus==="ALL" && !restockOnly && (currentBranch==="Q2" || currentBranch==="Q5")){
+    el.innerHTML = `<div class="empty search-landing"><div class="search-landing-icon">📍</div><div class="empty-title">Kho ${escapeHtml(currentBranch)} chưa có sản phẩm</div><div class="empty-sub">Hãy bấm “Thêm thiết bị” để nhập mặt hàng đầu tiên cho đúng chi nhánh này.</div></div>`;
+    return;
+  }
   if(!bulkSelectMode && !kw && currentTab==="ALL" && currentStatus==="ALL" && !restockOnly && currentBranch==="ALL"){
     el.innerHTML = `<div class="empty search-landing"><div class="search-landing-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"></circle><path d="M15.5 15.5L21 21"></path></svg></div><div class="empty-title">Bạn muốn tìm thiết bị nào?</div><div class="empty-sub">Chọn gợi ý hoặc nhập tên, mã hàng hay thương hiệu vào ô phía trên</div><div class="search-examples">${getSearchKeywordsForVisit().map(keyword=>`<button type="button" class="search-example" onclick="applySearchExample(this.textContent)">${escapeHtml(keyword)}</button>`).join("")}</div></div>`;
     return;
@@ -7451,7 +7459,7 @@ function getItemCreatedAtKey(row){
 }
 function getLatestTickerItems(){
   return DATA.map((row, index)=>({row, index, createdAt: Number(ITEM_CREATED_AT[getItemCreatedAtKey(row)]) || 0}))
-    .filter(item=>item.row && item.row[2])
+    .filter(item=>item.row && item.row[2] && String(item.row[13]||"Q2")===currentBranch)
     .sort((a,b)=>b.createdAt - a.createdAt || a.index - b.index)
     .slice(0, 5);
 }
@@ -7540,6 +7548,7 @@ function renderSearchSuggestions(value){
     const name = removeAccents(String(r[2]||""));
     const brand = removeAccents(String(r[3]||""));
     const hay = removeAccents([r[1],r[2],r[3],r[7],r[8],r[11],r[13]||"Q2"].join(" "));
+    if(String(r[13]||"Q2")!==currentBranch) return null;
     if(currentTab!=="ALL" && r[0]!==currentTab) return null;
     if(!tokens.every(token=>hay.includes(token))) return null;
     let score = 5;
