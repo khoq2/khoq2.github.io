@@ -5275,6 +5275,9 @@ function render(){
   const kwTokens = kw ? kw.split(/\s+/).filter(Boolean) : [];
   const homeLandingMode = !bulkSelectMode && !kw && currentTab==="ALL" && currentStatus==="ALL" && !restockOnly && !totalStockView;
   document.body.classList.toggle("home-landing-mode", homeLandingMode);
+  const latestTickerEl=document.getElementById("latestItemsTicker");
+  const footerCreditEl=document.querySelector(".footer-credit");
+  if(latestTickerEl && footerCreditEl && latestTickerEl.nextElementSibling!==footerCreditEl) latestTickerEl.after(footerCreditEl);
   const results = DATA.map((r,i)=>({r,i})).filter(({r})=>{
     const [sh,,ten,th,,,tt,ghi] = r;
     if(currentTab!=="ALL" && sh!==currentTab) return false;
@@ -7384,7 +7387,10 @@ function syncRestockButton(on){
   btn.style.color = on ? "#fff" : "#666";
   btn.style.borderColor = on ? "#922B21" : "#EC7063";
 }
-function setTab(btn){ goToTab(btn.dataset.tab); }
+function setTab(btn){
+  goToTab(btn.dataset.tab);
+  requestAnimationFrame(()=>btn.scrollIntoView({behavior:"smooth",block:"nearest",inline:"center"}));
+}
 function setStatus(btn){
   currentStatus = btn.dataset.status;
   restockOnly = false;
@@ -8290,6 +8296,11 @@ function setupHeaderAutoCollapse(){
       previousY = y;
       ticking = false;
       if(headerTransitioning || Date.now() < headerManualLockUntil) return;
+      if(window.matchMedia("(hover:none),(pointer:coarse)").matches){
+        downwardDistance=0;
+        upwardDistance=0;
+        return;
+      }
       if(document.activeElement === document.getElementById('search') || document.querySelector('.search-suggestions.open')){
         downwardDistance = 0;
         upwardDistance = 0;
@@ -8356,21 +8367,14 @@ function setupHeaderAutoCollapse(){
     touchStartY = e.changedTouches?.[0]?.clientY ?? null;
   }, {passive:true});
   window.addEventListener('touchend', e=>{
-    if(touchStartY===null || window.innerWidth>768) return;
+    if(touchStartY===null) return;
     const endY = e.changedTouches?.[0]?.clientY;
     const distance = Number.isFinite(endY) ? endY-touchStartY : 0;
     touchStartY = null;
     const sticky = document.querySelector('.sticky');
-    if(!sticky?.classList.contains('collapsed')){ downwardSwipeCount=0; return; }
     if(document.activeElement===document.getElementById('search') || document.querySelector('.search-suggestions.open') || document.querySelector('.overlay.open')) return;
-    if(distance < 45){ if(distance < -45) downwardSwipeCount=0; return; }
-    const now = Date.now();
-    downwardSwipeCount = now-lastDownwardSwipeAt <= 1800 ? downwardSwipeCount+1 : 1;
-    lastDownwardSwipeAt = now;
-    if(downwardSwipeCount>=2){
-      downwardSwipeCount=0;
-      setHeaderCollapsed(false,false);
-    }
+    if(distance<=-70 && !sticky?.classList.contains('collapsed')) setHeaderCollapsed(true,false);
+    else if(distance>=70 && sticky?.classList.contains('collapsed')) setHeaderCollapsed(false,false);
   }, {passive:true});
 }
 restoreHeaderState();
@@ -8474,7 +8478,6 @@ function setupSlowAutoScroll(selector){
   }, 80);
 }
 function setupHeaderAutoScroll(){
-  setupSlowAutoScroll(".tabs");
   setupSlowAutoScroll(".filters");
 }
 setupHeaderAutoScroll();
