@@ -1686,12 +1686,12 @@ html::-webkit-scrollbar-corner { background: #EAF2F8; }
   .card-shell { margin-bottom:8px; }
   .card { border-radius:10px; box-shadow:0 2px 7px rgba(30,58,95,.09); }
   .card:hover,.card:focus-within { transform:none; box-shadow:0 2px 7px rgba(30,58,95,.11); }
-  .card-top { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)) auto; align-items:stretch; gap:5px; padding:7px; }
+  .card-top { display:grid; grid-template-columns:minmax(68px,1.15fr) minmax(50px,.72fr) minmax(70px,1fr) minmax(76px,auto); align-items:stretch; gap:4px; padding:7px; }
   .card-top-left { display:contents; }
-  .sheet-badge,.ma-code { display:flex; align-items:center; justify-content:center; min-width:0; min-height:30px; margin:0; padding:5px 6px; border-radius:7px; font-size:10px; line-height:1.15; text-align:center; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .sheet-badge,.ma-code { display:flex; align-items:center; justify-content:center; min-width:0; min-height:30px; margin:0; padding:4px 3px; border-radius:7px; font-size:8.5px; line-height:1.1; letter-spacing:-.12px; text-align:center; white-space:nowrap; overflow:hidden; text-overflow:clip; }
   .product-category-path { grid-column:1/-1; grid-row:2; display:flex; align-items:center; justify-content:center; flex-wrap:wrap; width:100%; max-width:100%; margin-top:2px; font-size:10px; line-height:1.25; text-align:center; overflow:visible; }
   .product-path-link { min-width:0; min-height:28px; padding:3px 2px; white-space:normal; overflow:visible; text-overflow:clip; overflow-wrap:anywhere; }
-  .status-badge { grid-column:4; grid-row:1; display:flex; align-items:center; justify-content:center; max-width:100%; min-height:30px; margin:0; padding:5px 8px; font-size:10px; line-height:1.15; white-space:nowrap; text-align:center; }
+  .status-badge { grid-column:4; grid-row:1; display:flex; align-items:center; justify-content:center; max-width:100%; min-height:30px; margin:0; padding:4px 6px; font-size:9px; line-height:1.1; white-space:nowrap; text-align:center; }
   .card-body { padding:8px 9px; }
   .card-body-flex { display:grid; grid-template-columns:64px minmax(0,1fr); align-items:start; gap:10px; }
   .prod-media { width:64px; min-width:64px; flex-basis:64px; }
@@ -1702,13 +1702,14 @@ html::-webkit-scrollbar-corner { background: #EAF2F8; }
   .card-footer { justify-content:flex-start; align-items:flex-start; gap:5px; }
   .card-price-desktop { display:none; }
   .card-price-mobile { display:flex; align-items:center; justify-content:center; gap:6px; min-height:58px; margin:7px 0 0 -74px; width:calc(100% + 74px); padding:7px 8px; border:1px solid #E1E8EF; border-left:3px solid #2E86C1; border-radius:8px; background:#F8FAFC; }
-  .card-price-mobile::before { content:"Giá bán:"; color:#7B7D7D; font-size:11px; }
   .brand-tag { max-width:100%; padding:4px 7px; font-size:10px; line-height:1.2; white-space:normal; overflow-wrap:anywhere; }
   .price { font-size:13px; }
   .price-contact-btn { min-height:36px!important; padding:7px 10px!important; font-size:10.5px!important; }
   .ton-ctrl,.nguoi-ban-row { margin-left:-74px; width:calc(100% + 74px); max-width:none; }
-  .ton-ctrl { min-height:44px; padding:7px 8px; gap:6px; }
-  .btn-location { flex:1 1 150px; min-width:0; min-height:34px; white-space:normal; overflow-wrap:anywhere; line-height:1.25; }
+  .ton-ctrl { display:grid; grid-template-columns:auto auto minmax(0,1fr) auto auto; align-items:center; min-height:44px; padding:7px 8px; gap:5px; flex-wrap:nowrap; }
+  .ton-label { font-size:10px; white-space:nowrap; }
+  .ton-val { font-size:14px; min-width:15px; }
+  .btn-location { width:100%; min-width:0; min-height:32px; padding:5px 4px; font-size:9.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; line-height:1.15; }
   .nguoi-ban-row { min-height:44px; margin-top:6px; padding:7px; font-size:10.5px; }
   .nguoi-ban-label,.nguoi-ban-count,.nguoi-ban-latest-text { min-width:0; white-space:normal; overflow:visible; text-overflow:clip; overflow-wrap:anywhere; }
   .card-actions > button { min-height:44px; padding:8px 6px; line-height:1.2; white-space:normal; overflow-wrap:anywhere; }
