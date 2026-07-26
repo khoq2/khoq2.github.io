@@ -515,7 +515,22 @@ mark.kw-hit { background: #FFEB3B; color: #1A1A1A; padding: 0 1px; border-radius
 .build-tray-open b,.build-tray-open small { display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .build-tray-open b { font-size:12px; }.build-tray-open small { margin-top:1px; color:#5E7486; font-size:10px; }
 .build-tray-view { min-height:34px; border:0; border-radius:10px; padding:7px 12px; background:#F5B041; color:#3D2A05; font-size:11px; font-weight:900; cursor:pointer; white-space:nowrap; box-shadow:inset 0 1px 0 rgba(255,255,255,.38),0 2px 7px rgba(125,79,0,.18); }
-@media(max-width:480px){ .build-selection-tray{min-height:42px;padding:4px 5px 4px 9px}.build-tray-open small{display:none}.build-tray-view{min-height:32px;padding:6px 11px} }
+@media(max-width:600px){
+  .build-selection-tray{
+    z-index:460;
+    bottom:max(92px,calc(env(safe-area-inset-bottom) + 84px));
+    width:calc(100vw - 22px);
+    min-height:46px;
+    padding:5px 6px 5px 10px;
+    border-color:rgba(30,58,95,.18);
+    background:rgba(245,249,252,.97);
+    -webkit-backdrop-filter:none;
+    backdrop-filter:none;
+    box-shadow:0 6px 20px rgba(30,58,95,.22);
+  }
+  .build-tray-open small{display:none}
+  .build-tray-view{min-height:34px;padding:7px 11px}
+}
 .build-summary-modal { max-height:90vh; max-height:90svh; }
 .build-summary-head { display:flex; align-items:flex-start; justify-content:space-between; gap:10px; margin-bottom:12px; }
 .build-summary-sub { color:#64748B; font-size:12px; margin-top:3px; }
@@ -781,22 +796,22 @@ body.fab-menu-open .category-view-bar .view-mode-switch { pointer-events:none; }
     display:block!important;
     visibility:visible!important;
     opacity:1!important;
-    position:fixed!important;
-    z-index:450!important;
-    left:50%!important;
+    position:relative!important;
+    z-index:1!important;
+    left:auto!important;
     right:auto!important;
     top:auto!important;
-    bottom:max(96px,calc(env(safe-area-inset-bottom) + 88px))!important;
+    bottom:auto!important;
     width:max-content!important;
     max-width:calc(100vw - 24px)!important;
-    margin:0!important;
+    margin:14px auto 76px!important;
     padding:4px 9px!important;
     border-radius:999px!important;
     background:rgba(255,255,255,.88)!important;
     box-shadow:0 2px 9px rgba(30,58,95,.13)!important;
     color:#1E3A5F!important;
     font-size:10px!important;
-    transform:translateX(-50%)!important;
+    transform:none!important;
     pointer-events:none;
   }
   body .footer-credit-text {
@@ -1564,6 +1579,13 @@ html::-webkit-scrollbar-corner { background: #EAF2F8; }
   .condition-choice { flex:1 1 calc(50% - 4px); min-height:42px; }
   .condition-none { flex-basis:100%; }
 }
+/* Các thẻ có thể xuất hiện hàng trăm lần: giữ kiểu tĩnh để cuộn và bấm mượt. */
+.card .price-contact-btn,
+.card .nv-role-badge,
+.card .nv-role-badge::before,
+.card .nv-role-badge::after,
+.card .nv-role-badge > span:first-child,
+.card .nv-role-badge .nv-role-icon { animation:none!important; will-change:auto!important; }
 </style>
 </head>
 <body>
@@ -2208,7 +2230,7 @@ html::-webkit-scrollbar-corner { background: #EAF2F8; }
 // ====== Tự động dọn banner/overlay lạ do hosting chèn vào ======
 (function(){
   const APP_IDS = new Set(["results","editOverlay","importOverlay","adminOverlay","toast","imageLightbox"]);
-  const APP_CLASSES = ["sticky","fab-wrap","overlay","toast","image-lightbox","cursor-halo","cursor-dot","cursor-click-wave"];
+  const APP_CLASSES = ["sticky","fab-wrap","overlay","toast","image-lightbox","cursor-halo","cursor-dot","cursor-click-wave","footer-credit","build-selection-tray","category-view-bar","latest-items-ticker","scroll-btns"];
   function isAppEl(el){
     if(el.id && APP_IDS.has(el.id)) return true;
     if(el.classList){
@@ -2234,8 +2256,15 @@ html::-webkit-scrollbar-corner { background: #EAF2F8; }
       });
     });
   }
-  setInterval(cleanup, 1000);
-  document.addEventListener("click", ()=>setTimeout(cleanup,50), true);
+  let cleanupFrame=0;
+  const scheduleCleanup=()=>{
+    if(cleanupFrame) return;
+    cleanupFrame=requestAnimationFrame(()=>{ cleanupFrame=0; cleanup(); });
+  };
+  const observer=new MutationObserver(scheduleCleanup);
+  observer.observe(document.documentElement,{childList:true});
+  observer.observe(document.body,{childList:true});
+  window.addEventListener("load",scheduleCleanup,{once:true});
   cleanup();
 })();
 
@@ -5656,8 +5685,9 @@ function toggleBulkSelectMode(){
 function toggleItemSelected(idx, checked){
   if(checked){ selectedItems.add(idx); if(!buildQtyByIndex.has(idx)) buildQtyByIndex.set(idx,1); }
   else { selectedItems.delete(idx); buildQtyByIndex.delete(idx); }
+  const card=document.querySelector(`#results .card[data-index="${idx}"]`);
+  if(card) card.classList.toggle("bulk-selected",checked);
   updateBulkControls();
-  render();
 }
 
 function getBuildSelectedRows(){
@@ -8411,7 +8441,7 @@ function renderSearchSuggestions(value){
   const rawTokens = String(value||"").trim().split(/\s+/).filter(Boolean).map(removeAccents);
   box.innerHTML = searchSuggestionItems.map(({r,i},idx)=>{
     const stockClass=getStockState(r[5],r[12]).toLowerCase();
-    return `<button type="button" class="search-suggestion" data-suggestion-index="${idx}" onclick="selectSearchSuggestion(${i})"><span class="search-suggestion-main"><span class="search-suggestion-name">${highlightMatch(r[2]||"Chưa có tên",rawTokens)}</span><span class="search-suggestion-meta"><span class="search-suggestion-code">${highlightMatch(r[1]||"Chưa có mã",rawTokens)}</span><span class="search-suggestion-branch">📍 ${escapeHtml(r[13]||"Q2")}</span><span class="search-suggestion-stock ${stockClass}">Tồn ${Number(r[5])||0}</span></span></span></button>`;
+    return `<button type="button" class="search-suggestion" data-suggestion-index="${idx}" onclick="selectSearchSuggestion(${i})"><span class="search-suggestion-main"><span class="search-suggestion-name">${renderProductTitleWithCondition(r[2]||"Chưa có tên",rawTokens)}</span><span class="search-suggestion-meta"><span class="search-suggestion-code">${highlightMatch(r[1]||"Chưa có mã",rawTokens)}</span><span class="search-suggestion-branch">📍 ${escapeHtml(r[13]||"Q2")}</span><span class="search-suggestion-stock ${stockClass}">Tồn ${Number(r[5])||0}</span></span></span></button>`;
   }).join("");
   box.classList.add("open");
   document.querySelector(".sticky")?.classList.add("suggestions-open");
@@ -8723,7 +8753,7 @@ function setupSlowAutoScroll(selector){
   }, 80);
 }
 function setupHeaderAutoScroll(){
-  setupSlowAutoScroll(".filters");
+  // Kéo/vuốt thủ công mượt hơn và không cần timer chạy nền liên tục.
 }
 setupHeaderAutoScroll();
 
@@ -8826,29 +8856,7 @@ function setupGroupChipsAutoScroll(){
         track.addEventListener("pointercancel",end);
       });
     }
-    // Desktop dùng chuột/kéo trực tiếp, không tạo timer nền cho từng nhóm.
-    // Chỉ điện thoại màn hình nhỏ mới tự cuộn để gợi ý còn nội dung phía bên phải.
-    if(touchLike && window.innerWidth<=480){
-      const timer = setInterval(()=>{
-        let positionChanged=false;
-        const max = el.scrollWidth - el.clientWidth;
-        if(max > 2){
-          if(Date.now() >= state.pauseUntil){
-            state.pos += state.dir * 0.70;
-            if(state.pos >= max - 1){ state.pos=max-1; state.dir=-1; state.pauseUntil=Date.now()+520; }
-            if(state.pos <= 1){ state.pos=1; state.dir=1; state.pauseUntil=Date.now()+520; }
-            state.autoScrolling=true;
-            el.scrollLeft = state.pos;
-            positionChanged=true;
-            requestAnimationFrame(()=>{ state.autoScrolling=false; });
-          } else {
-            state.pos = el.scrollLeft;
-          }
-        }
-        if(positionChanged) updateIndicator();
-      }, 60);
-      groupChipsScrollTimers.push(timer);
-    }
+    // Không chạy timer tự cuộn nền; người dùng kéo bằng chuột hoặc vuốt trực tiếp.
     requestAnimationFrame(updateIndicator);
   });
 }
