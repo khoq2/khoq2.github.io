@@ -139,6 +139,20 @@ body.admin-mode .kpi-export-actions { display:flex; }
 .tabs::-webkit-scrollbar { display: none; }
 .tab-btn { flex-shrink: 0; padding: 10px 14px; border: none; border-bottom: 3px solid transparent; background: none; font-size: 12px; font-weight: normal; color: #777; cursor: pointer; white-space: nowrap; transition: all .15s; }
 .tab-btn.active { font-weight: bold; border-bottom-color: var(--c); }
+.tab-btn[data-tab]:not([data-tab="ALL"])::after { content:"⌄"; display:inline-block; margin-left:5px; font-size:14px; font-weight:900; line-height:1; vertical-align:-1px; opacity:.62; transition:transform .18s ease,color .18s ease,opacity .18s ease; }
+.tab-btn[data-tab]:not([data-tab="ALL"]):hover::after,.tab-btn[data-tab]:not([data-tab="ALL"]):focus-visible::after { color:var(--c); opacity:1; }
+.tab-btn.dropdown-open::after { transform:rotate(180deg); }
+.tab-dropdown { display:none; position:absolute; z-index:140; width:260px; max-width:calc(100vw - 16px); max-height:min(55vh,420px); padding:5px; border:1px solid rgba(255,255,255,.52); border-radius:10px; background:rgba(235,243,248,.56); -webkit-backdrop-filter:blur(20px) saturate(145%); backdrop-filter:blur(20px) saturate(145%); box-shadow:0 8px 24px rgba(30,58,95,.13),inset 0 1px 0 rgba(255,255,255,.62); overflow-y:auto; overscroll-behavior:contain; }
+.tab-dropdown.open { display:grid; gap:0; animation:tabDropdownIn .16s ease-out both; }
+@keyframes tabDropdownIn { from{opacity:0;transform:translateY(-6px)} to{opacity:1;transform:translateY(0)} }
+.tab-dropdown-item { width:100%; min-height:32px; padding:6px 9px; border:0; border-bottom:1px solid rgba(30,58,95,.075); border-left:2px solid transparent; border-radius:5px; background:transparent; color:#294052; font-size:11.5px; font-weight:700; line-height:1.25; text-align:left; white-space:normal; cursor:pointer; transition:color .14s ease,border-color .14s ease,background .14s ease,box-shadow .14s ease; }
+.tab-dropdown-item:last-child { border-bottom-color:transparent; }
+.tab-dropdown-item:hover,.tab-dropdown-item:focus-visible { background:var(--c,#1A5276); border-left-color:rgba(255,255,255,.92); color:#fff; box-shadow:0 3px 9px color-mix(in srgb,var(--c,#1A5276) 28%,transparent); outline:none; }
+.tab-dropdown-item:active { filter:brightness(.9); }
+@media (max-width:480px){
+  .tab-dropdown { width:calc(100vw - 16px); max-height:50vh; }
+  .tab-dropdown-item { min-height:38px; padding:8px 10px; font-size:12px; }
+}
 .filters { display: flex; gap: 6px; padding: 8px 12px; background: #fafafa; border-bottom: 1px solid #eee; align-items: center; flex-wrap: wrap; }
 .filters > * { flex-shrink: 0; }
 .home-stock-actions { flex: 1 0 100%; width: 100%; display: flex; align-items: center; justify-content: center; gap: 7px; }
@@ -185,7 +199,7 @@ body.admin-mode .kpi-export-actions { display:flex; }
 .search-example:active { transform:scale(.96); }
 @keyframes searchBreathe { 0%,100%{transform:translateY(0);box-shadow:0 0 0 7px rgba(46,134,193,.08),0 10px 24px rgba(30,58,95,.22)} 50%{transform:translateY(-3px);box-shadow:0 0 0 10px rgba(46,134,193,.05),0 14px 28px rgba(30,58,95,.26)} }
 @keyframes searchOrbit { from{transform:rotate(0deg) translateX(40px) rotate(0deg)} to{transform:rotate(360deg) translateX(40px) rotate(-360deg)} }
-.card { position:relative; background: #fff; border-radius: 12px; margin-bottom: 8px; overflow: hidden; border: 1.5px solid #E8E8E8; box-shadow: 0 1px 4px rgba(0,0,0,.06); transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease,background-color .18s ease; }
+.card { position:relative; background: #fff; border-radius: 12px; margin-bottom: 8px; overflow: hidden; border: 1.5px solid #E8E8E8; box-shadow: 0 1px 4px rgba(0,0,0,.06); transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease,background-color .18s ease; content-visibility:auto; contain-intrinsic-size:auto 285px; }
 .card-body,.card-top,.ton-ctrl,.nguoi-ban-row { transition:background-color .18s ease,border-color .18s ease,box-shadow .18s ease; }
 .card:hover,.card:focus-within { transform:translateY(-2px); border-color:#2E86C1; background:#F4FAFE; box-shadow:0 0 0 3px rgba(46,134,193,.16),0 10px 24px rgba(30,58,95,.20),inset 4px 0 0 #2E86C1; }
 .card:hover .card-body,.card:focus-within .card-body { background:linear-gradient(100deg,rgba(235,245,251,.94),rgba(255,255,255,.98) 72%); }
@@ -214,11 +228,15 @@ body.admin-mode .kpi-export-actions { display:flex; }
 .card-top { display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; border-bottom: 2px solid var(--c); }
 .card-top-left { display: flex; align-items: center; gap: 6px; min-width: 0; flex-wrap: wrap; }
 .sheet-badge { background: var(--c); color: #fff; font-size: 10px; font-weight: bold; padding: 2px 7px; border-radius: 6px; margin-right: 6px; }
-.ma-code { font-size: 11px; color: #666; font-weight: bold; }
+.ma-code { display:inline-flex; align-items:center; gap:4px; background:var(--c,#1E3A5F); color:#fff; font-size:10px; font-weight:bold; padding:2px 7px; border-radius:6px; box-shadow:inset 0 -1px 0 rgba(0,0,0,.18); }
 .btn-copy-code { display:none!important; }
-.ma-code.copy-code { cursor:copy; padding:3px 7px; border-radius:7px; transition:background .16s ease,color .16s ease,box-shadow .16s ease; user-select:none; }
-.ma-code.copy-code:hover { background:rgba(255,255,255,.88); color:#154360; box-shadow:0 1px 5px rgba(30,58,95,.16); }
+.ma-code.copy-code { cursor:copy; transition:background .16s ease,color .16s ease,box-shadow .16s ease; user-select:none; }
+.ma-code.copy-code:hover { background:#154360; color:#fff; box-shadow:0 1px 5px rgba(30,58,95,.22); }
 .ma-code.copy-code:active { transform:scale(.98); }
+.product-category-path { display:inline-flex; align-items:center; min-width:0; max-width:min(390px,48vw); padding:0; border:0; border-radius:0; background:transparent; color:#1A5276; font-size:10px; font-weight:900; line-height:1.2; white-space:nowrap; overflow:hidden; }
+.product-path-link { min-width:0; min-height:22px; padding:2px 4px; border:0; border-radius:5px; background:transparent; color:#1A5276; font:inherit; font-weight:900; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; cursor:pointer; }
+.product-path-link:hover,.product-path-link:focus-visible { background:transparent; color:#0B4F7A; text-decoration:underline; text-underline-offset:3px; outline:none; }
+.product-path-arrow { flex:0 0 auto; color:#7F8C8D; padding:0 1px; }
 .btn-copy-code:hover { background: #fff; border-color: rgba(30,58,95,.38); box-shadow: 0 3px 8px rgba(30,58,95,.14); transform: translateY(-1px); }
 .btn-copy-code svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
 .btn-copy-code .copy-check { opacity: 0; transform: scale(.75); transform-origin: center; transition: opacity .16s ease, transform .16s ease; }
@@ -261,9 +279,11 @@ body.admin-mode .kpi-export-actions { display:flex; }
     align-items: stretch;
   }
   .group-section > .group-header,
+  .group-section > .group-summary-wrap,
   .group-section > .group-summary-row,
   .group-section > .product-list-row {
     grid-column: 1 / -1;
+    min-width: 0;
   }
   .group-section > .card-shell {
     height: 100%;
@@ -768,7 +788,7 @@ body.fab-menu-open .category-view-bar .view-mode-switch { pointer-events:none; }
 .loading-icon { width:84px; height:84px; background:linear-gradient(145deg,#fff,#EDF6FC); box-shadow:0 0 0 7px rgba(46,134,193,.06),0 12px 28px rgba(30,58,95,.16); }
 .loading-title { color:#1E3A5F; font-size:16px; }
 .cat-title { font-size: 15px; font-weight: bold; color: #fff; background: var(--c,#1E3A5F); padding: 10px 14px; border-radius: 10px; margin-bottom: 8px; }
-.quick-nav-wrap { margin-bottom: 6px; }
+.quick-nav-wrap { position:sticky; top:var(--quick-nav-sticky-top,0px); z-index:90; margin:0 -2px 8px; padding:6px 4px 3px; background:rgba(255,255,255,.96); border:1px solid rgba(30,58,95,.14); border-radius:9px; box-shadow:0 5px 12px rgba(30,58,95,.13); backdrop-filter:blur(8px); }
 .quick-nav { display: flex; gap: 6px; flex-wrap: wrap; padding: 2px 0 10px; margin-bottom: 0; border-bottom: 1.5px dashed #D7DBDD; }
 .quick-nav-scroll { display: none; }
 .quick-nav-btn { flex-shrink: 0; border: 1.5px solid rgba(0,0,0,.08); background: var(--c); color: #2C3E50; font-size: 11px; font-weight: bold; padding: 6px 11px; border-radius: 14px; cursor: pointer; white-space: nowrap; margin-bottom: 2px; box-shadow: inset 0 -2px 0 rgba(0,0,0,.08); }
@@ -1128,6 +1148,8 @@ body.fab-menu-open .category-view-bar .view-mode-switch { pointer-events:none; }
   .overview-chip { min-width: calc(50% - 3px); flex-basis: calc(50% - 3px); }
   .card-top { flex-wrap: wrap; gap: 5px; align-items: flex-start; }
   .card-top-left { flex: 1 1 210px; }
+  .product-category-path { max-width:100%; flex:1 1 150px; }
+  .product-path-link { min-height:30px; }
   .status-badge { margin-left: auto; }
   .btn-location { max-width: 100%; white-space: normal; overflow-wrap: anywhere; flex-shrink: 1; }
   .total-stock-branch { flex-direction: column; align-items: flex-start; gap: 4px; }
@@ -1540,6 +1562,7 @@ html::-webkit-scrollbar-corner { background: #EAF2F8; }
     <button class="tab-btn" style="--c:#641E16" data-tab="CAM" onclick="setTab(this)">📷 Camera</button>
     <button class="tab-btn" style="--c:#0B5345" data-tab="INT" onclick="setTab(this)">🌐 Internet</button>
   </div>
+  <div class="tab-dropdown" id="tabDropdown" aria-label="Danh mục con"></div>
   <div class="filters" id="homeInventoryBar">
     <div class="home-stock-actions">
       <button class="filter-btn home-only-stock-filter" data-status="ALL" onclick="setStatus(this)">Tồn kho</button>
@@ -3247,7 +3270,7 @@ function getKpiProductPath(row){
 }
 function renderKpiProductLinks(entries, compactStock=false){
   return entries.map(({r,i})=>`<button type="button" class="kpi-product-link kpi-stacked-row" onclick="openKpiProduct(${i})">
-    <span class="kpi-stacked-title">${escapeHtml(r[2] || "Chưa có tên")}</span>
+    <span class="kpi-stacked-title">${renderProductTitleWithCondition(r[2] || "Chưa có tên")}</span>
     <span class="kpi-stacked-meta"><span>${escapeHtml(r[1] || "Chưa có mã")}</span><span class="kpi-meta-sep">·</span><span class="kpi-meta-branch">${escapeHtml((BRANCH_CFG[r[13] || "Q2"] || BRANCH_CFG.Q2).label)}</span><span class="kpi-meta-sep">·</span><span class="kpi-meta-stock">Tồn: ${Number(r[5]) || 0}</span></span>
   </button>`).join("");
 }
@@ -3537,7 +3560,7 @@ function clearQuickGroupFilter(){
 function setQuickGroupFilter(next){
   const same = quickGroupFilter
     && String(quickGroupFilter.scope || "group") === String(next.scope || "group")
-    && quickGroupFilter.groupLabel === next.groupLabel
+    && quickGroupLabelMatchKey(quickGroupFilter.groupLabel) === quickGroupLabelMatchKey(next.groupLabel)
     && quickGroupFilter.family === next.family
     && quickGroupFilter.primary === next.primary
     && String(quickGroupFilter.secondary || "") === String(next.secondary || "");
@@ -3568,6 +3591,12 @@ function toggleQuickGroupFilter(btn){
 
 function normalizeQuickText(text){
   return removeAccents(String(text ?? "")).toLowerCase().replace(/\s+/g, " ").trim();
+}
+
+// Nhãn nhóm trong dữ liệu cũ có thể khác icon hoặc số khoảng trắng với nhãn đang hiển thị.
+// Dùng cùng một khóa chữ để phần thống kê và phần lọc luôn nhận ra đó là cùng một nhóm.
+function quickGroupLabelMatchKey(value){
+  return normalizeQuickText(value).replace(/^[^a-z0-9]+/,"").trim();
 }
 
 function isRamGroupLabel(groupNorm){
@@ -4784,7 +4813,7 @@ function matchesQuickGroupFilter(r, groupLabel){
   if(!quickGroupFilter) return true;
   const scope = String(quickGroupFilter.scope || "group");
   const resolvedGroupLabel = resolveQuickGroupLabelFromRow(r, groupLabel || r?.[8] || "");
-  if(scope === "group" && resolvedGroupLabel !== quickGroupFilter.groupLabel) return false;
+  if(scope === "group" && quickGroupLabelMatchKey(resolvedGroupLabel) !== quickGroupLabelMatchKey(quickGroupFilter.groupLabel)) return false;
   const filterPrimary = String(quickGroupFilter.primary || "");
   const filterSecondary = String(quickGroupFilter.secondary || "");
   const candidates = scope === "group"
@@ -4807,7 +4836,7 @@ function renderQuickSummary(items, groupLabel){
   if(!buckets.length) return "";
   return `<div class="group-summary-wrap"><div class="group-summary-row">${buckets.map(bucket=>{
     const isActive = quickGroupFilter
-      && quickGroupFilter.groupLabel === groupLabel
+      && quickGroupLabelMatchKey(quickGroupFilter.groupLabel) === quickGroupLabelMatchKey(groupLabel)
       && quickGroupFilter.family === bucket.family
       && quickGroupFilter.primary === bucket.primary
       && String(quickGroupFilter.secondary || "") === String(bucket.secondary || "");
@@ -4898,6 +4927,20 @@ function sortProductItemsForView(items){
     return String(a.r[2]||"").localeCompare(String(b.r[2]||""),"vi",{numeric:true,sensitivity:"base"});
   });
 }
+function openProductCategoryPath(button){
+  const tabCode=String(button?.dataset?.tab||"ALL");
+  goToTab(tabCode);
+}
+function openProductGroupPath(button){
+  const tabCode=String(button?.dataset?.tab||"ALL");
+  const groupKey=quickGroupLabelMatchKey(button?.dataset?.group||"");
+  goToTab(tabCode);
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    const headers=[...document.querySelectorAll("#results .group-header[id]")];
+    const target=headers.find(header=>quickGroupLabelMatchKey(header.querySelector(".group-header-label")?.textContent||"")===groupKey);
+    if(target) jumpToGroup(target.id);
+  }));
+}
 function renderCard(r,i,displayNo){
   const [sh,ma,ten,th,giaNhap,ton,tt,ghi,,img,giaBan,,sapHet,branch,warrantyImg1,warrantyImg2,warrantyTitle1,warrantyTitle2,warrantyImg3,warrantyImg4,warrantyTitle3,warrantyTitle4]=r;
   const kw = removeAccents(searchQ.trim());
@@ -4914,6 +4957,9 @@ function renderCard(r,i,displayNo){
   const stBg=isHet?"#FADBD8":isSap?"#FEF9E7":"#D5F5E3";
   const stFg=isHet?"#922B21":isSap?"#B7950B":"#1E8449";
   const stTxt=getStockStatusLabel(ton, sapHet);
+  const productCategoryLabel=cleanKpiPathLabel(cfg.label);
+  const productGroupLabel=getPrimaryRowGroup(r[8]||"") || NO_GROUP;
+  const productGroupText=cleanKpiPathLabel(productGroupLabel);
   if(productViewMode==="list" && isProductViewModeAvailable()){
     const listStockClass=isHet?"het":isSap?"sap":"con";
     return `<button type="button" class="product-list-row" data-index="${i}" style="--list-color:${cfg.c}" title="Mở ${escapeHtml(ten)}" onclick="openProductFromList(${i})"><span class="product-list-main"><span class="product-list-title">${renderProductTitleWithCondition(ten,kwTokens)}</span><span class="product-list-meta">${highlightMatch(ma,kwTokens)} · ${escapeHtml(th||"Chưa rõ hãng")} · ${escapeHtml(branch||"Q2")}</span></span><span class="product-list-stock ${listStockClass}">${escapeHtml(stTxt)} · ${Number(ton)||0}</span></button>`;
@@ -4927,7 +4973,7 @@ function renderCard(r,i,displayNo){
     ? `${renderNVAvatar(latestTransaction.nv, "nv-avatar-latest")}${renderNVRoleBadge(latestTransaction.nv)}<span class="nguoi-ban-latest-text">${escapeHtml(latestTransactionText)}</span>`
     : escapeHtml(latestTransactionText);
   const imgHtml = img
-    ? `<img class="prod-img" src="${escapeHtml(img)}" alt="${escapeHtml(ten)}" referrerpolicy="no-referrer" onclick="openImageViewer(this.src, this.alt)" onerror="this.outerHTML='<div class=\\'prod-img prod-img-ph\\' title=\\'Không tải được ảnh\\'>💻</div>';" />`
+    ? `<img class="prod-img" src="${escapeHtml(img)}" alt="${escapeHtml(ten)}" loading="lazy" decoding="async" referrerpolicy="no-referrer" onclick="openImageViewer(this.src, this.alt)" onerror="this.outerHTML='<div class=\\'prod-img prod-img-ph\\' title=\\'Không tải được ảnh\\'>💻</div>';" />`
     : `<div class="prod-img prod-img-ph" title="Chưa có ảnh sản phẩm">💻</div>`;
   const imageTitle1 = cleanQuickLabel(warrantyTitle1 || "") || "Ảnh 2";
   const imageTitle2 = cleanQuickLabel(warrantyTitle2 || "") || "Ảnh 3";
@@ -4963,7 +5009,12 @@ function renderCard(r,i,displayNo){
       <div class="card-top-left">
         <span class="sheet-badge" style="--c: ${cfg.c};">${cfg.label}</span>
         <span class="sheet-badge" style="--c: ${branchCfg.color};">${branchCfg.label}</span>
-        <span class="ma-code copy-code" data-code="${escapeHtml(ma)}" data-copy-label="mã hàng" title="Nhấp đúp để sao chép mã hàng" ondblclick="event.stopPropagation();copyProductCode(this)">${highlightMatch(ma, kwTokens)}</span>
+        <span class="ma-code copy-code" style="--c:${cfg.c}" data-code="${escapeHtml(ma)}" data-copy-label="mã hàng" title="Nhấp đúp để sao chép mã hàng" ondblclick="event.stopPropagation();copyProductCode(this)">🏷️ ${highlightMatch(ma, kwTokens)}</span>
+        <span class="product-category-path" title="${escapeHtml(productCategoryLabel)} → ${escapeHtml(productGroupText)}">
+          <button type="button" class="product-path-link" data-tab="${escapeHtml(sh)}" onclick="event.stopPropagation();openProductCategoryPath(this)">🔗 ${escapeHtml(productCategoryLabel)}</button>
+          <span class="product-path-arrow">→</span>
+          <button type="button" class="product-path-link" data-tab="${escapeHtml(sh)}" data-group="${escapeHtml(productGroupLabel)}" onclick="event.stopPropagation();openProductGroupPath(this)">${escapeHtml(productGroupText)}</button>
+        </span>
       </div>
       <span class="status-badge" style="background: ${stBg}; color: ${stFg};">${stTxt}</span>
     </div>
@@ -5139,7 +5190,7 @@ function toggleSummaryProductList(key,title,shouldScroll=true){
     });
     const groupsHtml = [...groupMap.entries()].sort((a,b)=>cleanKpiPathLabel(a[0]).localeCompare(cleanKpiPathLabel(b[0]),"vi")).map(([group,groupItems],groupIndex)=>{
       const groupQty = groupItems.reduce((sum,item)=>sum+(Number(item.r[5])||0),0);
-      return `<details class="summary-group"${groupIndex===0?' open':''}><summary><span class="summary-group-name">${escapeHtml(cleanKpiPathLabel(group) || "Khác")}</span><span class="summary-group-total">${groupItems.length} mặt hàng · Tồn ${groupQty.toLocaleString("vi-VN")}</span></summary><div class="summary-group-products">${groupItems.map(item=>`<button type="button" class="summary-product-link" onclick="jumpToInventoryItem(${item.i})"><span class="summary-product-info"><b>${escapeHtml(item.r[1]||"Chưa có mã")}</b> · ${escapeHtml(item.r[2]||"Chưa có tên")}</span><span class="summary-product-path">Tồn ${Number(item.r[5])||0} · ${escapeHtml(item.r[13]||"Q2")}</span></button>`).join("")}</div></details>`;
+      return `<details class="summary-group"${groupIndex===0?' open':''}><summary><span class="summary-group-name">${escapeHtml(cleanKpiPathLabel(group) || "Khác")}</span><span class="summary-group-total">${groupItems.length} mặt hàng · Tồn ${groupQty.toLocaleString("vi-VN")}</span></summary><div class="summary-group-products">${groupItems.map(item=>`<button type="button" class="summary-product-link" onclick="jumpToInventoryItem(${item.i})"><span class="summary-product-info"><b>${escapeHtml(item.r[1]||"Chưa có mã")}</b> · ${renderProductTitleWithCondition(item.r[2]||"Chưa có tên")}</span><span class="summary-product-path">Tồn ${Number(item.r[5])||0} · ${escapeHtml(item.r[13]||"Q2")}</span></button>`).join("")}</div></details>`;
     }).join("");
     return `<section class="summary-category"><div class="summary-category-head" style="background:${cfg.c}"><span>${escapeHtml(cfg.label)}</span><small>${categoryItems.length} mặt hàng · Tổng tồn ${categoryQty.toLocaleString("vi-VN")}</small></div>${groupsHtml}</section>`;
   }).join("");
@@ -5577,7 +5628,7 @@ function renderBuildSummary(){
   body.innerHTML=`<div class="build-summary-list">${rows.map(({idx,r,qty,stock,price})=>{
     const img=String(r[9]||"");
     return `<div class="build-summary-row">
-      ${img?`<img class="build-summary-img" src="${escapeHtml(img)}" alt="${escapeHtml(r[2]||"Linh kiện")}" referrerpolicy="no-referrer" onerror="this.outerHTML='<div class=\\'build-summary-img build-summary-img-ph\\'>💻</div>'">`:`<div class="build-summary-img build-summary-img-ph">💻</div>`}
+      ${img?`<img class="build-summary-img" src="${escapeHtml(img)}" alt="${escapeHtml(r[2]||"Linh kiện")}" loading="lazy" decoding="async" referrerpolicy="no-referrer" onerror="this.outerHTML='<div class=\\'build-summary-img build-summary-img-ph\\'>💻</div>'">`:`<div class="build-summary-img build-summary-img-ph">💻</div>`}
       <div><div class="build-summary-name">${escapeHtml(r[2]||"Chưa có tên")}</div><div class="build-summary-meta">${escapeHtml(r[1]||"")} · Kho ${escapeHtml(r[13]||"Q2")}<br><span class="build-summary-stock">Tồn: ${stock}</span> · ${price>0?fmt(price):"Chưa có giá bán"}</div></div>
       <div class="build-summary-controls"><label>SL <input type="number" min="1" max="${Math.max(1,stock)}" value="${qty}" onchange="setBuildItemQty(${idx},this.value)"></label><button type="button" class="build-summary-remove" onclick="removeBuildItem(${idx})">Bỏ chọn</button></div>
     </div>`;
@@ -7417,10 +7468,113 @@ function syncRestockButton(on){
   btn.style.color = on ? "#fff" : "#666";
   btn.style.borderColor = on ? "#922B21" : "#EC7063";
 }
+let tabDropdownOpenFor = "";
+function closeTabDropdown(){
+  tabDropdownOpenFor="";
+  const box=document.getElementById("tabDropdown");
+  if(box){ box.classList.remove("open"); box.innerHTML=""; }
+  document.querySelectorAll(".tab-btn.dropdown-open").forEach(btn=>btn.classList.remove("dropdown-open"));
+}
+function getTabDropdownGroups(tabCode){
+  const map=new Map();
+  DATA.forEach(r=>{
+    if(r[0]!==tabCode || (currentBranch!=="ALL" && String(r[13]||"Q2")!==currentBranch)) return;
+    getRowGroups(r[8]).forEach(group=>{
+      const key=quickGroupLabelMatchKey(group);
+      if(!key) return;
+      const current=map.get(key)||{label:getConfiguredGroupLabel(tabCode,group),count:0};
+      current.count++;
+      map.set(key,current);
+    });
+  });
+  return applyGroupOrder(tabCode,[...map.values()].map(item=>item.label)).map(label=>{
+    const found=map.get(quickGroupLabelMatchKey(label));
+    return {label,count:found?.count||0};
+  }).filter(item=>item.count>0);
+}
+function positionTabDropdown(button){
+  const box=document.getElementById("tabDropdown");
+  const sticky=document.querySelector(".sticky");
+  const tabs=document.getElementById("tabs");
+  if(!box || !sticky || !tabs || !button) return;
+  const stickyRect=sticky.getBoundingClientRect();
+  const buttonRect=button.getBoundingClientRect();
+  const mobile=window.matchMedia("(max-width:480px)").matches;
+  const width=mobile ? Math.max(220,window.innerWidth-16) : Math.min(320,Math.max(240,buttonRect.width*2.5));
+  const maxLeft=Math.max(8,stickyRect.width-width-8);
+  const desiredLeft=mobile ? 8 : buttonRect.left-stickyRect.left;
+  box.style.width=`${width}px`;
+  box.style.left=`${Math.max(8,Math.min(desiredLeft,maxLeft))}px`;
+  box.style.top=`${tabs.offsetTop+tabs.offsetHeight}px`;
+}
+function showTabDropdown(button){
+  const tabCode=String(button?.dataset?.tab||"ALL");
+  if(tabCode==="ALL"){ closeTabDropdown(); return; }
+  if(tabDropdownOpenFor===tabCode){
+    positionTabDropdown(button);
+    return;
+  }
+  const groups=getTabDropdownGroups(tabCode);
+  const box=document.getElementById("tabDropdown");
+  if(!box || !groups.length){ closeTabDropdown(); return; }
+  tabDropdownOpenFor=tabCode;
+  document.querySelectorAll(".tab-btn.dropdown-open").forEach(btn=>btn.classList.remove("dropdown-open"));
+  button.classList.add("dropdown-open");
+  const color=(SHEET_CFG[tabCode]||SHEET_CFG.MT).c;
+  box.innerHTML=groups.map(item=>`<button type="button" class="tab-dropdown-item" style="--c:${color}" data-tab="${escapeHtml(tabCode)}" data-group="${escapeHtml(item.label)}" onclick="event.stopPropagation();openProductGroupPath(this);closeTabDropdown()">${escapeHtml(cleanKpiPathLabel(item.label))}</button>`).join("");
+  box.classList.add("open");
+  positionTabDropdown(button);
+}
+function toggleTabDropdown(button){
+  const tabCode=String(button?.dataset?.tab||"ALL");
+  if(tabDropdownOpenFor===tabCode){ closeTabDropdown(); return; }
+  showTabDropdown(button);
+}
 function setTab(btn){
+  const wasOpen = tabDropdownOpenFor===String(btn.dataset.tab||"");
   goToTab(btn.dataset.tab);
+  if(wasOpen) closeTabDropdown();
+  else toggleTabDropdown(btn);
   requestAnimationFrame(()=>btn.scrollIntoView({behavior:"smooth",block:"nearest",inline:"center"}));
 }
+function syncQuickNavStickyOffset(){
+  const sticky=document.querySelector(".sticky");
+  const height=sticky?.getBoundingClientRect().height||0;
+  document.documentElement.style.setProperty("--quick-nav-sticky-top",`${Math.ceil(height)}px`);
+}
+if(typeof ResizeObserver==="function"){
+  const quickNavStickyObserver=new ResizeObserver(syncQuickNavStickyOffset);
+  const stickyForQuickNav=document.querySelector(".sticky");
+  if(stickyForQuickNav) quickNavStickyObserver.observe(stickyForQuickNav);
+}
+window.addEventListener("resize",()=>{
+  syncQuickNavStickyOffset();
+  if(tabDropdownOpenFor){
+    const active=document.querySelector(`.tab-btn[data-tab="${tabDropdownOpenFor}"]`);
+    if(active) positionTabDropdown(active);
+  }
+},{passive:true});
+document.addEventListener("click",event=>{
+  if(!event.target.closest("#tabs,#tabDropdown")) closeTabDropdown();
+});
+document.addEventListener("keydown",event=>{ if(event.key==="Escape") closeTabDropdown(); });
+let tabDropdownHoverTimer=null;
+function cancelTabDropdownHoverClose(){ clearTimeout(tabDropdownHoverTimer); tabDropdownHoverTimer=null; }
+function scheduleTabDropdownHoverClose(){
+  if(!window.matchMedia("(hover:hover) and (pointer:fine)").matches) return;
+  cancelTabDropdownHoverClose();
+  tabDropdownHoverTimer=setTimeout(closeTabDropdown,180);
+}
+document.querySelectorAll(".tab-btn").forEach(button=>{
+  button.addEventListener("mouseenter",()=>{
+    if(!window.matchMedia("(hover:hover) and (pointer:fine)").matches) return;
+    cancelTabDropdownHoverClose();
+    showTabDropdown(button);
+  });
+});
+document.getElementById("tabs")?.addEventListener("mouseleave",scheduleTabDropdownHoverClose);
+document.getElementById("tabDropdown")?.addEventListener("mouseenter",cancelTabDropdownHoverClose);
+document.getElementById("tabDropdown")?.addEventListener("mouseleave",scheduleTabDropdownHoverClose);
 function setStatus(btn){
   currentStatus = btn.dataset.status;
   restockOnly = false;
@@ -8612,6 +8766,7 @@ function setupGroupChipsAutoScroll(){
       });
     }
     const timer = setInterval(()=>{
+      let positionChanged=false;
       const max = el.scrollWidth - el.clientWidth;
       if(max > 2){
         const isHovering = touchLike ? false : (state.hovering || el.matches(":hover"));
@@ -8622,13 +8777,14 @@ function setupGroupChipsAutoScroll(){
           if(state.pos <= 1){ state.pos=1; state.dir=1; state.pauseUntil=Date.now()+520; }
           state.autoScrolling=true;
           el.scrollLeft = state.pos;
+          positionChanged=true;
           requestAnimationFrame(()=>{ state.autoScrolling=false; });
         } else {
           state.pos = el.scrollLeft;
         }
       }
-      updateIndicator();
-    }, 20);
+      if(positionChanged) updateIndicator();
+    }, 60);
     groupChipsScrollTimers.push(timer);
     requestAnimationFrame(updateIndicator);
   });
