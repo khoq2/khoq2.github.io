@@ -768,7 +768,7 @@ body.fab-menu-open .category-view-bar .view-mode-switch { pointer-events:none; }
   .footer-credit { z-index:190; bottom:max(62px,calc(env(safe-area-inset-bottom) + 60px)); max-width:calc(100vw - 20px); padding:2px 5px; font-size:10px; letter-spacing:.25px; }
   .footer-credit-text { background:none; color:#607D9B; -webkit-text-fill-color:#607D9B; animation:none; }
   .footer-credit::before { animation:none; opacity:.7; }
-  .home-landing-mode .footer-credit { position:relative; left:auto; bottom:auto; max-width:calc(100vw - 20px); margin:16px auto 72px; transform:none; }
+  .home-landing-mode .footer-credit { position:fixed; left:50%; bottom:max(62px,calc(env(safe-area-inset-bottom) + 60px)); width:max-content; max-width:calc(100vw - 20px); margin:0; transform:translateX(-50%); }
 }
 .loading-wrap { margin: 0 auto; text-align: center; padding: 54px 20px; }
 .loading-icon { position: relative; width: 82px; height: 82px; margin: 0 auto 17px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: #fff; box-shadow: 0 8px 22px rgba(30,58,95,.14); }
