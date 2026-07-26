@@ -2557,8 +2557,10 @@ function checkAdminSession(){
 
 // Dòng URL duy nhất
 const SHEET_API_URL = "https://script.google.com/macros/s/AKfycby6YH69F7sfO1ZoUJsDm4BeX6Luj2GrhUfYWWJWNvqjraAEhkBck16EphrPBBm1BT3YqA/exec";
-const REQUIRED_API_VERSION = "2026.07.23-five-images-titles-8";
-const SHEET_TIMEOUT_MS = 12000;
+const REQUIRED_API_VERSION = "2026.07.26-safe-save-22";
+// Apps Script có thể phải chờ khóa ghi khi nhiều thao tác diễn ra gần nhau.
+// 45 giây dài hơn thời gian chờ khóa phía máy chủ, tránh báo lỗi giả trong khi Sheet vẫn đang ghi.
+const SHEET_TIMEOUT_MS = 45000;
 const PENDING_SYNC_KEY = "kho_cntt_pending_sync";
 const PENDING_BASE_FINGERPRINT_KEY = "kho_cntt_pending_base_fingerprint";
 const PENDING_TX_SYNC_KEY = "kho_cntt_pending_tx_sync";
@@ -3050,11 +3052,38 @@ async function saveProductRow(row, oldCode="", oldBranch="Q2"){
   if(!SHEET_API_URL) return true;
   setPendingSync(true, "Đang chờ đồng bộ sản phẩm");
   try{
-    const result=await postSheet("upsert_product", {row: normalizeSheetRows([row])[0], oldCode, oldBranch, baseFingerprint:SERVER_DATA_FINGERPRINT});
+    const safeRow = normalizeSheetRows([row])[0];
+    const result=await postSheet("upsert_product", {row: safeRow, oldCode, oldBranch, baseFingerprint:SERVER_DATA_FINGERPRINT}, 45000);
     if(result.fingerprint) SERVER_DATA_FINGERPRINT=result.fingerprint;
     setPendingSync(hadPendingBefore,hadPendingBefore?"Vẫn còn thay đổi khác đang chờ đồng bộ":""); setSyncBadge(hadPendingBefore?"pending":"synced"); markLastSync();
     return true;
-  }catch(e){ setSyncBadge("error", String(e)); return false; }
+  }catch(e){
+    // Hết thời gian chờ ở trình duyệt không đồng nghĩa Apps Script đã dừng.
+    // Đọc lại máy chủ để xác nhận, tránh người dùng lưu lần hai và tạo xung đột/trùng dữ liệu.
+    if(isRetryableSyncError(e)){
+      try{
+        await new Promise(resolve=>setTimeout(resolve,1800));
+        const latest=await fetchSheetJson(sheetUrl({type:"data",_ts:Date.now()}),{},45000);
+        const safeRow=normalizeSheetRows([row])[0];
+        const serverRow=normalizeSheetRows(latest.data||[]).find(r=>
+          normalizeProductCode(r[1])===normalizeProductCode(safeRow[1]) &&
+          String(r[13]||"Q2")===String(safeRow[13]||"Q2")
+        );
+        if(serverRow && JSON.stringify(serverRow)===JSON.stringify(safeRow)){
+          SERVER_DATA_FINGERPRINT=String(latest.fingerprint||SERVER_DATA_FINGERPRINT);
+          setPendingSync(hadPendingBefore,hadPendingBefore?"Vẫn còn thay đổi khác đang chờ đồng bộ":"");
+          setSyncBadge(hadPendingBefore?"pending":"synced");
+          markLastSync();
+          showToast("✓ Máy chủ đã lưu thành công sau khi kiểm tra lại",4000);
+          return true;
+        }
+      }catch(verifyError){
+        console.warn("Chưa xác minh được kết quả lưu trên máy chủ:",verifyError);
+      }
+    }
+    setSyncBadge("error", String(e));
+    return false;
+  }
 }
 async function deleteProductRow(code, branch){
   if(!SHEET_API_URL) return true;
@@ -7216,13 +7245,14 @@ async function saveItem(){ if(!requireAdmin()) return;
     alert(`⚠️ Mã hàng "${ma}" đã tồn tại trong lịch sử giao dịch. Không thể dùng lại mã này cho sản phẩm khác để tránh sai tồn kho.`);
     return;
   }
-  const row = normalizeSheetRows([[sh,ma,ten,th,gia,ton,getStockStatusValue(ton, sapHet),mergeNoteLocation(ghiNote, vitri),grp,img,giaBan,quickTag,sapHet,document.getElementById("fBranch").value,warrantyImg1,warrantyImg2,warrantyTitle1,warrantyTitle2,warrantyImg3,warrantyImg4,warrantyTitle3,warrantyTitle4]])[0];
+const row = normalizeSheetRows([[sh,ma,ten,th,gia,ton,getStockStatusValue(ton, sapHet),mergeNoteLocation(ghiNote, vitri),grp,img,giaBan,quickTag,sapHet,document.getElementById("fBranch").value,warrantyImg1,warrantyImg2,warrantyTitle1,warrantyTitle2,warrantyImg3,warrantyImg4,warrantyTitle3,warrantyTitle4]])[0];
+let shouldSaveDisplayConfig = false;
 const saveButton = document.getElementById("fSaveBtn");
 if(saveButton){ saveButton.disabled = true; saveButton.textContent = "⏳ Đang lưu lên máy chủ..."; }
 if(idx===""){
   DATA.unshift(row);
   ITEM_CREATED_AT[getItemCreatedAtKey(row)] = Date.now();
-  saveDisplayConfig();
+  shouldSaveDisplayConfig = true;
   showToast("Đã thêm: "+tenBase);
 } else {
   DATA[parseInt(idx)] = row;
@@ -7231,7 +7261,7 @@ if(idx===""){
   if(oldTimeKey !== newTimeKey && ITEM_CREATED_AT[oldTimeKey]){
     ITEM_CREATED_AT[newTimeKey] = ITEM_CREATED_AT[oldTimeKey];
     delete ITEM_CREATED_AT[oldTimeKey];
-    saveDisplayConfig();
+    shouldSaveDisplayConfig = true;
   }
   showToast("Đã lưu: "+tenBase);
 }
@@ -7243,6 +7273,8 @@ if(!saved){
   showToast("⚠️ Chưa lưu được lên máy chủ. Biểu mẫu vẫn được giữ để bạn thử lại.", 5000);
   return;
 }
+// Chỉ ghi cấu hình sau khi sản phẩm đã ghi xong để hai POST không tranh cùng khóa Apps Script.
+if(shouldSaveDisplayConfig) await saveDisplayConfig();
 if(saveButton){ saveButton.disabled = false; saveButton.textContent = "💾 Lưu thiết bị"; }
 
 closeOverlay("editOverlay");
