@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -694,12 +693,16 @@ mark.kw-hit { background: #FFEB3B; color: #1A1A1A; padding: 0 1px; border-radius
 .kpi-copy-content { flex:0 0 auto; min-height:30px; display:inline-flex; align-items:center; justify-content:center; gap:5px; padding:5px 9px; border:1px solid #9CC7E3; border-radius:8px; background:#EAF4FB; color:#1A5276; font-size:10px; font-weight:900; box-shadow:0 2px 6px rgba(30,58,95,.12); cursor:pointer; }
 .kpi-copy-content:hover { color:#fff; background:#1A5276; }
 .kpi-copy-content svg { width:16px; height:16px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+.kpi-copy-action { border:1px solid var(--kpi-accent,#1E3A5F)!important; background:var(--kpi-accent-soft,#D6EAF8)!important; color:var(--kpi-accent-soft-text,#1A5276)!important; box-shadow:0 4px 11px rgba(30,58,95,.14)!important; }
+#kpiOverlay .kpi-sticky-actions .edit-save-buttons { grid-template-columns:1fr 1fr; }
+#kpiOverlay .kpi-sticky-actions button { min-height:44px; margin:0; }
 @keyframes imageSaveAppear { from{opacity:0;transform:translateY(-5px) scale(.94)} to{opacity:1;transform:none} }
 .group-checkboxes { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:7px; max-height:190px; overflow-y:auto; padding:9px; border:1.5px solid #ddd; border-radius:10px; background:#fafafa; }
 .group-check { display:flex; align-items:flex-start; gap:6px; padding:6px; border-radius:7px; font-size:12px; line-height:1.3; cursor:pointer; }
 .group-check:has(input:checked) { background:#EAF2F8; color:#1A5276; font-weight:bold; }
 .group-check input { width:auto!important; margin:2px 0 0; accent-color:#1A5276; flex-shrink:0; }
 @media (max-width:480px){ .group-checkboxes { grid-template-columns:1fr; max-height:180px; } .image-lightbox { padding:calc(70px + env(safe-area-inset-top)) 10px calc(12px + env(safe-area-inset-bottom)); } .image-lightbox img { max-height:calc(100dvh - 82px - env(safe-area-inset-top) - env(safe-area-inset-bottom)); border-radius:7px; } .image-lightbox-close { top:calc(10px + env(safe-area-inset-top)); right:calc(10px + env(safe-area-inset-right)); } .image-lightbox-actions { top:calc(10px + env(safe-area-inset-top)); gap:6px; max-width:calc(100vw - 20px); } .image-lightbox-actions #imageLightboxSave { min-height:44px; padding:8px 12px; font-size:11px; } .kpi-content-frame{padding:6px}.kpi-content-toolbar{margin-bottom:6px;padding:4px 4px 6px}.kpi-copy-content{min-height:32px;padding:5px 7px} }
+@media (hover:none) and (pointer:coarse){ .image-lightbox img { -webkit-touch-callout:default; -webkit-user-select:auto; user-select:auto; touch-action:pinch-zoom; } }
 @media (max-width:480px) {
   .image-lightbox-close { display:none; }
   .fab-wrap { left:max(8px,env(safe-area-inset-left)); right:max(8px,env(safe-area-inset-right)); bottom:max(10px,calc(env(safe-area-inset-bottom) + 8px)); width:auto; align-items:stretch; }
@@ -795,7 +798,7 @@ mark.kw-hit { background: #FFEB3B; color: #1A1A1A; padding: 0 1px; border-radius
 .import-preview th { background: #f0f4ff; font-weight: bold; }
 .import-guide { background: #FFF9E6; border: 1px solid #F39C12; border-radius: 10px; padding: 10px 12px; font-size: 12px; color: #7D4F00; margin-bottom: 12px; line-height: 1.6; }
 .import-guide b { color: #B7950B; }
-.toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); background: #333; color: #fff; padding: 10px 20px; border-radius: 20px; font-size: 13px; font-weight: bold; z-index: 999; opacity: 0; pointer-events: none; transition: opacity .3s; white-space: nowrap; }
+.toast { position: fixed; bottom:max(100px,calc(env(safe-area-inset-bottom) + 76px)); left: 50%; transform: translateX(-50%); max-width:calc(100vw - 24px); background:rgba(25,35,45,.96); color:#fff; padding:10px 20px; border:1px solid rgba(255,255,255,.3); border-radius:20px; font-size:13px; font-weight:bold; z-index:5000; opacity:0; pointer-events:none; transition:opacity .3s; white-space:normal; text-align:center; line-height:1.35; box-shadow:0 8px 28px rgba(0,0,0,.38); -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px); }
 .toast.show { opacity: 1; }
 .admin-only { display: none!important; }
 body.admin-mode .admin-only { display: flex!important; }
@@ -2140,12 +2143,12 @@ html::-webkit-scrollbar-corner { background: #EAF2F8; }
     <div class="kpi-content-frame">
       <div class="kpi-content-toolbar">
         <span class="kpi-copy-scope" id="kpiCopyScope">DANH MỤC</span>
-        <button type="button" class="kpi-copy-content" title="Copy toàn bộ nội dung danh sách" aria-label="Copy toàn bộ nội dung danh sách" onclick="copyCurrentKpiContent()"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="11" height="11" rx="2"></rect><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"></path></svg> COPY NỘI DUNG</button>
       </div>
       <div id="kpiModalBody"></div>
     </div>
     <div class="simple-sticky-actions kpi-sticky-actions"><div class="edit-save-buttons">
-      <button type="button" class="btn-submit" onclick="closeOverlay('kpiOverlay')">Đóng</button>
+      <button type="button" class="btn-submit kpi-copy-action" onclick="copyCurrentKpiContent()">📋 COPY NỘI DUNG</button>
+      <button type="button" class="btn-submit kpi-close-action" onclick="closeOverlay('kpiOverlay')">ĐÓNG</button>
     </div></div>
   </div>
 </div>
@@ -3552,10 +3555,23 @@ function getKpiScopedEntries(){
 function showKpiDetail(type){
   currentKpiExportType = type;
   const kpiOverlay=document.getElementById("kpiOverlay");
-  const kpiColors={all:["#2E86C1","#fff"],ton:["#1E8449","#fff"],het:["#C0392B","#fff"],sap:["#B7950B","#fff"]};
-  const [kpiAccent,kpiAccentText]=kpiColors[type]||kpiColors.all;
+  const kpiColors={
+    all:["#2E86C1","#fff","#85C1E9","#154360"],
+    ton:["#1E8449","#fff","#82E0AA","#145A32"],
+    het:["#C0392B","#fff","#F1948A","#7B241C"],
+    sap:["#B7950B","#fff","#F7DC6F","#6E5600"]
+  };
+  const [kpiAccent,kpiAccentText,kpiAccentSoft,kpiAccentSoftText]=kpiColors[type]||kpiColors.all;
   kpiOverlay.style.setProperty("--kpi-accent",kpiAccent);
   kpiOverlay.style.setProperty("--kpi-accent-text",kpiAccentText);
+  kpiOverlay.style.setProperty("--kpi-accent-soft",kpiAccentSoft);
+  kpiOverlay.style.setProperty("--kpi-accent-soft-text",kpiAccentSoftText);
+  const kpiCloseButton=kpiOverlay.querySelector(".kpi-close-action");
+  if(kpiCloseButton){
+    kpiCloseButton.style.setProperty("background",kpiAccent,"important");
+    kpiCloseButton.style.setProperty("color",kpiAccentText,"important");
+    kpiCloseButton.style.setProperty("border-color",kpiAccent,"important");
+  }
   const cfg = SHEET_CFG;
   const scopedEntries = getKpiScopedEntries();
   const scopedRows = scopedEntries.map(item=>item.r);
@@ -6914,13 +6930,26 @@ async function saveCurrentViewerImage(){
     if(!response.ok) throw new Error("HTTP "+response.status);
     const blob=await response.blob();
     const ext=(blob.type.split("/")[1]||"jpg").replace("jpeg","jpg");
+    const filename=`${safeBase}.${ext}`;
+    if(typeof window.showSaveFilePicker==="function"){
+      const handle=await window.showSaveFilePicker({
+        suggestedName:filename,
+        types:[{description:"Tệp hình ảnh",accept:{[blob.type||"image/png"]:[`.${ext}`]}}]
+      });
+      const writable=await handle.createWritable();
+      await writable.write(blob);
+      await writable.close();
+      showToast("✅ Đã lưu ảnh vào vị trí bạn chọn");
+      return;
+    }
     const objectUrl=URL.createObjectURL(blob);
     const link=document.createElement("a");
-    link.href=objectUrl; link.download=`${safeBase}.${ext}`;
+    link.href=objectUrl; link.download=filename;
     document.body.appendChild(link); link.click(); link.remove();
     setTimeout(()=>URL.revokeObjectURL(objectUrl),1500);
     showToast("✅ Đã gửi ảnh tới mục tải xuống");
   }catch(e){
+    if(e?.name==="AbortError"){ showToast("Đã hủy lưu ảnh"); return; }
     const link=document.createElement("a");
     link.href=src; link.target="_blank"; link.rel="noopener"; link.download=safeBase;
     document.body.appendChild(link); link.click(); link.remove();
