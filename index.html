@@ -454,8 +454,15 @@ mark.kw-hit { background: #FFEB3B; color: #1A1A1A; padding: 0 1px; border-radius
 .note::-webkit-scrollbar-track { background:transparent; }
 .note::-webkit-scrollbar-thumb { background:#9DB5C7; border-radius:999px; }
 .note::-webkit-scrollbar-thumb:hover { background:#668AA5; }
+.product-related { margin-top:7px; padding:8px; border:1px solid #BFD8EA; border-radius:9px; background:#F4FAFE; }
+.product-related-title { display:block; margin-bottom:6px; color:#1A5276; font-size:11px; font-weight:900; }
+.product-related-list { display:flex; flex-wrap:wrap; gap:5px; }
+.product-related-link { border:1px solid #AED6F1; border-radius:999px; background:#fff; color:#1A5276; padding:5px 8px; font-size:10px; font-weight:850; cursor:pointer; }
+.product-related-link:active { transform:scale(.97); background:#EAF4FB; }
+.related-edit-preview { margin-top:6px; color:#607D8B; font-size:10px; line-height:1.4; }
 @media(max-width:560px){
   .note { max-height:54px; padding:6px 8px; }
+  .card-main > .product-related { width:calc(100% + 74px); margin-left:-74px; }
 }
 .card-actions { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:6px; margin-top:8px; border-top:1px solid #eee; padding-top:8px; }
 body.admin-mode .card-actions.admin-only { display:grid!important; }
@@ -1926,6 +1933,12 @@ html::-webkit-scrollbar-corner { background: #EAF2F8; }
       <textarea id="fGhi" placeholder="Ghi chú thêm cho sản phẩm (nếu có)"></textarea>
     </div>
     <div class="form-row">
+      <label>🔗 Bài viết / linh kiện liên quan <span style="font-weight:normal;color:#777">(mỗi mã một dòng)</span></label>
+      <textarea id="fRelatedCodes" placeholder="Ví dụ:&#10;CPU001&#10;RAM006&#10;Q5|CAM002"></textarea>
+      <div class="condition-note">Mã không ghi kho sẽ dùng cùng chi nhánh. Có thể liên kết chéo Máy tính, Máy in, Camera và Internet.</div>
+      <div id="fRelatedPreview" class="related-edit-preview"></div>
+    </div>
+    <div class="form-row">
       <label>Thương hiệu</label>
       <input type="text" id="fTH" list="fBrandSuggestions" placeholder="VD: Intel" onfocus="updateBrandSuggestions()">
       <datalist id="fBrandSuggestions"></datalist>
@@ -2876,7 +2889,7 @@ function checkAdminSession(){
 
 // Dòng URL duy nhất
 const SHEET_API_URL = "https://script.google.com/macros/s/AKfycby6YH69F7sfO1ZoUJsDm4BeX6Luj2GrhUfYWWJWNvqjraAEhkBck16EphrPBBm1BT3YqA/exec";
-const REQUIRED_API_VERSION = "2026.07.28-transaction-time-23";
+const REQUIRED_API_VERSION = "2026.07.28-product-links-24";
 // Apps Script có thể phải chờ khóa ghi khi nhiều thao tác diễn ra gần nhau.
 // 45 giây dài hơn thời gian chờ khóa phía máy chủ, tránh báo lỗi giả trong khi Sheet vẫn đang ghi.
 const SHEET_TIMEOUT_MS = 45000;
@@ -2897,6 +2910,8 @@ let configSaveSeq = 0;
 let SERVER_DATA_FINGERPRINT = "";
 let SERVER_NV_FINGERPRINT = "";
 let SERVER_CONFIG_FINGERPRINT = "";
+let PRODUCT_LINKS = [];
+let SERVER_PRODUCT_LINKS_FINGERPRINT = "";
 let serverSyncErrorLogs = [];
 let syncErrorAuthToken = "";
 
@@ -5408,6 +5423,7 @@ function renderCard(r,i,displayNo){
         <span class="card-price-desktop">${priceHtml}</span>
       </div>
       ${note?`<div class="note">📝 ${escapeHtml(note)}</div>`:""}
+      ${renderRelatedProducts(r)}
       <div class="ton-ctrl">
         <span class="ton-label">📦 Tồn kho:</span>
         <span class="ton-val" style="color:${stFg};">${ton}</span>
@@ -6738,6 +6754,70 @@ function getTransactionsForProduct(row){
     });
 }
 
+function productLinkKey(branch,code){
+  return `${String(branch||"Q2").trim().toUpperCase()==="Q5"?"Q5":"Q2"}|${normalizeProductCode(code)}`;
+}
+function findProductByLinkKey(key){
+  const [branch,code]=String(key||"").split("|");
+  const index=DATA.findIndex(row=>productLinkKey(row[13],row[1])===productLinkKey(branch,code));
+  return index<0?null:{index,row:DATA[index],key:productLinkKey(branch,code)};
+}
+function getRelatedProductItems(row){
+  const start=productLinkKey(row?.[13],row?.[1]);
+  const adjacency=new Map();
+  PRODUCT_LINKS.forEach(link=>{
+    const a=productLinkKey(link.sourceBranch,link.sourceCode), b=productLinkKey(link.targetBranch,link.targetCode);
+    if(!adjacency.has(a)) adjacency.set(a,new Set());
+    if(!adjacency.has(b)) adjacency.set(b,new Set());
+    adjacency.get(a).add(b); adjacency.get(b).add(a);
+  });
+  const visited=new Set([start]), queue=[start];
+  while(queue.length){
+    const key=queue.shift();
+    (adjacency.get(key)||[]).forEach(next=>{if(!visited.has(next)){visited.add(next);queue.push(next);}});
+  }
+  visited.delete(start);
+  return [...visited].map(findProductByLinkKey).filter(Boolean);
+}
+function renderRelatedProducts(row){
+  const items=getRelatedProductItems(row);
+  if(!items.length) return "";
+  return `<div class="product-related"><span class="product-related-title">🔗 Bài viết / thiết bị liên quan (${items.length})</span><div class="product-related-list">${items.map(item=>`<button type="button" class="product-related-link" onclick="event.stopPropagation();openRelatedProduct(${item.index})">${escapeHtml(item.row[1])} · ${escapeHtml(stripProductConditionFromTitle(item.row[2]))}</button>`).join("")}</div></div>`;
+}
+function openRelatedProduct(index){
+  if(!DATA[index]) return;
+  selectSearchSuggestion(index);
+}
+async function loadProductLinks(){
+  if(!SHEET_API_URL) return;
+  const json=await fetchSheetJson(sheetUrl({type:"product_links",_ts:Date.now()}),{},35000);
+  PRODUCT_LINKS=Array.isArray(json.links)?json.links:[];
+  SERVER_PRODUCT_LINKS_FINGERPRINT=String(json.fingerprint||"");
+}
+function parseRelatedTargets(value,defaultBranch){
+  const seen=new Set(), targets=[];
+  String(value||"").split(/[\n,;]+/).forEach(raw=>{
+    const text=raw.trim(); if(!text) return;
+    const parts=text.includes("|")?text.split("|"):[defaultBranch,text];
+    const branch=String(parts[0]||defaultBranch).trim().toUpperCase()==="Q5"?"Q5":"Q2";
+    const code=normalizeProductCode(parts.slice(1).join("|"));
+    const key=productLinkKey(branch,code);
+    if(code&&!seen.has(key)){seen.add(key);targets.push({branch,code});}
+  });
+  return targets;
+}
+function directRelatedText(branch,code){
+  const source=productLinkKey(branch,code);
+  return PRODUCT_LINKS.filter(link=>productLinkKey(link.sourceBranch,link.sourceCode)===source)
+    .map(link=>`${link.targetBranch===branch?"":link.targetBranch+"|"}${link.targetCode}`).join("\n");
+}
+async function saveProductLinks(sourceBranch,sourceCode,targets,oldBranch,oldCode){
+  const result=await postSheet("save_product_links",{sourceBranch,sourceCode,targets,oldBranch,oldCode,baseFingerprint:SERVER_PRODUCT_LINKS_FINGERPRINT},35000);
+  PRODUCT_LINKS=Array.isArray(result.links)?result.links:PRODUCT_LINKS;
+  SERVER_PRODUCT_LINKS_FINGERPRINT=String(result.fingerprint||SERVER_PRODUCT_LINKS_FINGERPRINT);
+  return true;
+}
+
 function getStockState(ton, lowLimit=2){
   ton = Number(ton) || 0;
   if(ton <= 0) return "HET";
@@ -7675,7 +7755,8 @@ function restoreAfterAdd(state){
   }));
 }
 
-function openAddModal(){ if(!requireAdmin()) return;
+async function openAddModal(){ if(!requireAdmin()) return;
+  if(SHEET_API_URL&&!SERVER_PRODUCT_LINKS_FINGERPRINT) try{await loadProductLinks();}catch(e){showToast("⚠️ Chưa tải được liên kết sản phẩm: "+String(e),5000);return;}
   addModalReturnState = captureAddReturnState();
   document.getElementById("editTitle").textContent = "➕ Thêm thiết bị mới"; document.getElementById("editIdx").value = "";
   document.getElementById("fSaveBtn").disabled = false; document.getElementById("fSaveBtn").textContent = "💾 Lưu thiết bị";
@@ -7683,11 +7764,13 @@ function openAddModal(){ if(!requireAdmin()) return;
   document.getElementById("fQuickTagNew").value = "";
   document.getElementById("fBranch").value = currentBranch === "Q5" ? "Q5" : "Q2"; document.getElementById("fSheet").value = ["MT","MI","CAM","INT"].includes(currentTab) ? currentTab : "MT"; document.getElementById("fMa").value = ""; document.getElementById("fTen").value = "";
   document.getElementById("fTH").value = ""; setVndInputValue("fGia", 0); setVndInputValue("fGiaBan", 0);
+  document.getElementById("fRelatedCodes").value = "";
   document.getElementById("fTon").value = "0"; document.getElementById("fSapHet").value = "2"; document.getElementById("fTT").value = "HẾT HÀNG";
   document.getElementById("fGhi").value = ""; document.getElementById("fVitri").value = ""; document.getElementById("fImgFile").value = ""; [1,2,3,4].forEach(n=>{ document.getElementById(`fWarrantyImg${n}`).value=""; document.getElementById(`fWarrantyTitle${n}`).value=""; updateSupplementaryImagePreview(n); }); setImagePreview(""); updateLocationSuggestions(); updateGroupOptions(""); updateBrandSuggestions(); checkProductCodeDuplicate(); syncProductConditionButtons(); updateAddFormLiveInfo();
   document.getElementById("editOverlay").classList.add("open");
 }
-function openEditModal(idx){ if(!requireAdmin()) return;
+async function openEditModal(idx){ if(!requireAdmin()) return;
+  if(SHEET_API_URL&&!SERVER_PRODUCT_LINKS_FINGERPRINT) try{await loadProductLinks();}catch(e){showToast("⚠️ Chưa tải được liên kết sản phẩm: "+String(e),5000);return;}
   const r = DATA[idx];
   const parts = splitNoteLocation(r[7]||"");
   const productCondition = getProductConditionFromTitle(r[2] || "");
@@ -7696,6 +7779,7 @@ function openEditModal(idx){ if(!requireAdmin()) return;
   document.getElementById("fCondition").value = productCondition;
   document.getElementById("fBranch").value = r[13] || "Q2"; document.getElementById("fSheet").value = r[0]; document.getElementById("fMa").value = r[1];
   document.getElementById("fTen").value = stripProductConditionFromTitle(r[2]); document.getElementById("fTH").value = r[3];
+  document.getElementById("fRelatedCodes").value = directRelatedText(r[13]||"Q2",r[1]);
   setVndInputValue("fGia", r[4]); setVndInputValue("fGiaBan", r[10]||0);
   document.getElementById("fTon").value = r[5]; document.getElementById("fSapHet").value = r[12] || 2; document.getElementById("fTT").value = getStockStatusValue(r[5], r[12]);
   document.getElementById("fGhi").value = parts.note || ""; document.getElementById("fVitri").value = parts.location || ""; document.getElementById("fImgFile").value = ""; document.getElementById("fQuickTagNew").value = "";
@@ -7732,8 +7816,16 @@ async function saveItem(){ if(!requireAdmin()) return;
     return;
   }
   const oldRow = idxNum >= 0 ? DATA[idxNum] : null;
-  const oldCode = idxNum >= 0 ? String(oldRow?.[1] || "") : "";
-  const oldBranch = idxNum >= 0 ? String(oldRow?.[13] || "Q2") : String(document.getElementById("fBranch").value || "Q2");
+	  const oldCode = idxNum >= 0 ? String(oldRow?.[1] || "") : "";
+	  const oldBranch = idxNum >= 0 ? String(oldRow?.[13] || "Q2") : String(document.getElementById("fBranch").value || "Q2");
+	  const newBranch=String(document.getElementById("fBranch").value||"Q2");
+	  const relatedTargets=parseRelatedTargets(document.getElementById("fRelatedCodes").value,newBranch)
+	    .filter(target=>productLinkKey(target.branch,target.code)!==productLinkKey(newBranch,ma));
+	  const missingRelated=relatedTargets.filter(target=>!findProductByLinkKey(productLinkKey(target.branch,target.code)));
+	  if(missingRelated.length){
+	    alert("Không tìm thấy mã liên kết: "+missingRelated.map(item=>item.branch+"|"+item.code).join(", ")+". Chưa lưu để tránh tạo liên kết sai.");
+	    return;
+	  }
   if(normalizeProductCode(ma) !== normalizeProductCode(oldCode) && TX_DATA.some(tx=>normalizeProductCode(tx.ma) === normalizeProductCode(ma) && String(tx.branch || "Q2") === document.getElementById("fBranch").value)){
     alert(`⚠️ Mã hàng "${ma}" đã tồn tại trong lịch sử giao dịch. Không thể dùng lại mã này cho sản phẩm khác để tránh sai tồn kho.`);
     return;
@@ -7759,13 +7851,21 @@ if(idx===""){
   showToast("Đã lưu: "+tenBase);
 }
 
-const saved = await saveProductRow(row, oldCode, oldBranch);
+	const saved = await saveProductRow(row, oldCode, oldBranch);
 if(!saved){
   if(idx==="") document.getElementById("editIdx").value = "0";
   if(saveButton){ saveButton.disabled = false; saveButton.textContent = "🔄 Thử lưu lại"; }
   showToast("⚠️ Chưa lưu được lên máy chủ. Biểu mẫu vẫn được giữ để bạn thử lại.", 5000);
-  return;
-}
+	  return;
+	}
+	try{
+	  await saveProductLinks(newBranch,ma,relatedTargets,oldBranch,oldCode||ma);
+	}catch(linkError){
+	  if(saveButton){ saveButton.disabled=false; saveButton.textContent="🔄 Lưu lại liên kết"; }
+	  setSyncBadge("error",String(linkError));
+	  showToast("⚠️ Sản phẩm đã lưu nhưng liên kết chưa lưu: "+String(linkError),6000);
+	  return;
+	}
 // Chỉ ghi cấu hình sau khi sản phẩm đã ghi xong để hai POST không tranh cùng khóa Apps Script.
 if(shouldSaveDisplayConfig) await saveDisplayConfig();
 if(saveButton){ saveButton.disabled = false; saveButton.textContent = "💾 Lưu thiết bị"; }
@@ -9385,7 +9485,7 @@ async function syncFromServerIfIdle(forceRetry=false){
     if(hasAuxPendingSync(PENDING_CONFIG_SYNC_KEY)) await saveDisplayConfig();
     if(hasPendingSync() || hasAuxPendingSync(PENDING_TX_SYNC_KEY) || hasAuxPendingSync(PENDING_NV_SYNC_KEY) || hasAuxPendingSync(PENDING_CONFIG_SYNC_KEY)) return;
     await loadData();
-    await Promise.all([loadTXFromSheet(), loadNVFromSheet(), loadDisplayConfig()]);
+    await Promise.all([loadTXFromSheet(), loadNVFromSheet(), loadDisplayConfig(), loadProductLinks()]);
     refreshLatestItemsTicker();
     render();
   }catch(e){
@@ -9516,7 +9616,7 @@ async function submitInventoryTransfer(){
   startBackgroundSync();
   // Ba nguồn này độc lập, tải song song để không phải cộng dồn thời gian chờ
   // Google Apps Script. Mỗi hàm vẫn giữ cơ chế chống ghi đè dữ liệu đang chờ.
-  await Promise.allSettled([loadTXFromSheet(),loadNVFromSheet(),loadDisplayConfig()]);
+  await Promise.allSettled([loadTXFromSheet(),loadNVFromSheet(),loadDisplayConfig(),loadProductLinks()]);
   refreshLatestItemsTicker();
   // Nếu lần lưu sản phẩm trước bị mất mạng, loadData đã giữ bản cục bộ mới nhất;
   // tự gửi lại ngay thay vì buộc người dùng bấm "Đẩy lên máy chủ".
