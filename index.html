@@ -1295,6 +1295,8 @@ body.fab-menu-open .category-view-bar .view-mode-switch { pointer-events:none; }
 .restock-level small { font-size: 10px; font-weight: 800; }
 .header-collapsible { overflow: hidden; transition: max-height .38s cubic-bezier(.22,.61,.36,1), opacity .3s ease; max-height: 520px; opacity: 1; }
 .sticky.suggestions-open .header-collapsible { overflow: visible; }
+.sticky.kpi-menu-open .header-collapsible { max-height:1000px; overflow:visible; }
+.sticky.kpi-menu-open .kpi-row { overflow:visible; }
 .sticky.collapsed .header-collapsible { max-height: 74px !important; opacity: 1; pointer-events: auto; }
 .admin-bar { max-height: 160px; transition: max-height .32s cubic-bezier(.22,.61,.36,1), opacity .22s ease, margin .32s ease; }
 .header .title { max-height: 42px; transition: max-height .32s cubic-bezier(.22,.61,.36,1), opacity .22s ease, margin .32s ease, color .22s ease, transform .22s ease; }
@@ -3814,11 +3816,15 @@ function showKpiHoverMenu(type){
     : `${entries.length} mặt hàng`;
   box.innerHTML=`<div class="kpi-hover-head"><span>${titles[type]||titles.all}</span><span class="kpi-hover-total">${total}</span></div>`+
     (entries.length?`<div class="kpi-hover-list">${entries.map(({r,i})=>`<button type="button" class="kpi-hover-item" onclick="event.stopPropagation();openKpiHoverProduct(${i})"><span class="kpi-hover-name">${renderProductTitleWithCondition(r[2]||"Chưa có tên")}</span><span class="kpi-hover-stock">Tồn ${Number(r[5])||0}</span><span class="kpi-hover-meta">${escapeHtml(relatedCategoryLabel(r[0]))} · ${escapeHtml(r[13]||"Q2")} · ${escapeHtml(r[1]||"Chưa có mã")}</span></button>`).join("")}</div>`:`<div class="kpi-hover-empty">Không có sản phẩm trong mục này.</div>`);
+  document.querySelector(".sticky")?.classList.add("kpi-menu-open");
   box.classList.add("open");
 }
 function scheduleKpiHoverClose(){
   clearTimeout(kpiHoverCloseTimer);
-  kpiHoverCloseTimer=setTimeout(()=>document.getElementById("kpiHoverMenu")?.classList.remove("open"),140);
+  kpiHoverCloseTimer=setTimeout(()=>{
+    document.getElementById("kpiHoverMenu")?.classList.remove("open");
+    document.querySelector(".sticky")?.classList.remove("kpi-menu-open");
+  },140);
 }
 function cancelKpiHoverClose(){
   clearTimeout(kpiHoverCloseTimer);
@@ -3826,12 +3832,14 @@ function cancelKpiHoverClose(){
 }
 function openKpiHoverProduct(index){
   document.getElementById("kpiHoverMenu")?.classList.remove("open");
+  document.querySelector(".sticky")?.classList.remove("kpi-menu-open");
   if(!DATA[index]) return;
   selectSearchSuggestion(index);
 }
 function showKpiDetail(type){
   cancelKpiHoverClose();
   document.getElementById("kpiHoverMenu")?.classList.remove("open");
+  document.querySelector(".sticky")?.classList.remove("kpi-menu-open");
   currentKpiExportType = type;
   const kpiOverlay=document.getElementById("kpiOverlay");
   const kpiColors={
