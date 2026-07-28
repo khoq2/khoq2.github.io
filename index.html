@@ -371,7 +371,8 @@ button:disabled,input:disabled,select:disabled,[aria-disabled="true"] { cursor:n
 .tx-delete { color: #C0392B; }
 .tx-action:active { transform: scale(.96); }
 #txOverlay { overscroll-behavior: contain; }
-.tx-history-modal { max-height: 80vh; max-height: 80svh; overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
+#txOverlay { justify-content:center; align-items:center; padding:18px; }
+.tx-history-modal { width:min(820px,100%); max-height: 88vh; max-height: 88svh; overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; border-radius:18px; }
 html.tx-overlay-open, body.tx-overlay-open { overflow: hidden; }
 @media (max-width: 520px) {
   .tx-history-modal { max-height: 82vh; max-height: 82svh; }
@@ -1678,6 +1679,63 @@ html::-webkit-scrollbar-corner { background: #EAF2F8; }
 .tx-detail-grid span { color:#566575; }
 .tx-detail-grid b { color:#1C2733; text-align:right; overflow-wrap:anywhere; }
 .tx-detail-grid .tx-total b { color:#16883F; font-size:13px; }
+@media (min-width:521px) {
+  #txOverlay .tx-history-modal {
+    width:min(900px,calc(100vw - 40px));
+    margin-inline:auto;
+  }
+  #txOverlay .tx-row {
+    display:grid;
+    grid-template-columns:220px minmax(0,1fr);
+    gap:12px 16px;
+    align-items:start;
+    padding:14px;
+  }
+  #txOverlay .tx-header {
+    grid-column:1;
+    grid-row:1;
+    display:flex;
+    flex-direction:column;
+    align-items:flex-start;
+    gap:8px;
+    margin:0;
+    padding:10px;
+    border:1px solid #E2E8F0;
+    border-radius:12px;
+    background:#F8FAFC;
+  }
+  #txOverlay .tx-nv {
+    width:100%;
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    gap:7px;
+  }
+  #txOverlay .tx-person { width:100%; }
+  #txOverlay .tx-kind { margin-left:0; }
+  #txOverlay .tx-head-right {
+    width:100%;
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:flex-start;
+    align-items:center;
+    gap:6px;
+  }
+  #txOverlay .tx-time { min-width:0; text-align:left; }
+  #txOverlay .tx-detail-grid {
+    grid-column:2;
+    grid-row:1 / span 3;
+    width:100%;
+    max-width:none;
+    margin:0;
+  }
+  #txOverlay .tx-detail-grid > div { grid-template-columns:150px minmax(0,1fr); }
+  #txOverlay .tx-detail-grid b { text-align:left; }
+  #txOverlay .tx-note { grid-column:1; }
+  #txOverlay .tx-related,
+  #txOverlay .tx-img,
+  #txOverlay .prod-media { grid-column:1 / -1; }
+}
 @media (max-width:520px) {
   #txOverlay { padding:7px; align-items:flex-start; }
   #txOverlay .tx-history-modal { width:100%; max-height:96dvh; border-radius:18px; padding:12px; background:linear-gradient(145deg,#F4F9FF,#EEF5FC); }
@@ -3481,6 +3539,7 @@ async function loadData(){
   loadLocal();
   const localSnapshot = JSON.parse(JSON.stringify(DATA));
   const localHasPending = hasPendingSync();
+  const loadStartSaveSeq = dataSaveSeq;
   if(SHEET_API_URL){
     setSyncBadge(localHasPending ? "pending" : "loading");
     try{
@@ -3490,10 +3549,14 @@ async function loadData(){
       if(validationIssues.length) throw new Error(inventoryValidationMessage(validationIssues,"máy chủ"));
       const sheetRows = normalizeSheetRows(json.data);
       const latestServerFingerprint = String(json.fingerprint || "");
-      if(localHasPending){
-        SERVER_DATA_FINGERPRINT = getPendingBaseFingerprint();
-        DATA = localSnapshot;
-        setSyncBadge("pending", "Dữ liệu mới trên máy đang chờ đồng bộ lại lên máy chủ");
+      // Trong lúc GET đang chờ, người dùng có thể vừa sửa dữ liệu hoặc bắt đầu lưu.
+      // Không áp dụng phản hồi được tạo trước thao tác đó vì có thể là bản máy chủ cũ.
+      const changedWhileLoading = dataSaveSeq !== loadStartSaveSeq;
+      const pendingNow = hasPendingSync();
+      if(localHasPending || pendingNow || changedWhileLoading){
+        if(localHasPending || pendingNow) SERVER_DATA_FINGERPRINT = getPendingBaseFingerprint();
+        if(localHasPending && !changedWhileLoading) DATA = localSnapshot;
+        setSyncBadge(pendingNow || localHasPending ? "pending" : "synced", "Đã giữ thay đổi mới trên thiết bị, bỏ qua phản hồi máy chủ cũ");
         return;
       }
       SERVER_DATA_FINGERPRINT = latestServerFingerprint;
@@ -9613,29 +9676,47 @@ async function submitInventoryTransfer(){
   showLastSync();
   startInitLoading();
   await loadTX();
-  updateInitLoading("Đang tải thông tin nhân viên...", 12);
+  updateInitLoading("Đang tải thông tin nhân viên...", 25);
   await loadNV();
-  updateInitLoading("Đang đọc dữ liệu kho hàng...", 20);
-  await loadData();
+  updateInitLoading("Đang mở dữ liệu kho gần nhất...", 55);
+  // Mở ngay bản dữ liệu an toàn đã lưu trên thiết bị. Không giữ màn hình ở 90%
+  // chỉ để chờ Google Apps Script; dữ liệu máy chủ sẽ được đối chiếu ở nền bên dưới.
+  loadLocal();
+  updateInitLoading("Đang chuẩn bị giao diện kho hàng...", 82);
   await finishInitLoading();
-  // Hiện ngay thiết bị mới nhất sau khi DATA đã có dữ liệu, không phải đợi chu kỳ 3 giây.
   refreshLatestItemsTicker();
-  // Dữ liệu thiết bị chính đã sẵn sàng: mở kho ngay, không che giao diện để chờ các nguồn phụ.
   syncStatusButtons(totalStockView ? currentStatus : "");
   render();
-  startBackgroundSync();
-  // Ba nguồn này độc lập, tải song song để không phải cộng dồn thời gian chờ
-  // Google Apps Script. Mỗi hàm vẫn giữ cơ chế chống ghi đè dữ liệu đang chờ.
-  await Promise.allSettled([loadTXFromSheet(),loadNVFromSheet(),loadDisplayConfig(),loadProductLinks()]);
-  refreshLatestItemsTicker();
-  // Nếu lần lưu sản phẩm trước bị mất mạng, loadData đã giữ bản cục bộ mới nhất;
-  // tự gửi lại ngay thay vì buộc người dùng bấm "Đẩy lên máy chủ".
-  if(hasPendingSync()) await saveData();
-  if(hasAuxPendingSync(PENDING_TX_SYNC_KEY)) await saveTX();
-  if(hasAuxPendingSync(PENDING_NV_SYNC_KEY)) await saveNV();
-  if(hasAuxPendingSync(PENDING_CONFIG_SYNC_KEY)) await saveDisplayConfig();
-  syncStatusButtons(totalStockView ? currentStatus : "");
-  render();
+
+  // Đồng bộ Google Sheet hoàn toàn ở nền. loadData() vẫn kiểm tra cờ pending:
+  // nếu thiết bị có thay đổi chưa gửi thì giữ nguyên bản cục bộ, tuyệt đối không
+  // lấy dữ liệu máy chủ về ghi đè.
+  void (async()=>{
+    try{
+      await Promise.allSettled([
+        loadData(),
+        loadTXFromSheet(),
+        loadNVFromSheet(),
+        loadDisplayConfig(),
+        loadProductLinks()
+      ]);
+      refreshLatestItemsTicker();
+      syncStatusButtons(totalStockView ? currentStatus : "");
+      render();
+
+      // Tự gửi lại các thay đổi còn chờ sau khi đã đối chiếu máy chủ.
+      if(hasPendingSync()) await saveData();
+      if(hasAuxPendingSync(PENDING_TX_SYNC_KEY)) await saveTX();
+      if(hasAuxPendingSync(PENDING_NV_SYNC_KEY)) await saveNV();
+      if(hasAuxPendingSync(PENDING_CONFIG_SYNC_KEY)) await saveDisplayConfig();
+      syncStatusButtons(totalStockView ? currentStatus : "");
+      render();
+    }catch(e){
+      console.warn("Đồng bộ khởi động chạy nền chưa hoàn tất:",e);
+    }finally{
+      startBackgroundSync();
+    }
+  })();
 })();
 </script>
 </body>
