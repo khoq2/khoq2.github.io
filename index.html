@@ -3033,6 +3033,37 @@ html, body, button, input, select, textarea {
     border-radius: 10px;
   }
 }
+
+/* Sửa bố cục khi chạy trên GitHub Pages: sidebar không được che phần đầu trang. */
+@media (min-width: 1050px) {
+  body > .sticky {
+    left: auto;
+    width: 100%;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+  body > .sticky .tabs {
+    left: 0;
+  }
+}
+@media (min-width: 1050px) and (max-width: 1240px) {
+  .header {
+    padding-inline: 14px;
+  }
+  .header .title {
+    max-width: 100%;
+  }
+  .kpi-row {
+    gap: 7px;
+  }
+  .kpi {
+    min-width: 0;
+    padding-inline: 10px;
+  }
+  .kpi-v {
+    font-size: 18px;
+  }
+}
 </style>
 </head>
 <body>
