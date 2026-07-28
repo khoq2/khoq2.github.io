@@ -957,6 +957,7 @@ body.fab-menu-open .category-view-bar .view-mode-switch { pointer-events:none; }
 .group-header-count { flex-shrink: 0; min-height:30px; border:1px solid rgba(255,255,255,.55); font-size: 11px; font-weight: 900; color: #fff; background: var(--group-strong,#1E3A5F); padding: 6px 10px; border-radius: 999px; white-space: nowrap; box-shadow: 0 2px 6px rgba(0,0,0,.18); cursor:pointer; }
 .group-header-count:hover { filter:brightness(1.12); transform:translateY(-1px); }
 .group-detail-modal { width:min(620px,100%); max-height:86dvh; overflow-y:auto; }
+#groupDetailOverlay { justify-content:center; align-items:center; padding:16px; }
 .group-detail-summary { margin:-5px 0 10px; padding:9px 11px; border-radius:10px; background:#EAF4FB; color:#1A5276; font-size:12px; font-weight:850; }
 .group-detail-list { display:grid; gap:6px; }
 .group-detail-item { width:100%; display:grid; grid-template-columns:minmax(0,1fr) auto; gap:8px; align-items:center; padding:9px 10px; border:1px solid #D6E4EE; border-radius:10px; background:#fff; color:#263B4A; text-align:left; cursor:pointer; }
@@ -964,7 +965,7 @@ body.fab-menu-open .category-view-bar .view-mode-switch { pointer-events:none; }
 .group-detail-name { min-width:0; font-size:12px; font-weight:850; line-height:1.3; overflow-wrap:anywhere; }
 .group-detail-meta { display:block; margin-top:3px; color:#718096; font-size:10px; font-weight:700; }
 .group-detail-stock { min-width:54px; padding:5px 7px; border-radius:999px; background:#E8F8F0; color:#1E8449; font-size:11px; font-weight:950; text-align:center; }
-@media(max-width:600px){.group-header{align-items:stretch}.group-header-count{min-height:38px;padding:7px 9px;white-space:normal;line-height:1.15;text-align:center}.group-detail-modal{max-height:calc(100dvh - 20px)}.group-detail-item{padding:9px 8px}.group-detail-name{font-size:11px}}
+@media(max-width:600px){.group-header{align-items:stretch}.group-header-count{min-height:38px;padding:7px 9px;white-space:normal;line-height:1.15;text-align:center}#groupDetailOverlay{align-items:flex-end;padding:0}.group-detail-modal{max-height:calc(100dvh - 20px);border-radius:20px 20px 0 0}.group-detail-item{padding:9px 8px}.group-detail-name{font-size:11px}}
 .group-header.jump-alert { animation: groupJumpAlert 1.15s ease-out; }
 @keyframes groupJumpAlert {
   0%, 100% { background: var(--group-bg, #FADBD8); color: #333; box-shadow: none; }
@@ -1647,6 +1648,43 @@ html::-webkit-scrollbar-corner { background: #EAF2F8; }
   .customer-bill-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
   .customer-results { max-height:38dvh; }
 }
+/* Lịch sử giao dịch kiểu mobile card: gọn, rõ và không thay đổi dữ liệu. */
+.tx-kpi-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; background:transparent!important; padding:0!important; }
+.tx-kpi { min-width:0; display:flex; align-items:center; gap:7px; padding:10px; border:1px solid #DCE7F3; border-radius:12px; background:#fff; }
+.tx-kpi-icon { flex:0 0 28px; width:28px; height:28px; display:grid; place-items:center; border-radius:9px; background:#EAF3FF; color:#1670D2; font-weight:950; }
+.tx-kpi small { display:block; color:#607080; font-size:9px; white-space:nowrap; }
+.tx-kpi b { display:block; margin-top:2px; color:#172B4D; font-size:15px; line-height:1.1; overflow-wrap:anywhere; }
+.tx-kpi em { color:#16883F; font-size:8px; font-style:normal; }
+.tx-kpi-out .tx-kpi-icon { background:#E7F9ED; color:#16A34A; }
+.tx-kpi-in .tx-kpi-icon { background:#FFF4DD; color:#F08A00; }
+.tx-kpi-money .tx-kpi-icon { background:#EAF3FF; color:#1769C2; }
+.tx-detail-grid { margin-top:10px; padding:8px 12px; border:1px solid #E1E8F0; border-radius:11px; background:#fff; }
+.tx-detail-grid > div { display:grid; grid-template-columns:minmax(110px,.8fr) minmax(0,1.2fr); gap:8px; align-items:center; min-height:34px; border-bottom:1px solid #EDF1F5; }
+.tx-detail-grid > div:last-child { border-bottom:0; }
+.tx-detail-grid span { color:#566575; }
+.tx-detail-grid b { color:#1C2733; text-align:right; overflow-wrap:anywhere; }
+.tx-detail-grid .tx-total b { color:#16883F; font-size:13px; }
+@media (max-width:520px) {
+  #txOverlay { padding:7px; align-items:flex-start; }
+  #txOverlay .tx-history-modal { width:100%; max-height:96dvh; border-radius:18px; padding:12px; background:linear-gradient(145deg,#F4F9FF,#EEF5FC); }
+  #txOverlay .modal-title { padding:5px 3px 12px; font-size:16px; }
+  #txOverlay .tx-filter { grid-template-columns:1fr 1fr; padding:11px; gap:9px; border-radius:14px; background:rgba(255,255,255,.86); box-shadow:0 4px 14px rgba(29,78,122,.09); }
+  #txOverlay .tx-filter-field:first-child { grid-column:1/-1; }
+  #txOverlay .tx-filter-label { color:#34495E; text-shadow:none; }
+  #txOverlay .tx-filter select,#txOverlay .tx-filter input { min-height:42px; border-color:#D7E0EA; background:#fff; color:#273746; }
+  #txOverlay .tx-filter .tx-clear-filter { grid-column:1/-1; min-height:43px; background:linear-gradient(135deg,#FF4D57,#F0444C); border:0; }
+  #txOverlay .tx-kpi-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  #txOverlay .tx-row { padding:13px; border:1px solid #E0E8F1; border-radius:15px; background:#fff; box-shadow:0 6px 18px rgba(25,65,105,.09); }
+  #txOverlay .tx-row::after { display:none; }
+  #txOverlay .tx-header { align-items:center; }
+  #txOverlay .tx-nv { flex-wrap:wrap; font-size:14px; }
+  #txOverlay .tx-nv .nv-avatar { width:40px; height:40px; }
+  #txOverlay .tx-head-right { flex-direction:column; align-items:flex-end; }
+  #txOverlay .tx-time { font-size:11px; color:#50677B; }
+  #txOverlay .tx-detail-grid > div { grid-template-columns:minmax(100px,.9fr) minmax(0,1.1fr); font-size:11px; }
+  #txOverlay .simple-sticky-actions { position:sticky; bottom:-12px; padding:10px 0 2px; background:linear-gradient(transparent,#EEF5FC 28%); }
+  #txOverlay .simple-sticky-actions .btn-submit { min-height:48px; border-radius:12px; background:#1976ED; font-size:15px; }
+}
 </style>
 <style id="contact-variant-b">
 /* Nút Liên hệ mẫu B: xanh đậm, viền cyan và ánh sáng nhẹ. */
@@ -1700,6 +1738,7 @@ html::-webkit-scrollbar-corner { background: #EAF2F8; }
   .card-main { width:100%; min-width:0; overflow:visible; }
   .product-name-row { width:100%; max-width:none; overflow:visible; }
   .product-name { display:block; width:100%; font-size:13px; line-height:1.32; white-space:normal; overflow-wrap:anywhere; word-break:normal; }
+  .card-main > .note { width:calc(100% + 74px); max-width:none; margin-left:-74px; margin-right:0; padding-left:10px; padding-right:10px; }
   .card-footer { justify-content:flex-start; align-items:flex-start; gap:5px; }
   .card-price-desktop { display:none; }
   .card-price-mobile { display:flex; align-items:center; justify-content:center; gap:6px; min-height:58px; margin:7px 0 0 -74px; width:calc(100% + 74px); padding:7px 8px; border:1px solid #E1E8EF; border-left:3px solid #2E86C1; border-radius:8px; background:#F8FAFC; }
@@ -2837,7 +2876,7 @@ function checkAdminSession(){
 
 // Dòng URL duy nhất
 const SHEET_API_URL = "https://script.google.com/macros/s/AKfycby6YH69F7sfO1ZoUJsDm4BeX6Luj2GrhUfYWWJWNvqjraAEhkBck16EphrPBBm1BT3YqA/exec";
-const REQUIRED_API_VERSION = "2026.07.26-safe-save-22";
+const REQUIRED_API_VERSION = "2026.07.28-transaction-time-23";
 // Apps Script có thể phải chờ khóa ghi khi nhiều thao tác diễn ra gần nhau.
 // 45 giây dài hơn thời gian chờ khóa phía máy chủ, tránh báo lỗi giả trong khi Sheet vẫn đang ghi.
 const SHEET_TIMEOUT_MS = 45000;
@@ -3246,24 +3285,63 @@ async function replaceAllInventoryRows(snapshot){
   }
 }
 
-async function fetchSheetJson(url, options={}, timeoutMs=SHEET_TIMEOUT_MS){
-  const ctrl = new AbortController();
-  const timer = setTimeout(()=>ctrl.abort(), timeoutMs);
-  try{
-    const res = await fetch(url, {...options, cache: "no-store", signal: ctrl.signal});
-    if(!res.ok) throw new Error("HTTP "+res.status);
-    const text = await res.text();
-    let json;
-    try{ json = JSON.parse(text); }
-    catch(e){ throw new Error("Máy chủ trả về dữ liệu không hợp lệ"); }
-    if(!json || json.ok !== true) throw new Error((json&&json.error)||"Phản hồi máy chủ không hợp lệ");
-    return json;
-  }catch(e){
-    if(e.name==="AbortError") throw new Error("Máy chủ phản hồi quá lâu");
-    throw e;
-  }finally{
-    clearTimeout(timer);
+function sheetRequestContext(url, options={}){
+  const method=String(options.method||"GET").toUpperCase();
+  let requestType="", action="";
+  try{ requestType=new URL(url,location.href).searchParams.get("type")||""; }catch(_){}
+  if(method==="POST" && typeof options.body==="string"){
+    try{ action=String(JSON.parse(options.body)?.action||""); }catch(_){}
   }
+  return {method,requestType,action,label:action||requestType||"api"};
+}
+function sheetHttpError(status, context, responseText=""){
+  const excerpt=String(responseText||"").replace(/\s+/g," ").trim().slice(0,180);
+  const error=new Error(`HTTP ${status} · ${context.method} ${context.label}${excerpt?` · ${excerpt}`:""}`);
+  error.status=status;
+  error.requestContext=context;
+  return error;
+}
+function isSafeSheetGetRetry(error){
+  const status=Number(error?.status||0);
+  return !status || status===404 || status===408 || status===429 || status>=500;
+}
+async function fetchSheetJson(url, options={}, timeoutMs=SHEET_TIMEOUT_MS){
+  const context=sheetRequestContext(url,options);
+  // Chỉ GET được tự thử lại. POST có thể đã ghi Sheet dù trình duyệt nhận lỗi,
+  // nên không gửi lại mù để tránh nhân đôi giao dịch hoặc tồn kho.
+  const maxAttempts=context.method==="GET" ? 3 : 1;
+  let lastError;
+  for(let attempt=1;attempt<=maxAttempts;attempt++){
+    const ctrl=new AbortController();
+    const timer=setTimeout(()=>ctrl.abort(),timeoutMs);
+    try{
+      let requestUrl=url;
+      if(context.method==="GET" && attempt>1){
+        const retryUrl=new URL(url,location.href);
+        retryUrl.searchParams.set("_retry",`${Date.now()}-${attempt}`);
+        requestUrl=retryUrl.toString();
+      }
+      const res=await fetch(requestUrl,{...options,cache:"no-store",signal:ctrl.signal});
+      const text=await res.text();
+      if(!res.ok) throw sheetHttpError(res.status,context,text);
+      let json;
+      try{ json=JSON.parse(text); }
+      catch(_){ throw new Error(`Máy chủ trả dữ liệu không hợp lệ · ${context.method} ${context.label}`); }
+      if(!json || json.ok!==true) throw new Error(`${(json&&json.error)||"Phản hồi máy chủ không hợp lệ"} · ${context.method} ${context.label}`);
+      return json;
+    }catch(rawError){
+      const error=rawError?.name==="AbortError"
+        ? new Error(`Máy chủ phản hồi quá lâu · ${context.method} ${context.label}`)
+        : rawError;
+      if(!error.requestContext) error.requestContext=context;
+      lastError=error;
+      if(attempt>=maxAttempts || !isSafeSheetGetRetry(error)) break;
+      await new Promise(resolve=>setTimeout(resolve,500*attempt+Math.floor(Math.random()*250)));
+    }finally{
+      clearTimeout(timer);
+    }
+  }
+  throw lastError;
 }
 
 function sheetUrl(params){
@@ -5309,7 +5387,7 @@ function renderCard(r,i,displayNo){
       <div class="card-top" style="--c: ${cfg.c}; background: ${cfg.light};">
       <div class="card-top-left">
         <span class="sheet-badge" style="--c: ${cfg.c};">${cfg.label}</span>
-        <span class="sheet-badge" style="--c: ${branchCfg.color};">${branchCfg.label}</span>
+        <span class="sheet-badge branch-badge" style="--c: ${cfg.c};">${branchCfg.label}</span>
         <span class="ma-code copy-code" style="--c:${cfg.c}" data-code="${escapeHtml(ma)}" data-copy-label="mã hàng" title="Nhấp đúp để sao chép mã hàng" ondblclick="event.stopPropagation();copyProductCode(this)">🏷️ ${highlightMatch(ma, kwTokens)}</span>
         <span class="product-category-path" title="${escapeHtml(productCategoryLabel)} → ${escapeHtml(productGroupText)}">
           <button type="button" class="product-path-link" data-tab="${escapeHtml(sh)}" onclick="event.stopPropagation();openProductCategoryPath(this)">🔗 ${escapeHtml(productCategoryLabel)}</button>
@@ -5412,9 +5490,16 @@ function showGroupInventoryDetail(key){
   document.getElementById("groupDetailSummary").textContent=`${items.length} mặt hàng · Tổng tồn chính xác: ${total.toLocaleString("vi-VN")}`;
   document.getElementById("groupDetailList").innerHTML=items.map(item=>{
     const row=item.r||[], stock=Number(row[5])||0;
-    return `<button type="button" class="group-detail-item" onclick="closeOverlay('groupDetailOverlay');jumpToInventoryItem(${item.i})"><span class="group-detail-name">${escapeHtml(row[2]||"Chưa có tên")}<span class="group-detail-meta">${escapeHtml(row[1]||"Chưa có mã")} · 📍 ${escapeHtml(row[13]||"Q2")}</span></span><span class="group-detail-stock">Tồn ${stock}</span></button>`;
+    return `<button type="button" class="group-detail-item" onclick="openGroupDetailProduct(${item.i})"><span class="group-detail-name">${renderProductTitleWithCondition(row[2]||"Chưa có tên")}<span class="group-detail-meta">${escapeHtml(row[1]||"Chưa có mã")} · 📍 ${escapeHtml(row[13]||"Q2")}</span></span><span class="group-detail-stock">Tồn ${stock}</span></button>`;
   }).join("") || '<div class="empty">Nhóm này chưa có mặt hàng.</div>';
   document.getElementById("groupDetailOverlay").classList.add("open");
+}
+function openGroupDetailProduct(index){
+  if(!DATA[index]) return;
+  closeOverlay("groupDetailOverlay");
+  // Dùng cùng luồng chọn kết quả tìm kiếm: xóa các bộ lọc nhóm/trạng thái,
+  // render đúng mã hàng rồi mới cuộn và đánh dấu đúng thẻ.
+  selectSearchSuggestion(index);
 }
 
 const GROUP_COLORS = ["#D6EAF8","#FDEBD0","#D5F5E3","#FADBD8","#E8DAEF","#FCF3CF","#D1F2EB","#F5CBA7","#D7DBFD","#F9E0F2","#D4EFDF","#FAE3D9","#CFF4FC","#EAEDED"];
@@ -6531,8 +6616,16 @@ async function saveSale(){ if(!requireAdmin()) return;
     try{
       await ensureAtomicApi();
       const updated = {...tx,nv,gia,ghi,img,warranty1,warranty2,time:transactionTime,vatRate,basePrice};
-      await postSheet("update_transaction",updated,35000);
-      Object.assign(tx,updated);
+      const result=await postSheet("update_transaction",updated,35000);
+      const savedTx=normalizeTxItem(result?.tx);
+      if(!savedTx || String(savedTx.id)!==String(txId)){
+        throw new Error("Máy chủ không trả lại giao dịch vừa sửa");
+      }
+      if(formatTxTime(savedTx.time)!==transactionTime){
+        throw new Error(`Ngày giờ máy chủ không khớp: đã chọn ${transactionTime}, máy chủ trả ${formatTxTime(savedTx.time)||"trống"}`);
+      }
+      // Dùng chính dữ liệu máy chủ trả về; không giả định bản cục bộ đã đồng bộ.
+      Object.assign(tx,savedTx);
       safeLocalStorageSet("kho_cntt_tx",JSON.stringify(normalizeTxList(TX_DATA)));
       closeOverlay("saleOverlay");
       setSyncBadge("synced"); markLastSync();
@@ -6634,7 +6727,15 @@ function getTransactionKindLabel(tx){
 function getTransactionsForProduct(row){
   const code = String(row?.[1] || "").trim();
   const branch = String(row?.[13] || "Q2").trim().toUpperCase() === "Q5" ? "Q5" : "Q2";
-  return TX_DATA.filter(tx=>String(tx.ma || "").trim() === code && (String(tx.branch || "Q2").trim().toUpperCase() === "Q5" ? "Q5" : "Q2") === branch);
+  return TX_DATA
+    .filter(tx=>String(tx.ma || "").trim() === code && (String(tx.branch || "Q2").trim().toUpperCase() === "Q5" ? "Q5" : "Q2") === branch)
+    // Trang chủ phải dựa vào thời gian giao dịch thật, không dựa vào vị trí
+    // dòng trong Google Sheet hoặc thứ tự mảng cục bộ.
+    .sort((a,b)=>{
+      const timeDiff=txTimeSortValue(b)-txTimeSortValue(a);
+      if(timeDiff) return timeDiff;
+      return String(b.id||"").localeCompare(String(a.id||""),undefined,{numeric:true});
+    });
 }
 
 function getStockState(ton, lowLimit=2){
@@ -6797,11 +6898,12 @@ function renderTxHistory(){
   const totalSoldQty = soldRows.reduce((s,t)=>s + Math.abs(Number(t.qty) || 0),0);
   const totalImportedQty = importedRows.reduce((s,t)=>s + Math.abs(Number(t.qty) || 0),0);
   const totalGia = soldRows.reduce((s,t)=>s+(Number(t.gia)||0)*Math.abs(Number(t.qty)||0),0);
-  const summary = `<div class="tx-summary"><div class="tx-summary-line">
-      <span>Hiển thị: <b>${filtered.length}</b></span><span class="tx-summary-sep">·</span>
-      <span>Đã xuất: <b>${totalSoldQty}</b> / Đã nhập: <b>${totalImportedQty}</b></span><span class="tx-summary-sep">·</span>
-      <span>Doanh thu: <b class="revenue">${fmt(totalGia)}</b></span>
-    </div></div>`;
+  const summary = `<div class="tx-summary tx-kpi-grid">
+      <div class="tx-kpi"><span class="tx-kpi-icon">◉</span><span><small>Hiển thị</small><b>${filtered.length}</b></span></div>
+      <div class="tx-kpi tx-kpi-out"><span class="tx-kpi-icon">⇧</span><span><small>Đã xuất</small><b>${totalSoldQty}</b></span></div>
+      <div class="tx-kpi tx-kpi-in"><span class="tx-kpi-icon">⇩</span><span><small>Đã nhập</small><b>${totalImportedQty}</b></span></div>
+      <div class="tx-kpi tx-kpi-money"><span class="tx-kpi-icon">◉</span><span><small>Doanh thu</small><b>${fmt(totalGia)} <em>VND</em></b></span></div>
+    </div>`;
   const rows = filtered.length ? filtered.map(t=>`
         <div class="tx-row">
           <div class="tx-header">
@@ -6811,10 +6913,13 @@ function renderTxHistory(){
               ${document.body.classList.contains("admin-mode")?`<button class="tx-action tx-edit" title="Sửa ngày giờ và thông tin giao dịch" onclick="event.stopPropagation(); editTX('${escapeHtml(t.id)}')">📅 Sửa ngày giờ</button><button class="tx-action tx-delete" title="Xóa giao dịch" onclick="event.stopPropagation(); deleteTX('${escapeHtml(t.id)}')">🗑️</button>`:""}
             </div>
           </div>
-          <div class="tx-meta">
-            <span class="tx-pill">${getTransactionKind(t)==="IMPORT" ? "Đã nhập" : getTransactionKind(t)==="ADJUST" ? "Điều chỉnh" : "Đã xuất"}: (<b>${Math.abs(Number(t.qty) || 0)}</b>)</span>
-            ${getTransactionKind(t)==="SALE" ? `<span class="tx-pill tx-price-pill">${t.gia>0?fmt(t.gia)+"/cái":"Không ghi giá"}${Number(t.vatRate)===8?` (đã gồm VAT 8%)`:""}</span>` : ""}
-          </div>
+	          <div class="tx-detail-grid">
+	            <div><span>📦 Sản phẩm</span><b>${escapeHtml(t.ten||t.ma||"")}</b></div>
+	            <div><span>#️⃣ Mã giao dịch</span><b>${escapeHtml(String(t.id||""))}</b></div>
+	            <div><span>🏷️ Số lượng</span><b>${Math.abs(Number(t.qty)||0)}</b></div>
+	            <div><span>🪙 Đơn giá</span><b>${t.gia>0?fmt(t.gia)+" VND":"Không ghi giá"}</b></div>
+	            <div class="tx-total"><span>💰 Thành tiền</span><b>${fmt((Number(t.gia)||0)*Math.abs(Number(t.qty)||0))} VND</b></div>
+	          </div>
           ${t.ghi?`<span class="tx-note">📝 ${escapeHtml(t.ghi)}</span>`:""}
           ${renderSameDayEmployeeLinks(t, r)}
           ${t.img?`<img class="tx-img" src="${escapeHtml(t.img)}" alt="Ảnh giao dịch" referrerpolicy="no-referrer" onclick="openImageViewer(this.src, this.alt)" onerror="this.style.display='none';">`:""}
@@ -6867,7 +6972,12 @@ function editTX(id){ if(!requireAdmin()) return;
   nvSel.value = tx.nv || "";
   document.getElementById("saleQty").value = tx.qty || 1;
   document.getElementById("saleQty").disabled = true;
-  document.getElementById("saleTime").value = formatTxTime(tx.time || new Date());
+  const originalTime=formatTxTime(tx.time);
+  if(!formatTxTimeFromInput(originalTime)){
+    alert("Giao dịch này đang có ngày giờ bị thiếu hoặc sai định dạng trên Google Sheet. Không tự thay bằng ngày hôm nay; hãy sửa trực tiếp dữ liệu nguồn trước.");
+    return;
+  }
+  document.getElementById("saleTime").value = originalTime;
   setVndInputValue("saleGia", tx.basePrice || tx.gia || 0);
   document.getElementById("saleVat8").checked = Number(tx.vatRate) === 8;
   updateSaleVatPreview();
