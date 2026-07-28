@@ -1675,6 +1675,12 @@ html::-webkit-scrollbar-corner { background: #EAF2F8; }
 #customerOverlay.combined-new .customer-record-identity { display:none; }
 #customerOverlay.combined-new #customerEditor { margin-bottom:0; border-radius:14px 14px 0 0; }
 #customerOverlay.combined-new #customerRecordEditor { margin-top:0; border-top:0; border-radius:0 0 14px 14px; }
+#customerOverlay.customer-editing .customer-search-wrap,
+#customerOverlay.customer-editing .customer-search-help,
+#customerOverlay.customer-editing > .customer-modal > .customer-toolbar,
+#customerOverlay.customer-editing .customer-results,
+#customerOverlay.customer-editing .customer-detail { display:none!important; }
+#customerOverlay.customer-editing .customer-editor.open { margin-top:0; }
 @media (max-width:520px) {
   .customer-modal { max-height:94dvh; padding-left:11px; padding-right:11px; }
   .customer-editor-grid { grid-template-columns:1fr; }
@@ -1893,13 +1899,13 @@ html::-webkit-scrollbar-corner { background: #EAF2F8; }
     </div>
     <div class="title"><span class="title-icon">🏪</span><span class="title-text"><span class="title-base">HOÀNG GIA COMPUTER</span><span class="title-shine" aria-hidden="true"></span></span><span class="warehouse-switcher" role="group" aria-label="Chọn kho đang xem"><button type="button" class="warehouse-switch" data-warehouse="Q2" onclick="selectWarehouseBranch('Q2')"><span class="warehouse-pin">📍</span> Q2</button><button type="button" class="warehouse-switch" data-warehouse="Q5" onclick="selectWarehouseBranch('Q5')"><span class="warehouse-pin">📍</span> Q5</button></span></div>
     <div class="kpi-row">
-      <div class="kpi" style="background: #2E86C1;" onclick="showKpiDetail('all')"><div class="kpi-v"><span class="kpi-icon kpi-icon-box" aria-hidden="true">📦</span><span id="kpi-mh">0</span></div><div class="kpi-l">mặt hàng <span class="kpi-hint">▼</span></div></div>
-      <div class="kpi" style="background: #1E8449;" onclick="showKpiDetail('ton')"><div class="kpi-v"><span class="kpi-icon kpi-icon-stock" aria-hidden="true">📊</span><span id="kpi-ton">0</span></div><div class="kpi-l">tổng tồn <span class="kpi-hint">▼</span></div></div>
-     <div class="kpi" style="background: #C0392B;" onclick="showKpiDetail('het')">
+      <div class="kpi" style="background: #2E86C1;" onclick="showKpiDetail('all')" onmouseenter="scheduleKpiHover('all')" onmouseleave="cancelKpiHover()"><div class="kpi-v"><span class="kpi-icon kpi-icon-box" aria-hidden="true">📦</span><span id="kpi-mh">0</span></div><div class="kpi-l">mặt hàng <span class="kpi-hint">▼</span></div></div>
+      <div class="kpi" style="background: #1E8449;" onclick="showKpiDetail('ton')" onmouseenter="scheduleKpiHover('ton')" onmouseleave="cancelKpiHover()"><div class="kpi-v"><span class="kpi-icon kpi-icon-stock" aria-hidden="true">📊</span><span id="kpi-ton">0</span></div><div class="kpi-l">tổng tồn <span class="kpi-hint">▼</span></div></div>
+     <div class="kpi" style="background: #C0392B;" onclick="showKpiDetail('het')" onmouseenter="scheduleKpiHover('het')" onmouseleave="cancelKpiHover()">
     <div class="kpi-v"><span class="kpi-icon kpi-icon-out" aria-hidden="true">🔴</span><span id="kpi-het">0</span></div>
     <div class="kpi-l">hết hàng <span class="kpi-hint">▼</span></div>
 </div>
-      <div class="kpi" style="background: #B7950B;" onclick="showKpiDetail('sap')"><div class="kpi-v"><span class="kpi-icon kpi-icon-low" aria-hidden="true">🟡</span><span id="kpi-sap">0</span></div><div class="kpi-l">sắp hết <span class="kpi-hint">▼</span></div></div>
+      <div class="kpi" style="background: #B7950B;" onclick="showKpiDetail('sap')" onmouseenter="scheduleKpiHover('sap')" onmouseleave="cancelKpiHover()"><div class="kpi-v"><span class="kpi-icon kpi-icon-low" aria-hidden="true">🟡</span><span id="kpi-sap">0</span></div><div class="kpi-l">sắp hết <span class="kpi-hint">▼</span></div></div>
     </div>
     <div class="search-box">
       <span class="search-icon" aria-hidden="true">
@@ -3775,7 +3781,21 @@ function openKpiProduct(idx){
 function getKpiScopedEntries(){
   return DATA.map((r,i)=>({r,i})).filter(({r})=>currentBranch==="ALL" || String(r[13] || "Q2")===currentBranch);
 }
+let kpiHoverTimer=null;
+function scheduleKpiHover(type){
+  if(!window.matchMedia("(hover:hover) and (pointer:fine)").matches) return;
+  clearTimeout(kpiHoverTimer);
+  kpiHoverTimer=setTimeout(()=>{
+    kpiHoverTimer=null;
+    if(!document.querySelector(".overlay.open")) showKpiDetail(type);
+  },500);
+}
+function cancelKpiHover(){
+  clearTimeout(kpiHoverTimer);
+  kpiHoverTimer=null;
+}
 function showKpiDetail(type){
+  cancelKpiHover();
   currentKpiExportType = type;
   const kpiOverlay=document.getElementById("kpiOverlay");
   const kpiColors={
@@ -8552,6 +8572,7 @@ function renderCustomerSearch(){
   box.innerHTML=matches.map(({customer})=>`<button type="button" class="customer-result" onclick="openCustomerDetail('${customer.phone}')"><span class="customer-result-phone">${escapeHtml(formatCustomerPhone(customer.phone))}</span><span class="customer-result-name">${escapeHtml(customer.name || "Chưa ghi tên")}</span>${customer.note?`<span class="customer-result-note">${escapeHtml(customer.note)}</span>`:""}</button>`).join("");
 }
 async function openCustomerDetail(phone){
+  clearTimeout(customerSearchTimer);
   selectedCustomer = CUSTOMER_DATA.find(item=>item.phone===normalizeCustomerPhone(phone)) || null;
   if(!selectedCustomer) return;
   document.getElementById("customerResults").innerHTML="";
@@ -8621,7 +8642,7 @@ function openCustomerBillImage(img){
 function closeCustomerEditors(){
   document.getElementById("customerEditor")?.classList.remove("open");
   document.getElementById("customerRecordEditor")?.classList.remove("open");
-  document.getElementById("customerOverlay")?.classList.remove("combined-new");
+  document.getElementById("customerOverlay")?.classList.remove("combined-new","customer-editing");
   customerCreatingCombined=false;
 }
 function openCustomerEditor(phone=""){
@@ -8632,6 +8653,7 @@ function openCustomerEditor(phone=""){
   document.getElementById("customerEditPhone").value=customer?.phone || normalizeCustomerPhone(document.getElementById("customerSearch")?.value);
   document.getElementById("customerEditName").value=customer?.name || "";
   document.getElementById("customerEditNote").value=customer?.note || "";
+  document.getElementById("customerOverlay").classList.add("customer-editing");
   document.getElementById("customerEditor").classList.add("open");
   if(!customer){
     customerCreatingCombined=true;
@@ -8685,6 +8707,7 @@ function openCustomerRecordEditor(recordId=""){
   closeCustomerEditors();
   fillCustomerRecordEditor(record);
   document.getElementById("customerRecordSaveBtn").textContent="💾 Lưu hồ sơ";
+  document.getElementById("customerOverlay").classList.add("customer-editing");
   document.getElementById("customerRecordEditor").classList.add("open");
 }
 async function saveCustomerRecord(){
