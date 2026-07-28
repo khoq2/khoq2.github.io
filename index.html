@@ -57,7 +57,7 @@ button:disabled,input:disabled,select:disabled,[aria-disabled="true"] { cursor:n
 .title-shine { position: absolute; left: 0; top: 50%; width: 42%; height: 1.4em; z-index: 2; pointer-events: none; border-radius: 999px; background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,.15) 18%, rgba(255,255,255,.95) 50%, rgba(255,255,255,.15) 82%, rgba(255,255,255,0) 100%); filter: blur(.4px); opacity: .9; transform: translate(-140%, -50%) skewX(-18deg); animation: titleSweep 3.2s ease-in-out infinite alternate; }
 @keyframes titleSweep { from { transform: translate(-140%, -50%) skewX(-18deg); } to { transform: translate(260%, -50%) skewX(-18deg); } }
 .kpi-row { position:relative; display: flex; gap: 5px; margin-bottom: 10px; }
-.kpi-hover-menu { display:none; position:absolute; z-index:260; top:calc(100% + 6px); left:0; width:min(430px,calc(100vw - 28px)); max-height:min(58vh,390px); overflow:auto; padding:8px; border:1px solid rgba(255,255,255,.72); border-radius:13px; background:rgba(247,251,254,.98); color:#253B4B; box-shadow:0 14px 34px rgba(8,30,48,.3); }
+.kpi-hover-menu { display:none; position:absolute; z-index:260; top:calc(100% + 4px); left:0; width:min(430px,calc(100vw - 28px)); max-height:min(58vh,390px); overflow:auto; overscroll-behavior:contain; padding:8px; border:1px solid rgba(255,255,255,.72); border-radius:13px; background:rgba(247,251,254,.98); color:#253B4B; box-shadow:0 14px 34px rgba(8,30,48,.3); scrollbar-width:thin; }
 .kpi-hover-menu.open { display:block; animation:tabDropdownIn .14s ease-out both; }
 .kpi-hover-head { display:flex; align-items:center; justify-content:space-between; gap:8px; padding:5px 6px 9px; color:#1E3A5F; font-size:12px; font-weight:950; }
 .kpi-hover-total { padding:4px 7px; border-radius:999px; background:#E7F1F8; color:#1A5276; font-size:10px; white-space:nowrap; }
@@ -223,7 +223,7 @@ button:disabled,input:disabled,select:disabled,[aria-disabled="true"] { cursor:n
 .card:hover .ton-ctrl,.card:focus-within .ton-ctrl { background:#EAF7F0; border-color:#A9D8BA; }
 .card:hover .nguoi-ban-row,.card:focus-within .nguoi-ban-row { background:#EAF3FA; border-color:#B8D3E7; }
 /* Khoang tach bai + Tapered Line nam ngoai the, khong bi vien the che mat. */
-.card-shell { min-width:0; margin-bottom:12px; }
+.card-shell { min-width:0; margin-bottom:12px; content-visibility:auto; contain-intrinsic-size:auto 250px; }
 .card-shell > .card { margin-bottom:0; }
 .tapered-separator {
   width:88%;
@@ -522,7 +522,7 @@ body.admin-mode .card-actions.admin-only { display:grid!important; }
 .view-mode-btn:active { transform:scale(.9); box-shadow:inset 0 3px 7px rgba(30,58,95,.18); }
 .view-mode-btn.active { color:#fff; border-color:rgba(255,255,255,.75); background:linear-gradient(145deg,#2E86C1,#1E3A5F); box-shadow:0 0 0 3px rgba(46,134,193,.17),0 6px 14px rgba(30,58,95,.28),inset 0 1px 0 rgba(255,255,255,.3); }
 .view-mode-btn:last-child.active { background:linear-gradient(145deg,#F39C12,#A04000); box-shadow:0 0 0 3px rgba(243,156,18,.17),0 6px 14px rgba(160,64,0,.25),inset 0 1px 0 rgba(255,255,255,.3); }
-.product-list-row { width:100%; min-height:52px; display:flex; align-items:center; gap:10px; margin:7px 0; padding:9px 11px; border:1.5px solid #C9D6E2; border-left:5px solid var(--list-color,#1E3A5F); border-radius:11px; background:#fff; box-shadow:0 2px 6px rgba(30,58,95,.08); color:#243B53; text-align:left; cursor:pointer; }
+.product-list-row { width:100%; min-height:52px; display:flex; align-items:center; gap:10px; margin:7px 0; padding:9px 11px; border:1.5px solid #C9D6E2; border-left:5px solid var(--list-color,#1E3A5F); border-radius:11px; background:#fff; box-shadow:0 2px 6px rgba(30,58,95,.08); color:#243B53; text-align:left; cursor:pointer; content-visibility:auto; contain-intrinsic-size:auto 58px; }
 .product-list-row:active { transform:scale(.992); background:#F2F7FA; }
 .product-list-main { flex:1; min-width:0; display:flex; flex-direction:column; gap:3px; }
 .product-list-title { min-width:0; font-size:13px; font-weight:900; line-height:1.35; overflow-wrap:anywhere; }
@@ -893,11 +893,13 @@ body.fab-menu-open .category-view-bar .view-mode-switch { pointer-events:none; }
 .footer-credit-text { display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; background:linear-gradient(100deg,#607D9B 20%,#D8F1FF 44%,#2E86C1 52%,#D8F1FF 60%,#607D9B 82%); background-size:260% 100%; -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; animation:footerShimmer 6s ease-in-out infinite; }
 .home-landing-mode .latest-items-ticker { position:relative; left:auto; right:auto; bottom:auto; width:fit-content; max-width:calc(100vw - 28px); margin:16px 14px 0; transform:translateY(7px); }
 .home-landing-mode .latest-items-line { justify-content:flex-start; }
-.home-landing-mode .sticky,.loading-layout-mode .sticky { position:relative; top:auto; }
+.loading-layout-mode .sticky { position:relative; top:auto; }
 .home-landing-mode .search-examples::after { content:""; flex:0 0 72%; height:1px; margin-top:5px; border-radius:999px; background:linear-gradient(90deg,transparent,rgba(46,134,193,.22) 18%,rgba(46,134,193,.72) 50%,rgba(46,134,193,.22) 82%,transparent); box-shadow:0 0 4px rgba(46,134,193,.18); pointer-events:none; }
 .home-landing-mode .latest-items-ticker.show,.home-landing-mode .latest-items-ticker.is-rising { transform:translateY(0); }
 .home-landing-mode .latest-items-ticker.is-leaving { transform:translateY(7px); }
 .home-landing-mode #results { padding-bottom:0; }
+.search-results-transition #results { opacity:.72; transform:translateY(2px); }
+#results { transition:opacity .14s ease,transform .14s ease; }
 .home-landing-mode .search-landing { margin-bottom:0; padding-bottom:0; }
 .home-landing-mode .footer-credit { position:relative; left:auto; bottom:auto; width:fit-content; max-width:calc(100vw - 28px); margin:16px auto 24px; transform:none; }
 @media (any-hover:hover) and (any-pointer:fine) {
@@ -1897,10 +1899,95 @@ html::-webkit-scrollbar-corner { background: #EAF2F8; }
   .view-mode-btn { width:28px; height:28px; border-radius:8px; }
   .view-mode-btn svg { width:13px; height:13px; }
 }
+/* Menu nghiệp vụ trượt từ trái sang phải. Tách biệt khỏi nội dung kho hiện tại. */
+.erp-menu-toggle {
+  position:fixed; z-index:10000; left:8px; top:10px;
+  width:46px; height:46px; display:grid; place-items:center;
+  border:2px solid rgba(255,255,255,.86); border-radius:12px;
+  background:linear-gradient(145deg,#0B2F59,#1763A7); color:#fff;
+  box-shadow:0 7px 22px rgba(8,37,70,.48),0 0 0 3px rgba(243,156,18,.45);
+  transition:left .24s ease,background .18s ease,transform .18s ease;
+}
+.erp-menu-toggle:hover { background:linear-gradient(145deg,#10457E,#1763A7); }
+.erp-menu-toggle:active { transform:scale(.96); }
+.erp-menu-toggle svg { width:23px; height:23px; fill:none; stroke:currentColor; stroke-width:2.2; stroke-linecap:round; }
+.erp-menu-toggle[aria-expanded="true"] { left:min(294px,calc(100vw - 54px)); }
+.erp-side-scrim {
+  position:fixed; z-index:1230; inset:0; border:0;
+  background:rgba(7,24,42,.34); opacity:0; visibility:hidden;
+  transition:opacity .24s ease,visibility .24s ease;
+}
+.erp-side-menu {
+  position:fixed; z-index:1240; left:0; top:0; bottom:0;
+  width:min(286px,calc(100vw - 46px)); display:flex; flex-direction:column;
+  padding:18px 13px max(14px,env(safe-area-inset-bottom));
+  background:linear-gradient(180deg,#0A315E 0%,#0B376A 58%,#082D58 100%);
+  color:#fff; box-shadow:16px 0 38px rgba(4,24,46,.3);
+  transform:translateX(-105%); visibility:hidden;
+  transition:transform .24s cubic-bezier(.22,.8,.25,1),visibility .24s ease;
+  overflow-y:auto; overscroll-behavior:contain;
+}
+body.erp-side-menu-open { overflow:hidden; }
+body.erp-side-menu-open .erp-side-scrim { opacity:1; visibility:visible; }
+body.erp-side-menu-open .erp-side-menu { transform:translateX(0); visibility:visible; }
+.erp-side-brand { padding:4px 9px 16px; border-bottom:1px solid rgba(255,255,255,.12); }
+.erp-side-brand strong { display:block; font-size:15px; letter-spacing:.2px; }
+.erp-side-brand span { display:block; margin-top:4px; color:#A9C7E5; font-size:10px; }
+.erp-side-nav { display:grid; gap:5px; padding:13px 0; }
+.erp-side-item {
+  width:100%; min-height:45px; display:flex; align-items:center; gap:11px;
+  padding:10px 12px; border:1px solid transparent; border-radius:10px;
+  background:transparent; color:#DCEBFA; font-size:13px; font-weight:750;
+  text-align:left; transition:.16s ease;
+}
+.erp-side-item:hover,.erp-side-item:focus-visible {
+  border-color:rgba(111,186,255,.38); background:rgba(46,134,241,.22);
+  color:#fff; outline:none; transform:translateX(2px);
+}
+.erp-side-item.active {
+  border-color:#2C8FFF; background:linear-gradient(135deg,#1475E8,#1F8BFF);
+  color:#fff; box-shadow:0 6px 15px rgba(0,104,224,.35),inset 0 1px 0 rgba(255,255,255,.22);
+}
+.erp-side-icon { width:23px; flex:0 0 23px; text-align:center; font-size:18px; }
+.erp-side-footer {
+  margin-top:auto; padding:13px 11px; border:1px solid rgba(116,184,246,.22);
+  border-radius:12px; background:rgba(4,27,52,.22); color:#B8D3EC;
+  font-size:10px; line-height:1.55; text-align:center;
+}
+.erp-side-footer strong { color:#fff; font-size:12px; }
+@media(max-width:480px){
+  .erp-menu-toggle { left:7px; top:8px; width:42px; height:42px; }
+  .erp-menu-toggle[aria-expanded="true"] { left:min(285px,calc(100vw - 49px)); }
+  .erp-side-menu { width:min(278px,calc(100vw - 42px)); padding-top:max(14px,env(safe-area-inset-top)); }
+}
+@media(prefers-reduced-motion:reduce){
+  .erp-menu-toggle,.erp-side-scrim,.erp-side-menu { transition:none; }
+}
 </style>
 </head>
 <body>
 <div class="cursor-halo" aria-hidden="true"></div><div class="cursor-dot" aria-hidden="true"></div>
+
+<button type="button" class="erp-menu-toggle" id="erpMenuToggle"
+  style="display:flex!important;visibility:visible!important;opacity:1!important;position:fixed!important;left:8px!important;top:8px!important;z-index:2147483647!important;width:48px!important;height:48px!important;align-items:center!important;justify-content:center!important;background:#0B3B70!important;color:#fff!important;border:3px solid #F39C12!important;border-radius:12px!important;box-shadow:0 5px 18px rgba(0,0,0,.5)!important;font-size:27px!important;font-weight:900!important;line-height:1!important"
+  aria-label="Mở menu quản lý" aria-controls="erpSideMenu" aria-expanded="false" onclick="toggleErpSideMenu()">☰
+</button>
+<button type="button" class="erp-side-scrim" id="erpSideScrim" aria-label="Đóng menu" onclick="closeErpSideMenu()"></button>
+<aside class="erp-side-menu" id="erpSideMenu" aria-label="Menu quản lý" aria-hidden="true">
+  <div class="erp-side-brand"><strong>HOÀNG GIA ERP</strong><span>Quản lý kho hàng</span></div>
+  <nav class="erp-side-nav">
+    <button type="button" class="erp-side-item active" data-erp-menu="overview" onclick="handleErpMenuItem(this)"><span class="erp-side-icon">⌂</span><span>Tổng quan</span></button>
+    <button type="button" class="erp-side-item" data-erp-menu="products" onclick="handleErpMenuItem(this)"><span class="erp-side-icon">▣</span><span>Sản phẩm</span></button>
+    <button type="button" class="erp-side-item" data-erp-menu="imports" onclick="handleErpMenuItem(this)"><span class="erp-side-icon">⇩</span><span>Nhập hàng</span></button>
+    <button type="button" class="erp-side-item" data-erp-menu="exports" onclick="handleErpMenuItem(this)"><span class="erp-side-icon">⇧</span><span>Xuất hàng</span></button>
+    <button type="button" class="erp-side-item" data-erp-menu="inventory" onclick="handleErpMenuItem(this)"><span class="erp-side-icon">☑</span><span>Kiểm kê</span></button>
+    <button type="button" class="erp-side-item" data-erp-menu="reports" onclick="handleErpMenuItem(this)"><span class="erp-side-icon">▤</span><span>Báo cáo</span></button>
+    <button type="button" class="erp-side-item" data-erp-menu="suppliers" onclick="handleErpMenuItem(this)"><span class="erp-side-icon">♙</span><span>Nhà cung cấp</span></button>
+    <button type="button" class="erp-side-item" data-erp-menu="customers" onclick="handleErpMenuItem(this)"><span class="erp-side-icon">♧</span><span>Khách hàng</span></button>
+    <button type="button" class="erp-side-item" data-erp-menu="settings" onclick="handleErpMenuItem(this)"><span class="erp-side-icon">⚙</span><span>Cài đặt</span></button>
+  </nav>
+  <div class="erp-side-footer">Hỗ trợ nhanh<br><strong>0375 111 112</strong><br><br>Phiên bản menu 1.0</div>
+</aside>
 
 <div class="sticky">
 <div class="header-collapsible">
@@ -1913,14 +2000,14 @@ html::-webkit-scrollbar-corner { background: #EAF2F8; }
     </div>
     <div class="title"><span class="title-icon">🏪</span><span class="title-text"><span class="title-base">HOÀNG GIA COMPUTER</span><span class="title-shine" aria-hidden="true"></span></span><span class="warehouse-switcher" role="group" aria-label="Chọn kho đang xem"><button type="button" class="warehouse-switch" data-warehouse="Q2" onclick="selectWarehouseBranch('Q2')"><span class="warehouse-pin">📍</span> Q2</button><button type="button" class="warehouse-switch" data-warehouse="Q5" onclick="selectWarehouseBranch('Q5')"><span class="warehouse-pin">📍</span> Q5</button></span></div>
     <div class="kpi-row">
-      <div class="kpi" style="background: #2E86C1;" onclick="showKpiDetail('all')" onmouseenter="showKpiHoverMenu('all')" onmouseleave="scheduleKpiHoverClose()"><div class="kpi-v"><span class="kpi-icon kpi-icon-box" aria-hidden="true">📦</span><span id="kpi-mh">0</span></div><div class="kpi-l">mặt hàng <span class="kpi-hint">▼</span></div></div>
-      <div class="kpi" style="background: #1E8449;" onclick="showKpiDetail('ton')" onmouseenter="showKpiHoverMenu('ton')" onmouseleave="scheduleKpiHoverClose()"><div class="kpi-v"><span class="kpi-icon kpi-icon-stock" aria-hidden="true">📊</span><span id="kpi-ton">0</span></div><div class="kpi-l">tổng tồn <span class="kpi-hint">▼</span></div></div>
-     <div class="kpi" style="background: #C0392B;" onclick="showKpiDetail('het')" onmouseenter="showKpiHoverMenu('het')" onmouseleave="scheduleKpiHoverClose()">
+      <div class="kpi" style="background: #2E86C1;" onclick="showKpiDetail('all')" onmouseenter="showKpiHoverMenu('all',this)" onmouseleave="scheduleKpiHoverClose()"><div class="kpi-v"><span class="kpi-icon kpi-icon-box" aria-hidden="true">📦</span><span id="kpi-mh">0</span></div><div class="kpi-l">mặt hàng <span class="kpi-hint">▼</span></div></div>
+      <div class="kpi" style="background: #1E8449;" onclick="showKpiDetail('ton')" onmouseenter="showKpiHoverMenu('ton',this)" onmouseleave="scheduleKpiHoverClose()"><div class="kpi-v"><span class="kpi-icon kpi-icon-stock" aria-hidden="true">📊</span><span id="kpi-ton">0</span></div><div class="kpi-l">tổng tồn <span class="kpi-hint">▼</span></div></div>
+     <div class="kpi" style="background: #C0392B;" onclick="showKpiDetail('het')" onmouseenter="showKpiHoverMenu('het',this)" onmouseleave="scheduleKpiHoverClose()">
     <div class="kpi-v"><span class="kpi-icon kpi-icon-out" aria-hidden="true">🔴</span><span id="kpi-het">0</span></div>
     <div class="kpi-l">hết hàng <span class="kpi-hint">▼</span></div>
 </div>
-      <div class="kpi" style="background: #B7950B;" onclick="showKpiDetail('sap')" onmouseenter="showKpiHoverMenu('sap')" onmouseleave="scheduleKpiHoverClose()"><div class="kpi-v"><span class="kpi-icon kpi-icon-low" aria-hidden="true">🟡</span><span id="kpi-sap">0</span></div><div class="kpi-l">sắp hết <span class="kpi-hint">▼</span></div></div>
-      <div id="kpiHoverMenu" class="kpi-hover-menu" onmouseenter="cancelKpiHoverClose()" onmouseleave="scheduleKpiHoverClose()"></div>
+      <div class="kpi" style="background: #B7950B;" onclick="showKpiDetail('sap')" onmouseenter="showKpiHoverMenu('sap',this)" onmouseleave="scheduleKpiHoverClose()"><div class="kpi-v"><span class="kpi-icon kpi-icon-low" aria-hidden="true">🟡</span><span id="kpi-sap">0</span></div><div class="kpi-l">sắp hết <span class="kpi-hint">▼</span></div></div>
+      <div id="kpiHoverMenu" class="kpi-hover-menu" onmouseenter="cancelKpiHoverClose()" onmouseleave="scheduleKpiHoverClose()" onwheel="event.stopPropagation();cancelKpiHoverClose()"></div>
     </div>
     <div class="search-box">
       <span class="search-icon" aria-hidden="true">
@@ -3804,7 +3891,7 @@ function kpiHoverEntries(type){
   if(type==="ton") return scoped.filter(({r})=>(Number(r[5])||0)>0).sort((a,b)=>(Number(b.r[5])||0)-(Number(a.r[5])||0));
   return scoped;
 }
-function showKpiHoverMenu(type){
+function showKpiHoverMenu(type,trigger){
   if(!window.matchMedia("(hover:hover) and (pointer:fine)").matches) return;
   cancelKpiHoverClose();
   const box=document.getElementById("kpiHoverMenu");
@@ -3818,13 +3905,20 @@ function showKpiHoverMenu(type){
     (entries.length?`<div class="kpi-hover-list">${entries.map(({r,i})=>`<button type="button" class="kpi-hover-item" onclick="event.stopPropagation();openKpiHoverProduct(${i})"><span class="kpi-hover-name">${renderProductTitleWithCondition(r[2]||"Chưa có tên")}</span><span class="kpi-hover-stock">Tồn ${Number(r[5])||0}</span><span class="kpi-hover-meta">${escapeHtml(relatedCategoryLabel(r[0]))} · ${escapeHtml(r[13]||"Q2")} · ${escapeHtml(r[1]||"Chưa có mã")}</span></button>`).join("")}</div>`:`<div class="kpi-hover-empty">Không có sản phẩm trong mục này.</div>`);
   document.querySelector(".sticky")?.classList.add("kpi-menu-open");
   box.classList.add("open");
+  // Căn giữa bảng ngay dưới KPI đang được rê, nhưng không để vượt ra ngoài hàng KPI.
+  const row=trigger?.closest?.(".kpi-row");
+  if(row&&trigger){
+    const desired=trigger.offsetLeft+(trigger.offsetWidth/2)-(box.offsetWidth/2);
+    const maxLeft=Math.max(0,row.clientWidth-box.offsetWidth);
+    box.style.left=`${Math.max(0,Math.min(maxLeft,desired))}px`;
+  }
 }
 function scheduleKpiHoverClose(){
   clearTimeout(kpiHoverCloseTimer);
   kpiHoverCloseTimer=setTimeout(()=>{
     document.getElementById("kpiHoverMenu")?.classList.remove("open");
     document.querySelector(".sticky")?.classList.remove("kpi-menu-open");
-  },140);
+  },320);
 }
 function cancelKpiHoverClose(){
   clearTimeout(kpiHoverCloseTimer);
@@ -8216,6 +8310,7 @@ closeOverlay("importOverlay");
 render();
 showToast(skipped > 0 ? `Import xong: đã thêm ${importRows.length - skipped} sản phẩm mới, bỏ qua ${skipped} dòng trùng mã hàng đã có sẵn` : "Import thành công!");
 }
+let tabRenderFrame=0;
 function goToTab(tabCode){
   document.querySelectorAll(".tab-btn").forEach(
     b=>b.classList.toggle("active", b.dataset.tab===tabCode)
@@ -8237,17 +8332,21 @@ function goToTab(tabCode){
   if(clearBtn) clearBtn.style.display = "none";
   syncStatusButtons("");
 
-  render();
-  if(tabCode==="ALL"){
-    window.scrollTo({top:0,left:0,behavior:"auto"});
-    const resultsEl = document.getElementById("results");
-    if(resultsEl){
-      resultsEl.classList.remove("home-enter");
-      void resultsEl.offsetWidth;
-      resultsEl.classList.add("home-enter");
-      setTimeout(()=>resultsEl.classList.remove("home-enter"), 560);
+  cancelAnimationFrame(tabRenderFrame);
+  tabRenderFrame=requestAnimationFrame(()=>{
+    tabRenderFrame=0;
+    render();
+    if(tabCode==="ALL"){
+      window.scrollTo({top:0,left:0,behavior:"auto"});
+      const resultsEl = document.getElementById("results");
+      if(resultsEl){
+        resultsEl.classList.remove("home-enter");
+        void resultsEl.offsetWidth;
+        resultsEl.classList.add("home-enter");
+        setTimeout(()=>resultsEl.classList.remove("home-enter"),560);
+      }
     }
-  }
+  });
 }
 function syncStatusButtons(status){
   const map={ALL:["#1E3A5F","#fff"],AUDIT:["#F5B041","#512E0A"],CON:["#D5F5E3","#1E8449"],SAP:["#FEF9E7","#7D6608"],HET:["#FADBD8","#922B21"]};
@@ -8349,19 +8448,53 @@ function setTab(btn){
   if(touchMenu){
     closeTabDropdown();
     goToTab(tabCode);
-    requestAnimationFrame(()=>btn.scrollIntoView({behavior:"smooth",block:"nearest",inline:"center"}));
+    requestAnimationFrame(()=>btn.scrollIntoView({behavior:"auto",block:"nearest",inline:"center"}));
     return;
   }
   const wasOpen = tabDropdownOpenFor===String(btn.dataset.tab||"");
   goToTab(tabCode);
   if(wasOpen) closeTabDropdown();
   else toggleTabDropdown(btn);
-  requestAnimationFrame(()=>btn.scrollIntoView({behavior:"smooth",block:"nearest",inline:"center"}));
 }
 function syncQuickNavStickyOffset(){
   const sticky=document.querySelector(".sticky");
   const height=sticky?.getBoundingClientRect().height||0;
   document.documentElement.style.setProperty("--quick-nav-sticky-top",`${Math.ceil(height)}px`);
+}
+function setErpSideMenu(open){
+  const isOpen=!!open;
+  const menu=document.getElementById("erpSideMenu");
+  const toggle=document.getElementById("erpMenuToggle");
+  document.body.classList.toggle("erp-side-menu-open",isOpen);
+  if(menu) menu.setAttribute("aria-hidden",String(!isOpen));
+  if(toggle){
+    toggle.setAttribute("aria-expanded",String(isOpen));
+    toggle.setAttribute("aria-label",isOpen?"Đóng menu quản lý":"Mở menu quản lý");
+  }
+  if(isOpen){
+    closeTabDropdown();
+    closeSearchSuggestions();
+  }
+}
+function toggleErpSideMenu(){
+  setErpSideMenu(!document.body.classList.contains("erp-side-menu-open"));
+}
+function closeErpSideMenu(){
+  setErpSideMenu(false);
+}
+function handleErpMenuItem(button){
+  document.querySelectorAll(".erp-side-item").forEach(item=>item.classList.toggle("active",item===button));
+  const action=String(button?.dataset?.erpMenu||"");
+  closeErpSideMenu();
+  if(action==="overview" || action==="products"){
+    goToTab("ALL");
+    return;
+  }
+  if(action==="customers" && typeof openCustomerPanel==="function"){
+    openCustomerPanel();
+    return;
+  }
+  showToast(`Mục “${button?.innerText?.trim()||"Menu"}” đã sẵn sàng để bạn cấu hình sau.`);
 }
 if(typeof ResizeObserver==="function"){
   const quickNavStickyObserver=new ResizeObserver(syncQuickNavStickyOffset);
@@ -8378,7 +8511,12 @@ window.addEventListener("resize",()=>{
 document.addEventListener("click",event=>{
   if(!event.target.closest("#tabs,#tabDropdown")) closeTabDropdown();
 });
-document.addEventListener("keydown",event=>{ if(event.key==="Escape") closeTabDropdown(); });
+document.addEventListener("keydown",event=>{
+  if(event.key==="Escape"){
+    closeTabDropdown();
+    closeErpSideMenu();
+  }
+});
 let tabDropdownHoverTimer=null;
 function cancelTabDropdownHoverClose(){ clearTimeout(tabDropdownHoverTimer); tabDropdownHoverTimer=null; }
 function scheduleTabDropdownHoverClose(){
@@ -9071,6 +9209,25 @@ async function exportMonthlyAccountingPdf(){
 let searchRenderTimer = null;
 let searchSuggestionItems = [];
 let searchSuggestionIndex = -1;
+function renderSearchResultsSmooth(){
+  const searchBox=document.querySelector(".search-box");
+  const anchorTop=searchBox?.getBoundingClientRect().top;
+  document.body.classList.add("search-results-transition");
+  render();
+  // Giữ ô tìm kiếm đứng yên nếu việc đổi chế độ trang chủ làm thay đổi bố cục.
+  if(Number.isFinite(anchorTop)&&searchBox){
+    const nextTop=searchBox.getBoundingClientRect().top;
+    const delta=nextTop-anchorTop;
+    if(Math.abs(delta)>1) window.scrollBy({top:delta,left:0,behavior:"auto"});
+  }
+  requestAnimationFrame(()=>requestAnimationFrame(()=>document.body.classList.remove("search-results-transition")));
+}
+function scheduleSearchResultsRender(){
+  clearTimeout(searchRenderTimer);
+  // Gợi ý phía trên đã cập nhật tức thì; chỉ dựng danh sách nặng một lần sau
+  // khi người dùng ngừng gõ trong một nhịp ngắn.
+  searchRenderTimer=setTimeout(renderSearchResultsSmooth,220);
+}
 const SEARCH_PLACEHOLDER_FALLBACK = [
   "SSD 128GB",
   "M2 NVME 512GB",
@@ -9274,7 +9431,7 @@ function renderSearchSuggestions(value){
     const name = removeAccents(String(r[2]||""));
     const brand = removeAccents(String(r[3]||""));
     const hay = removeAccents([r[1],r[2],r[3],r[7],r[8],r[11],r[13]||"Q2"].join(" "));
-    if(String(r[13]||"Q2")!==currentBranch) return null;
+    if(currentBranch!=="ALL" && String(r[13]||"Q2")!==currentBranch) return null;
     if(!tokens.every(token=>hay.includes(token))) return null;
     let score = 5;
     if(code===query) score=0;
@@ -9327,8 +9484,7 @@ document.getElementById("search").addEventListener("input", function(){
     syncRestockButton(false);
   }
   document.getElementById("clear-btn").style.display=searchQ?"flex":"none";
-  clearTimeout(searchRenderTimer);
-  searchRenderTimer=setTimeout(render,120);
+  scheduleSearchResultsRender();
 });
 document.getElementById("search").addEventListener("keydown", function(e){
   if(!searchSuggestionItems.length) return;
