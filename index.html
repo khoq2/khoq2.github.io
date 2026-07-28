@@ -56,7 +56,19 @@ button:disabled,input:disabled,select:disabled,[aria-disabled="true"] { cursor:n
 .title-base { position: relative; z-index: 1; display: inline-block; white-space: nowrap; }
 .title-shine { position: absolute; left: 0; top: 50%; width: 42%; height: 1.4em; z-index: 2; pointer-events: none; border-radius: 999px; background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,.15) 18%, rgba(255,255,255,.95) 50%, rgba(255,255,255,.15) 82%, rgba(255,255,255,0) 100%); filter: blur(.4px); opacity: .9; transform: translate(-140%, -50%) skewX(-18deg); animation: titleSweep 3.2s ease-in-out infinite alternate; }
 @keyframes titleSweep { from { transform: translate(-140%, -50%) skewX(-18deg); } to { transform: translate(260%, -50%) skewX(-18deg); } }
-.kpi-row { display: flex; gap: 5px; margin-bottom: 10px; }
+.kpi-row { position:relative; display: flex; gap: 5px; margin-bottom: 10px; }
+.kpi-hover-menu { display:none; position:absolute; z-index:260; top:calc(100% + 6px); left:0; width:min(430px,calc(100vw - 28px)); max-height:min(58vh,390px); overflow:auto; padding:8px; border:1px solid rgba(255,255,255,.72); border-radius:13px; background:rgba(247,251,254,.98); color:#253B4B; box-shadow:0 14px 34px rgba(8,30,48,.3); }
+.kpi-hover-menu.open { display:block; animation:tabDropdownIn .14s ease-out both; }
+.kpi-hover-head { display:flex; align-items:center; justify-content:space-between; gap:8px; padding:5px 6px 9px; color:#1E3A5F; font-size:12px; font-weight:950; }
+.kpi-hover-total { padding:4px 7px; border-radius:999px; background:#E7F1F8; color:#1A5276; font-size:10px; white-space:nowrap; }
+.kpi-hover-list { display:grid; gap:4px; }
+.kpi-hover-item { width:100%; display:grid; grid-template-columns:minmax(0,1fr) auto; gap:3px 8px; padding:8px 9px; border:1px solid #DCE7EF; border-radius:9px; background:#fff; color:#263B4A; text-align:left; cursor:pointer; }
+.kpi-hover-item:hover,.kpi-hover-item:focus-visible { border-color:#5DADE2; background:#EBF5FB; outline:none; }
+.kpi-hover-name { min-width:0; overflow:hidden; color:#1E3A5F; font-size:11px; font-weight:900; text-overflow:ellipsis; white-space:nowrap; }
+.kpi-hover-stock { color:#1E8449; font-size:10px; font-weight:950; white-space:nowrap; }
+.kpi-hover-meta { grid-column:1/-1; color:#6C7E8C; font-size:9px; }
+.kpi-hover-empty { padding:18px 10px; color:#708392; font-size:11px; text-align:center; }
+@media(hover:none),(pointer:coarse){.kpi-hover-menu{display:none!important}}
 .kpi-modal-head { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:12px; }
 .kpi-modal-head .modal-title { min-width:0; margin-bottom:0; }
 .kpi-export-actions { display:flex; flex:0 0 auto; align-items:center; justify-content:flex-end; gap:6px; margin:0; padding:0; border:0; }
@@ -1899,13 +1911,14 @@ html::-webkit-scrollbar-corner { background: #EAF2F8; }
     </div>
     <div class="title"><span class="title-icon">🏪</span><span class="title-text"><span class="title-base">HOÀNG GIA COMPUTER</span><span class="title-shine" aria-hidden="true"></span></span><span class="warehouse-switcher" role="group" aria-label="Chọn kho đang xem"><button type="button" class="warehouse-switch" data-warehouse="Q2" onclick="selectWarehouseBranch('Q2')"><span class="warehouse-pin">📍</span> Q2</button><button type="button" class="warehouse-switch" data-warehouse="Q5" onclick="selectWarehouseBranch('Q5')"><span class="warehouse-pin">📍</span> Q5</button></span></div>
     <div class="kpi-row">
-      <div class="kpi" style="background: #2E86C1;" onclick="showKpiDetail('all')" onmouseenter="scheduleKpiHover('all')" onmouseleave="cancelKpiHover()"><div class="kpi-v"><span class="kpi-icon kpi-icon-box" aria-hidden="true">📦</span><span id="kpi-mh">0</span></div><div class="kpi-l">mặt hàng <span class="kpi-hint">▼</span></div></div>
-      <div class="kpi" style="background: #1E8449;" onclick="showKpiDetail('ton')" onmouseenter="scheduleKpiHover('ton')" onmouseleave="cancelKpiHover()"><div class="kpi-v"><span class="kpi-icon kpi-icon-stock" aria-hidden="true">📊</span><span id="kpi-ton">0</span></div><div class="kpi-l">tổng tồn <span class="kpi-hint">▼</span></div></div>
-     <div class="kpi" style="background: #C0392B;" onclick="showKpiDetail('het')" onmouseenter="scheduleKpiHover('het')" onmouseleave="cancelKpiHover()">
+      <div class="kpi" style="background: #2E86C1;" onclick="showKpiDetail('all')" onmouseenter="showKpiHoverMenu('all')" onmouseleave="scheduleKpiHoverClose()"><div class="kpi-v"><span class="kpi-icon kpi-icon-box" aria-hidden="true">📦</span><span id="kpi-mh">0</span></div><div class="kpi-l">mặt hàng <span class="kpi-hint">▼</span></div></div>
+      <div class="kpi" style="background: #1E8449;" onclick="showKpiDetail('ton')" onmouseenter="showKpiHoverMenu('ton')" onmouseleave="scheduleKpiHoverClose()"><div class="kpi-v"><span class="kpi-icon kpi-icon-stock" aria-hidden="true">📊</span><span id="kpi-ton">0</span></div><div class="kpi-l">tổng tồn <span class="kpi-hint">▼</span></div></div>
+     <div class="kpi" style="background: #C0392B;" onclick="showKpiDetail('het')" onmouseenter="showKpiHoverMenu('het')" onmouseleave="scheduleKpiHoverClose()">
     <div class="kpi-v"><span class="kpi-icon kpi-icon-out" aria-hidden="true">🔴</span><span id="kpi-het">0</span></div>
     <div class="kpi-l">hết hàng <span class="kpi-hint">▼</span></div>
 </div>
-      <div class="kpi" style="background: #B7950B;" onclick="showKpiDetail('sap')" onmouseenter="scheduleKpiHover('sap')" onmouseleave="cancelKpiHover()"><div class="kpi-v"><span class="kpi-icon kpi-icon-low" aria-hidden="true">🟡</span><span id="kpi-sap">0</span></div><div class="kpi-l">sắp hết <span class="kpi-hint">▼</span></div></div>
+      <div class="kpi" style="background: #B7950B;" onclick="showKpiDetail('sap')" onmouseenter="showKpiHoverMenu('sap')" onmouseleave="scheduleKpiHoverClose()"><div class="kpi-v"><span class="kpi-icon kpi-icon-low" aria-hidden="true">🟡</span><span id="kpi-sap">0</span></div><div class="kpi-l">sắp hết <span class="kpi-hint">▼</span></div></div>
+      <div id="kpiHoverMenu" class="kpi-hover-menu" onmouseenter="cancelKpiHoverClose()" onmouseleave="scheduleKpiHoverClose()"></div>
     </div>
     <div class="search-box">
       <span class="search-icon" aria-hidden="true">
@@ -3781,21 +3794,44 @@ function openKpiProduct(idx){
 function getKpiScopedEntries(){
   return DATA.map((r,i)=>({r,i})).filter(({r})=>currentBranch==="ALL" || String(r[13] || "Q2")===currentBranch);
 }
-let kpiHoverTimer=null;
-function scheduleKpiHover(type){
-  if(!window.matchMedia("(hover:hover) and (pointer:fine)").matches) return;
-  clearTimeout(kpiHoverTimer);
-  kpiHoverTimer=setTimeout(()=>{
-    kpiHoverTimer=null;
-    if(!document.querySelector(".overlay.open")) showKpiDetail(type);
-  },500);
+let kpiHoverCloseTimer=null;
+function kpiHoverEntries(type){
+  const scoped=getKpiScopedEntries();
+  if(type==="het") return scoped.filter(({r})=>getStockState(r[5],r[12])==="HET");
+  if(type==="sap") return scoped.filter(({r})=>getStockState(r[5],r[12])==="SAP");
+  if(type==="ton") return scoped.filter(({r})=>(Number(r[5])||0)>0).sort((a,b)=>(Number(b.r[5])||0)-(Number(a.r[5])||0));
+  return scoped;
 }
-function cancelKpiHover(){
-  clearTimeout(kpiHoverTimer);
-  kpiHoverTimer=null;
+function showKpiHoverMenu(type){
+  if(!window.matchMedia("(hover:hover) and (pointer:fine)").matches) return;
+  cancelKpiHoverClose();
+  const box=document.getElementById("kpiHoverMenu");
+  if(!box) return;
+  const entries=kpiHoverEntries(type);
+  const titles={all:"📦 Tất cả mặt hàng",ton:"📊 Mặt hàng đang có tồn",het:"🔴 Mặt hàng hết hàng",sap:"🟡 Mặt hàng sắp hết"};
+  const total=type==="ton"
+    ? `${entries.reduce((sum,item)=>sum+(Number(item.r[5])||0),0).toLocaleString("vi-VN")} tồn`
+    : `${entries.length} mặt hàng`;
+  box.innerHTML=`<div class="kpi-hover-head"><span>${titles[type]||titles.all}</span><span class="kpi-hover-total">${total}</span></div>`+
+    (entries.length?`<div class="kpi-hover-list">${entries.map(({r,i})=>`<button type="button" class="kpi-hover-item" onclick="event.stopPropagation();openKpiHoverProduct(${i})"><span class="kpi-hover-name">${renderProductTitleWithCondition(r[2]||"Chưa có tên")}</span><span class="kpi-hover-stock">Tồn ${Number(r[5])||0}</span><span class="kpi-hover-meta">${escapeHtml(relatedCategoryLabel(r[0]))} · ${escapeHtml(r[13]||"Q2")} · ${escapeHtml(r[1]||"Chưa có mã")}</span></button>`).join("")}</div>`:`<div class="kpi-hover-empty">Không có sản phẩm trong mục này.</div>`);
+  box.classList.add("open");
+}
+function scheduleKpiHoverClose(){
+  clearTimeout(kpiHoverCloseTimer);
+  kpiHoverCloseTimer=setTimeout(()=>document.getElementById("kpiHoverMenu")?.classList.remove("open"),140);
+}
+function cancelKpiHoverClose(){
+  clearTimeout(kpiHoverCloseTimer);
+  kpiHoverCloseTimer=null;
+}
+function openKpiHoverProduct(index){
+  document.getElementById("kpiHoverMenu")?.classList.remove("open");
+  if(!DATA[index]) return;
+  selectSearchSuggestion(index);
 }
 function showKpiDetail(type){
-  cancelKpiHover();
+  cancelKpiHoverClose();
+  document.getElementById("kpiHoverMenu")?.classList.remove("open");
   currentKpiExportType = type;
   const kpiOverlay=document.getElementById("kpiOverlay");
   const kpiColors={
@@ -5915,18 +5951,20 @@ function render(){
   document.body.classList.toggle("home-landing-mode", homeLandingMode);
   const results = DATA.map((r,i)=>({r,i})).filter(({r})=>{
     const [sh,,ten,th,,,tt,ghi] = r;
-    if(currentTab!=="ALL" && sh!==currentTab) return false;
+    // Khi có từ khóa, tìm toàn bộ danh mục trong kho hiện tại; tab chỉ giới hạn
+    // danh sách khi ô tìm kiếm đang trống.
+    if(!kwTokens.length && currentTab!=="ALL" && sh!==currentTab) return false;
     if(currentBranch!=="ALL" && (r[13]||"Q2")!==currentBranch) return false;
     const stockState = getStockState(r[5], r[12]);
-    if(currentStatus==="CON" && stockState!=="CON") return false;
-    if(currentStatus==="SAP" && stockState!=="SAP") return false;
-    if(currentStatus==="HET" && stockState!=="HET") return false;
-    if(currentStatus==="AUDIT" && !getInventoryAuditReasons(r).length) return false;
-    if(restockOnly && stockState!=="SAP" && stockState!=="HET") return false;
+    if(!kwTokens.length && currentStatus==="CON" && stockState!=="CON") return false;
+    if(!kwTokens.length && currentStatus==="SAP" && stockState!=="SAP") return false;
+    if(!kwTokens.length && currentStatus==="HET" && stockState!=="HET") return false;
+    if(!kwTokens.length && currentStatus==="AUDIT" && !getInventoryAuditReasons(r).length) return false;
+    if(!kwTokens.length && restockOnly && stockState!=="SAP" && stockState!=="HET") return false;
     const resolvedGroupLabel = resolveQuickGroupLabelFromRow(r, r[8] || "");
-    if(!matchesQuickGroupFilter(r, resolvedGroupLabel)) return false;
+    if(!kwTokens.length && !matchesQuickGroupFilter(r, resolvedGroupLabel)) return false;
     if(!kwTokens.length) return true;
-    const hay = removeAccents(r[1]+" "+ten+" "+th+" "+(ghi||""));
+    const hay = removeAccents([r[1],ten,th,ghi||"",r[8]||"",r[11]||"",SHEET_CFG[sh]?.label||""].join(" "));
     return kwTokens.every(t => hay.includes(t));
   });
   if(currentStatus==="CON" || currentStatus==="SAP" || currentStatus==="HET"){
@@ -9229,7 +9267,6 @@ function renderSearchSuggestions(value){
     const brand = removeAccents(String(r[3]||""));
     const hay = removeAccents([r[1],r[2],r[3],r[7],r[8],r[11],r[13]||"Q2"].join(" "));
     if(String(r[13]||"Q2")!==currentBranch) return null;
-    if(currentTab!=="ALL" && r[0]!==currentTab) return null;
     if(!tokens.every(token=>hay.includes(token))) return null;
     let score = 5;
     if(code===query) score=0;
@@ -9270,7 +9307,21 @@ function selectSearchSuggestion(idx){
   render();
   setTimeout(()=>jumpToInventoryItem(idx),80);
 }
-document.getElementById("search").addEventListener("input", function(){ searchQ = this.value; renderSearchSuggestions(searchQ); if(searchQ){ quickGroupFilter = null; if(totalStockView){ totalStockView = false; syncStatusButtons(""); } } document.getElementById("clear-btn").style.display = searchQ ? "flex" : "none"; clearTimeout(searchRenderTimer); searchRenderTimer = setTimeout(render, 120); });
+document.getElementById("search").addEventListener("input", function(){
+  searchQ=this.value;
+  renderSearchSuggestions(searchQ);
+  if(searchQ.trim()){
+    quickGroupFilter=null;
+    totalStockView=false;
+    restockOnly=false;
+    currentStatus="ALL";
+    syncStatusButtons("");
+    syncRestockButton(false);
+  }
+  document.getElementById("clear-btn").style.display=searchQ?"flex":"none";
+  clearTimeout(searchRenderTimer);
+  searchRenderTimer=setTimeout(render,120);
+});
 document.getElementById("search").addEventListener("keydown", function(e){
   if(!searchSuggestionItems.length) return;
   if(e.key==="ArrowDown"){ e.preventDefault(); searchSuggestionIndex=(searchSuggestionIndex+1)%searchSuggestionItems.length; updateSearchSuggestionActive(); }
