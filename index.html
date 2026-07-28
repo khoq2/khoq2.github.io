@@ -665,22 +665,26 @@ body.admin-mode .card-actions.admin-only { display:grid!important; }
 #customerOverlay .customer-results:not(:empty),#customerOverlay .customer-detail:not(:empty),#customerOverlay .customer-editor.open { padding:8px; border-radius:14px; background:rgba(255,255,255,.78); box-shadow:inset 0 1px 0 rgba(255,255,255,.7); }
 #customerOverlay .customer-empty { border-radius:11px; background:rgba(255,255,255,.86); color:#52606D; }
 #customerOverlay .customer-record,#customerOverlay .customer-result,#customerOverlay .customer-editor { color:#263B4A; }
-#customerOverlay .customer-modal { width:min(720px,calc(100vw - 28px)); padding:16px; border-color:rgba(255,255,255,.52); background:linear-gradient(145deg,rgba(244,250,254,.62),rgba(215,233,245,.38)); }
-#customerOverlay .customer-head { min-height:42px; margin:0 0 12px; padding:0 2px 8px; border-bottom:1px solid rgba(255,255,255,.38); }
-#customerOverlay .customer-title { display:flex; flex:1 1 auto; align-items:center; justify-content:center; align-self:stretch; gap:7px; min-width:0; min-height:36px; padding:7px 12px; border:1px solid #A93226; border-radius:10px; background:linear-gradient(135deg,#C0392B,#E74C3C); color:#fff; font-size:17px; letter-spacing:.25px; text-shadow:0 1px 3px rgba(75,10,8,.35); box-shadow:0 4px 12px rgba(133,30,22,.22),inset 0 1px 0 rgba(255,255,255,.25); }
-#customerOverlay .customer-close { width:36px; height:36px; flex:0 0 36px; border:1px solid rgba(255,173,166,.78); background:rgba(255,235,233,.88); color:#C0392B; box-shadow:0 4px 12px rgba(133,30,22,.16); }
-#customerOverlay .customer-search-wrap { padding:3px; border:1px solid rgba(255,174,92,.75); border-radius:16px; background:linear-gradient(135deg,rgba(255,240,232,.62),rgba(255,255,255,.4)); box-shadow:0 7px 20px rgba(140,48,28,.13); }
-#customerOverlay .customer-search { min-height:50px; border:0; border-radius:13px; background:rgba(255,253,231,.94); box-shadow:none; }
-#customerOverlay .customer-search:focus { box-shadow:0 0 0 3px rgba(243,156,18,.2); }
-#customerOverlay .customer-search-help { margin:7px 5px 1px; color:rgba(255,255,255,.92); font-size:10.5px; line-height:1.35; text-shadow:0 1px 4px rgba(0,0,0,.42); }
+#customerOverlay .customer-modal { width:min(680px,calc(100vw - 28px)); padding:16px; border:1px solid #D7E3EC; background:#F4F8FB; color:#21384A; box-shadow:0 22px 60px rgba(8,28,45,.34); -webkit-backdrop-filter:none; backdrop-filter:none; }
+#customerOverlay .customer-head { min-height:42px; margin:0 0 13px; padding:0 0 10px; border-bottom:1px solid #D8E3EB; }
+#customerOverlay .customer-title { display:flex; flex:1 1 auto; align-items:center; justify-content:flex-start; align-self:stretch; gap:8px; min-width:0; min-height:38px; padding:7px 11px; border:0; border-radius:10px; background:linear-gradient(135deg,#1E3A5F,#2874A6); color:#fff; font-size:15px; letter-spacing:.15px; text-shadow:none; box-shadow:0 5px 14px rgba(30,58,95,.18); }
+#customerOverlay .customer-close { width:36px; height:36px; flex:0 0 36px; border:1px solid #D8E3EB; background:#fff; color:#B03A2E; box-shadow:0 3px 9px rgba(30,58,95,.1); }
+#customerOverlay .customer-search-wrap { padding:0; border:1.5px solid #B9CEDD; border-radius:13px; background:#fff; box-shadow:0 4px 13px rgba(30,58,95,.08); }
+#customerOverlay .customer-search { min-height:48px; padding-left:14px; border:0; border-radius:12px; background:#fff; color:#1E3A5F; box-shadow:none; }
+#customerOverlay .customer-search:focus { box-shadow:0 0 0 3px rgba(46,134,193,.15); }
+#customerOverlay .customer-search-help { margin:6px 4px 3px; color:#667B8C; font-size:10.5px; line-height:1.35; text-shadow:none; }
 #customerOverlay .customer-toolbar { margin:8px 0; }
 #customerOverlay .customer-primary,#customerOverlay .customer-secondary { min-height:38px; padding:8px 12px; border-radius:10px; }
-#customerOverlay .customer-results:not(:empty),#customerOverlay .customer-detail:not(:empty),#customerOverlay .customer-editor.open { padding:8px; background:rgba(248,252,255,.88); box-shadow:0 8px 22px rgba(18,47,70,.1),inset 0 1px 0 #fff; }
+#customerOverlay .customer-results:not(:empty),#customerOverlay .customer-detail:not(:empty),#customerOverlay .customer-editor.open { padding:8px; border:1px solid #DCE6ED; background:#fff; box-shadow:0 6px 18px rgba(30,58,95,.07); }
 #customerOverlay .customer-results { gap:6px; scrollbar-width:thin; scrollbar-color:#9CBFD5 transparent; }
-#customerOverlay .customer-result { position:relative; padding:10px 12px 10px 15px; border:1px solid rgba(137,181,211,.42); background:rgba(255,255,255,.9); box-shadow:0 3px 9px rgba(30,58,95,.06); transition:border-color .15s ease,background .15s ease,transform .15s ease; }
-#customerOverlay .customer-result::before { content:""; position:absolute; left:0; top:9px; bottom:9px; width:3px; border-radius:0 4px 4px 0; background:linear-gradient(#E74C3C,#F39C12); }
-#customerOverlay .customer-result:hover { transform:translateY(-1px); border-color:#F08B74; background:#FFFDFC; }
-#customerOverlay .customer-result-phone { color:#C0392B; }
+#customerOverlay .customer-result { position:relative; padding:10px 12px 10px 15px; border:1px solid #D8E5EE; background:#fff; box-shadow:0 2px 7px rgba(30,58,95,.05); transition:border-color .15s ease,background .15s ease,transform .15s ease; }
+#customerOverlay .customer-result::before { content:""; position:absolute; left:0; top:9px; bottom:9px; width:3px; border-radius:0 4px 4px 0; background:linear-gradient(#2E86C1,#1E8449); }
+#customerOverlay .customer-result:hover { transform:translateY(-1px); border-color:#78B4D8; background:#F7FBFE; }
+#customerOverlay .customer-result-phone { color:#1A5276; }
+#customerOverlay .customer-empty { min-height:86px; display:grid; place-items:center; padding:18px; border:1px dashed #C8D9E5; border-radius:11px; background:#F8FBFD; color:#607789; line-height:1.45; }
+#customerOverlay .simple-sticky-actions { margin-top:10px; border-top-color:#D8E3EB; background:rgba(244,248,251,.97); box-shadow:0 -5px 14px rgba(30,58,95,.08); }
+#customerOverlay .simple-sticky-actions .btn-submit { min-height:42px; border-radius:10px; background:#1E3A5F; font-size:13px; }
+#customerOverlay .customer-primary:disabled { opacity:.65; cursor:wait; }
 #customerOverlay .customer-profile { border:1px solid rgba(255,255,255,.28); border-radius:13px; box-shadow:0 7px 18px rgba(30,58,95,.16); }
 #customerOverlay .customer-record { border-color:rgba(137,181,211,.38); box-shadow:0 4px 12px rgba(30,58,95,.07); }
 #customerOverlay .customer-editor { border-color:rgba(137,181,211,.42); }
@@ -1754,7 +1758,28 @@ html::-webkit-scrollbar-corner { background: #EAF2F8; }
 @media (max-width:520px) {
   #txOverlay { padding:7px; align-items:flex-start; }
   #txOverlay .tx-history-modal { width:100%; max-height:96dvh; border-radius:18px; padding:12px; background:linear-gradient(145deg,#F4F9FF,#EEF5FC); }
-  #txOverlay .modal-title { display:block; width:100%; padding:5px 3px 10px; font-size:13px; line-height:1.25; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  #txOverlay .modal-title {
+    width:100%;
+    min-height:38px;
+    display:flex;
+    align-items:center;
+    gap:5px;
+    margin-bottom:9px;
+    padding:8px 10px;
+    border:1px solid #D9E6F0;
+    border-radius:11px;
+    background:rgba(255,255,255,.94);
+    color:#173B5E;
+    font-size:12px;
+    line-height:1.2;
+    text-shadow:none;
+    box-shadow:0 3px 10px rgba(30,58,95,.08);
+    white-space:nowrap;
+    overflow:hidden;
+  }
+  #txOverlay .tx-title-icon { flex:0 0 auto; }
+  #txOverlay .tx-title-text { min-width:0; display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  #txOverlay .modal-title .product-condition-icon { height:13px; max-width:36px; margin-left:3px; vertical-align:-2px; }
   #txOverlay .tx-filter { grid-template-columns:1fr 1fr; padding:11px; gap:9px; border-radius:14px; background:rgba(255,255,255,.86); box-shadow:0 4px 14px rgba(29,78,122,.09); }
   #txOverlay .tx-filter-field:first-child { grid-column:1/-1; }
   #txOverlay .tx-filter-label { color:#34495E; text-shadow:none; }
@@ -1763,14 +1788,14 @@ html::-webkit-scrollbar-corner { background: #EAF2F8; }
   #txOverlay .tx-kpi-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
   #txOverlay .tx-row { padding:13px; border:1px solid #E0E8F1; border-radius:15px; background:#fff; box-shadow:0 6px 18px rgba(25,65,105,.09); }
   #txOverlay .tx-row::after { display:none; }
-  #txOverlay .tx-header { display:grid; grid-template-columns:minmax(0,1fr); gap:5px; align-items:center; }
-  #txOverlay .tx-nv { width:100%; display:flex; flex-wrap:nowrap; align-items:center; gap:5px; font-size:13px; }
-  #txOverlay .tx-person { flex:1 1 auto; overflow:hidden; }
-  #txOverlay .tx-nv .nv-avatar { width:34px; height:34px; flex:0 0 34px; }
-  #txOverlay .tx-nv .nv-role-badge { flex:0 1 auto; max-width:92px; padding:3px 6px; font-size:8px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  #txOverlay .tx-kind { min-height:22px; max-width:112px; padding:3px 7px; font-size:9px; line-height:1; }
-  #txOverlay .tx-head-right { width:100%; flex-direction:row; justify-content:flex-end; align-items:center; }
-  #txOverlay .tx-time { font-size:11px; color:#50677B; }
+  #txOverlay .tx-header { display:flex; flex-wrap:wrap; gap:6px; align-items:center; }
+  #txOverlay .tx-nv { display:contents; font-size:12px; }
+  #txOverlay .tx-person { width:100%; flex:0 0 100%; overflow:hidden; }
+  #txOverlay .tx-nv .nv-avatar { width:30px; height:30px; flex:0 0 30px; }
+  #txOverlay .tx-nv .nv-role-badge { flex:0 1 auto; max-width:80px; padding:2px 5px; font-size:7px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  #txOverlay .tx-kind { flex:0 0 auto; min-height:20px; max-width:100px; padding:3px 6px; font-size:8px; line-height:1; }
+  #txOverlay .tx-head-right { width:auto; min-width:0; flex:1 1 auto; flex-direction:row; justify-content:flex-end; align-items:center; gap:4px; }
+  #txOverlay .tx-time { min-width:0; font-size:9px; color:#50677B; white-space:nowrap; }
   #txOverlay .tx-detail-grid > div { grid-template-columns:minmax(100px,.9fr) minmax(0,1.1fr); font-size:11px; }
   #txOverlay .simple-sticky-actions { position:sticky; bottom:-12px; padding:10px 0 2px; background:linear-gradient(transparent,#EEF5FC 28%); }
   #txOverlay .simple-sticky-actions .btn-submit { min-height:48px; border-radius:12px; background:#1976ED; font-size:15px; }
@@ -2333,10 +2358,10 @@ html::-webkit-scrollbar-corner { background: #EAF2F8; }
       <button type="button" class="customer-close" aria-label="Đóng" onclick="closeCustomerPanel()">×</button>
     </div>
     <div class="customer-search-wrap">
-      <input id="customerSearch" class="customer-search" type="tel" inputmode="tel" autocomplete="off" placeholder="Nhập số điện thoại khách hàng..." oninput="scheduleCustomerSearch()">
+      <input id="customerSearch" class="customer-search" type="search" inputmode="search" autocomplete="off" placeholder="Tìm bằng số điện thoại hoặc tên khách..." oninput="scheduleCustomerSearch()">
       <span class="customer-search-icon">🔎</span>
     </div>
-    <div class="customer-search-help">Vui lòng nhập 0375111112, hoặc chỉ 4 số cuối.</div>
+    <div class="customer-search-help">Có thể nhập đầy đủ số điện thoại, 4 số cuối hoặc tên khách hàng.</div>
     <div class="customer-toolbar">
       <button type="button" class="customer-primary admin-only" onclick="openCustomerEditor()">＋ Thêm khách hàng</button>
     </div>
@@ -2349,7 +2374,7 @@ html::-webkit-scrollbar-corner { background: #EAF2F8; }
         <label>Tên khách hàng<input id="customerEditName" type="text" autocomplete="off" placeholder="Tên khách"></label>
         <label class="wide">Ghi chú chung<textarea id="customerEditNote" placeholder="Khách quen, loại thiết bị thường sửa..."></textarea></label>
       </div>
-      <div class="customer-toolbar" id="customerProfileToolbar"><button type="button" class="customer-secondary btn-cancel-danger" onclick="closeCustomerEditors()">Hủy</button><button type="button" class="customer-primary" onclick="saveCustomerProfile()">💾 Lưu khách hàng</button></div>
+      <div class="customer-toolbar" id="customerProfileToolbar"><button type="button" class="customer-secondary btn-cancel-danger" onclick="closeCustomerEditors()">Hủy</button><button type="button" class="customer-primary" id="customerProfileSaveBtn" onclick="saveCustomerProfile()">💾 Lưu khách hàng</button></div>
     </div>
     <div id="customerRecordEditor" class="customer-editor">
       <input type="hidden" id="customerRecordId">
@@ -2980,7 +3005,7 @@ function checkAdminSession(){
 
 // Dòng URL duy nhất
 const SHEET_API_URL = "https://script.google.com/macros/s/AKfycby6YH69F7sfO1ZoUJsDm4BeX6Luj2GrhUfYWWJWNvqjraAEhkBck16EphrPBBm1BT3YqA/exec";
-const REQUIRED_API_VERSION = "2026.07.28-product-links-24";
+const REQUIRED_API_VERSION = "2026.07.28-customer-safe-25";
 // Apps Script có thể phải chờ khóa ghi khi nhiều thao tác diễn ra gần nhau.
 // 45 giây dài hơn thời gian chờ khóa phía máy chủ, tránh báo lỗi giả trong khi Sheet vẫn đang ghi.
 const SHEET_TIMEOUT_MS = 45000;
@@ -7120,7 +7145,7 @@ function renderTxHistory(){
   const txs = getTransactionsForProduct(r);
   const filtered = sortTxHistoryRows(txHistoryFilteredRows(txs));
   const nvOptions = [...new Set(txs.map(t=>t.nv).filter(Boolean))];
-  document.getElementById("txModalTitle").innerHTML = `📋 ${renderProductTitleWithCondition(r[2] || "Chưa có tên")}`;
+  document.getElementById("txModalTitle").innerHTML = `<span class="tx-title-icon">📋</span><span class="tx-title-text">${renderProductTitleWithCondition(r[2] || "Chưa có tên")}</span>`;
   const dateVal = TX_HISTORY_STATE.date || "";
   const nvVal = TX_HISTORY_STATE.nv || "";
   const sortVal = TX_HISTORY_STATE.sort || "newest";
@@ -8423,6 +8448,51 @@ function normalizeCustomerList(list){
     note:String(item?.note || ""), createdAt:String(item?.createdAt || ""), updatedAt:String(item?.updatedAt || "")
   })).filter(item=>item.phone && !seen.has(item.phone) && seen.add(item.phone));
 }
+function makeCustomerRequestId(prefix){
+  const random=globalThis.crypto?.randomUUID?.().replace(/-/g,"") || `${Date.now()}${Math.random().toString(36).slice(2,10)}`;
+  return String(prefix||"KH")+random;
+}
+function cacheSavedCustomer(customer){
+  const normalized=normalizeCustomerList([customer])[0];
+  if(!normalized) return null;
+  const index=CUSTOMER_DATA.findIndex(item=>item.id===normalized.id || item.phone===normalized.phone);
+  if(index>=0) CUSTOMER_DATA[index]=normalized;
+  else CUSTOMER_DATA.unshift(normalized);
+  safeLocalStorageSet(CUSTOMER_CACHE_KEY,JSON.stringify(CUSTOMER_DATA));
+  return normalized;
+}
+async function upsertCustomerSafely(payload){
+  const data={...payload};
+  if(!data.id) data.id=makeCustomerRequestId("KH");
+  try{
+    return await postSheet("upsert_customer",data,70000);
+  }catch(originalError){
+    // POST có thể đã ghi xong nhưng phản hồi bị mất hoặc hết giờ chờ.
+    // Đọc lại bằng ID/số điện thoại trước khi báo lỗi để tránh người dùng bấm lưu lần hai.
+    try{
+      const json=await fetchSheetJson(sheetUrl({type:"customers",_ts:Date.now()}),{},45000);
+      const found=normalizeCustomerList(json.customers).find(item=>item.id===data.id || item.phone===normalizeCustomerPhone(data.phone));
+      if(found && found.name===cleanQuickLabel(data.name||"") && found.note===String(data.note||"")){
+        return {ok:true,customer:found,verifiedAfterError:true};
+      }
+    }catch(_){}
+    throw originalError;
+  }
+}
+async function upsertCustomerRecordSafely(payload){
+  const data={...payload};
+  if(!data.id) data.id=makeCustomerRequestId("HS");
+  try{
+    return await postSheet("upsert_customer_record",data,70000);
+  }catch(originalError){
+    try{
+      const json=await fetchSheetJson(sheetUrl({type:"customer_records",phone:data.phone,_ts:Date.now()}),{},45000);
+      const found=(Array.isArray(json.records)?json.records:[]).find(item=>String(item.id)===String(data.id));
+      if(found) return {ok:true,record:found,verifiedAfterError:true};
+    }catch(_){}
+    throw originalError;
+  }
+}
 async function loadCustomers(force=false){
   if(!force && CUSTOMER_DATA.length) return CUSTOMER_DATA;
   try{
@@ -8467,7 +8537,7 @@ function renderCustomerSearch(){
   const raw = String(document.getElementById("customerSearch")?.value || "").trim();
   const phoneQuery = normalizeCustomerPhone(raw);
   const textQuery = removeAccents(raw);
-  if(!raw){ box.innerHTML='<div class="customer-empty">Nhập số điện thoại để tìm hồ sơ khách hàng.</div>'; return; }
+  if(!raw){ box.innerHTML='<div class="customer-empty"><span><b>🔎 Tra cứu khách hàng</b><br>Nhập số điện thoại, 4 số cuối hoặc tên khách hàng.</span></div>'; return; }
   const matches = CUSTOMER_DATA.map(customer=>{
     const phone = customer.phone;
     const name = removeAccents(customer.name);
@@ -8578,16 +8648,20 @@ async function saveCustomerProfile(){
   const phone=normalizeCustomerPhone(document.getElementById("customerEditPhone").value);
   if(phone.length<9){ alert("Số điện thoại không hợp lệ!"); return; }
   customerSaving=true;
+  const saveBtn=document.getElementById("customerProfileSaveBtn");
+  if(saveBtn){ saveBtn.disabled=true; saveBtn.textContent="⏳ Đang lưu an toàn..."; }
   try{
-    const json=await postSheet("upsert_customer",{id:document.getElementById("customerEditId").value,phone,name:document.getElementById("customerEditName").value.trim(),note:document.getElementById("customerEditNote").value.trim()},35000);
-    await loadCustomers(true);
+    const idField=document.getElementById("customerEditId");
+    if(!idField.value) idField.value=makeCustomerRequestId("KH");
+    const json=await upsertCustomerSafely({id:idField.value,phone,name:document.getElementById("customerEditName").value.trim(),note:document.getElementById("customerEditNote").value.trim()});
+    cacheSavedCustomer(json.customer);
     closeCustomerEditors();
     document.getElementById("customerSearch").value=json.customer.phone;
     renderCustomerSearch();
     await openCustomerDetail(json.customer.phone);
     showToast("✅ Đã lưu khách hàng");
   }catch(e){ showToast("⚠️ Không lưu được khách hàng: "+String(e),4500); }
-  finally{ customerSaving=false; }
+  finally{ customerSaving=false; if(saveBtn){ saveBtn.disabled=false; saveBtn.textContent="💾 Lưu khách hàng"; } }
 }
 function fillCustomerRecordEditor(record=null){
   document.getElementById("customerRecordId").value=record?.id || "";
@@ -8629,21 +8703,27 @@ async function saveCustomerRecord(){
   const recordTime=document.getElementById("customerRecordTime").value;
   if(!recordTime){ alert("Vui lòng chọn ngày giờ khách đến hoặc thực hiện!"); return; }
   customerSaving=true;
+  const saveBtn=document.getElementById("customerRecordSaveBtn");
+  const originalSaveText=saveBtn?.textContent || "💾 Lưu hồ sơ";
+  if(saveBtn){ saveBtn.disabled=true; saveBtn.textContent="⏳ Đang lưu an toàn..."; }
   try{
     if(customerCreatingCombined){
-      const profile=await postSheet("upsert_customer",{id:"",phone:recordPhone,name:recordCustomerName,note:document.getElementById("customerEditNote").value.trim()},35000);
+      const customerIdField=document.getElementById("customerEditId");
+      if(!customerIdField.value) customerIdField.value=makeCustomerRequestId("KH");
+      const profile=await upsertCustomerSafely({id:customerIdField.value,phone:recordPhone,name:recordCustomerName,note:document.getElementById("customerEditNote").value.trim()});
       recordPhone=profile.customer.phone;
       recordCustomerName=profile.customer.name || recordCustomerName;
-      selectedCustomer=profile.customer;
+      selectedCustomer=cacheSavedCustomer(profile.customer) || profile.customer;
     }
-    await postSheet("upsert_customer_record",{id:document.getElementById("customerRecordId").value,phone:recordPhone,customerName:recordCustomerName,device:document.getElementById("customerRecordDevice").value.trim(),model:document.getElementById("customerRecordModel").value.trim(),serialTag:document.getElementById("customerRecordSerialTag").value.trim(),amount:parseVndInput(document.getElementById("customerRecordAmount").value),work,images:imageLinks.join("\n"),note:document.getElementById("customerRecordNote").value.trim(),employee:document.getElementById("customerRecordEmployee").value.trim(),branch:document.getElementById("customerRecordBranch").value,time:recordTime.replace("T"," ")},35000);
-    await loadCustomers(true);
+    const recordIdField=document.getElementById("customerRecordId");
+    if(!recordIdField.value) recordIdField.value=makeCustomerRequestId("HS");
+    await upsertCustomerRecordSafely({id:recordIdField.value,phone:recordPhone,customerName:recordCustomerName,device:document.getElementById("customerRecordDevice").value.trim(),model:document.getElementById("customerRecordModel").value.trim(),serialTag:document.getElementById("customerRecordSerialTag").value.trim(),amount:parseVndInput(document.getElementById("customerRecordAmount").value),work,images:imageLinks.join("\n"),note:document.getElementById("customerRecordNote").value.trim(),employee:document.getElementById("customerRecordEmployee").value.trim(),branch:document.getElementById("customerRecordBranch").value,time:recordTime.replace("T"," ")});
     closeCustomerEditors();
     document.getElementById("customerSearch").value=recordPhone;
     await openCustomerDetail(recordPhone);
     showToast("✅ Đã lưu hồ sơ khách hàng");
   }catch(e){ showToast("⚠️ Không lưu được hồ sơ: "+String(e),4500); }
-  finally{ customerSaving=false; }
+  finally{ customerSaving=false; if(saveBtn){ saveBtn.disabled=false; saveBtn.textContent=originalSaveText; } }
 }
 async function deleteCustomerRecord(id){
   if(!requireAdmin() || !id) return;
