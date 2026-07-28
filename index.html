@@ -468,6 +468,21 @@ mark.kw-hit { background: #FFEB3B; color: #1A1A1A; padding: 0 1px; border-radius
 .product-related-link { border:1px solid #AED6F1; border-radius:999px; background:#fff; color:#1A5276; padding:5px 8px; font-size:10px; font-weight:850; cursor:pointer; }
 .product-related-link:active { transform:scale(.97); background:#EAF4FB; }
 .related-edit-preview { margin-top:6px; color:#607D8B; font-size:10px; line-height:1.4; }
+.related-smart-picker { position:relative; }
+.related-smart-search { width:100%; min-height:44px; padding-right:38px!important; }
+.related-smart-results { display:none; max-height:230px; overflow-y:auto; margin-top:5px; padding:5px; border:1px solid #C9DCEB; border-radius:10px; background:#fff; box-shadow:0 8px 20px rgba(30,58,95,.14); }
+.related-smart-results.open { display:grid; gap:4px; }
+.related-smart-result { width:100%; display:grid; grid-template-columns:minmax(0,1fr) auto; gap:5px 9px; padding:8px 9px; border:1px solid #E2EAF0; border-radius:8px; background:#F9FCFE; color:#263B4A; text-align:left; cursor:pointer; }
+.related-smart-result:hover,.related-smart-result:focus-visible { border-color:#5DADE2; background:#EBF5FB; outline:none; }
+.related-smart-result-name { overflow:hidden; color:#1E3A5F; font-size:11px; font-weight:900; text-overflow:ellipsis; white-space:nowrap; }
+.related-smart-result-code { color:#A04000; font-size:10px; font-weight:900; white-space:nowrap; }
+.related-smart-result-meta { grid-column:1/-1; color:#657786; font-size:9px; }
+.related-smart-empty { padding:10px; color:#7B8794; font-size:11px; text-align:center; }
+.related-selected-list { display:flex; flex-wrap:wrap; gap:6px; margin-top:7px; }
+.related-selected-chip { display:inline-flex; align-items:center; gap:5px; max-width:100%; padding:6px 7px 6px 9px; border:1px solid #AED6F1; border-radius:999px; background:#EAF5FC; color:#1A5276; font-size:10px; font-weight:850; }
+.related-selected-chip span { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.related-selected-chip button { width:20px; height:20px; display:grid; place-items:center; padding:0; border:0; border-radius:50%; background:#fff; color:#C0392B; font-size:12px; font-weight:950; cursor:pointer; }
+.related-picker-help { margin-top:6px; color:#607D8B; font-size:10px; line-height:1.4; }
 @media(max-width:560px){
   .note { max-height:54px; padding:6px 8px; }
   .card-main > .product-related { width:calc(100% + 74px); margin-left:-74px; }
@@ -1944,7 +1959,7 @@ html::-webkit-scrollbar-corner { background: #EAF2F8; }
     <div class="form-basic-grid">
       <div class="form-row">
         <label>Chi nhánh *</label>
-        <select id="fBranch" onchange="checkProductCodeDuplicate();updateLocationSuggestions();updateBrandSuggestions();updateAddFormLiveInfo()"><option value="Q2">📍 Q2</option><option value="Q5">📍 Q5</option></select>
+        <select id="fBranch" onchange="checkProductCodeDuplicate();updateLocationSuggestions();updateBrandSuggestions();updateAddFormLiveInfo();renderRelatedPickerPreview()"><option value="Q2">📍 Q2</option><option value="Q5">📍 Q5</option></select>
       </div>
       <div class="form-row">
         <label>Danh mục *</label>
@@ -1957,7 +1972,7 @@ html::-webkit-scrollbar-corner { background: #EAF2F8; }
       </div>
       <div class="form-row form-code-centered">
         <label>Mã hàng *</label>
-      <input type="text" id="fMa" list="fMaSuggestions" placeholder="VD: CPU001" onfocus="updateProductCodeSuggestions();checkProductCodeDuplicate()" oninput="checkProductCodeDuplicate();updateAddFormLiveInfo()" autocomplete="off">
+      <input type="text" id="fMa" list="fMaSuggestions" placeholder="VD: CPU001" onfocus="updateProductCodeSuggestions();checkProductCodeDuplicate()" oninput="checkProductCodeDuplicate();updateAddFormLiveInfo();renderRelatedPickerPreview()" autocomplete="off">
       <datalist id="fMaSuggestions"></datalist>
       <div id="fMaExistingHint" class="code-existing-hint"></div>
       </div>
@@ -2001,10 +2016,18 @@ html::-webkit-scrollbar-corner { background: #EAF2F8; }
       <textarea id="fGhi" placeholder="Ghi chú thêm cho sản phẩm (nếu có)"></textarea>
     </div>
     <div class="form-row">
-      <label>🔗 Bài viết / linh kiện liên quan <span style="font-weight:normal;color:#777">(mỗi mã một dòng)</span></label>
-      <textarea id="fRelatedCodes" placeholder="Ví dụ:&#10;CPU001&#10;RAM006&#10;Q5|CAM002"></textarea>
-      <div class="condition-note">Mã không ghi kho sẽ dùng cùng chi nhánh. Có thể liên kết chéo Máy tính, Máy in, Camera và Internet.</div>
+      <label>🔗 Các sản phẩm đi cùng bộ <span style="font-weight:normal;color:#777">(không bắt buộc)</span></label>
+      <div class="related-smart-picker">
+        <input type="search" id="fRelatedSearch" class="related-smart-search"
+          placeholder="Gõ tên hoặc mã sản phẩm cần liên kết..."
+          autocomplete="off"
+          onfocus="renderRelatedPickerResults()"
+          oninput="renderRelatedPickerResults()">
+        <div id="fRelatedResults" class="related-smart-results"></div>
+      </div>
+      <textarea id="fRelatedCodes" hidden aria-hidden="true"></textarea>
       <div id="fRelatedPreview" class="related-edit-preview"></div>
+      <div class="related-picker-help">Gõ tên hoặc mã rồi bấm đúng sản phẩm trong danh sách. Hệ thống tự ghi chính xác mã, kho và loại sản phẩm; không cần nhập thủ công.</div>
     </div>
     <div class="form-row">
       <label>Thương hiệu</label>
@@ -6884,6 +6907,87 @@ function directRelatedText(branch,code){
   return PRODUCT_LINKS.filter(link=>productLinkKey(link.sourceBranch,link.sourceCode)===source)
     .map(link=>`${link.targetBranch===branch?"":link.targetBranch+"|"}${link.targetCode}`).join("\n");
 }
+function getRelatedFormBranch(){
+  return document.getElementById("fBranch")?.value==="Q5"?"Q5":"Q2";
+}
+function getRelatedFormTargets(){
+  return parseRelatedTargets(document.getElementById("fRelatedCodes")?.value||"",getRelatedFormBranch());
+}
+function setRelatedFormTargets(targets){
+  const field=document.getElementById("fRelatedCodes");
+  if(field) field.value=targets.map(item=>`${item.branch}|${item.code}`).join("\n");
+  renderRelatedPickerPreview();
+}
+function relatedCategoryLabel(value){
+  return ({MT:"Máy tính",MI:"Máy in",CAM:"Camera",INT:"Internet"})[String(value||"").trim().toUpperCase()]||String(value||"Sản phẩm");
+}
+function renderRelatedPickerResults(){
+  const input=document.getElementById("fRelatedSearch");
+  const box=document.getElementById("fRelatedResults");
+  if(!input||!box) return;
+  const query=removeAccents(String(input.value||"").trim());
+  const sourceKey=productLinkKey(getRelatedFormBranch(),document.getElementById("fMa")?.value||"");
+  const selected=new Set(getRelatedFormTargets().map(item=>productLinkKey(item.branch,item.code)));
+  const matches=DATA.map((row,index)=>({row,index,key:productLinkKey(row[13],row[1])}))
+    .filter(item=>item.key!==sourceKey&&!selected.has(item.key))
+    .filter(item=>{
+      if(!query) return true;
+      const row=item.row;
+      return removeAccents([row[1],row[2],row[3],row[8],row[13]].join(" ")).includes(query);
+    })
+    .sort((a,b)=>{
+      const current=getRelatedFormBranch();
+      const branchDiff=(String(a.row[13]||"Q2")===current?0:1)-(String(b.row[13]||"Q2")===current?0:1);
+      return branchDiff||String(a.row[2]||"").localeCompare(String(b.row[2]||""),"vi");
+    }).slice(0,12);
+  if(!matches.length){
+    box.innerHTML=`<div class="related-smart-empty">${query?"Không tìm thấy sản phẩm phù hợp":"Không còn sản phẩm nào để chọn"}</div>`;
+  }else{
+    box.innerHTML=matches.map(item=>{
+      const row=item.row, branch=String(row[13]||"Q2"), group=getPrimaryRowGroup(row[8]||"");
+      return `<button type="button" class="related-smart-result" onclick="addRelatedProductByIndex(${item.index})">
+        <span class="related-smart-result-name">${escapeHtml(stripProductConditionFromTitle(row[2]||"Chưa có tên"))}</span>
+        <span class="related-smart-result-code">${escapeHtml(branch+" · "+String(row[1]||""))}</span>
+        <span class="related-smart-result-meta">${escapeHtml(relatedCategoryLabel(row[0]))}${group?" · "+escapeHtml(group):""} · Tồn ${Number(row[5])||0}</span>
+      </button>`;
+    }).join("");
+  }
+  box.classList.add("open");
+}
+function addRelatedProductByIndex(index){
+  const row=DATA[Number(index)];
+  if(!row) return;
+  const target={branch:String(row[13]||"Q2")==="Q5"?"Q5":"Q2",code:normalizeProductCode(row[1])};
+  const sourceKey=productLinkKey(getRelatedFormBranch(),document.getElementById("fMa")?.value||"");
+  const targetKey=productLinkKey(target.branch,target.code);
+  if(targetKey===sourceKey){ showToast("Không thể liên kết sản phẩm với chính nó"); return; }
+  const targets=getRelatedFormTargets();
+  if(targets.some(item=>productLinkKey(item.branch,item.code)===targetKey)){ showToast("Sản phẩm này đã được chọn"); return; }
+  targets.push(target);
+  setRelatedFormTargets(targets);
+  const input=document.getElementById("fRelatedSearch");
+  if(input) input.value="";
+  document.getElementById("fRelatedResults")?.classList.remove("open");
+}
+function removeRelatedProductAt(position){
+  const targets=getRelatedFormTargets();
+  targets.splice(Number(position),1);
+  setRelatedFormTargets(targets);
+}
+function renderRelatedPickerPreview(){
+  const preview=document.getElementById("fRelatedPreview");
+  if(!preview) return;
+  const targets=getRelatedFormTargets();
+  if(!targets.length){
+    preview.innerHTML=`<div class="related-smart-empty">Chưa chọn sản phẩm đi cùng bộ</div>`;
+    return;
+  }
+  preview.innerHTML=`<div class="related-selected-list">${targets.map((target,index)=>{
+    const item=findProductByLinkKey(productLinkKey(target.branch,target.code));
+    const label=item?`${target.branch} · ${target.code} · ${stripProductConditionFromTitle(item.row[2]||"")}`:`${target.branch} · ${target.code}`;
+    return `<span class="related-selected-chip"><span>${escapeHtml(label)}</span><button type="button" onclick="removeRelatedProductAt(${index})" title="Bỏ liên kết" aria-label="Bỏ liên kết">×</button></span>`;
+  }).join("")}</div>`;
+}
 async function saveProductLinks(sourceBranch,sourceCode,targets,oldBranch,oldCode){
   const result=await postSheet("save_product_links",{sourceBranch,sourceCode,targets,oldBranch,oldCode,baseFingerprint:SERVER_PRODUCT_LINKS_FINGERPRINT},35000);
   PRODUCT_LINKS=Array.isArray(result.links)?result.links:PRODUCT_LINKS;
@@ -7838,6 +7942,7 @@ async function openAddModal(){ if(!requireAdmin()) return;
   document.getElementById("fBranch").value = currentBranch === "Q5" ? "Q5" : "Q2"; document.getElementById("fSheet").value = ["MT","MI","CAM","INT"].includes(currentTab) ? currentTab : "MT"; document.getElementById("fMa").value = ""; document.getElementById("fTen").value = "";
   document.getElementById("fTH").value = ""; setVndInputValue("fGia", 0); setVndInputValue("fGiaBan", 0);
   document.getElementById("fRelatedCodes").value = "";
+  document.getElementById("fRelatedSearch").value = ""; setRelatedFormTargets([]);
   document.getElementById("fTon").value = "0"; document.getElementById("fSapHet").value = "2"; document.getElementById("fTT").value = "HẾT HÀNG";
   document.getElementById("fGhi").value = ""; document.getElementById("fVitri").value = ""; document.getElementById("fImgFile").value = ""; [1,2,3,4].forEach(n=>{ document.getElementById(`fWarrantyImg${n}`).value=""; document.getElementById(`fWarrantyTitle${n}`).value=""; updateSupplementaryImagePreview(n); }); setImagePreview(""); updateLocationSuggestions(); updateGroupOptions(""); updateBrandSuggestions(); checkProductCodeDuplicate(); syncProductConditionButtons(); updateAddFormLiveInfo();
   document.getElementById("editOverlay").classList.add("open");
@@ -7853,6 +7958,7 @@ async function openEditModal(idx){ if(!requireAdmin()) return;
   document.getElementById("fBranch").value = r[13] || "Q2"; document.getElementById("fSheet").value = r[0]; document.getElementById("fMa").value = r[1];
   document.getElementById("fTen").value = stripProductConditionFromTitle(r[2]); document.getElementById("fTH").value = r[3];
   document.getElementById("fRelatedCodes").value = directRelatedText(r[13]||"Q2",r[1]);
+  document.getElementById("fRelatedSearch").value = ""; setRelatedFormTargets(getRelatedFormTargets());
   setVndInputValue("fGia", r[4]); setVndInputValue("fGiaBan", r[10]||0);
   document.getElementById("fTon").value = r[5]; document.getElementById("fSapHet").value = r[12] || 2; document.getElementById("fTT").value = getStockStatusValue(r[5], r[12]);
   document.getElementById("fGhi").value = parts.note || ""; document.getElementById("fVitri").value = parts.location || ""; document.getElementById("fImgFile").value = ""; document.getElementById("fQuickTagNew").value = "";
