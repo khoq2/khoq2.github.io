@@ -333,6 +333,10 @@ button:disabled,input:disabled,select:disabled,[aria-disabled="true"] { cursor:n
 .tx-filter-field { display: grid; gap: 4px; min-width: 0; }
 .tx-filter-label { color: #607D8B; font-size: 11px; font-weight: 800; padding-left: 1px; }
 .tx-filter select, .tx-filter input { width: 100%; padding: 9px 10px; border-radius: 8px; border: 1.5px solid #D5DBDB; font-size: 13px; background: #fff; color: #2C3E50; }
+.tx-date-input { position:relative; }
+.tx-date-input > span { display:none; position:absolute; inset:0; align-items:center; padding:0 12px; color:#7B8794; font-size:13px; pointer-events:none; }
+.tx-date-input:not(.has-value) > span { display:flex; }
+.tx-date-input:not(.has-value) input { color:transparent!important; }
 .tx-filter button { border: none; border-radius: 8px; padding: 9px 12px; background: #F4F6F9; color: #34495E; font-size: 13px; font-weight: 700; cursor: pointer; }
 .tx-filter button:active { transform: scale(.98); }
 .tx-row { position:relative; padding:10px 0 15px; margin-bottom:4px; border-bottom:0; font-size:12px; }
@@ -346,6 +350,9 @@ button:disabled,input:disabled,select:disabled,[aria-disabled="true"] { cursor:n
 }
 .tx-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 6px; }
 .tx-nv { font-weight: bold; color: #1E3A5F; flex: 1; min-width: 0; }
+.tx-person { min-width:0; display:inline-flex; align-items:center; gap:5px; }
+.tx-name { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.tx-kind { flex:0 0 auto; white-space:nowrap; }
 .tx-head-right { display: flex; align-items: flex-start; gap: 6px; flex-shrink: 0; }
 .tx-time { font-size: 10px; color: #7B7D7D; text-align: right; line-height: 1.35; white-space: nowrap; }
 .tx-meta { display: flex; flex-wrap: wrap; gap: 6px; color: #555; }
@@ -1674,7 +1681,7 @@ html::-webkit-scrollbar-corner { background: #EAF2F8; }
 @media (max-width:520px) {
   #txOverlay { padding:7px; align-items:flex-start; }
   #txOverlay .tx-history-modal { width:100%; max-height:96dvh; border-radius:18px; padding:12px; background:linear-gradient(145deg,#F4F9FF,#EEF5FC); }
-  #txOverlay .modal-title { padding:5px 3px 12px; font-size:16px; }
+  #txOverlay .modal-title { display:block; width:100%; padding:5px 3px 10px; font-size:13px; line-height:1.25; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   #txOverlay .tx-filter { grid-template-columns:1fr 1fr; padding:11px; gap:9px; border-radius:14px; background:rgba(255,255,255,.86); box-shadow:0 4px 14px rgba(29,78,122,.09); }
   #txOverlay .tx-filter-field:first-child { grid-column:1/-1; }
   #txOverlay .tx-filter-label { color:#34495E; text-shadow:none; }
@@ -1683,10 +1690,13 @@ html::-webkit-scrollbar-corner { background: #EAF2F8; }
   #txOverlay .tx-kpi-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
   #txOverlay .tx-row { padding:13px; border:1px solid #E0E8F1; border-radius:15px; background:#fff; box-shadow:0 6px 18px rgba(25,65,105,.09); }
   #txOverlay .tx-row::after { display:none; }
-  #txOverlay .tx-header { align-items:center; }
-  #txOverlay .tx-nv { flex-wrap:wrap; font-size:14px; }
-  #txOverlay .tx-nv .nv-avatar { width:40px; height:40px; }
-  #txOverlay .tx-head-right { flex-direction:column; align-items:flex-end; }
+  #txOverlay .tx-header { display:grid; grid-template-columns:minmax(0,1fr); gap:5px; align-items:center; }
+  #txOverlay .tx-nv { width:100%; display:flex; flex-wrap:nowrap; align-items:center; gap:5px; font-size:13px; }
+  #txOverlay .tx-person { flex:1 1 auto; overflow:hidden; }
+  #txOverlay .tx-nv .nv-avatar { width:34px; height:34px; flex:0 0 34px; }
+  #txOverlay .tx-nv .nv-role-badge { flex:0 1 auto; max-width:92px; padding:3px 6px; font-size:8px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  #txOverlay .tx-kind { min-height:22px; max-width:112px; padding:3px 7px; font-size:9px; line-height:1; }
+  #txOverlay .tx-head-right { width:100%; flex-direction:row; justify-content:flex-end; align-items:center; }
   #txOverlay .tx-time { font-size:11px; color:#50677B; }
   #txOverlay .tx-detail-grid > div { grid-template-columns:minmax(100px,.9fr) minmax(0,1.1fr); font-size:11px; }
   #txOverlay .simple-sticky-actions { position:sticky; bottom:-12px; padding:10px 0 2px; background:linear-gradient(transparent,#EEF5FC 28%); }
@@ -6950,7 +6960,7 @@ function renderTxHistory(){
   const filterBar = `<div class="tx-filter">
     <div class="tx-filter-field">
       <label class="tx-filter-label" for="txFilterDate">Ngày giao dịch (dd/mm/yyyy)</label>
-      <input type="date" id="txFilterDate" value="${dateVal}" aria-label="Ngày giao dịch theo định dạng ngày/tháng/năm" onchange="applyTxHistoryFilters()">
+      <div class="tx-date-input${dateVal?" has-value":""}"><input type="date" id="txFilterDate" value="${dateVal}" aria-label="Ngày giao dịch theo định dạng ngày/tháng/năm" onchange="applyTxHistoryFilters()"><span>Chọn ngày</span></div>
     </div>
     <div class="tx-filter-field">
       <label class="tx-filter-label" for="txFilterNV">Nhân viên</label>
@@ -6987,7 +6997,7 @@ function renderTxHistory(){
   const rows = filtered.length ? filtered.map(t=>`
         <div class="tx-row">
           <div class="tx-header">
-            <span class="tx-nv">${renderNVAvatar(t.nv)} ${escapeHtml(t.nv || "")} ${renderNVRoleBadge(t.nv)} <span class="tx-pill" style="margin-left:4px;${getTransactionKind(t)==="IMPORT" ? "background:#E8F8F0;color:#1E8449;border:1px solid #A9DFBF;" : getTransactionKind(t)==="ADJUST" ? "background:#FEF9E7;color:#7D6608;border:1px solid #F7DC6F;" : "background:#FDEDEC;color:#C0392B;border:1px solid #F5B7B1;"}">${getTransactionKindLabel(t)}</span></span>
+	            <span class="tx-nv"><span class="tx-person">${renderNVAvatar(t.nv)} <span class="tx-name">${escapeHtml(t.nv || "")}</span> ${renderNVRoleBadge(t.nv)}</span><span class="tx-pill tx-kind" style="${getTransactionKind(t)==="IMPORT" ? "background:#E8F8F0;color:#1E8449;border:1px solid #A9DFBF;" : getTransactionKind(t)==="ADJUST" ? "background:#FEF9E7;color:#7D6608;border:1px solid #F7DC6F;" : "background:#FDEDEC;color:#C0392B;border:1px solid #F5B7B1;"}">${getTransactionKindLabel(t)}</span></span>
             <div class="tx-head-right">
               <span class="tx-time">${formatTxTime(t.time)}</span>
               ${document.body.classList.contains("admin-mode")?`<button class="tx-action tx-edit" title="Sửa ngày giờ và thông tin giao dịch" onclick="event.stopPropagation(); editTX('${escapeHtml(t.id)}')">📅 Sửa ngày giờ</button><button class="tx-action tx-delete" title="Xóa giao dịch" onclick="event.stopPropagation(); deleteTX('${escapeHtml(t.id)}')">🗑️</button>`:""}
