@@ -3066,6 +3066,11 @@ html, body, button, input, select, textarea {
 }
 
 /* Menu danh mục luôn nằm ngang và căn giữa; không dùng làm sidebar. */
+.header .search-box {
+  width: 100%;
+  max-width: none;
+  margin-inline: 0;
+}
 @media (min-width: 1050px) {
   body {
     padding-left: 0;
@@ -3121,6 +3126,11 @@ html, body, button, input, select, textarea {
     border-bottom-color: #1677FF;
     background: #EEF6FF;
     box-shadow: none;
+  }
+  body > .sticky .search-box {
+    width: 100%;
+    max-width: none;
+    margin-inline: 0;
   }
   body > .sticky.collapsed .tabs {
     max-height: 0 !important;
