@@ -3634,6 +3634,21 @@ body .category-view-bar .view-mode-btn svg{width:14px!important;height:14px!impo
   body .group-summary-chip:hover * {
     color:#FFFFFF!important;
   }
+  body .quick-nav,
+  body .group-summary-row { cursor:grab!important; }
+  body .quick-nav.is-dragging,
+  body .quick-nav.is-dragging *,
+  body .group-summary-row.is-dragging,
+  body .group-summary-row.is-dragging * {
+    cursor:grabbing!important;
+    user-select:none!important;
+    -webkit-user-select:none!important;
+  }
+  body .quick-nav.is-dragging,
+  body .group-summary-row.is-dragging {
+    scroll-snap-type:none!important;
+    scroll-behavior:auto!important;
+  }
 }
 
 </style>
@@ -7375,7 +7390,7 @@ function renderCard(r,i,displayNo){
         <span class="price-label">Giá bán:</span>
         ${giaBan>0
           ? `<span class="price price-sale-on" style="color: #D50000;font-size:15px;font-weight:900">${fmt(giaBan)}</span>`
-          : `<button type="button" class="price price-contact-btn" data-title="${escapeHtml([ten, th].filter(Boolean).join(" "))}" data-code="${escapeHtml(ma)}" data-branch="${escapeHtml(branch || "Q2")}" data-stock="${ton}" data-location="${escapeHtml(location || "Chưa ghi vị trí")}" data-image="${escapeHtml(img || "")}" aria-label="Liên hệ qua Zalo" onclick="openZaloContact(this)">💬 LIÊN HỆ</button>`
+          : `<button type="button" class="price price-contact-btn" data-title="${escapeHtml([ten, th].filter(Boolean).join(" "))}" data-code="${escapeHtml(ma)}" data-branch="${escapeHtml(branch || "Q2")}" data-stock="${ton}" data-location="${escapeHtml(location || "Chưa ghi vị trí")}" data-image="${escapeHtml(img || "")}" style="background:${stBg}!important;color:${stFg}!important;border-color:${stFg}!important;box-shadow:0 3px 10px ${stBg},inset 0 1px 0 rgba(255,255,255,.55)!important;text-shadow:none!important;" aria-label="Liên hệ qua Zalo" onclick="openZaloContact(this)">💬 LIÊN HỆ</button>`
         }
        </div>`;
   return `<div class="card-shell"><div class="card${isHet?" het":isSap?" sap":" con"}${bulkSelectMode?" bulk-mode":""}${isSelected?" bulk-selected":""}${quickClass}" data-ma="${escapeHtml(ma)}" data-index="${i}">
@@ -11568,6 +11583,38 @@ function enableMouseDragScroll(el, onUserScroll){
   }, true);
 }
 
+function enablePointerDragScrollV2(el,onUserScroll){
+  if(!el||el.dataset.pointerDragV2) return;
+  el.dataset.pointerDragV2="1";
+  let dragging=false,pointerId=null,startX=0,startScroll=0,moved=false,blockClick=false;
+  if(window.matchMedia("(hover:hover) and (pointer:fine)").matches) el.style.cursor="grab";
+  el.addEventListener("pointerdown",event=>{
+    if(event.pointerType!=="mouse"||event.button!==0) return;
+    dragging=true; pointerId=event.pointerId; startX=event.clientX; startScroll=el.scrollLeft; moved=false;
+    el.classList.add("is-dragging"); el.style.cursor="grabbing";
+    try{el.setPointerCapture(pointerId);}catch(_){}
+  });
+  el.addEventListener("pointermove",event=>{
+    if(!dragging||event.pointerId!==pointerId) return;
+    const distance=event.clientX-startX;
+    if(Math.abs(distance)>3){moved=true;event.preventDefault();}
+    el.scrollLeft=startScroll-distance;
+    if(typeof onUserScroll==="function") onUserScroll();
+  });
+  const finish=event=>{
+    if(!dragging||(event?.pointerId!=null&&event.pointerId!==pointerId)) return;
+    blockClick=moved;
+    try{el.releasePointerCapture(pointerId);}catch(_){}
+    dragging=false; pointerId=null; el.classList.remove("is-dragging");
+    el.style.cursor=window.matchMedia("(hover:hover) and (pointer:fine)").matches?"grab":"";
+  };
+  el.addEventListener("pointerup",finish);
+  el.addEventListener("pointercancel",finish);
+  el.addEventListener("click",event=>{
+    if(blockClick){event.preventDefault();event.stopPropagation();blockClick=false;moved=false;}
+  },true);
+}
+
 const autoScrollBars = {};
 function setupSlowAutoScroll(selector){
   const el = document.querySelector(selector);
@@ -11636,6 +11683,7 @@ function setupQuickNavScrollIndicators(){
       thumb.style.left = `${leftPercent}%`;
     };
     nav.addEventListener("scroll", update, {passive:true});
+    enablePointerDragScrollV2(nav,update);
     track.addEventListener("pointerdown", event=>{
       if(!wrap.classList.contains("has-overflow")) return;
       event.preventDefault();
@@ -11691,7 +11739,7 @@ function setupGroupChipsAutoScroll(){
       if(!state.autoScrolling) state.pauseUntil=Date.now()+(touchLike?900:3500);
       state.pos=el.scrollLeft;
     }, {passive:true});
-    enableMouseDragScroll(el, ()=>{ state.pauseUntil = Date.now() + 3500; state.pos = el.scrollLeft; });
+    enablePointerDragScrollV2(el,()=>{ state.pauseUntil=Date.now()+3500; state.pos=el.scrollLeft; updateIndicator(); });
     if(track){
       track.addEventListener("pointerdown",event=>{
         event.preventDefault();
