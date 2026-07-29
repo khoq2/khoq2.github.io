@@ -3149,6 +3149,207 @@ html, body, button, input, select, textarea {
   }
 }
 </style>
+<style id="modern-inventory-dashboard-2026-complete">
+/* Modern Inventory Dashboard 2026 — unified presentation layer.
+   DOM ids, handlers and data contracts remain unchanged. */
+:root{
+  --ui-bg:#f3f7fb;--ui-surface:rgba(255,255,255,.94);--ui-soft:#f7faff;
+  --ui-ink:#10233f;--ui-muted:#64748b;--ui-line:#dbe6f1;--ui-line-2:#c8d7e7;
+  --ui-primary:#0f5f9f;--ui-primary-2:#1387c9;--ui-accent:#06b6d4;
+  --ui-success:#138a63;--ui-warning:#c58512;--ui-danger:#c84652;
+  --ui-r-sm:12px;--ui-r:16px;--ui-r-lg:22px;
+  --ui-shadow-sm:0 5px 16px rgba(16,35,63,.07);
+  --ui-shadow:0 14px 40px rgba(15,51,83,.12);
+  --ui-shadow-lg:0 24px 70px rgba(8,34,62,.2);
+  --ui-focus:0 0 0 3px rgba(19,135,201,.18);
+}
+html{background:var(--ui-bg);color-scheme:light}
+body{
+  min-height:100dvh;color:var(--ui-ink);letter-spacing:-.005em;
+  font-family:Inter,"Segoe UI",Roboto,"Noto Sans",Arial,sans-serif;
+  background:radial-gradient(circle at 10% -10%,rgba(6,182,212,.12),transparent 31rem),
+    radial-gradient(circle at 100% 8%,rgba(15,95,159,.1),transparent 34rem),
+    linear-gradient(180deg,#f7fbff,#f2f7fb 42%,#eef4f9);
+}
+body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.28;
+  background-image:linear-gradient(rgba(15,95,159,.045) 1px,transparent 1px),
+  linear-gradient(90deg,rgba(15,95,159,.045) 1px,transparent 1px);background-size:32px 32px;
+  -webkit-mask-image:linear-gradient(#000,transparent 70%);mask-image:linear-gradient(#000,transparent 70%)}
+*,*::before,*::after{box-sizing:border-box}
+button,input,select,textarea{font:inherit}
+button,a,[role=button],summary{transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease,background-color .18s ease,color .18s ease}
+button:focus-visible,a:focus-visible,[role=button]:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:0!important;box-shadow:var(--ui-focus)!important}
+button:not(:disabled):active,[role=button]:active{transform:translateY(1px) scale(.99)}
+button:disabled{opacity:.55;cursor:not-allowed;filter:saturate(.5)}
+
+/* App shell */
+.sticky{background:rgba(247,251,255,.84)!important;border-bottom:1px solid rgba(200,215,231,.82)!important;
+  box-shadow:0 8px 28px rgba(16,35,63,.07)!important;-webkit-backdrop-filter:blur(18px) saturate(145%);backdrop-filter:blur(18px) saturate(145%)}
+.header,.tabs,.filters,#homeInventoryBar,#results{width:min(100%,1480px);margin-inline:auto}
+.header{border:1px solid rgba(219,230,241,.8)!important;border-radius:var(--ui-r-lg)!important;
+  background:linear-gradient(135deg,rgba(255,255,255,.9),rgba(247,251,255,.76))!important;box-shadow:var(--ui-shadow-sm)}
+.title{color:var(--ui-ink)!important}
+.title-text{isolation:isolate}
+.title-base{
+  font-weight:850!important;letter-spacing:.025em!important;color:transparent!important;
+  background:linear-gradient(105deg,#10233f 0%,#0f5f9f 30%,#06a8c4 44%,#fff 49%,#84e7f5 54%,#0f5f9f 68%,#10233f 100%);
+  background-size:320% 100%;background-position:100% 50%;
+  -webkit-background-clip:text;background-clip:text;
+  animation:titleTextSweep2026 3.2s ease-in-out infinite;
+}
+.title-shine{
+  width:34%!important;height:1.6em!important;opacity:.92!important;
+  background:linear-gradient(90deg,transparent,rgba(121,228,247,.28) 24%,rgba(255,255,255,.98) 50%,rgba(121,228,247,.28) 76%,transparent)!important;
+  filter:blur(.3px) drop-shadow(0 0 6px rgba(6,182,212,.42))!important;
+  mix-blend-mode:screen;
+  animation:titleSweep 3.2s ease-in-out infinite!important;
+}
+@keyframes titleTextSweep2026{
+  0%,8%{background-position:100% 50%}
+  92%,100%{background-position:0% 50%}
+}
+.title-icon{display:inline-grid;place-items:center;border-radius:14px;background:linear-gradient(145deg,#e6f7fb,#d9eafb);
+  box-shadow:inset 0 0 0 1px rgba(19,135,201,.13),0 7px 18px rgba(15,95,159,.13)}
+.title-logo-slot{
+  position:relative;display:inline-grid;place-items:center;flex:0 0 auto;
+  overflow:hidden;border-radius:12px;isolation:isolate;
+}
+.title-logo-slot>*{grid-area:1/1}
+.title-logo-slot::after{
+  content:"";position:absolute;z-index:20;left:-12%;width:124%;height:34%;top:-42%;
+  display:block;pointer-events:none;opacity:0;border-radius:999px;
+  background:linear-gradient(180deg,rgba(255,255,255,0) 0%,rgba(111,229,255,.64) 28%,#fff 49%,rgba(111,229,255,.7) 70%,rgba(255,255,255,0) 100%);
+  box-shadow:0 0 8px rgba(255,255,255,.94),0 0 14px rgba(0,196,255,.82);
+  filter:blur(.15px);
+  animation:logoVerticalSweep2026 4.6s ease-in-out infinite!important;
+  animation-duration:4.6s!important;
+}
+@keyframes logoVerticalSweep2026{
+  0%{top:-42%;opacity:0}
+  4%{opacity:1}
+  43%{top:108%;opacity:1}
+  48%{top:108%;opacity:0}
+  52%{top:108%;opacity:0}
+  57%{opacity:1}
+  96%{top:-42%;opacity:1}
+  100%{top:-42%;opacity:0}
+}
+.title-brand-logo{
+  width:46px!important;height:46px!important;flex:0 0 46px!important;object-fit:contain!important;
+  padding:2px!important;border-radius:12px!important;background:linear-gradient(145deg,#e7f5fc,#dceaf7)!important;
+  box-shadow:inset 0 0 0 1px rgba(19,135,201,.16),0 7px 18px rgba(15,95,159,.16)!important;
+}
+.title-brand-fallback{width:46px;height:46px}
+.warehouse-switcher,.view-mode-switch{padding:4px!important;border:1px solid var(--ui-line)!important;border-radius:999px!important;background:#edf5fb!important}
+.warehouse-switch,.view-mode-btn{border:0!important;border-radius:999px!important;color:var(--ui-muted)!important;background:transparent!important}
+.warehouse-switch.active,.view-mode-btn.active{color:#fff!important;background:linear-gradient(135deg,var(--ui-primary),var(--ui-primary-2))!important;
+  box-shadow:0 6px 16px rgba(15,95,159,.24)!important}
+.admin-btn,.sync-badge{min-height:34px;border:1px solid var(--ui-line)!important;border-radius:999px!important;
+  background:rgba(255,255,255,.9)!important;color:var(--ui-ink)!important;box-shadow:var(--ui-shadow-sm)}
+.admin-btn:hover,.sync-badge:hover{border-color:#9bc9e5!important;background:#f8fcff!important}
+
+/* KPI and navigation */
+.kpi-row{gap:12px!important}.kpi{overflow:hidden;position:relative;isolation:isolate;border:1px solid rgba(255,255,255,.5)!important;
+  border-radius:var(--ui-r)!important;box-shadow:0 12px 26px rgba(16,35,63,.14)!important}
+.kpi::after{content:"";position:absolute;inset:auto -20% -70% 25%;z-index:-1;aspect-ratio:1;border-radius:50%;background:rgba(255,255,255,.17)}
+.kpi:hover{transform:translateY(-2px);box-shadow:0 17px 34px rgba(16,35,63,.2)!important}.kpi-v{font-weight:850!important}
+.kpi-hover-menu,.tab-dropdown{border:1px solid rgba(200,215,231,.9)!important;border-radius:var(--ui-r)!important;
+  background:rgba(255,255,255,.98)!important;box-shadow:var(--ui-shadow-lg)!important;backdrop-filter:blur(18px)}
+.search-box{border:1px solid var(--ui-line-2)!important;border-radius:var(--ui-r)!important;background:rgba(255,255,255,.95)!important;
+  box-shadow:0 8px 24px rgba(16,35,63,.08)!important}.search-box:focus-within{border-color:#78badf!important;box-shadow:var(--ui-focus)!important}
+#search{color:var(--ui-ink)!important;background:transparent!important}.search-icon{color:var(--ui-primary-2)!important}
+.search-suggestions{border:1px solid var(--ui-line)!important;border-radius:0 0 var(--ui-r) var(--ui-r)!important;
+  background:rgba(255,255,255,.98)!important;box-shadow:var(--ui-shadow)!important}
+.tabs{gap:8px!important;padding-block:8px!important}
+.tab-btn,.filter-btn,.bulk-btn,.quick-chip,.group-summary-chip{border:1px solid var(--ui-line)!important;border-radius:999px!important;
+  background:rgba(255,255,255,.86)!important;color:#41536b!important;box-shadow:0 3px 10px rgba(16,35,63,.045)}
+.tab-btn:hover,.filter-btn:hover,.bulk-btn:hover,.quick-chip:hover,.group-summary-chip:hover{border-color:#9bc9e5!important;color:var(--ui-primary)!important;background:#f8fcff!important}
+.tab-btn.active,.filter-btn.active,.quick-chip.active,.group-summary-chip.active{border-color:transparent!important;color:#fff!important;
+  background:linear-gradient(135deg,var(--ui-primary),var(--ui-primary-2))!important;box-shadow:0 7px 18px rgba(15,95,159,.22)!important}
+.count-badge,.category-view-bar,.scroll-btns{border:1px solid var(--ui-line)!important;border-radius:999px!important;
+  background:rgba(255,255,255,.9)!important;color:var(--ui-muted)!important;box-shadow:var(--ui-shadow-sm)!important;backdrop-filter:blur(14px)}
+
+/* Products and dynamic lists */
+.group-section,.section-card,.group-summary-wrap,.quick-nav-wrap{border-color:var(--ui-line)!important;border-radius:var(--ui-r-lg)!important;
+  background:rgba(255,255,255,.72)!important;box-shadow:var(--ui-shadow-sm)!important}
+.card,.product-list-row{border:1px solid var(--ui-line)!important;border-radius:var(--ui-r)!important;
+  background:linear-gradient(155deg,#fff,#f8fbfe)!important;box-shadow:0 8px 22px rgba(16,35,63,.075)!important}
+.card:hover,.product-list-row:hover{border-color:#9bc9e5!important;transform:translateY(-3px);box-shadow:0 16px 36px rgba(15,74,117,.14)!important}
+.card img,.product-image,.product-list-image{border-radius:var(--ui-r-sm)!important;background:#edf4f9}
+.product-title,.card-title,.product-list-title{color:var(--ui-ink)!important;font-weight:750!important}
+.product-code,.code-badge,.branch-badge,.status-badge,.stock-badge{border-radius:999px!important;font-weight:700!important}
+.product-list-row:nth-child(even){background:linear-gradient(155deg,#fbfdff,#f5f9fc)!important}
+.latest-items-ticker,.build-selection-tray{border:1px solid rgba(19,135,201,.22)!important;color:var(--ui-primary)!important;
+  background:rgba(245,252,255,.95)!important;box-shadow:var(--ui-shadow-sm)!important;backdrop-filter:blur(18px)}
+.latest-items-ticker{border-radius:999px!important}.build-selection-tray{border-radius:var(--ui-r)!important;box-shadow:var(--ui-shadow-lg)!important}
+.fab{border:1px solid rgba(255,255,255,.22)!important;border-radius:999px!important;box-shadow:0 12px 28px rgba(16,35,63,.18)!important;font-weight:750!important}
+.fab:hover{transform:translateY(-2px);box-shadow:0 17px 34px rgba(16,35,63,.24)!important}
+.fab-toggle,.fab-add{background:linear-gradient(135deg,var(--ui-primary),var(--ui-primary-2))!important}
+
+/* All overlays, forms and admin surfaces */
+.overlay{padding:clamp(12px,3vw,30px)!important;background:rgba(7,25,45,.54)!important;backdrop-filter:blur(9px) saturate(120%)}
+.modal{width:min(100%,720px);max-height:min(90dvh,920px);overflow:auto;border:1px solid rgba(255,255,255,.68)!important;
+  border-radius:var(--ui-r-lg)!important;color:var(--ui-ink)!important;background:linear-gradient(145deg,rgba(255,255,255,.99),rgba(245,250,254,.98))!important;
+  box-shadow:var(--ui-shadow-lg)!important;scrollbar-color:#b6ccdd transparent}
+.modal::before{content:"";display:block;width:52px;height:4px;margin:-2px auto 15px;border-radius:999px;background:linear-gradient(90deg,var(--ui-primary-2),var(--ui-accent))}
+.modal-title{margin-bottom:16px!important;color:var(--ui-ink)!important;font-weight:850!important;letter-spacing:.02em!important}
+.modal-title::after{content:"";display:block;width:42px;height:3px;margin-top:9px;border-radius:999px;background:linear-gradient(90deg,var(--ui-primary-2),var(--ui-accent))}
+.form-row{gap:7px!important}.form-row label,.modal label{color:#3b4e66!important;font-size:12px!important;font-weight:750!important}
+.modal input:not([type=checkbox]):not([type=radio]),.modal select,.modal textarea,.sync-error-text{min-height:42px;border:1px solid var(--ui-line-2)!important;
+  border-radius:var(--ui-r-sm)!important;color:var(--ui-ink)!important;background:#fff!important;box-shadow:inset 0 1px 2px rgba(16,35,63,.035)}
+.modal textarea{line-height:1.5;resize:vertical}.modal input:hover,.modal select:hover,.modal textarea:hover{border-color:#9fc6dd!important}
+.modal input:focus,.modal select:focus,.modal textarea:focus{border-color:var(--ui-primary-2)!important;box-shadow:var(--ui-focus)!important}
+.modal input[type=checkbox],.modal input[type=radio]{accent-color:var(--ui-primary)}
+.modal .btn-submit,.modal .btn-save,.modal button[type=submit]{border:0!important;border-radius:var(--ui-r-sm)!important;color:#fff!important;
+  background:linear-gradient(135deg,var(--ui-primary),var(--ui-primary-2))!important;box-shadow:0 8px 18px rgba(15,95,159,.2)!important;font-weight:750!important}
+.modal .btn-cancel,.modal .btn-secondary,.modal .btn-img-pick{border:1px solid var(--ui-line-2)!important;border-radius:var(--ui-r-sm)!important;
+  color:#41536b!important;background:#f7fafc!important;box-shadow:none!important}
+.modal .btn-cancel-danger,.modal .btn-danger,.modal [class*=delete]{border-color:#efb7bd!important;color:#a92f3d!important;background:#fff4f5!important}
+.order-list,.nv-list,#customerSearchResults,#customerRecordList,#trashList,#activityList,#unitList,#transferUnitPicker{display:grid;gap:9px}
+.order-item,.nv-row,.customer-row,.customer-record-card,.trash-row,.activity-row,.unit-row,.transfer-unit-row,.tx-card,.transaction-card{
+  border:1px solid var(--ui-line)!important;border-radius:var(--ui-r-sm)!important;background:rgba(255,255,255,.9)!important;box-shadow:0 5px 14px rgba(16,35,63,.05)!important}
+.order-item:hover,.nv-row:hover,.customer-row:hover,.customer-record-card:hover,.trash-row:hover,.activity-row:hover,.unit-row:hover,.tx-card:hover,.transaction-card:hover{
+  border-color:#a6cce2!important;box-shadow:0 9px 20px rgba(16,35,63,.09)!important}
+.customer-panel-header,.customer-detail-header,.transaction-header,.order-modal-footer{border-color:var(--ui-line)!important;background:var(--ui-soft)!important}
+.customer-avatar,.nv-avatar{border:2px solid #fff!important;box-shadow:0 5px 14px rgba(16,35,63,.13)!important}
+.sync-error-help,.form-help,.hint,.empty-state{color:var(--ui-muted)!important}
+
+/* Tables, images, notifications and loading */
+.modal table,.data-table{width:100%;border-collapse:separate!important;border-spacing:0!important;overflow:hidden;border:1px solid var(--ui-line)!important;border-radius:var(--ui-r-sm)!important;background:#fff}
+.modal th,.data-table th{color:#3c526c!important;background:#eef5fa!important;font-size:11px;letter-spacing:.035em;text-transform:uppercase}
+.modal th,.modal td,.data-table th,.data-table td{padding:10px!important;border-color:var(--ui-line)!important}
+.image-lightbox{background:rgba(5,18,32,.9)!important;backdrop-filter:blur(10px)}
+.image-lightbox img{border:1px solid rgba(255,255,255,.22);border-radius:var(--ui-r)!important;box-shadow:0 24px 80px rgba(0,0,0,.45)!important}
+.image-lightbox-close,.image-lightbox-nav,.image-lightbox-save{border:1px solid rgba(255,255,255,.2)!important;border-radius:999px!important;background:rgba(14,31,49,.72)!important;backdrop-filter:blur(12px)}
+.toast{border:1px solid rgba(255,255,255,.22)!important;border-radius:999px!important;background:rgba(16,35,63,.94)!important;box-shadow:var(--ui-shadow-lg)!important;backdrop-filter:blur(14px)}
+.loading-overlay,.loading-screen{background:linear-gradient(145deg,#f8fcff,#eaf3f9)!important}
+.loading-card,.loading-box{border:1px solid var(--ui-line)!important;border-radius:var(--ui-r-lg)!important;background:rgba(255,255,255,.93)!important;box-shadow:var(--ui-shadow)!important}
+.footer-credit{color:#8090a4!important}
+
+@media(max-width:800px){
+  :root{--ui-r:14px;--ui-r-lg:18px}
+  .sticky{background:rgba(247,251,255,.93)!important}.header{border-radius:0 0 var(--ui-r-lg) var(--ui-r-lg)!important;border-inline:0!important}
+  .kpi-row{gap:7px!important}.kpi{border-radius:13px!important}.tabs{padding-inline:8px!important}#results{padding-inline:8px!important}
+  .overlay{align-items:flex-end!important;padding:0!important}.modal{width:100%!important;max-width:none!important;max-height:92dvh!important;margin:0!important;
+    border-width:1px 0 0!important;border-radius:22px 22px 0 0!important;padding:18px 16px max(18px,env(safe-area-inset-bottom))!important}
+  .modal::before{margin-top:-8px}.fab-wrap{right:12px!important;bottom:max(12px,env(safe-area-inset-bottom))!important}
+  .build-selection-tray{left:8px!important;right:8px!important;bottom:max(8px,env(safe-area-inset-bottom))!important}
+}
+@media(max-width:480px){
+  .title-base{font-size:clamp(15px,4.6vw,20px)!important}.warehouse-switch{padding-inline:9px!important}
+  .title-brand-logo{width:38px!important;height:38px!important;flex-basis:38px!important;border-radius:10px!important}
+  .title-brand-fallback{width:38px;height:38px}
+  .kpi-l{font-size:9px!important}.kpi-v{font-size:18px!important}.tab-btn,.filter-btn,.bulk-btn{min-height:36px!important}
+  .modal input:not([type=checkbox]):not([type=radio]),.modal select,.modal textarea{font-size:16px!important}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+  .title-logo-slot::after{animation:logoVerticalSweep2026 4.6s ease-in-out infinite!important}
+  .title-base{animation:titleTextSweep2026 3.2s ease-in-out infinite!important}
+  .title-shine{animation:titleSweep 3.2s ease-in-out infinite!important}
+}
+
+</style>
 </head>
 <body>
 <div class="cursor-halo" aria-hidden="true"></div><div class="cursor-dot" aria-hidden="true"></div>
@@ -3162,7 +3363,7 @@ html, body, button, input, select, textarea {
       <button class="admin-btn admin-only" id="syncBtn" type="button" title="Đồng bộ thủ công lên máy chủ" aria-label="Đồng bộ thủ công lên máy chủ" onclick="manualSync()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7h-5V2"></path><path d="M4 17h5v5"></path><path d="M5.2 9A8 8 0 0 1 18.5 5.5L20 7"></path><path d="M18.8 15A8 8 0 0 1 5.5 18.5L4 17"></path></svg></button>
       <button class="admin-btn" id="adminBtn" onclick="onAdminBtnClick()">🔒 Admin</button>
     </div>
-    <div class="title"><span class="title-icon">🏪</span><span class="title-text"><span class="title-base">HOÀNG GIA COMPUTER</span><span class="title-shine" aria-hidden="true"></span></span><span class="warehouse-switcher" role="group" aria-label="Chọn kho đang xem"><button type="button" class="warehouse-switch" data-warehouse="Q2" onclick="selectWarehouseBranch('Q2')"><span class="warehouse-pin">📍</span> Q2</button><button type="button" class="warehouse-switch" data-warehouse="Q5" onclick="selectWarehouseBranch('Q5')"><span class="warehouse-pin">📍</span> Q5</button></span></div>
+    <div class="title"><span class="title-logo-slot"><img class="title-icon title-brand-logo" id="headerBrandLogo" src="" alt="Logo cửa hàng" hidden onerror="this.hidden=true;document.getElementById('headerBrandFallback').hidden=false"><span class="title-icon title-brand-fallback" id="headerBrandFallback" aria-hidden="true">🏪</span></span><span class="title-text"><span class="title-base">HOÀNG GIA COMPUTER</span><span class="title-shine" aria-hidden="true"></span></span><span class="warehouse-switcher" role="group" aria-label="Chọn kho đang xem"><button type="button" class="warehouse-switch" data-warehouse="Q2" onclick="selectWarehouseBranch('Q2')"><span class="warehouse-pin">📍</span> Q2</button><button type="button" class="warehouse-switch" data-warehouse="Q5" onclick="selectWarehouseBranch('Q5')"><span class="warehouse-pin">📍</span> Q5</button></span></div>
     <div class="kpi-row">
       <div class="kpi" style="background: #2E86C1;" onclick="showKpiDetail('all')" onmouseenter="showKpiHoverMenu('all',this)" onmouseleave="scheduleKpiHoverClose()"><div class="kpi-v"><span class="kpi-icon kpi-icon-box" aria-hidden="true">📦</span><span id="kpi-mh">0</span></div><div class="kpi-l">mặt hàng <span class="kpi-hint">▼</span></div></div>
       <div class="kpi" style="background: #1E8449;" onclick="showKpiDetail('ton')" onmouseenter="showKpiHoverMenu('ton',this)" onmouseleave="scheduleKpiHoverClose()"><div class="kpi-v"><span class="kpi-icon kpi-icon-stock" aria-hidden="true">📊</span><span id="kpi-ton">0</span></div><div class="kpi-l">tổng tồn <span class="kpi-hint">▼</span></div></div>
@@ -3238,6 +3439,7 @@ html, body, button, input, select, textarea {
     <button class="fab admin-only" style="background:#5B2C6F;color:#fff" onclick="openQuickOrderModal()">↕️ Sắp xếp lọc</button>
     <button class="fab admin-only" style="background:#8E44AD;color:#fff" onclick="openNVModal()">👥 Nhân viên</button>
     <button class="fab admin-only" style="background:#21618C;color:#fff" onclick="openCustomerPanel()">👤 Khách hàng</button>
+    <button class="fab admin-only" style="background:#0E7490;color:#fff" onclick="changeHeaderLogoUrl()">🖼️ Logo tiêu đề</button>
     <button class="fab admin-only" style="background:#1F618D;color:#fff" onclick="exportMonthlyAccountingExcel()">🧾 Xuất file Excel</button>
     <button class="fab admin-only" style="background:#922B21;color:#fff" onclick="exportMonthlyAccountingPdf()">📄 Xuất file PDF</button>
     <button class="fab admin-only" style="background:#A04000;color:#fff" onclick="openTrashModal()">♻️ Thùng rác</button>
@@ -5548,9 +5750,10 @@ function saveDisplayConfig(){
     localStorage.setItem(QUICK_HIDDEN_TAGS_KEY, JSON.stringify(QUICK_HIDDEN_TAGS));
     localStorage.setItem(ITEM_CREATED_AT_KEY, JSON.stringify(ITEM_CREATED_AT));
     localStorage.setItem("kho_cntt_group_options", JSON.stringify(GROUP_OPTIONS));
+    localStorage.setItem(HEADER_LOGO_URL_KEY, HEADER_LOGO_URL);
   }catch(e){}
   if(!SHEET_API_URL) return Promise.resolve(true);
-  const snapshot = {quickOrder: QUICK_ORDER, groupOrder: GROUP_ORDER, customQuickTags: QUICK_CUSTOM_TAGS, hiddenQuickTags: QUICK_HIDDEN_TAGS, itemCreatedAt: ITEM_CREATED_AT, groupOptions: GROUP_OPTIONS};
+  const snapshot = {quickOrder: QUICK_ORDER, groupOrder: GROUP_ORDER, customQuickTags: QUICK_CUSTOM_TAGS, hiddenQuickTags: QUICK_HIDDEN_TAGS, itemCreatedAt: ITEM_CREATED_AT, groupOptions: GROUP_OPTIONS, headerLogoUrl: HEADER_LOGO_URL};
   const seq = ++configSaveSeq;
   setAuxPendingSync(PENDING_CONFIG_SYNC_KEY, true);
   configSaveChain = configSaveChain.then(async ()=>{
@@ -5590,6 +5793,10 @@ async function loadDisplayConfig(){
     if(json.config?.customQuickTags && typeof json.config.customQuickTags === "object") QUICK_CUSTOM_TAGS = json.config.customQuickTags;
     if(json.config?.hiddenQuickTags && typeof json.config.hiddenQuickTags === "object") QUICK_HIDDEN_TAGS = json.config.hiddenQuickTags;
     if(json.config?.itemCreatedAt && typeof json.config.itemCreatedAt === "object") ITEM_CREATED_AT = json.config.itemCreatedAt;
+    if(typeof json.config?.headerLogoUrl === "string"){
+      HEADER_LOGO_URL = json.config.headerLogoUrl.trim();
+      applyHeaderLogoUrl();
+    }
     if(json.config?.groupOptions && typeof json.config.groupOptions === "object"){
       Object.keys(GROUP_OPTIONS).forEach(tab=>{ if(Array.isArray(json.config.groupOptions[tab])) GROUP_OPTIONS[tab]=json.config.groupOptions[tab]; });
     }
@@ -5601,6 +5808,7 @@ async function loadDisplayConfig(){
       localStorage.setItem(QUICK_HIDDEN_TAGS_KEY, JSON.stringify(QUICK_HIDDEN_TAGS));
       localStorage.setItem(ITEM_CREATED_AT_KEY, JSON.stringify(ITEM_CREATED_AT));
       localStorage.setItem("kho_cntt_group_options", JSON.stringify(GROUP_OPTIONS));
+      localStorage.setItem(HEADER_LOGO_URL_KEY, HEADER_LOGO_URL);
     }catch(e){}
   }catch(e){ console.warn("Lỗi tải thứ tự hiển thị:",e); }
 }
@@ -6118,16 +6326,36 @@ const GROUP_ORDER_KEY = "kho_cntt_group_order";
 const QUICK_CUSTOM_TAGS_KEY = "kho_cntt_quick_custom_tags";
 const QUICK_HIDDEN_TAGS_KEY = "kho_cntt_quick_hidden_tags";
 const ITEM_CREATED_AT_KEY = "kho_cntt_item_created_at";
+const HEADER_LOGO_URL_KEY = "kho_cntt_header_logo_url";
 let QUICK_ORDER = {};
 let GROUP_ORDER = {};
 let QUICK_CUSTOM_TAGS = {};
 let QUICK_HIDDEN_TAGS = {};
 let ITEM_CREATED_AT = {};
+let HEADER_LOGO_URL = "";
 try { QUICK_ORDER = JSON.parse(localStorage.getItem(QUICK_ORDER_KEY) || "{}"); } catch(e) { QUICK_ORDER = {}; }
 try { GROUP_ORDER = JSON.parse(localStorage.getItem(GROUP_ORDER_KEY) || "{}"); } catch(e) { GROUP_ORDER = {}; }
 try { QUICK_CUSTOM_TAGS = JSON.parse(localStorage.getItem(QUICK_CUSTOM_TAGS_KEY) || "{}"); } catch(e) { QUICK_CUSTOM_TAGS = {}; }
 try { QUICK_HIDDEN_TAGS = JSON.parse(localStorage.getItem(QUICK_HIDDEN_TAGS_KEY) || "{}"); } catch(e) { QUICK_HIDDEN_TAGS = {}; }
 try { ITEM_CREATED_AT = JSON.parse(localStorage.getItem(ITEM_CREATED_AT_KEY) || "{}"); } catch(e) { ITEM_CREATED_AT = {}; }
+try { HEADER_LOGO_URL = String(localStorage.getItem(HEADER_LOGO_URL_KEY) || "").trim(); } catch(e) { HEADER_LOGO_URL = ""; }
+function applyHeaderLogoUrl(){
+  const image=document.getElementById("headerBrandLogo"), fallback=document.getElementById("headerBrandFallback");
+  if(!image || !fallback) return;
+  const raw=String(HEADER_LOGO_URL || "").trim();
+  if(!raw){ image.hidden=true; image.removeAttribute("src"); fallback.hidden=false; return; }
+  image.hidden=false; fallback.hidden=true; image.src=resolveImageUrl(raw);
+}
+async function changeHeaderLogoUrl(){
+  if(!requireAdmin()) return;
+  const value=prompt("Dán URL ảnh hoặc link chia sẻ Google Drive. Để trống để dùng biểu tượng mặc định:",HEADER_LOGO_URL);
+  if(value===null) return;
+  HEADER_LOGO_URL=String(value || "").trim();
+  applyHeaderLogoUrl();
+  const saved=await saveDisplayConfig();
+  showToast(saved ? (HEADER_LOGO_URL ? "✓ Đã cập nhật logo tiêu đề" : "✓ Đã dùng lại biểu tượng mặc định") : "Logo đã đổi trên máy này, đang chờ đồng bộ");
+}
+applyHeaderLogoUrl();
 try {
   const savedGroupOptions=JSON.parse(localStorage.getItem("kho_cntt_group_options") || "{}");
   Object.keys(GROUP_OPTIONS).forEach(tab=>{ if(Array.isArray(savedGroupOptions[tab])) GROUP_OPTIONS[tab]=savedGroupOptions[tab]; });
