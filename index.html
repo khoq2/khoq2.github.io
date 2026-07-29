@@ -1758,6 +1758,7 @@ html::-webkit-scrollbar-corner { background: #EAF2F8; }
 .tx-kpi-out .tx-kpi-icon { background:#E7F9ED; color:#16A34A; }
 .tx-kpi-in .tx-kpi-icon { background:#FFF4DD; color:#F08A00; }
 .tx-kpi-money .tx-kpi-icon { background:#EAF3FF; color:#1769C2; }
+.tx-kpi-money b { color:#16883F!important; }
 .tx-detail-grid { margin-top:10px; padding:8px 12px; border:1px solid #E1E8F0; border-radius:11px; background:#fff; }
 .tx-detail-grid > div { display:grid; grid-template-columns:minmax(110px,.8fr) minmax(0,1.2fr); gap:8px; align-items:center; min-height:34px; border-bottom:1px solid #EDF1F5; }
 .tx-detail-grid > div:last-child { border-bottom:0; }
@@ -1867,6 +1868,154 @@ html::-webkit-scrollbar-corner { background: #EAF2F8; }
   #txOverlay .simple-sticky-actions { position:sticky; bottom:-12px; padding:10px 0 2px; background:linear-gradient(transparent,#EEF5FC 28%); }
   #txOverlay .simple-sticky-actions .btn-submit { min-height:48px; border-radius:12px; background:#1976ED; font-size:15px; }
 }
+
+/* Header compact: trạng thái máy chủ nằm dưới tên cửa hàng, không chiếm một hàng riêng. */
+.header { position:relative; }
+.admin-bar {
+  position:absolute!important;
+  z-index:360;
+  top:5px;
+  right:7px;
+  width:auto;
+  min-height:0!important;
+  max-height:none!important;
+  margin:0!important;
+  gap:4px!important;
+  pointer-events:none;
+}
+.admin-bar > * { pointer-events:auto; }
+.title-text {
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  justify-content:center;
+  min-width:0;
+  overflow:visible;
+}
+.title-heading-line {
+  position:relative;
+  display:inline-block;
+  max-width:100%;
+  overflow:hidden;
+  line-height:1.2;
+  white-space:nowrap;
+}
+.title-heading-line .title-shine {
+  top:50%!important;
+  width:28%!important;
+  height:.9em!important;
+  opacity:.55!important;
+  filter:blur(.25px)!important;
+}
+.title-status-line {
+  position:relative;
+  z-index:4;
+  display:flex;
+  align-items:center;
+  gap:5px;
+  max-width:100%;
+  margin-top:2px;
+  color:#65798A;
+  font-size:8px;
+  font-weight:750;
+  line-height:1.1;
+  white-space:nowrap;
+}
+.title-status-line .sync-badge {
+  display:inline-flex!important;
+  min-height:0!important;
+  margin:0!important;
+  padding:0!important;
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  color:#536B7E!important;
+  box-shadow:none!important;
+  font-size:8px!important;
+  line-height:1.1!important;
+}
+.title-status-line #lastSyncText {
+  color:#6E8191!important;
+  font-size:8px!important;
+}
+.title-status-sep { color:#A9B6C1; }
+.network-status {
+  display:inline-flex;
+  align-items:center;
+  gap:3px;
+  padding:2px 5px;
+  border-radius:999px;
+  font-size:7px;
+  font-weight:950;
+  line-height:1;
+}
+.network-status::before { content:""; width:5px; height:5px; border-radius:50%; background:currentColor; box-shadow:0 0 0 2px rgba(255,255,255,.8); }
+.network-status.online { background:#DDF7E8; color:#148447; }
+.network-status.offline { background:#FDE4E2; color:#C0392B; }
+.title-status-line #syncBtn {
+  width:16px!important;
+  height:16px!important;
+  min-height:16px!important;
+  flex:0 0 16px!important;
+  padding:0!important;
+  border:0!important;
+  background:transparent!important;
+  color:#2B6D9B!important;
+  box-shadow:none!important;
+}
+@media(max-width:520px){
+  .title-status-line{gap:3px;font-size:7px}
+  .title-status-line .sync-badge,.title-status-line #lastSyncText{font-size:7px!important}
+  .network-status{padding:2px 4px;font-size:6px}
+}
+
+/* Đồng bộ nút cuộn nhanh với cụm List/Grid. */
+.scroll-btns {
+  gap:5px!important;
+  padding:4px!important;
+  border:1px solid var(--ui-line)!important;
+  border-radius:999px!important;
+  background:#EDF5FB!important;
+  box-shadow:0 7px 18px rgba(16,35,63,.13)!important;
+  -webkit-backdrop-filter:blur(14px)!important;
+  backdrop-filter:blur(14px)!important;
+}
+.scroll-btns::before { content:none!important; }
+.scroll-btns .scroll-btn {
+  width:34px!important;
+  height:34px!important;
+  padding:0!important;
+  border:0!important;
+  border-radius:999px!important;
+  background:transparent!important;
+  color:var(--ui-muted)!important;
+  box-shadow:none!important;
+}
+.scroll-btns .scroll-btn:first-child {
+  background:rgba(255,255,255,.92)!important;
+  color:var(--ui-primary-2)!important;
+}
+.scroll-btns .scroll-btn:last-child {
+  background:#FFF8EA!important;
+  color:#A65308!important;
+}
+.scroll-btns .scroll-btn:hover {
+  color:#fff!important;
+  background:linear-gradient(135deg,var(--ui-primary),var(--ui-primary-2))!important;
+  box-shadow:0 6px 16px rgba(15,95,159,.22)!important;
+  transform:none!important;
+}
+.scroll-btns .scroll-btn:last-child:hover {
+  background:linear-gradient(135deg,#F3A11A,#B65A08)!important;
+  box-shadow:0 6px 16px rgba(182,90,8,.2)!important;
+}
+.scroll-btns .scroll-btn:active { transform:scale(.94)!important; }
+@media(max-width:520px){
+  .scroll-btns{gap:4px!important;padding:3px!important}
+  .scroll-btns .scroll-btn{width:30px!important;height:30px!important}
+  .scroll-btns .scroll-btn svg{width:14px!important;height:14px!important}
+}
+
 </style>
 <style id="contact-variant-b">
 /* Nút Liên hệ mẫu B: xanh đậm, viền cyan và ánh sáng nhẹ. */
@@ -3401,6 +3550,90 @@ button:disabled{opacity:.55;cursor:not-allowed;filter:saturate(.5)}
   .title-logo-slot::after{animation:none!important;opacity:0!important}
   .title-base{animation:titleTextSweepPause2026 10s ease-in-out infinite!important}
   .title-shine{animation:titleShinePause2026 10s ease-in-out infinite!important}
+}
+
+/* Lớp cuối: đồng bộ tuyệt đối nút cuộn nhanh với List/Grid 2026. */
+body .scroll-btns{
+  gap:4px!important;
+  padding:4px!important;
+  border:1px solid var(--ui-line)!important;
+  border-radius:999px!important;
+  background:#EDF5FB!important;
+  box-shadow:var(--ui-shadow-sm)!important;
+  -webkit-backdrop-filter:blur(14px)!important;
+  backdrop-filter:blur(14px)!important;
+}
+body .scroll-btns::before{content:none!important;display:none!important}
+body .scroll-btns .scroll-btn{
+  width:30px!important;
+  height:30px!important;
+  min-width:30px!important;
+  min-height:30px!important;
+  padding:0!important;
+  border:0!important;
+  border-radius:999px!important;
+  background:transparent!important;
+  color:var(--ui-muted)!important;
+  box-shadow:none!important;
+}
+body .scroll-btns .scroll-btn:first-child{
+  background:linear-gradient(135deg,var(--ui-primary),var(--ui-primary-2))!important;
+  color:#FFFFFF!important;
+  box-shadow:0 6px 16px rgba(15,95,159,.24)!important;
+}
+body .scroll-btns .scroll-btn:last-child{
+  background:linear-gradient(145deg,#FFFDF7,#FDEBD0)!important;
+  color:#A65308!important;
+}
+body .scroll-btns .scroll-btn:hover{
+  color:#fff!important;
+  background:linear-gradient(135deg,var(--ui-primary),var(--ui-primary-2))!important;
+  box-shadow:0 6px 16px rgba(15,95,159,.24)!important;
+  transform:none!important;
+}
+body .scroll-btns .scroll-btn:last-child:hover{
+  background:linear-gradient(135deg,#F39C12,#A65308)!important;
+}
+body .scroll-btns .scroll-btn:active{transform:scale(.94)!important}
+body .scroll-btns .scroll-btn svg{
+  width:14px!important;
+  height:14px!important;
+  stroke-width:2.2!important;
+}
+@media(max-width:520px){
+  body .scroll-btns{padding:3px!important}
+  body .scroll-btns .scroll-btn{width:28px!important;height:28px!important;min-width:28px!important;min-height:28px!important}
+  body .scroll-btns .scroll-btn svg{width:13px!important;height:13px!important}
+}
+body .category-view-bar .view-mode-btn{
+  width:30px!important;
+  height:30px!important;
+  min-width:30px!important;
+  min-height:30px!important;
+}
+body .category-view-bar .view-mode-btn svg{width:14px!important;height:14px!important}
+@media(max-width:520px){
+  body .category-view-bar .view-mode-btn{width:28px!important;height:28px!important;min-width:28px!important;min-height:28px!important}
+  body .category-view-bar .view-mode-btn svg{width:13px!important;height:13px!important}
+}
+@media(hover:hover) and (pointer:fine){
+  body .filter-btn:hover,
+  body .quick-nav-btn:hover,
+  body .smart-chip:hover,
+  body .quick-chip:hover,
+  body .group-summary-chip:hover {
+    border-color:transparent!important;
+    background:linear-gradient(135deg,var(--ui-primary),var(--ui-primary-2))!important;
+    color:#FFFFFF!important;
+    box-shadow:0 7px 18px rgba(15,95,159,.22)!important;
+    transform:translateY(-1px)!important;
+  }
+  body .smart-chip:hover *,
+  body .quick-nav-btn:hover *,
+  body .quick-chip:hover *,
+  body .group-summary-chip:hover * {
+    color:#FFFFFF!important;
+  }
 }
 
 </style>
@@ -7150,8 +7383,8 @@ function renderCard(r,i,displayNo){
       <div class="card-top" style="--c: ${cfg.c}; background: ${cfg.light};">
       <div class="card-top-left">
         <span class="sheet-badge" style="--c: ${cfg.c};">${cfg.label}</span>
-        <span class="sheet-badge branch-badge" style="--c: ${cfg.c};">${branchCfg.label}</span>
-        <span class="ma-code copy-code" style="--c:${cfg.c}" data-code="${escapeHtml(ma)}" data-copy-label="mã hàng" title="Nhấp đúp để sao chép mã hàng" ondblclick="event.stopPropagation();copyProductCode(this)">🏷️ ${highlightMatch(ma, kwTokens)}</span>
+        <span class="sheet-badge branch-badge" style="--c:${cfg.c};background:${stBg}!important;color:${stFg}!important;border-color:${stBg}!important;">${branchCfg.label}</span>
+        <span class="ma-code copy-code" style="--c:${cfg.c};background:${stBg}!important;color:${stFg}!important;border-color:${stBg}!important;" data-code="${escapeHtml(ma)}" data-copy-label="mã hàng" title="Nhấp đúp để sao chép mã hàng" ondblclick="event.stopPropagation();copyProductCode(this)">🏷️ ${highlightMatch(ma, kwTokens)}</span>
         <span class="product-category-path" title="${escapeHtml(productCategoryLabel)} → ${escapeHtml(productGroupText)}">
           <button type="button" class="product-path-link" data-tab="${escapeHtml(sh)}" onclick="event.stopPropagation();openProductCategoryPath(this)">🔗 ${escapeHtml(productCategoryLabel)}</button>
           <span class="product-path-arrow">→</span>
@@ -11674,6 +11907,54 @@ function updateTransferPreview(){
   const from=String(row[13]||"Q2"), to=from==="Q2"?"Q5":"Q2", qty=Math.max(0,Number(document.getElementById("transferQty").value)||0);
   document.getElementById("transferPreview").innerHTML=`Bạn chuẩn bị chuyển <b>${qty}</b> × <b>${escapeHtml(row[1])}</b> từ <b>${from}</b> sang <b>${to}</b>.<br>Tồn kho đi sau chuyển: <b>${Math.max(0,(Number(row[5])||0)-qty)}</b>. Giao dịch chỉ hoàn tất khi máy chủ xác nhận cả hai kho.`;
 }
+
+function updateHeaderNetworkStatus(){
+  const badge=document.getElementById("headerNetworkStatus");
+  if(!badge) return;
+  const online=navigator.onLine;
+  badge.className=`network-status ${online?"online":"offline"}`;
+  badge.textContent=online?"Online":"Offline";
+  badge.title=online?"Thiết bị đang có kết nối mạng":"Thiết bị đang mất kết nối mạng";
+}
+function setupCompactHeaderStatus(){
+  const titleText=document.querySelector(".title-text");
+  const adminBar=document.querySelector(".admin-bar");
+  const syncBadge=document.getElementById("syncBadge");
+  const lastSync=document.getElementById("lastSyncText");
+  const syncBtn=document.getElementById("syncBtn");
+  if(!titleText||!syncBadge||document.getElementById("headerNetworkStatus")) return;
+  const titleBase=titleText.querySelector(".title-base");
+  const titleShine=titleText.querySelector(".title-shine");
+  if(titleBase&&!titleText.querySelector(".title-heading-line")){
+    const heading=document.createElement("span");
+    heading.className="title-heading-line";
+    titleText.insertBefore(heading,titleBase);
+    heading.appendChild(titleBase);
+    if(titleShine) heading.appendChild(titleShine);
+  }
+  const line=document.createElement("span");
+  line.className="title-status-line";
+  syncBadge.textContent=syncBadge.textContent.replace(/^💾\s*/,"");
+  line.appendChild(syncBadge);
+  if(lastSync){
+    const sep=document.createElement("span");
+    sep.className="title-status-sep";
+    sep.textContent="·";
+    line.appendChild(sep);
+    line.appendChild(lastSync);
+  }
+  const network=document.createElement("span");
+  network.id="headerNetworkStatus";
+  line.appendChild(network);
+  if(syncBtn) line.appendChild(syncBtn);
+  titleText.appendChild(line);
+  if(adminBar&&!adminBar.children.length) adminBar.hidden=true;
+  updateHeaderNetworkStatus();
+}
+setupCompactHeaderStatus();
+window.addEventListener("online",updateHeaderNetworkStatus);
+window.addEventListener("offline",updateHeaderNetworkStatus);
+
 async function submitInventoryTransfer(){
   const index=Number(document.getElementById("transferProductIndex").value), row=DATA[index], qty=Number(document.getElementById("transferQty").value), employee=document.getElementById("transferEmployee").value;
   if(!row||!Number.isInteger(qty)||qty<1||qty>Number(row[5]||0)){alert("Số lượng chuyển không hợp lệ hoặc vượt quá tồn kho");return;} if(!employee){alert("Vui lòng chọn nhân viên thực hiện");return;}
