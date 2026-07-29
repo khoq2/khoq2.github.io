@@ -33,6 +33,8 @@ button:disabled, input:disabled, select:disabled, [aria-disabled="true"] { curso
 .cursor-halo,.cursor-dot,.cursor-click-wave { display:none !important; }
 html,body,body * { cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='26' height='32' viewBox='0 0 26 32'%3E%3Cdefs%3E%3Cfilter id='blur' x='-70%25' y='-70%25' width='240%25' height='240%25'%3E%3CfeGaussianBlur stdDeviation='2.2'/%3E%3C/filter%3E%3C/defs%3E%3Cg transform='translate(4 3)'%3E%3Cpath d='M1 1L16 15.5 10.5 16.7 14 22 11.4 23 8 17.6 3 22Z' fill='none' stroke='%235DADE2' stroke-width='5' stroke-linejoin='round' opacity='.75' filter='url(%23blur)'/%3E%3Cpath d='M1 1L16 15.5 10.5 16.7 14 22 11.4 23 8 17.6 3 22Z' fill='none' stroke='%2300C8FF' stroke-width='3.2' stroke-linejoin='round' opacity='.48'/%3E%3Cpath d='M1 1L16 15.5 10.5 16.7 14 22 11.4 23 8 17.6 3 22Z' fill='%231E3A5F' stroke='%2388E2FF' stroke-width='1.35' stroke-linejoin='round'/%3E%3Cpath d='M2.4 3.2L12.9 14.1 8.5 15 11.6 20.2' fill='none' stroke='white' stroke-width='.85' stroke-linecap='round'/%3E%3C/g%3E%3C/svg%3E") 5 4,auto !important; }
 button:not(:disabled),a[href],label[for],summary,select,input[type="checkbox"],input[type="radio"],input[type="file"],[role="button"],[onclick],.card[data-index],.product-list-row,.tab-btn,.filter-btn,.quick-nav-btn,.smart-chip,.overview-chip { cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='27' height='27' viewBox='0 0 27 27'%3E%3Cdefs%3E%3Cfilter id='g' x='-50%25' y='-50%25' width='200%25' height='200%25'%3E%3CfeGaussianBlur stdDeviation='2' result='b'/%3E%3CfeMerge%3E%3CfeMergeNode in='b'/%3E%3CfeMergeNode in='SourceGraphic'/%3E%3C/feMerge%3E%3C/filter%3E%3C/defs%3E%3Cg transform='scale(.8)'%3E%3Cpath d='M8 17V6.5a2.25 2.25 0 014.5 0V14v-3.6a2.1 2.1 0 014.2 0V14v-2.5a2.1 2.1 0 014.2 0V15v-1.8a2.1 2.1 0 014.2 0V21c0 5-3.4 8-8 8h-2.2c-3 0-4.7-1.6-6.2-3.8l-4.1-6a2.25 2.25 0 013.5-2.8L8 18z' fill='none' stroke='%235DADE2' stroke-width='5' stroke-linejoin='round' opacity='.72' filter='url(%23g)'/%3E%3Cpath d='M8 17V6.5a2.25 2.25 0 014.5 0V14v-3.6a2.1 2.1 0 014.2 0V14v-2.5a2.1 2.1 0 014.2 0V15v-1.8a2.1 2.1 0 014.2 0V21c0 5-3.4 8-8 8h-2.2c-3 0-4.7-1.6-6.2-3.8l-4.1-6a2.25 2.25 0 013.5-2.8L8 18z' fill='%231E3A5F' stroke='%2388E2FF' stroke-width='1.45' stroke-linejoin='round'/%3E%3Cpath d='M10.2 7V17M14.7 12V17M18.9 13V17M23.1 14.5V18' stroke='white' stroke-width='.8' stroke-linecap='round' opacity='.9'/%3E%3C/g%3E%3C/svg%3E") 8 3,pointer !important; }
+html,body,body * { cursor:auto !important; }
+button:not(:disabled),a[href],label[for],summary,select,input[type="checkbox"],input[type="radio"],input[type="file"],[role="button"],[onclick],.card[data-index],.product-list-row,.tab-btn,.filter-btn,.quick-nav-btn,.smart-chip,.overview-chip { cursor:pointer !important; }
 input[type="text"],input[type="search"],input[type="number"],input[type="url"],input[type="email"],input[type="password"],input[type="tel"],textarea { cursor:text !important; }
 button:disabled,input:disabled,select:disabled,[aria-disabled="true"] { cursor:not-allowed !important; }
 .prod-img,.tx-img,.customer-bill-img,.nv-avatar.has-preview { cursor:zoom-in !important; }
@@ -45,6 +47,44 @@ button:disabled,input:disabled,select:disabled,[aria-disabled="true"] { cursor:n
 .warehouse-switch:hover { background:rgba(255,255,255,.14); color:#fff; }
 .warehouse-switch.active { background:#F39C12; color:#17202A; box-shadow:0 2px 8px rgba(0,0,0,.22); }
 .warehouse-pin { position:relative; z-index:1; display:inline-block; transform-origin:50% 85%; }
+.recent-activity-wrap { position:relative; flex:0 0 auto; margin-left:auto; }
+.recent-activity-wrap + .warehouse-switcher { margin-left:0; }
+.recent-activity-bell { position:relative; display:grid; place-items:center; width:38px; height:38px; padding:0; border:1px solid rgba(255,255,255,.22); border-radius:50%; background:rgba(9,35,67,.72); color:#fff; box-shadow:0 5px 16px rgba(5,25,45,.24); cursor:pointer; transition:transform .18s ease,background .18s ease,border-color .18s ease; }
+.recent-activity-bell:hover,.recent-activity-bell[aria-expanded="true"] { transform:translateY(-1px); border-color:rgba(255,255,255,.62); background:#173B67; }
+.recent-activity-bell svg { width:20px; height:20px; fill:none; stroke:currentColor; stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round; }
+.recent-activity-count { position:absolute; z-index:3; top:1px; right:1px; display:none; min-width:18px; height:18px; padding:0 4px; align-items:center; justify-content:center; border:2px solid #173B67; border-radius:999px; background:#F02849; color:#fff; font-size:9px; font-weight:950; line-height:1; box-shadow:0 2px 7px rgba(240,40,73,.5); }
+.recent-activity-count.show { display:flex; animation:recentBadgePop .28s ease-out both; }
+@keyframes recentBadgePop { from{transform:scale(.55)} to{transform:scale(1)} }
+.recent-activity-panel { position:fixed; z-index:2147483647; top:64px; right:14px; left:auto; display:none; width:min(420px,calc(100vw - 28px)); max-width:none; max-height:none; margin:0; padding:0; overflow:hidden; border:1px solid #C9DCEB; border-radius:16px; background:#fff; color:#20374B; box-shadow:0 22px 60px rgba(7,35,61,.4); }
+.recent-activity-panel.open { display:block!important; visibility:visible!important; opacity:1!important; pointer-events:auto!important; }
+@keyframes recentPanelIn { from{opacity:0;transform:translateY(-7px) scale(.98)} to{opacity:1;transform:none} }
+.recent-activity-head { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:13px 14px; border-bottom:1px solid rgba(255,255,255,.14); background:linear-gradient(135deg,#102F55,#1D5685); }
+.recent-activity-title { color:#fff; font-size:12px; font-weight:950; letter-spacing:.025em; }
+.recent-activity-head-actions { display:flex; align-items:center; gap:6px; }
+.recent-activity-all { padding:5px 8px; border:0; border-radius:8px; background:#EBF5FB; color:#1676B8; font-size:10px; font-weight:900; cursor:pointer; }
+.recent-activity-close { display:grid; place-items:center; width:27px; height:27px; padding:0; border:1px solid rgba(255,255,255,.25); border-radius:8px; background:rgba(255,255,255,.12); color:#fff; font-size:17px; line-height:1; cursor:pointer; }
+.recent-activity-close:hover { background:rgba(255,255,255,.24); }
+.recent-activity-list { max-height:min(62vh,470px); overflow:auto; overscroll-behavior:contain; padding:7px 10px 10px; background:#F7FAFD; scrollbar-width:thin; }
+.recent-activity-row { width:100%; display:grid; grid-template-columns:38px minmax(0,1fr) auto; gap:10px; align-items:center; margin:5px 0; padding:10px; border:1px solid #E4EDF4; border-radius:12px; background:#fff; color:inherit; box-shadow:0 2px 7px rgba(22,62,92,.05); text-align:left; cursor:pointer; transition:border-color .16s ease,box-shadow .16s ease,background .16s ease; }
+.recent-activity-row:hover,.recent-activity-row:focus-visible { border-color:#69B5E7; background:#F4FAFF; box-shadow:0 5px 15px rgba(31,111,166,.13); outline:none; }
+.recent-activity-row:last-child { border-bottom:0; }
+.recent-activity-kind-icon { display:grid; place-items:center; width:32px; height:32px; border-radius:10px; font-size:15px; }
+.recent-activity-kind-icon.import { background:#E9F7EF; color:#18894B; }
+.recent-activity-kind-icon.sale { background:#FDEDEC; color:#D63D35; }
+.recent-activity-kind-icon.adjust { background:#FEF5E7; color:#CA7611; }
+.recent-activity-copy { min-width:0; }
+.recent-activity-action { overflow:hidden; color:#25394B; font-size:11px; font-weight:850; text-overflow:ellipsis; white-space:nowrap; }
+.recent-activity-product { margin-top:2px; overflow:hidden; color:#6B7D8C; font-size:10px; text-overflow:ellipsis; white-space:nowrap; }
+.recent-activity-time { color:#738494; font-size:9px; font-weight:750; white-space:nowrap; }
+.recent-activity-empty { padding:25px 14px; color:#718291; font-size:11px; text-align:center; }
+@media(max-width:520px){
+  .recent-activity-bell{width:34px;height:34px;border-radius:11px}
+  .recent-activity-bell svg{width:18px;height:18px}
+  .recent-activity-count{top:1px;right:1px}
+  .recent-activity-panel{position:fixed;top:58px;right:8px;left:8px;width:auto;max-height:calc(100dvh - 70px);border-radius:14px}
+  .recent-activity-list{max-height:calc(100dvh - 132px);padding:6px}
+  .recent-activity-row{grid-template-columns:36px minmax(0,1fr) auto;gap:8px;padding:9px 8px}
+}
 .warehouse-switch.active .warehouse-pin { animation:warehousePinFire .72s ease-in-out infinite alternate; filter:drop-shadow(0 0 3px #FF3B1F) drop-shadow(0 -2px 5px #FFB000); }
 .warehouse-switch.active .warehouse-pin::after { content:""; position:absolute; z-index:-1; left:50%; bottom:45%; width:13px; height:17px; border-radius:52% 48% 55% 45%; background:radial-gradient(circle at 50% 72%,#FFF59D 0 18%,#FFB000 24% 48%,#F44336 55% 76%,transparent 80%); opacity:.82; transform:translateX(-50%) rotate(4deg); animation:warehouseFlame .48s ease-in-out infinite alternate; pointer-events:none; }
 @keyframes warehousePinFire { from{transform:translateY(0) rotate(-2deg) scale(1)} to{transform:translateY(-1px) rotate(2deg) scale(1.1)} }
@@ -1298,6 +1338,10 @@ body.fab-menu-open .category-view-bar .view-mode-switch { pointer-events:none; }
 .header-collapsible { overflow: hidden; transition: max-height .38s cubic-bezier(.22,.61,.36,1), opacity .3s ease; max-height: 520px; opacity: 1; }
 .sticky.suggestions-open .header-collapsible { overflow: visible; }
 .sticky.kpi-menu-open .header-collapsible { max-height:1000px; overflow:visible; }
+.sticky.recent-activity-open .header-collapsible { max-height:1000px; overflow:visible; }
+.sticky.recent-activity-open .kpi-hover-menu { display:none!important; }
+.sticky.recent-activity-open .kpi-row { pointer-events:none; }
+.sticky.recent-activity-open .recent-activity-wrap { pointer-events:auto; }
 .sticky.kpi-menu-open .kpi-row { overflow:visible; }
 .sticky.collapsed .header-collapsible { max-height: 74px !important; opacity: 1; pointer-events: auto; }
 .admin-bar { max-height: 160px; transition: max-height .32s cubic-bezier(.22,.61,.36,1), opacity .22s ease, margin .32s ease; }
@@ -1719,6 +1763,7 @@ html::-webkit-scrollbar-corner { background: #EAF2F8; }
 .tx-detail-grid > div:last-child { border-bottom:0; }
 .tx-detail-grid span { color:#566575; }
 .tx-detail-grid b { color:#1C2733; text-align:right; overflow-wrap:anywhere; }
+.tx-historical-name { display:block; margin-top:4px; color:#78899A; font-size:9px; font-weight:600; line-height:1.35; }
 .tx-detail-grid .tx-total b { color:#16883F; font-size:13px; }
 @media (min-width:521px) {
   #txOverlay .tx-history-modal {
@@ -2588,12 +2633,6 @@ html, body, button, input, select, textarea {
   background: #FFF4D6;
   font-weight: 900;
 }
-#homeInventoryBar #restockBtn::before {
-  content: "↓";
-  color: #7B3FC6;
-  background: #F0E8FF;
-  font-weight: 900;
-}
 #homeInventoryBar .home-stock-actions .filter-btn:hover {
   transform: translateY(-1px);
   border-color: #91BDE2;
@@ -3066,6 +3105,10 @@ html, body, button, input, select, textarea {
 }
 
 /* Menu danh mục luôn nằm ngang và căn giữa; không dùng làm sidebar. */
+.header .title {
+  width: 100%;
+  max-width: 100%;
+}
 .header .search-box {
   width: 100%;
   max-width: none;
@@ -3195,18 +3238,34 @@ button:disabled{opacity:.55;cursor:not-allowed;filter:saturate(.5)}
   background:linear-gradient(105deg,#10233f 0%,#0f5f9f 30%,#06a8c4 44%,#fff 49%,#84e7f5 54%,#0f5f9f 68%,#10233f 100%);
   background-size:320% 100%;background-position:100% 50%;
   -webkit-background-clip:text;background-clip:text;
-  animation:titleTextSweep2026 3.2s ease-in-out infinite;
+  animation:titleTextSweepPause2026 10s ease-in-out infinite;
 }
 .title-shine{
   width:34%!important;height:1.6em!important;opacity:.92!important;
   background:linear-gradient(90deg,transparent,rgba(121,228,247,.28) 24%,rgba(255,255,255,.98) 50%,rgba(121,228,247,.28) 76%,transparent)!important;
   filter:blur(.3px) drop-shadow(0 0 6px rgba(6,182,212,.42))!important;
   mix-blend-mode:screen;
-  animation:titleSweep 3.2s ease-in-out infinite!important;
+  animation:titleShinePause2026 10s ease-in-out infinite!important;
 }
 @keyframes titleTextSweep2026{
   0%,8%{background-position:100% 50%}
   92%,100%{background-position:0% 50%}
+}
+@keyframes titleTextSweepPause2026{
+  0%{background-position:100% 50%}
+  20%{background-position:0% 50%}
+  50%{background-position:0% 50%}
+  70%{background-position:100% 50%}
+  100%{background-position:100% 50%}
+}
+@keyframes titleShinePause2026{
+  0%{transform:translate(-140%,-50%) skewX(-18deg);opacity:0}
+  3%{opacity:.72}
+  20%{transform:translate(260%,-50%) skewX(-18deg);opacity:.72}
+  23%,50%{transform:translate(260%,-50%) skewX(-18deg);opacity:0}
+  53%{opacity:.72}
+  70%{transform:translate(-140%,-50%) skewX(-18deg);opacity:.72}
+  73%,100%{transform:translate(-140%,-50%) skewX(-18deg);opacity:0}
 }
 .title-icon{display:inline-grid;place-items:center;border-radius:14px;background:linear-gradient(145deg,#e6f7fb,#d9eafb);
   box-shadow:inset 0 0 0 1px rgba(19,135,201,.13),0 7px 18px rgba(15,95,159,.13)}
@@ -3216,30 +3275,25 @@ button:disabled{opacity:.55;cursor:not-allowed;filter:saturate(.5)}
 }
 .title-logo-slot>*{grid-area:1/1}
 .title-logo-slot::after{
-  content:"";position:absolute;z-index:20;left:-12%;width:124%;height:34%;top:-42%;
-  display:block;pointer-events:none;opacity:0;border-radius:999px;
-  background:linear-gradient(180deg,rgba(255,255,255,0) 0%,rgba(111,229,255,.64) 28%,#fff 49%,rgba(111,229,255,.7) 70%,rgba(255,255,255,0) 100%);
-  box-shadow:0 0 8px rgba(255,255,255,.94),0 0 14px rgba(0,196,255,.82);
-  filter:blur(.15px);
-  animation:logoVerticalSweep2026 4.6s ease-in-out infinite!important;
-  animation-duration:4.6s!important;
+  content:"";position:absolute;z-index:20;left:-75%;top:-55%;width:42%;height:210%;
+  display:block;pointer-events:none;opacity:0;
+  background:linear-gradient(90deg,transparent,rgba(183,239,250,.2) 36%,rgba(255,255,255,.5) 50%,rgba(183,239,250,.2) 64%,transparent);
+  filter:blur(.6px);
+  transform:rotate(24deg);
+  animation:logoDiagonalSweep2026 5.4s ease-in-out infinite!important;
 }
-@keyframes logoVerticalSweep2026{
-  0%{top:-42%;opacity:0}
-  4%{opacity:1}
-  43%{top:108%;opacity:1}
-  48%{top:108%;opacity:0}
-  52%{top:108%;opacity:0}
-  57%{opacity:1}
-  96%{top:-42%;opacity:1}
-  100%{top:-42%;opacity:0}
+@keyframes logoDiagonalSweep2026{
+  0%,16%{left:-75%;opacity:0}
+  22%{opacity:.62}
+  58%{left:135%;opacity:.62}
+  64%,100%{left:135%;opacity:0}
 }
 .title-brand-logo{
-  width:46px!important;height:46px!important;flex:0 0 46px!important;object-fit:contain!important;
-  padding:2px!important;border-radius:12px!important;background:linear-gradient(145deg,#e7f5fc,#dceaf7)!important;
-  box-shadow:inset 0 0 0 1px rgba(19,135,201,.16),0 7px 18px rgba(15,95,159,.16)!important;
+  width:36px!important;height:36px!important;flex:0 0 36px!important;object-fit:contain!important;
+  padding:2px!important;border-radius:10px!important;background:linear-gradient(145deg,#e7f5fc,#dceaf7)!important;
+  box-shadow:inset 0 0 0 1px rgba(19,135,201,.14),0 4px 12px rgba(15,95,159,.12)!important;
 }
-.title-brand-fallback{width:46px;height:46px}
+.title-brand-fallback{width:36px;height:36px}
 .warehouse-switcher,.view-mode-switch{padding:4px!important;border:1px solid var(--ui-line)!important;border-radius:999px!important;background:#edf5fb!important}
 .warehouse-switch,.view-mode-btn{border:0!important;border-radius:999px!important;color:var(--ui-muted)!important;background:transparent!important}
 .warehouse-switch.active,.view-mode-btn.active{color:#fff!important;background:linear-gradient(135deg,var(--ui-primary),var(--ui-primary-2))!important;
@@ -3337,23 +3391,21 @@ button:disabled{opacity:.55;cursor:not-allowed;filter:saturate(.5)}
 }
 @media(max-width:480px){
   .title-base{font-size:clamp(15px,4.6vw,20px)!important}.warehouse-switch{padding-inline:9px!important}
-  .title-brand-logo{width:38px!important;height:38px!important;flex-basis:38px!important;border-radius:10px!important}
-  .title-brand-fallback{width:38px;height:38px}
+  .title-brand-logo{width:32px!important;height:32px!important;flex-basis:32px!important;border-radius:9px!important}
+  .title-brand-fallback{width:32px;height:32px}
   .kpi-l{font-size:9px!important}.kpi-v{font-size:18px!important}.tab-btn,.filter-btn,.bulk-btn{min-height:36px!important}
   .modal input:not([type=checkbox]):not([type=radio]),.modal select,.modal textarea{font-size:16px!important}
 }
 @media(prefers-reduced-motion:reduce){
   *,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
-  .title-logo-slot::after{animation:logoVerticalSweep2026 4.6s ease-in-out infinite!important}
-  .title-base{animation:titleTextSweep2026 3.2s ease-in-out infinite!important}
-  .title-shine{animation:titleSweep 3.2s ease-in-out infinite!important}
+  .title-logo-slot::after{animation:none!important;opacity:0!important}
+  .title-base{animation:titleTextSweepPause2026 10s ease-in-out infinite!important}
+  .title-shine{animation:titleShinePause2026 10s ease-in-out infinite!important}
 }
 
 </style>
 </head>
 <body>
-<div class="cursor-halo" aria-hidden="true"></div><div class="cursor-dot" aria-hidden="true"></div>
-
 <div class="sticky">
 <div class="header-collapsible">
   <div class="header">
@@ -3363,7 +3415,7 @@ button:disabled{opacity:.55;cursor:not-allowed;filter:saturate(.5)}
       <button class="admin-btn admin-only" id="syncBtn" type="button" title="Đồng bộ thủ công lên máy chủ" aria-label="Đồng bộ thủ công lên máy chủ" onclick="manualSync()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7h-5V2"></path><path d="M4 17h5v5"></path><path d="M5.2 9A8 8 0 0 1 18.5 5.5L20 7"></path><path d="M18.8 15A8 8 0 0 1 5.5 18.5L4 17"></path></svg></button>
       <button class="admin-btn" id="adminBtn" onclick="onAdminBtnClick()">🔒 Admin</button>
     </div>
-    <div class="title"><span class="title-logo-slot"><img class="title-icon title-brand-logo" id="headerBrandLogo" src="" alt="Logo cửa hàng" hidden onerror="this.hidden=true;document.getElementById('headerBrandFallback').hidden=false"><span class="title-icon title-brand-fallback" id="headerBrandFallback" aria-hidden="true">🏪</span></span><span class="title-text"><span class="title-base">HOÀNG GIA COMPUTER</span><span class="title-shine" aria-hidden="true"></span></span><span class="warehouse-switcher" role="group" aria-label="Chọn kho đang xem"><button type="button" class="warehouse-switch" data-warehouse="Q2" onclick="selectWarehouseBranch('Q2')"><span class="warehouse-pin">📍</span> Q2</button><button type="button" class="warehouse-switch" data-warehouse="Q5" onclick="selectWarehouseBranch('Q5')"><span class="warehouse-pin">📍</span> Q5</button></span></div>
+    <div class="title"><span class="title-logo-slot"><img class="title-icon title-brand-logo" id="headerBrandLogo" src="" alt="Logo cửa hàng" hidden onerror="this.hidden=true;document.getElementById('headerBrandFallback').hidden=false"><span class="title-icon title-brand-fallback" id="headerBrandFallback" aria-hidden="true">🏪</span></span><span class="title-text"><span class="title-base">HOÀNG GIA COMPUTER</span><span class="title-shine" aria-hidden="true"></span></span><div class="recent-activity-wrap" id="recentActivityWrap"><button type="button" class="recent-activity-bell" id="recentActivityBell" aria-label="Mở thông báo giao dịch mới" aria-expanded="false" onclick="toggleRecentActivity(event)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"></path><path d="M10 21h4"></path></svg><span class="recent-activity-count" id="recentActivityCount"></span></button><div class="recent-activity-panel" id="recentActivityPanel"><div class="recent-activity-head"><span class="recent-activity-title">HOẠT ĐỘNG GẦN ĐÂY</span><span class="recent-activity-head-actions"><button type="button" class="recent-activity-all" id="recentActivityAll" onclick="toggleAllRecentActivity(event)">Xem tất cả</button><button type="button" class="recent-activity-close" aria-label="Đóng hoạt động gần đây" onclick="closeRecentActivity();event.stopPropagation()">×</button></span></div><div class="recent-activity-list" id="recentActivityList"></div></div></div><span class="warehouse-switcher" role="group" aria-label="Chọn kho đang xem"><button type="button" class="warehouse-switch" data-warehouse="Q2" onclick="selectWarehouseBranch('Q2')"><span class="warehouse-pin">📍</span> Q2</button><button type="button" class="warehouse-switch" data-warehouse="Q5" onclick="selectWarehouseBranch('Q5')"><span class="warehouse-pin">📍</span> Q5</button></span></div>
     <div class="kpi-row">
       <div class="kpi" style="background: #2E86C1;" onclick="showKpiDetail('all')" onmouseenter="showKpiHoverMenu('all',this)" onmouseleave="scheduleKpiHoverClose()"><div class="kpi-v"><span class="kpi-icon kpi-icon-box" aria-hidden="true">📦</span><span id="kpi-mh">0</span></div><div class="kpi-l">mặt hàng <span class="kpi-hint">▼</span></div></div>
       <div class="kpi" style="background: #1E8449;" onclick="showKpiDetail('ton')" onmouseenter="showKpiHoverMenu('ton',this)" onmouseleave="scheduleKpiHoverClose()"><div class="kpi-v"><span class="kpi-icon kpi-icon-stock" aria-hidden="true">📊</span><span id="kpi-ton">0</span></div><div class="kpi-l">tổng tồn <span class="kpi-hint">▼</span></div></div>
@@ -4981,6 +5033,7 @@ async function ensureAtomicApi(){
 function cacheAtomicInventoryState(){
   safeLocalStorageSet("kho_cntt_data",JSON.stringify(normalizeSheetRows(DATA)));
   safeLocalStorageSet("kho_cntt_tx",JSON.stringify(normalizeTxList(TX_DATA)));
+  refreshRecentActivityNotification();
   if(hasPendingSync() || hasAuxPendingSync(PENDING_TX_SYNC_KEY) || hasAuxPendingSync(PENDING_NV_SYNC_KEY) || hasAuxPendingSync(PENDING_CONFIG_SYNC_KEY)){
     setSyncBadge("pending","Một số thay đổi khác vẫn đang chờ đồng bộ");
   }else{
@@ -5259,6 +5312,7 @@ function kpiHoverEntries(type){
 }
 function showKpiHoverMenu(type,trigger){
   if(!window.matchMedia("(hover:hover) and (pointer:fine)").matches) return;
+  if(document.querySelector(".sticky")?.classList.contains("recent-activity-open")) return;
   cancelKpiHoverClose();
   const box=document.getElementById("kpiHoverMenu");
   if(!box) return;
@@ -6344,7 +6398,30 @@ function applyHeaderLogoUrl(){
   if(!image || !fallback) return;
   const raw=String(HEADER_LOGO_URL || "").trim();
   if(!raw){ image.hidden=true; image.removeAttribute("src"); fallback.hidden=false; return; }
-  image.hidden=false; fallback.hidden=true; image.src=resolveImageUrl(raw);
+  let id="", match=raw.match(/\/file\/d\/([a-zA-Z0-9_-]{10,})/);
+  if(match) id=match[1];
+  if(!id){ match=raw.match(/[?&]id=([a-zA-Z0-9_-]{10,})/); if(match) id=match[1]; }
+  if(!id && /^[a-zA-Z0-9_-]{20,}$/.test(raw)) id=raw;
+  const candidates=id
+    ? [
+        `https://drive.google.com/thumbnail?id=${encodeURIComponent(id)}&sz=w1000`,
+        `https://lh3.googleusercontent.com/d/${encodeURIComponent(id)}=w1000`,
+        `https://drive.google.com/uc?export=view&id=${encodeURIComponent(id)}`
+      ]
+    : [raw];
+  let candidateIndex=0;
+  image.referrerPolicy="no-referrer";
+  image.onload=()=>{ image.hidden=false; fallback.hidden=true; };
+  image.onerror=()=>{
+    candidateIndex++;
+    if(candidateIndex<candidates.length){ image.src=candidates[candidateIndex]; return; }
+    image.hidden=true;
+    fallback.hidden=false;
+    showToast("⚠️ Không tải được logo. Hãy bật quyền: Bất kỳ ai có liên kết.");
+  };
+  fallback.hidden=false;
+  image.hidden=true;
+  image.src=candidates[0];
 }
 async function changeHeaderLogoUrl(){
   if(!requireAdmin()) return;
@@ -8170,10 +8247,169 @@ function normalizeTxList(list){
   });
   return out;
 }
-function loadTX(){ try{ TX_DATA = normalizeTxList(JSON.parse(localStorage.getItem("kho_cntt_tx")||"[]")); }catch(e){ TX_DATA=[]; } }
+const RECENT_TX_SEEN_KEY = "kho_cntt_recent_tx_seen";
+let recentActivityExpanded = false;
+function recentTxSorted(){
+  return TX_DATA.slice().sort((a,b)=>{
+    const timeDiff=txTimeSortValue(b)-txTimeSortValue(a);
+    if(timeDiff) return timeDiff;
+    return String(b.id||"").localeCompare(String(a.id||""),undefined,{numeric:true});
+  });
+}
+function recentTxSignature(tx){
+  return [String(tx?.branch||"Q2").toUpperCase(),String(tx?.id||""),String(tx?.time||""),String(tx?.ma||"")].join("|");
+}
+function getRecentTxSeenSet(){
+  try{
+    const stored=JSON.parse(localStorage.getItem(RECENT_TX_SEEN_KEY)||"[]");
+    return new Set(Array.isArray(stored)?stored.map(String):[]);
+  }catch(_){
+    return new Set();
+  }
+}
+function recentTxUnreadCount(rows){
+  const seen=getRecentTxSeenSet();
+  return rows.reduce((count,tx)=>count+(seen.has(recentTxSignature(tx))?0:1),0);
+}
+function markRecentActivitySeen(rows){
+  const seen=getRecentTxSeenSet();
+  rows.forEach(tx=>seen.add(recentTxSignature(tx)));
+  const keys=Array.from(seen);
+  safeLocalStorageSet(RECENT_TX_SEEN_KEY,JSON.stringify(keys.slice(Math.max(0,keys.length-5000))));
+}
+function recentActivityTimeLabel(value){
+  const full=formatTxTime(value);
+  const m=full.match(/^(\d{2})\/(\d{2})\/(\d{4})\s+(\d{2}:\d{2})/);
+  if(!m) return full;
+  const now=formatTxTime(new Date());
+  return now.slice(0,10)===`${m[1]}/${m[2]}/${m[3]}` ? m[4] : `${m[1]}/${m[2]} ${m[4]}`;
+}
+function renderRecentActivity(){
+  const list=document.getElementById("recentActivityList");
+  if(!list) return;
+  const rows=recentTxSorted();
+  const shown=recentActivityExpanded ? rows : rows.slice(0,5);
+  const allBtn=document.getElementById("recentActivityAll");
+  if(allBtn){
+    allBtn.hidden=rows.length<=5;
+    allBtn.textContent=recentActivityExpanded ? "Thu gọn" : "Xem tất cả";
+  }
+  if(!shown.length){
+    list.innerHTML='<div class="recent-activity-empty">Chưa có giao dịch nào.</div>';
+    return;
+  }
+  list.innerHTML=shown.map(tx=>{
+    const kind=getTransactionKind(tx);
+    const info=getTransactionProductDisplay(tx,null);
+    const qty=Math.abs(Number(tx.qty)||0);
+    const action=kind==="IMPORT" ? "nhập hàng" : kind==="ADJUST" ? "điều chỉnh kho" : "xuất hàng";
+    const icon=kind==="IMPORT" ? "📥" : kind==="ADJUST" ? "⚙️" : "🛒";
+    const kindClass=kind==="IMPORT" ? "import" : kind==="ADJUST" ? "adjust" : "sale";
+    return `<button type="button" class="recent-activity-row" data-code="${escapeHtml(tx.ma||"")}" data-branch="${escapeHtml(tx.branch||"Q2")}" title="Mở sản phẩm này" onclick="openRecentActivityProduct(this,event)"><span class="recent-activity-kind-icon ${kindClass}">${icon}</span><span class="recent-activity-copy"><span class="recent-activity-action">${escapeHtml(tx.nv||"Chưa rõ nhân viên")} ${action}</span><span class="recent-activity-product">${escapeHtml(info.currentName||tx.ma||"Sản phẩm")}${qty?` (${qty} cái)`:""}</span></span><span class="recent-activity-time">${escapeHtml(recentActivityTimeLabel(tx.time))}</span></button>`;
+  }).join("");
+}
+function openRecentActivityProduct(button,event){
+  event?.stopPropagation();
+  const code=normalizeProductCode(button?.dataset?.code||"");
+  const branch=String(button?.dataset?.branch||"Q2").toUpperCase()==="Q5"?"Q5":"Q2";
+  const index=DATA.findIndex(row=>normalizeProductCode(row?.[1]||"")===code
+    && (String(row?.[13]||"Q2").toUpperCase()==="Q5"?"Q5":"Q2")===branch);
+  if(index<0){
+    showToast("Không tìm thấy sản phẩm này trong kho hiện tại.",4000);
+    return;
+  }
+  closeRecentActivity();
+  currentTab="ALL";
+  document.querySelectorAll(".tab-btn").forEach(btn=>btn.classList.toggle("active",btn.dataset.tab==="ALL"));
+  selectWarehouseBranch(branch);
+  selectSearchSuggestion(index);
+}
+function refreshRecentActivityNotification(){
+  const rows=recentTxSorted();
+  const count=recentTxUnreadCount(rows);
+  const badge=document.getElementById("recentActivityCount");
+  const bell=document.getElementById("recentActivityBell");
+  if(badge){
+    badge.textContent=count>99 ? "99+" : String(count);
+    badge.classList.toggle("show",count>0);
+  }
+  if(bell){
+    bell.title=count ? `${count} giao dịch mới chưa xem` : "Không có giao dịch mới";
+    bell.setAttribute("aria-label",bell.title);
+  }
+  renderRecentActivity();
+}
+function positionRecentActivityPanel(){
+  const panel=document.getElementById("recentActivityPanel");
+  const bell=document.getElementById("recentActivityBell");
+  if(!panel||!bell||!panel.classList.contains("open")) return;
+  const rect=bell.getBoundingClientRect();
+  panel.style.top=`${Math.max(8,Math.min(rect.bottom+9,window.innerHeight-90))}px`;
+  if(window.innerWidth<=520){
+    panel.style.left="8px";
+    panel.style.right="8px";
+  }else{
+    panel.style.left="auto";
+    panel.style.right=`${Math.max(14,window.innerWidth-rect.right)}px`;
+  }
+}
+function toggleRecentActivity(event){
+  event?.stopPropagation();
+  const panel=document.getElementById("recentActivityPanel");
+  const bell=document.getElementById("recentActivityBell");
+  if(!panel||!bell) return;
+  const opening=!panel.classList.contains("open");
+  if(opening){
+    cancelKpiHoverClose();
+    document.getElementById("kpiHoverMenu")?.classList.remove("open");
+    document.querySelector(".sticky")?.classList.remove("kpi-menu-open");
+    if(panel.parentElement!==document.body) document.body.appendChild(panel);
+  }
+  panel.classList.toggle("open",opening);
+  panel.style.setProperty("display",opening?"block":"none","important");
+  document.querySelector(".sticky")?.classList.toggle("recent-activity-open",opening);
+  bell.setAttribute("aria-expanded",String(opening));
+  if(opening){
+    recentActivityExpanded=false;
+    positionRecentActivityPanel();
+    try{
+      renderRecentActivity();
+      markRecentActivitySeen(recentTxSorted());
+      refreshRecentActivityNotification();
+    }catch(error){
+      console.error("Không thể dựng danh sách thông báo:",error);
+      const list=document.getElementById("recentActivityList");
+      if(list) list.innerHTML='<div class="recent-activity-empty">Không thể đọc danh sách giao dịch. Vui lòng tải lại trang.</div>';
+    }
+  }
+}
+function toggleAllRecentActivity(event){
+  event?.stopPropagation();
+  recentActivityExpanded=!recentActivityExpanded;
+  renderRecentActivity();
+}
+function closeRecentActivity(){
+  const panel=document.getElementById("recentActivityPanel");
+  panel?.classList.remove("open");
+  panel?.style.setProperty("display","none","important");
+  document.getElementById("recentActivityBell")?.setAttribute("aria-expanded","false");
+  document.querySelector(".sticky")?.classList.remove("recent-activity-open");
+}
+document.addEventListener("click",event=>{
+  const wrap=document.getElementById("recentActivityWrap");
+  const panel=document.getElementById("recentActivityPanel");
+  if(!wrap?.contains(event.target) && !panel?.contains(event.target)) closeRecentActivity();
+});
+document.addEventListener("keydown",event=>{ if(event.key==="Escape") closeRecentActivity(); });
+window.addEventListener("resize",positionRecentActivityPanel,{passive:true});
+if(document.getElementById("recentActivityPanel")?.parentElement!==document.body){
+  document.body.appendChild(document.getElementById("recentActivityPanel"));
+}
+function loadTX(){ try{ TX_DATA = normalizeTxList(JSON.parse(localStorage.getItem("kho_cntt_tx")||"[]")); }catch(e){ TX_DATA=[]; } refreshRecentActivityNotification(); }
 async function saveTX(){
   TX_DATA = normalizeTxList(TX_DATA);
   try{ safeLocalStorageSet("kho_cntt_tx", JSON.stringify(TX_DATA)); }catch(e){}
+  refreshRecentActivityNotification();
   if(!SHEET_API_URL) return true;
   const snapshot = JSON.parse(JSON.stringify(TX_DATA));
   const seq = ++txSaveSeq;
@@ -8196,6 +8432,7 @@ function loadTXFromSheet(){
       if(!hasAuxPendingSync(PENDING_TX_SYNC_KEY) && (sheetTX.length || !TX_DATA.length)){
         TX_DATA = sheetTX;
         safeLocalStorageSet("kho_cntt_tx", JSON.stringify(TX_DATA));
+        refreshRecentActivityNotification();
       }
     })
     .catch(e=>{
@@ -8689,6 +8926,19 @@ function renderSameDayEmployeeLinks(tx, currentRow){
   if(!links.length) return "";
   return `<div class="tx-related"><span class="tx-related-label">Cùng ngày, ${escapeHtml(tx.nv || "nhân viên này")} đã bán thêm:</span><div class="tx-related-links">${links.map(({other,index},order)=>`<button type="button" class="tx-related-link" title="Mở ${escapeHtml(other.ten || other.ma || "sản phẩm")}" onclick="openRelatedHistoryProduct(${index})"><span class="tx-related-number">${order+1}</span><span>${escapeHtml(other.ten || other.ma || "Sản phẩm")}</span></button>`).join("")}</div></div>`;
 }
+function getTransactionProductDisplay(tx, fallbackRow){
+  const code=normalizeProductCode(tx?.ma || fallbackRow?.[1] || "");
+  const branch=String(tx?.branch || fallbackRow?.[13] || "Q2").trim().toUpperCase()==="Q5" ? "Q5" : "Q2";
+  const currentRow=DATA.find(row=>normalizeProductCode(row?.[1] || "")===code
+    && (String(row?.[13] || "Q2").trim().toUpperCase()==="Q5" ? "Q5" : "Q2")===branch) || fallbackRow;
+  const currentName=String(currentRow?.[2] || tx?.ten || tx?.ma || "").trim();
+  const historicalName=String(tx?.ten || "").trim();
+  return {
+    currentName:currentName || historicalName || String(tx?.ma || ""),
+    historicalName,
+    changed:!!historicalName && normalizeQuickText(historicalName)!==normalizeQuickText(currentName)
+  };
+}
 
 function renderTxHistory(){
   const idx = TX_HISTORY_STATE.idx;
@@ -8736,9 +8986,11 @@ function renderTxHistory(){
       <div class="tx-kpi"><span class="tx-kpi-icon">◉</span><span><small>Hiển thị</small><b>${filtered.length}</b></span></div>
       <div class="tx-kpi tx-kpi-out"><span class="tx-kpi-icon">⇧</span><span><small>Đã xuất</small><b>${totalSoldQty}</b></span></div>
       <div class="tx-kpi tx-kpi-in"><span class="tx-kpi-icon">⇩</span><span><small>Đã nhập</small><b>${totalImportedQty}</b></span></div>
-      <div class="tx-kpi tx-kpi-money"><span class="tx-kpi-icon">◉</span><span><small>Doanh thu</small><b>${fmt(totalGia)} <em>VND</em></b></span></div>
+      <div class="tx-kpi tx-kpi-money"><span class="tx-kpi-icon">◉</span><span><small>Doanh thu</small><b>${fmt(totalGia)}</b></span></div>
     </div>`;
-  const rows = filtered.length ? filtered.map(t=>`
+  const rows = filtered.length ? filtered.map(t=>{
+        const productDisplay=getTransactionProductDisplay(t,r);
+        return `
         <div class="tx-row">
           <div class="tx-header">
 	            <span class="tx-nv"><span class="tx-person">${renderNVAvatar(t.nv)} <span class="tx-name">${escapeHtml(t.nv || "")}</span> ${renderNVRoleBadge(t.nv)}</span><span class="tx-pill tx-kind" style="${getTransactionKind(t)==="IMPORT" ? "background:#E8F8F0;color:#1E8449;border:1px solid #A9DFBF;" : getTransactionKind(t)==="ADJUST" ? "background:#FEF9E7;color:#7D6608;border:1px solid #F7DC6F;" : "background:#FDEDEC;color:#C0392B;border:1px solid #F5B7B1;"}">${getTransactionKindLabel(t)}</span></span>
@@ -8748,11 +9000,11 @@ function renderTxHistory(){
             </div>
           </div>
 	          <div class="tx-detail-grid">
-	            <div><span>📦 Sản phẩm</span><b>${escapeHtml(t.ten||t.ma||"")}</b></div>
+	            <div><span>📦 Sản phẩm</span><b>${escapeHtml(productDisplay.currentName)}${productDisplay.changed?`<small class="tx-historical-name">Tên lúc giao dịch: ${escapeHtml(productDisplay.historicalName)}</small>`:""}</b></div>
 	            <div><span>#️⃣ Mã giao dịch</span><b>${escapeHtml(String(t.id||""))}</b></div>
 	            <div><span>🏷️ Số lượng</span><b>${Math.abs(Number(t.qty)||0)}</b></div>
-	            <div><span>🪙 Đơn giá</span><b>${t.gia>0?fmt(t.gia)+" VND":"Không ghi giá"}</b></div>
-	            <div class="tx-total"><span>💰 Thành tiền</span><b>${fmt((Number(t.gia)||0)*Math.abs(Number(t.qty)||0))} VND</b></div>
+	            <div><span>🪙 Đơn giá</span><b>${t.gia>0?fmt(t.gia):"Không ghi giá"}</b></div>
+	            <div class="tx-total"><span>💰 Thành tiền</span><b>${fmt((Number(t.gia)||0)*Math.abs(Number(t.qty)||0))}</b></div>
 	          </div>
           ${t.ghi?`<span class="tx-note">📝 ${escapeHtml(t.ghi)}</span>`:""}
           ${renderSameDayEmployeeLinks(t, r)}
@@ -8761,7 +9013,8 @@ function renderTxHistory(){
             ${t.warranty1?`<button type="button" class="prod-extra-image" data-url="${escapeHtml(t.warranty1)}" data-title="Bảo hành 1 - ${escapeHtml(t.ten||t.ma||'Giao dịch')}" onclick="openImageViewer(this.dataset.url,this.dataset.title)">Bảo hành 1</button>`:""}
             ${t.warranty2?`<button type="button" class="prod-extra-image" data-url="${escapeHtml(t.warranty2)}" data-title="Bảo hành 2 - ${escapeHtml(t.ten||t.ma||'Giao dịch')}" onclick="openImageViewer(this.dataset.url,this.dataset.title)">Bảo hành 2</button>`:""}
           </div>`:""}
-        </div>`).join("") : `<div style="text-align: center; padding: 20px; color: #888;">Không có giao dịch phù hợp bộ lọc</div>`;
+        </div>`;
+      }).join("") : `<div style="text-align: center; padding: 20px; color: #888;">Không có giao dịch phù hợp bộ lọc</div>`;
   document.getElementById("txModalBody").innerHTML = filterBar + summary + rows;
 }
 
@@ -11354,26 +11607,6 @@ function startBackgroundSync(){
     if(!document.hidden) setTimeout(syncFromServerIfIdle, 500);
   });
 }
-
-function setupColorCursorEffect(){
-  const halo=document.querySelector(".cursor-halo"), dot=document.querySelector(".cursor-dot");
-  if(!halo || !dot) return;
-  document.addEventListener("pointermove",e=>{
-    if(e.pointerType && e.pointerType!=="mouse") return;
-    document.documentElement.classList.add("neon-cursor-active");
-    halo.style.transform=`translate3d(${e.clientX}px,${e.clientY}px,0)`;
-    halo.style.opacity="1";
-    const action=!!e.target.closest("button,a,[role='button'],[onclick],input,select,textarea,summary,.card[data-index],.product-list-row");
-    halo.classList.toggle("cursor-action",action);
-  },{passive:true});
-  document.addEventListener("pointerdown",e=>{
-    if(e.pointerType && e.pointerType!=="mouse") return;
-    halo.classList.add("cursor-down");
-  },{passive:true});
-  document.addEventListener("pointerup",()=>halo.classList.remove("cursor-down"),{passive:true});
-  document.documentElement.addEventListener("mouseleave",()=>{halo.style.opacity="0";document.documentElement.classList.remove("neon-cursor-active");});
-}
-// Con trỏ neon dùng cơ chế cursor gốc của trình duyệt để không bị trễ; không chạy lớp bám chuột bằng JavaScript.
 
 async function openProductActivity(index){
   if(!requireAdmin() || !DATA[index]) return;
