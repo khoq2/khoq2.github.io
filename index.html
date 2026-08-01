@@ -12118,12 +12118,39 @@ function quickInventoryFileStamp(){
 }
 async function copyCurrentKpiContent(){
   const r=getCurrentKpiExport();
+  const categoryMeta={
+    MT:{label:"MÁY TÍNH",icon:"💻"},
+    MI:{label:"MÁY IN",icon:"🖨️"},
+    CAM:{label:"CAMERA",icon:"📷"},
+    INT:{label:"INTERNET",icon:"🌐"}
+  };
+  const categoryOrder=["MT","MI","CAM","INT"];
+  const groups=new Map();
+  r.inventory.forEach(item=>{
+    const key=(item.category||"KHAC").toString().trim().toUpperCase()||"KHAC";
+    if(!groups.has(key)) groups.set(key,[]);
+    groups.get(key).push(item);
+  });
+  const orderedKeys=[...categoryOrder.filter(key=>groups.has(key)),...Array.from(groups.keys()).filter(key=>!categoryOrder.includes(key))];
+  const itemLine=item=>{
+    const code=item.code?`${item.code} — `:"";
+    if(r.type==="het") return `• ${code}${item.name}`;
+    if(r.type==="sap") return `• ${code}${item.name} — Còn ${item.qty}`;
+    return `• ${code}${item.name} — Tồn ${item.qty}`;
+  };
+  const groupedLines=[];
+  orderedKeys.forEach((key,index)=>{
+    const items=groups.get(key)||[];
+    const meta=categoryMeta[key]||{label:key||"KHÁC",icon:"📦"};
+    if(index) groupedLines.push("");
+    groupedLines.push(`${meta.icon} ${meta.label} (${items.length})`,...items.map(itemLine));
+  });
   const lines=[
-    `${r.title} · KHO ${r.branch}`,
-    `${r.inventory.length} mặt hàng${r.type==="ton"?` · Tổng tồn ${r.totalStock}`:""}`,
-    `Cập nhật: ${r.generatedAt}`,
+    `📋 ${r.title} — KHO ${r.branch}`,
+    `Tổng cộng: ${r.inventory.length} mặt hàng${r.type==="ton"?` · ${r.totalStock} sản phẩm`:""}`,
+    `🕒 ${r.generatedAt}`,
     "",
-    ...r.inventory.map((item,index)=>`${index+1}. ${item.name}\n   Mã: ${item.code} · Nhóm: ${item.category} · Tồn: ${item.qty} · ${item.status}`)
+    ...groupedLines
   ];
   const text=lines.join("\n");
   try{
