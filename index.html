@@ -4832,6 +4832,1011 @@ button,[role="button"],a[href],input,select,textarea{
 }
 
 </style>
+<style id="customer-qr-dock-preview" media="not all">
+/* Dock trung tâm cho lối vào Khách hàng / QR Code.
+   Giai đoạn này chỉ dựng giao diện; hai nút chưa nối vào nghiệp vụ. */
+body{
+  padding-bottom:calc(112px + env(safe-area-inset-bottom));
+}
+.customer-qr-dock{
+  --dock-blue:#0A84FF;
+  --dock-cyan:#42D3FF;
+  position:fixed;
+  z-index:325;
+  left:50%;
+  bottom:max(15px,calc(env(safe-area-inset-bottom) + 10px));
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:7px;
+  width:max-content;
+  max-width:calc(100vw - 28px);
+  padding:7px;
+  border:1px solid rgba(255,255,255,.78);
+  border-radius:22px;
+  background:
+    linear-gradient(145deg,rgba(255,255,255,.78),rgba(218,235,249,.58)),
+    rgba(238,247,255,.68);
+  box-shadow:
+    0 16px 38px rgba(18,52,82,.24),
+    0 4px 12px rgba(10,132,255,.13),
+    inset 0 1px 0 rgba(255,255,255,.96),
+    inset 0 -1px 0 rgba(89,151,199,.16);
+  -webkit-backdrop-filter:blur(24px) saturate(1.55);
+  backdrop-filter:blur(24px) saturate(1.55);
+  transform:translateX(-50%);
+  isolation:isolate;
+  animation:customerQrDockArrival .48s cubic-bezier(.2,.8,.2,1) both;
+}
+.customer-qr-dock::before{
+  content:"";
+  position:absolute;
+  z-index:-1;
+  inset:3px 10px auto;
+  height:42%;
+  border-radius:18px;
+  background:linear-gradient(180deg,rgba(255,255,255,.72),transparent);
+  pointer-events:none;
+}
+.customer-qr-dock::after{
+  content:"";
+  position:absolute;
+  z-index:-2;
+  left:13%;
+  right:13%;
+  bottom:-8px;
+  height:14px;
+  border-radius:50%;
+  background:rgba(16,74,119,.22);
+  filter:blur(9px);
+  pointer-events:none;
+}
+.customer-qr-dock-item{
+  position:relative;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:9px;
+  min-width:146px;
+  min-height:48px;
+  margin:0;
+  padding:8px 15px 8px 10px;
+  border:1px solid rgba(80,137,180,.18);
+  border-radius:16px;
+  background:linear-gradient(145deg,rgba(255,255,255,.92),rgba(235,245,253,.78));
+  color:#173A5A;
+  font:900 11.5px/1.1 system-ui,-apple-system,"Segoe UI",sans-serif;
+  letter-spacing:.48px;
+  white-space:nowrap;
+  box-shadow:0 3px 8px rgba(30,79,116,.09),inset 0 1px 0 rgba(255,255,255,.96);
+  cursor:pointer;
+  transform:translateY(0) scale(1);
+  transform-origin:50% 100%;
+  transition:transform .2s cubic-bezier(.2,.8,.2,1),box-shadow .2s ease,border-color .2s ease,color .2s ease,background .2s ease;
+  -webkit-tap-highlight-color:transparent;
+}
+.customer-qr-dock-icon{
+  display:grid;
+  place-items:center;
+  width:34px;
+  height:34px;
+  flex:0 0 34px;
+  border-radius:11px;
+  color:#fff;
+  background:linear-gradient(145deg,var(--dock-cyan),var(--dock-blue));
+  box-shadow:0 6px 14px rgba(10,132,255,.28),inset 0 1px 0 rgba(255,255,255,.48);
+  transition:transform .2s cubic-bezier(.2,.8,.2,1),filter .2s ease;
+}
+.customer-qr-dock-item[data-dock-target="qr"] .customer-qr-dock-icon{
+  background:linear-gradient(145deg,#8B7CFF,#5856D6);
+  box-shadow:0 6px 14px rgba(88,86,214,.28),inset 0 1px 0 rgba(255,255,255,.48);
+}
+.customer-qr-dock-icon svg{
+  width:21px;
+  height:21px;
+  fill:none;
+  stroke:currentColor;
+  stroke-width:1.9;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+}
+.customer-qr-dock-separator{
+  width:1px;
+  height:32px;
+  flex:0 0 1px;
+  border-radius:999px;
+  background:linear-gradient(transparent,rgba(39,85,120,.24),transparent);
+}
+.customer-qr-dock-item:hover,
+.customer-qr-dock-item:focus-visible{
+  z-index:2;
+  color:#075B9A;
+  border-color:rgba(10,132,255,.36);
+  background:linear-gradient(145deg,#fff,rgba(228,244,255,.94));
+  box-shadow:0 14px 24px rgba(25,76,116,.2),0 5px 12px rgba(10,132,255,.16),inset 0 1px 0 #fff;
+  transform:translateY(-9px) scale(1.07);
+  outline:none;
+}
+.customer-qr-dock-item:hover .customer-qr-dock-icon,
+.customer-qr-dock-item:focus-visible .customer-qr-dock-icon{
+  transform:scale(1.08);
+  filter:saturate(1.12) brightness(1.04);
+}
+.customer-qr-dock-item:active{
+  transform:translateY(-3px) scale(.98);
+}
+.footer-credit,
+.home-landing-mode .footer-credit{
+  position:fixed;
+  left:50%;
+  bottom:max(84px,calc(env(safe-area-inset-bottom) + 78px));
+  width:max-content;
+  margin:0;
+  transform:translateX(-50%);
+}
+.build-selection-tray.show{
+  bottom:max(86px,calc(env(safe-area-inset-bottom) + 80px));
+}
+.scroll-btns{
+  bottom:max(96px,calc(env(safe-area-inset-bottom) + 90px))!important;
+}
+@keyframes customerQrDockArrival{
+  from{opacity:0;transform:translate(-50%,18px) scale(.96)}
+  to{opacity:1;transform:translate(-50%,0) scale(1)}
+}
+@media(max-width:640px){
+  .customer-qr-dock-tooltip{display:none}
+  .customer-qr-dock{
+    gap:5px;
+    width:calc(100vw - 24px);
+    padding:6px;
+    border-radius:19px;
+  }
+  .customer-qr-dock-item{
+    flex:1 1 0;
+    min-width:0;
+    min-height:46px;
+    gap:7px;
+    padding:7px 9px 7px 7px;
+    border-radius:14px;
+    font-size:10.5px;
+    letter-spacing:.28px;
+  }
+  .customer-qr-dock-icon{
+    width:32px;
+    height:32px;
+    flex-basis:32px;
+    border-radius:10px;
+  }
+  body.admin-mode{
+    padding-bottom:calc(174px + env(safe-area-inset-bottom));
+  }
+  body.admin-mode .customer-qr-dock{
+    bottom:max(77px,calc(env(safe-area-inset-bottom) + 72px));
+  }
+  body.admin-mode .footer-credit{
+    bottom:max(145px,calc(env(safe-area-inset-bottom) + 140px));
+  }
+}
+@media(max-width:370px){
+  .customer-qr-dock-item{font-size:9.6px;gap:5px;padding-right:6px}
+  .customer-qr-dock-icon{width:29px;height:29px;flex-basis:29px}
+  .customer-qr-dock-icon svg{width:18px;height:18px}
+}
+@media(hover:none){
+  .customer-qr-dock-item:hover{transform:none;color:#173A5A;border-color:rgba(80,137,180,.18);box-shadow:0 3px 8px rgba(30,79,116,.09),inset 0 1px 0 rgba(255,255,255,.96)}
+  .customer-qr-dock-item:active{transform:translateY(-2px) scale(.98)}
+}
+@media(prefers-reduced-motion:reduce){
+  .customer-qr-dock{animation:none}
+  .customer-qr-dock-item,.customer-qr-dock-icon{transition:none}
+}
+</style>
+<style id="customer-qr-dock-macos-final" media="not all">
+/* macOS-style Dock: icon là trọng tâm, nhãn nổi lên khi rê chuột. */
+body{padding-bottom:calc(118px + env(safe-area-inset-bottom))}
+.customer-qr-dock{
+  left:50%;
+  bottom:max(8px,calc(env(safe-area-inset-bottom) + 5px));
+  width:max-content;
+  max-width:calc(100vw - 24px);
+  min-height:70px;
+  padding:8px 10px 7px;
+  gap:3px;
+  align-items:flex-end;
+  overflow:visible;
+  border:1px solid rgba(255,255,255,.76);
+  border-radius:20px;
+  background:linear-gradient(145deg,rgba(255,255,255,.64),rgba(204,224,240,.46));
+  box-shadow:0 16px 34px rgba(20,48,74,.28),0 2px 8px rgba(34,88,128,.14),inset 0 1px 0 rgba(255,255,255,.92);
+  -webkit-backdrop-filter:blur(26px) saturate(1.6);
+  backdrop-filter:blur(26px) saturate(1.6);
+}
+.customer-qr-dock::before{
+  inset:3px 7px auto;
+  height:48%;
+  border-radius:16px;
+  background:linear-gradient(180deg,rgba(255,255,255,.72),rgba(255,255,255,.05));
+}
+.customer-qr-dock-item{
+  position:relative;
+  display:flex;
+  flex:0 0 66px;
+  flex-direction:column;
+  align-items:center;
+  justify-content:flex-end;
+  gap:0;
+  width:66px;
+  min-width:66px;
+  height:56px;
+  min-height:56px;
+  padding:0 5px 3px;
+  overflow:visible;
+  border:0;
+  border-radius:15px;
+  background:transparent;
+  box-shadow:none;
+  color:#173A5A;
+  transform:none;
+  transition:none;
+}
+.customer-qr-dock-icon{
+  position:relative;
+  z-index:2;
+  width:50px;
+  height:50px;
+  flex:0 0 50px;
+  border-radius:13px;
+  transform:translateY(0) scale(1);
+  transform-origin:50% 100%;
+  will-change:transform;
+  transition:transform .2s cubic-bezier(.2,.8,.2,1),filter .2s ease,box-shadow .2s ease;
+  box-shadow:0 7px 14px rgba(10,132,255,.3),inset 0 1px 0 rgba(255,255,255,.5),inset 0 -1px 0 rgba(0,58,110,.18);
+}
+.customer-qr-dock-item[data-dock-target="qr"] .customer-qr-dock-icon{
+  box-shadow:0 7px 14px rgba(88,86,214,.3),inset 0 1px 0 rgba(255,255,255,.5),inset 0 -1px 0 rgba(50,42,140,.18);
+}
+.customer-qr-dock-icon::after{
+  content:"";
+  position:absolute;
+  inset:3px 5px auto;
+  height:40%;
+  border-radius:9px;
+  background:linear-gradient(180deg,rgba(255,255,255,.45),transparent);
+  pointer-events:none;
+}
+.customer-qr-dock-icon svg{width:28px;height:28px;stroke-width:1.8}
+.customer-qr-dock-label{
+  position:absolute;
+  z-index:5;
+  left:50%;
+  top:-39px;
+  width:max-content;
+  max-width:160px;
+  padding:6px 9px;
+  border:1px solid rgba(255,255,255,.22);
+  border-radius:7px;
+  background:rgba(27,35,44,.9);
+  color:#fff;
+  box-shadow:0 7px 18px rgba(0,0,0,.22);
+  font:800 10.5px/1 system-ui,-apple-system,"Segoe UI",sans-serif;
+  letter-spacing:.28px;
+  white-space:nowrap;
+  opacity:0;
+  pointer-events:none;
+  transform:translate(-50%,8px) scale(.96);
+  transition:opacity .14s ease,transform .18s cubic-bezier(.2,.8,.2,1);
+}
+.customer-qr-dock-label::after{
+  content:"";
+  position:absolute;
+  left:50%;
+  bottom:-5px;
+  width:9px;
+  height:9px;
+  border-radius:1px;
+  background:rgba(27,35,44,.9);
+  transform:translateX(-50%) rotate(45deg);
+}
+.customer-qr-dock-label{display:none}
+.customer-qr-dock-tooltip{
+  position:absolute;
+  z-index:9;
+  top:-37px;
+  width:max-content;
+  padding:6px 9px;
+  border:1px solid rgba(255,255,255,.22);
+  border-radius:7px;
+  background:rgba(27,35,44,.92);
+  color:#fff;
+  box-shadow:0 7px 18px rgba(0,0,0,.22);
+  font:800 10.5px/1 system-ui,-apple-system,"Segoe UI",sans-serif;
+  letter-spacing:.28px;
+  white-space:nowrap;
+  opacity:0;
+  pointer-events:none;
+  transform:translate(-50%,8px) scale(.96);
+  transition:opacity .14s ease,transform .18s cubic-bezier(.2,.8,.2,1);
+}
+.customer-qr-dock-tooltip::after{
+  content:"";
+  position:absolute;
+  left:50%;
+  bottom:-5px;
+  width:9px;
+  height:9px;
+  border-radius:1px;
+  background:rgba(27,35,44,.92);
+  transform:translateX(-50%) rotate(45deg);
+}
+.customer-qr-dock-tooltip-customer{left:43px}
+.customer-qr-dock-tooltip-qr{left:123px}
+#customerDockButton:hover + .customer-qr-dock-tooltip,
+#customerDockButton:focus-visible + .customer-qr-dock-tooltip,
+#qrDockButton:hover + .customer-qr-dock-tooltip,
+#qrDockButton:focus-visible + .customer-qr-dock-tooltip{
+  opacity:1;
+  transform:translate(-50%,-8px) scale(1);
+}
+.customer-qr-dock-separator{
+  width:1px;
+  height:45px;
+  margin:0 3px 5px;
+  background:linear-gradient(transparent,rgba(36,72,101,.28) 18% 82%,transparent);
+}
+.customer-qr-dock-item:hover,
+.customer-qr-dock-item:focus-visible{
+  z-index:4;
+  border:0;
+  background:transparent;
+  color:#173A5A;
+  box-shadow:none;
+  transform:none;
+  outline:none;
+}
+.customer-qr-dock-item:hover .customer-qr-dock-icon,
+.customer-qr-dock-item:focus-visible .customer-qr-dock-icon{
+  transform:translateY(-17px) scale(1.4);
+  filter:saturate(1.12) brightness(1.05);
+  box-shadow:0 18px 28px rgba(24,69,104,.3),inset 0 1px 0 rgba(255,255,255,.62);
+}
+.customer-qr-dock-item:hover .customer-qr-dock-label,
+.customer-qr-dock-item:focus-visible .customer-qr-dock-label{
+  opacity:1;
+  transform:translate(-50%,-9px) scale(1);
+}
+.customer-qr-dock:has(.customer-qr-dock-item[data-dock-target="customer"]:hover) .customer-qr-dock-item[data-dock-target="qr"] .customer-qr-dock-icon,
+.customer-qr-dock:has(.customer-qr-dock-item[data-dock-target="qr"]:hover) .customer-qr-dock-item[data-dock-target="customer"] .customer-qr-dock-icon,
+.customer-qr-dock:has(.customer-qr-dock-item[data-dock-target="customer"]:focus-visible) .customer-qr-dock-item[data-dock-target="qr"] .customer-qr-dock-icon,
+.customer-qr-dock:has(.customer-qr-dock-item[data-dock-target="qr"]:focus-visible) .customer-qr-dock-item[data-dock-target="customer"] .customer-qr-dock-icon{
+  transform:translateY(-6px) scale(1.13);
+}
+.customer-qr-dock-item:active .customer-qr-dock-icon{transform:translateY(-10px) scale(1.22)}
+.footer-credit,
+.home-landing-mode .footer-credit{bottom:max(96px,calc(env(safe-area-inset-bottom) + 90px))}
+body:has(.customer-qr-dock-item:hover) .footer-credit,
+body:has(.customer-qr-dock-item:focus-visible) .footer-credit{opacity:0;pointer-events:none}
+.build-selection-tray.show{bottom:max(105px,calc(env(safe-area-inset-bottom) + 99px))}
+.scroll-btns{bottom:max(108px,calc(env(safe-area-inset-bottom) + 102px))!important}
+@media(max-width:640px){
+  .customer-qr-dock{
+    width:max-content;
+    min-height:69px;
+    padding:7px 9px 6px;
+    gap:2px;
+    border-radius:19px;
+  }
+  .customer-qr-dock-item{
+    flex:0 0 76px;
+    width:76px;
+    min-width:76px;
+    height:57px;
+    min-height:57px;
+    padding:0 4px 2px;
+  }
+  .customer-qr-dock-icon{width:46px;height:46px;flex-basis:46px;border-radius:12px}
+  .customer-qr-dock-icon svg{width:25px;height:25px}
+  .customer-qr-dock-separator{height:43px;margin-inline:2px}
+  .customer-qr-dock-label{
+    display:block;
+    position:static;
+    max-width:72px;
+    margin-top:3px;
+    padding:0;
+    overflow:hidden;
+    border:0;
+    border-radius:0;
+    background:transparent;
+    color:#173A5A;
+    box-shadow:none;
+    font-size:8.5px;
+    letter-spacing:.12px;
+    text-overflow:ellipsis;
+    opacity:1;
+    transform:none;
+  }
+  .customer-qr-dock-label::after{display:none}
+  body.admin-mode .customer-qr-dock{bottom:max(77px,calc(env(safe-area-inset-bottom) + 72px))}
+  body.admin-mode .footer-credit{bottom:max(160px,calc(env(safe-area-inset-bottom) + 154px))}
+}
+@media(hover:none){
+  .customer-qr-dock-tooltip{display:none}
+  .customer-qr-dock-item:hover{transform:none;background:transparent;box-shadow:none}
+  .customer-qr-dock-item:hover .customer-qr-dock-icon{transform:none;filter:none}
+  .customer-qr-dock:has(.customer-qr-dock-item:hover) .customer-qr-dock-item .customer-qr-dock-icon{transform:none}
+  .customer-qr-dock-label{
+    display:block;
+    position:static;
+    max-width:72px;
+    margin-top:3px;
+    padding:0;
+    overflow:hidden;
+    border:0;
+    border-radius:0;
+    background:transparent;
+    color:#173A5A;
+    box-shadow:none;
+    font-size:8.5px;
+    letter-spacing:.12px;
+    text-overflow:ellipsis;
+    opacity:1;
+    transform:none;
+  }
+  .customer-qr-dock-label::after{display:none}
+  .customer-qr-dock-item:active .customer-qr-dock-icon{transform:translateY(-7px) scale(1.14)}
+}
+@media(prefers-reduced-motion:reduce){
+  .customer-qr-dock-icon,.customer-qr-dock-label{transition:none}
+}
+</style>
+<style id="macos-dock-v3">
+/* Dock tiện ích: ba biểu tượng ứng dụng, phóng đại theo khoảng cách con trỏ. */
+body{
+  padding-bottom:calc(88px + env(safe-area-inset-bottom));
+}
+.macos-dock{
+  --dock-app-width:44px;
+  position:fixed;
+  z-index:325;
+  left:50%;
+  bottom:max(9px,calc(env(safe-area-inset-bottom) + 6px));
+  display:flex;
+  align-items:flex-end;
+  justify-content:center;
+  gap:2px;
+  width:max-content;
+  max-width:calc(100vw - 16px);
+  min-height:76px;
+  padding:32px 20px 2px;
+  overflow:visible;
+  border:0;
+  border-radius:0;
+  background:transparent;
+  box-shadow:none;
+  -webkit-backdrop-filter:none;
+  backdrop-filter:none;
+  transform:translateX(-50%);
+  isolation:isolate;
+  animation:macosDockEntrance .48s cubic-bezier(.2,.8,.2,1) both;
+}
+.macos-dock::before{
+  display:none;
+}
+.macos-dock::after{
+  display:none;
+}
+.macos-dock-app{
+  --dock-scale:1;
+  --dock-lift:0px;
+  --dock-shift-x:0px;
+  --dock-slot-grow:0px;
+  position:relative;
+  z-index:1;
+  display:flex;
+  flex:0 0 calc(var(--dock-app-width) + var(--dock-slot-grow));
+  flex-direction:column;
+  align-items:center;
+  justify-content:flex-end;
+  width:calc(var(--dock-app-width) + var(--dock-slot-grow));
+  height:36px;
+  min-width:calc(var(--dock-app-width) + var(--dock-slot-grow));
+  min-height:36px;
+  margin:0;
+  padding:0 4px 2px;
+  overflow:visible!important;
+  border:0;
+  border-radius:16px;
+  outline:0;
+  background:transparent;
+  box-shadow:none;
+  color:#fff;
+  cursor:pointer;
+  transition:flex-basis .11s cubic-bezier(.2,.75,.25,1),width .11s cubic-bezier(.2,.75,.25,1),min-width .11s cubic-bezier(.2,.75,.25,1);
+  -webkit-tap-highlight-color:transparent;
+}
+.macos-dock-app-icon{
+  position:relative;
+  display:grid;
+  flex:0 0 30px;
+  place-items:center;
+  width:30px;
+  height:30px;
+  overflow:visible;
+  border:1px solid rgba(255,255,255,.55);
+  border-radius:8px;
+  color:#fff;
+  transform:translate(var(--dock-shift-x),var(--dock-lift)) scale(var(--dock-scale));
+  transform-origin:50% 100%;
+  will-change:transform;
+  transition:transform .14s cubic-bezier(.2,.75,.25,1),filter .16s ease,box-shadow .16s ease;
+}
+.macos-dock-app-icon::before{
+  content:"";
+  position:absolute;
+  inset:2px 4px auto;
+  height:46%;
+  border-radius:7px 7px 5px 5px;
+  background:linear-gradient(180deg,rgba(255,255,255,.48),rgba(255,255,255,0));
+  pointer-events:none;
+}
+.macos-dock-app-icon::after{
+  content:"";
+  position:absolute;
+  right:2px;
+  bottom:2px;
+  width:20px;
+  height:20px;
+  border-radius:50%;
+  background:rgba(255,255,255,.12);
+  pointer-events:none;
+}
+.macos-dock-app-icon svg{
+  position:relative;
+  z-index:2;
+  width:18px;
+  height:18px;
+  fill:currentColor;
+  stroke:none;
+  stroke-width:0;
+  filter:drop-shadow(0 1px 1px rgba(0,0,0,.18));
+}
+.macos-dock-customer{
+  background:
+    radial-gradient(circle at 50% 53%,#43c9f4 0 47%,#0794d8 48% 61%,transparent 62%),
+    linear-gradient(145deg,#ffffff 0%,#eef1f4 62%,#c7cdd3 100%);
+  border-color:rgba(151,160,169,.7);
+  box-shadow:0 8px 17px rgba(29,112,166,.32),inset 0 1px 0 rgba(255,255,255,.9),inset 0 -1px 0 rgba(82,93,105,.22);
+}
+.macos-dock-partner{
+  background:linear-gradient(145deg,#ff7189 0%,#fb365c 48%,#e91843 100%);
+  box-shadow:0 8px 17px rgba(222,29,69,.34),inset 0 1px 0 rgba(255,255,255,.5),inset 0 -1px 0 rgba(119,10,36,.22);
+}
+.macos-dock-qr{
+  background:linear-gradient(145deg,#d96cff 0%,#a13ee0 48%,#6d21bd 100%);
+  box-shadow:0 8px 17px rgba(130,41,198,.36),inset 0 1px 0 rgba(255,255,255,.5),inset 0 -1px 0 rgba(66,17,116,.23);
+}
+.macos-dock-app:hover,
+.macos-dock-app:focus-visible{z-index:5}
+.macos-dock:not(.is-tracking) .macos-dock-app:hover{
+  --dock-scale:1.82;
+  --dock-lift:-13px;
+  --dock-slot-grow:12px;
+}
+.macos-dock-app:focus-visible .macos-dock-app-icon{
+  outline:2px solid rgba(255,255,255,.96);
+  outline-offset:3px;
+}
+.macos-dock-app:active .macos-dock-app-icon{
+  filter:brightness(.94) saturate(1.08);
+  transition-duration:.06s;
+}
+.macos-dock-mobile-label{
+  display:none;
+  width:100%;
+  margin-top:3px;
+  overflow:hidden;
+  color:#193850;
+  font:800 8.4px/1 system-ui,-apple-system,"Segoe UI",sans-serif;
+  letter-spacing:.05px;
+  text-align:center;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  text-shadow:0 1px rgba(255,255,255,.78);
+}
+.macos-dock-tooltip{
+  position:absolute;
+  z-index:20;
+  left:50%;
+  bottom:calc(100% + 28px);
+  width:max-content;
+  padding:6px 9px 7px;
+  border:1px solid rgba(255,255,255,.19);
+  border-radius:7px;
+  background:rgba(29,32,37,.92);
+  color:#fff;
+  box-shadow:0 8px 20px rgba(0,0,0,.27);
+  font:700 10.5px/1 system-ui,-apple-system,"Segoe UI",sans-serif;
+  letter-spacing:.24px;
+  white-space:nowrap;
+  opacity:0;
+  pointer-events:none;
+  transform:translate(-50%,8px) scale(.96);
+  transition:opacity .13s ease,transform .17s cubic-bezier(.2,.8,.2,1);
+}
+.macos-dock-tooltip::after{
+  content:"";
+  position:absolute;
+  left:50%;
+  bottom:-5px;
+  width:9px;
+  height:9px;
+  border-radius:1px;
+  background:rgba(29,32,37,.92);
+  transform:translateX(-50%) rotate(45deg);
+}
+.macos-dock-app:hover .macos-dock-tooltip,
+.macos-dock-app:focus-visible .macos-dock-tooltip,
+.macos-dock-app.dock-active .macos-dock-tooltip{
+  opacity:1;
+  transform:translate(-50%,-1px) scale(1);
+}
+.footer-credit,
+.home-landing-mode .footer-credit{
+  position:fixed;
+  left:50%;
+  bottom:max(66px,calc(env(safe-area-inset-bottom) + 60px));
+  width:max-content;
+  margin:0;
+  transform:translateX(-50%);
+  transition:opacity .16s ease;
+}
+body:has(.macos-dock-app:hover) .footer-credit,
+body:has(.macos-dock-app:focus-visible) .footer-credit{
+  opacity:0;
+  pointer-events:none;
+}
+.build-selection-tray.show{bottom:max(78px,calc(env(safe-area-inset-bottom) + 72px))}
+.scroll-btns{bottom:max(81px,calc(env(safe-area-inset-bottom) + 75px))!important}
+@keyframes macosDockEntrance{
+  from{opacity:0;transform:translate(-50%,18px) scale(.94)}
+  to{opacity:1;transform:translate(-50%,0) scale(1)}
+}
+@media(max-width:640px),(hover:none){
+  .macos-dock{
+    --dock-app-width:58px;
+    min-height:49px;
+    padding:4px 3px 2px;
+    gap:2px;
+  }
+  .macos-dock-app{
+    height:43px;
+    min-height:43px;
+    padding:0 4px 2px;
+  }
+  .macos-dock-app-icon{
+    width:28px;
+    height:28px;
+    flex-basis:28px;
+    border-radius:8px;
+  }
+  .macos-dock-app-icon svg{width:17px;height:17px}
+  .macos-dock-mobile-label{display:block;font-size:7.1px;letter-spacing:-.1px}
+  .macos-dock-tooltip{display:none}
+}
+@media(hover:none){
+  .macos-dock:not(.is-tracking) .macos-dock-app:hover{--dock-scale:1;--dock-lift:0px;--dock-slot-grow:0px}
+  .macos-dock-app:active{--dock-scale:1.12;--dock-lift:-6px}
+}
+@media(max-width:370px){
+  .macos-dock{--dock-app-width:56px;gap:1px;padding-inline:2px}
+  .macos-dock-app-icon{width:28px;height:28px;flex-basis:28px}
+  .macos-dock-mobile-label{font-size:6.8px}
+}
+@media(max-width:640px){
+  body.admin-mode{padding-bottom:calc(190px + env(safe-area-inset-bottom))}
+  body.admin-mode .macos-dock{bottom:max(78px,calc(env(safe-area-inset-bottom) + 72px))}
+  body.admin-mode .footer-credit{bottom:max(168px,calc(env(safe-area-inset-bottom) + 162px))}
+}
+@media(prefers-reduced-motion:reduce){
+  .macos-dock{animation:none}
+  .macos-dock-app,.macos-dock-app-icon,.macos-dock-tooltip{transition:none}
+}
+</style>
+<style id="qr-showcase-demo">
+body.qr-showcase-open{overflow:hidden!important}
+.qr-showcase-overlay{
+  position:fixed;
+  z-index:7200;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  background:rgba(11,23,35,.56);
+  -webkit-backdrop-filter:blur(15px) saturate(1.15);
+  backdrop-filter:blur(15px) saturate(1.15);
+  opacity:0;
+  transition:opacity .2s ease;
+}
+.qr-showcase-overlay[hidden]{display:none!important}
+.qr-showcase-overlay.is-open{opacity:1}
+.qr-showcase-dialog{
+  position:relative;
+  display:flex;
+  flex-direction:column;
+  width:min(920px,calc(100vw - 40px));
+  max-height:calc(100dvh - 40px);
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,.82);
+  border-radius:26px;
+  background:linear-gradient(155deg,#ffffff 0%,#f5f9fc 62%,#edf5fa 100%);
+  box-shadow:0 30px 90px rgba(4,18,31,.38),inset 0 1px 0 #fff;
+  color:#17334c;
+  transform:translateY(16px) scale(.97);
+  transition:transform .24s cubic-bezier(.2,.8,.2,1);
+}
+.qr-showcase-overlay.is-open .qr-showcase-dialog{transform:translateY(0) scale(1)}
+.qr-showcase-header{
+  position:relative;
+  z-index:2;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  min-height:70px;
+  padding:14px 72px 14px 22px;
+  border-bottom:1px solid #dce8f0;
+  background:rgba(255,255,255,.84);
+  -webkit-backdrop-filter:blur(16px);
+  backdrop-filter:blur(16px);
+}
+.qr-showcase-header-icon{
+  display:grid;
+  flex:0 0 42px;
+  place-items:center;
+  width:42px;
+  height:42px;
+  border-radius:13px;
+  background:linear-gradient(145deg,#d96cff,#a13ee0 48%,#6d21bd);
+  color:#fff;
+  box-shadow:0 8px 18px rgba(130,41,198,.28),inset 0 1px 0 rgba(255,255,255,.48);
+}
+.qr-showcase-header-icon svg{width:23px;height:23px;fill:currentColor}
+.qr-showcase-heading{min-width:0}
+.qr-showcase-heading h2{margin:0;color:#15334d;font:900 17px/1.15 system-ui,-apple-system,"Segoe UI",sans-serif;letter-spacing:.15px}
+.qr-showcase-heading p{margin:4px 0 0;color:#687f92;font:600 11px/1.35 system-ui,-apple-system,"Segoe UI",sans-serif}
+.qr-showcase-close{
+  position:absolute!important;
+  top:17px!important;
+  right:18px!important;
+  left:auto!important;
+  display:grid;
+  place-items:center;
+  width:36px;
+  height:36px;
+  min-width:36px;
+  min-height:36px;
+  padding:0;
+  overflow:visible!important;
+  border:1px solid #d7e3eb;
+  border-radius:999px;
+  background:#f2f6f9;
+  color:#4a657a;
+  box-shadow:none;
+  cursor:pointer;
+  transition:transform .16s ease,background .16s ease,color .16s ease;
+}
+.qr-showcase-close:hover{background:#e7eff5;color:#15334d;transform:scale(1.05)}
+.qr-showcase-close svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round}
+.qr-showcase-browse{
+  padding:22px;
+  overflow:auto;
+  overscroll-behavior:contain;
+}
+.qr-showcase-intro{margin:0 0 16px;color:#587185;font:700 12px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif;text-align:center}
+.qr-showcase-grid{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:14px;
+}
+.qr-showcase-card{
+  --qr-card-accent:#7c3ed1;
+  position:relative;
+  display:flex;
+  min-width:0;
+  flex-direction:column;
+  align-items:stretch;
+  gap:10px;
+  margin:0;
+  padding:10px 10px 12px;
+  overflow:hidden!important;
+  border:1px solid #dae5ed;
+  border-radius:18px;
+  background:#fff;
+  color:#183a55;
+  box-shadow:0 7px 20px rgba(28,66,94,.1);
+  cursor:pointer;
+  text-align:left;
+  transition:transform .2s cubic-bezier(.2,.8,.2,1),box-shadow .2s ease,border-color .2s ease;
+}
+.qr-showcase-card:nth-child(1){--qr-card-accent:#128fda}
+.qr-showcase-card:nth-child(2){--qr-card-accent:#ed3156}
+.qr-showcase-card:nth-child(3){--qr-card-accent:#9b3ddd}
+.qr-showcase-card:nth-child(4){--qr-card-accent:#1a9b68}
+.qr-showcase-card::before{content:"";position:absolute;inset:0 0 auto;height:4px;background:var(--qr-card-accent)}
+.qr-showcase-card:hover,.qr-showcase-card:focus-visible{
+  z-index:2;
+  border-color:color-mix(in srgb,var(--qr-card-accent) 45%,#d7e3eb);
+  box-shadow:0 16px 30px rgba(24,61,88,.18);
+  outline:none;
+  transform:translateY(-5px);
+}
+.qr-image-shell{
+  position:relative;
+  display:grid;
+  place-items:center;
+  width:100%;
+  aspect-ratio:1;
+  overflow:hidden;
+  border:1px solid #e2eaf0;
+  border-radius:13px;
+  background:
+    linear-gradient(45deg,#f3f6f8 25%,transparent 25% 75%,#f3f6f8 75%),
+    linear-gradient(45deg,#f3f6f8 25%,#fff 25% 75%,#f3f6f8 75%);
+  background-position:0 0,6px 6px;
+  background-size:12px 12px;
+}
+.qr-image-shell img{
+  position:absolute!important;
+  z-index:2;
+  inset:0!important;
+  display:block;
+  width:100%!important;
+  height:100%!important;
+  padding:5px;
+  object-fit:contain!important;
+  background:#fff;
+}
+.qr-image-fallback{display:none;padding:16px;color:#7b8d9b;font:800 11px/1.35 system-ui;text-align:center}
+.qr-image-shell.is-error .qr-image-fallback{display:block}
+.qr-showcase-card-copy{display:flex;min-width:0;align-items:center;justify-content:space-between;gap:8px;padding:0 2px}
+.qr-showcase-card-text{min-width:0}
+.qr-showcase-card-title{display:block;overflow:hidden;color:#173a55;font:900 11.5px/1.25 system-ui,-apple-system,"Segoe UI",sans-serif;text-overflow:ellipsis;white-space:nowrap}
+.qr-showcase-card-hint{display:block;margin-top:3px;color:#7890a2;font:650 9.5px/1.2 system-ui,-apple-system,"Segoe UI",sans-serif}
+.qr-showcase-card-arrow{display:grid;flex:0 0 25px;place-items:center;width:25px;height:25px;border-radius:999px;background:color-mix(in srgb,var(--qr-card-accent) 12%,#fff);color:var(--qr-card-accent);font:900 15px/1 system-ui}
+.qr-showcase-focus{
+  flex:1;
+  min-height:0;
+  padding:18px 22px 24px;
+  overflow:auto;
+  overscroll-behavior:contain;
+}
+.qr-showcase-focus[hidden],.qr-showcase-browse[hidden]{display:none!important}
+.qr-showcase-back{
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  min-height:35px;
+  margin:0 0 10px;
+  padding:7px 12px;
+  overflow:visible!important;
+  border:1px solid #d7e3eb;
+  border-radius:999px;
+  background:#fff;
+  color:#34536a;
+  box-shadow:0 3px 10px rgba(25,60,84,.08);
+  font:800 11px/1 system-ui,-apple-system,"Segoe UI",sans-serif;
+  cursor:pointer;
+}
+.qr-showcase-stage{display:flex;flex-direction:column;align-items:center;text-align:center}
+.qr-showcase-main-shell{
+  width:min(340px,52vw);
+  min-width:250px;
+  max-width:100%;
+  height:min(450px,calc(100dvh - 250px));
+  min-height:330px;
+  aspect-ratio:auto;
+  padding:10px;
+  border:1px solid #dbe5ec;
+  border-radius:22px;
+  background:#fff;
+  box-shadow:0 18px 45px rgba(25,61,87,.17);
+}
+.qr-showcase-main-shell img{padding:0;border-radius:13px}
+.qr-showcase-main-title{margin:16px 0 0;color:#173a55;font:950 20px/1.15 system-ui,-apple-system,"Segoe UI",sans-serif;letter-spacing:.15px}
+.qr-showcase-main-note{margin:7px 0 0;color:#667f92;font:650 11.5px/1.4 system-ui,-apple-system,"Segoe UI",sans-serif}
+.qr-showcase-actions{display:flex;align-items:center;justify-content:center;gap:9px;margin-top:14px}
+.qr-showcase-original,.qr-showcase-choose{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-height:38px;
+  padding:9px 14px;
+  border-radius:11px;
+  font:850 11px/1 system-ui,-apple-system,"Segoe UI",sans-serif;
+  text-decoration:none;
+  cursor:pointer;
+}
+.qr-showcase-original{border:0;background:linear-gradient(135deg,#7f42d6,#5e24ad);color:#fff;box-shadow:0 7px 16px rgba(104,41,183,.24)}
+.qr-showcase-choose{border:1px solid #d7e3eb;background:#fff;color:#36556c;box-shadow:none}
+@media(max-width:820px){
+  .qr-showcase-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:600px){
+  .qr-showcase-overlay{align-items:stretch;padding:0;background:rgba(10,22,34,.62)}
+  .qr-showcase-dialog{width:100%;max-height:100dvh;height:100dvh;border:0;border-radius:0;transform:translateY(24px)}
+  .qr-showcase-header{min-height:61px;padding:10px 58px 10px 14px}
+  .qr-showcase-header-icon{width:38px;height:38px;flex-basis:38px;border-radius:11px}
+  .qr-showcase-heading h2{font-size:15px}
+  .qr-showcase-heading p{font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .qr-showcase-close{top:12px;right:12px;width:36px;height:36px}
+  .qr-showcase-browse{padding:14px 12px calc(20px + env(safe-area-inset-bottom))}
+  .qr-showcase-intro{margin-bottom:12px;font-size:11px}
+  .qr-showcase-grid{gap:10px}
+  .qr-showcase-card{gap:7px;padding:8px 8px 10px;border-radius:15px}
+  .qr-image-shell{border-radius:10px}
+  .qr-showcase-card-title{font-size:10.5px}
+  .qr-showcase-card-hint{font-size:8.8px}
+  .qr-showcase-card-arrow{width:22px;height:22px;flex-basis:22px;font-size:13px}
+  .qr-showcase-focus{padding:12px 14px calc(22px + env(safe-area-inset-bottom))}
+  .qr-showcase-main-shell{width:min(84vw,360px);min-width:0;height:min(520px,calc(100dvh - 245px));min-height:300px;padding:8px;border-radius:18px}
+  .qr-showcase-main-title{margin-top:13px;font-size:18px}
+  .qr-showcase-main-note{font-size:11px}
+  .qr-showcase-actions{flex-wrap:wrap}
+}
+@media(max-width:360px){
+  .qr-showcase-grid{gap:7px}
+  .qr-showcase-card{padding:7px 7px 9px}
+  .qr-showcase-card-title{font-size:9.8px}
+}
+@media(prefers-reduced-motion:reduce){
+  .qr-showcase-overlay,.qr-showcase-dialog,.qr-showcase-card{transition:none}
+}
+</style>
+<style id="private-customer-partner-ui">
+body.private-panel-open{overflow:hidden}
+.private-access-modal{width:min(410px,calc(100vw - 28px));padding:24px;border-radius:22px;text-align:center}
+.private-access-badge{display:grid;place-items:center;width:62px;height:62px;margin:0 auto 12px;border-radius:18px;background:linear-gradient(145deg,#2E86C1,#1B4F72);color:#fff;box-shadow:0 12px 28px rgba(30,88,132,.3)}
+.private-access-badge svg{width:30px;height:30px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.private-access-title{margin:0;color:#173A5A;font-size:20px;font-weight:950;letter-spacing:.35px}
+.private-access-subtitle{margin:7px 0 17px;color:#667B8C;font-size:12px;line-height:1.45}
+.private-access-error{min-height:18px;margin:8px 0 0;color:#B03A2E;font-size:11px;font-weight:800}
+.private-access-actions{display:grid;grid-template-columns:1fr 1.35fr;gap:9px;margin-top:13px}
+.private-access-actions button{min-height:44px;border-radius:12px}
+#partnerOverlay{align-items:center;justify-content:center;padding:18px;background:rgba(8,22,38,.64);backdrop-filter:blur(10px)}
+.partner-modal{width:min(860px,calc(100vw - 28px));max-height:calc(100dvh - 30px);padding:15px;border:1px solid #D7E3EC;border-radius:20px;background:#F4F8FB;color:#21384A;box-shadow:0 22px 60px rgba(8,28,45,.34);overflow:auto}
+.partner-head{display:flex;align-items:center;gap:10px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid #D8E3EB}
+.partner-title{display:flex;flex:1;align-items:center;gap:8px;min-height:40px;padding:8px 12px;border-radius:11px;background:linear-gradient(135deg,#B91C45,#F04769);color:#fff;font-size:15px;font-weight:950;letter-spacing:.25px;box-shadow:0 6px 16px rgba(193,30,72,.2)}
+.partner-close{width:38px;height:38px;border:1px solid #D8E3EB;border-radius:11px;background:#fff;color:#B03A2E;font-size:22px;cursor:pointer}
+.partner-filters{display:grid;grid-template-columns:minmax(190px,.8fr) minmax(220px,1.2fr) auto;gap:9px;align-items:center}
+.partner-filters select,.partner-filters input{width:100%;min-height:44px;border:1.5px solid #B9CEDD;border-radius:12px;background:#fff;color:#1E3A5F;padding:0 12px;font:700 13px system-ui}
+.partner-add{min-height:44px;padding:0 14px;border:0;border-radius:12px;background:#1E3A5F;color:#fff;font-weight:900;cursor:pointer}
+.partner-service-filter{display:flex;flex-wrap:wrap;gap:7px;margin:10px 0}
+.partner-service-chip{min-height:34px;padding:7px 11px;border:1px solid #C7D8E4;border-radius:999px;background:#fff;color:#36566E;font-size:11px;font-weight:900;cursor:pointer}
+.partner-service-chip.active{border-color:#E63B62;background:#FFF0F4;color:#B91C45;box-shadow:0 0 0 2px rgba(230,59,98,.09)}
+.partner-summary{margin:8px 2px;color:#667B8C;font-size:11px;font-weight:750}
+.partner-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.partner-card{position:relative;padding:14px;border:1px solid #D9E5ED;border-radius:15px;background:#fff;box-shadow:0 5px 14px rgba(30,58,95,.07)}
+.partner-card::before{content:"";position:absolute;left:0;top:13px;bottom:13px;width:4px;border-radius:0 5px 5px 0;background:linear-gradient(#F04769,#9426B8)}
+.partner-name{padding-left:3px;color:#173A5A;font-size:15px;font-weight:950}
+.partner-district{margin-top:3px;color:#B91C45;font-size:11px;font-weight:900}
+.partner-services{display:flex;flex-wrap:wrap;gap:5px;margin:10px 0}
+.partner-service-tag{padding:5px 8px;border-radius:999px;background:#EEF5FA;color:#315D7B;font-size:10px;font-weight:850}
+.partner-contact{display:grid;gap:6px;margin-top:8px;color:#52697A;font-size:12px;line-height:1.4}
+.partner-contact a{color:#1769A0;font-weight:850;text-decoration:none;overflow-wrap:anywhere}
+.partner-note{margin-top:9px;padding:8px 9px;border-radius:9px;background:#FFF8E8;color:#795A19;font-size:11px;line-height:1.4}
+.partner-card-actions{display:flex;flex-wrap:wrap;gap:7px;margin-top:11px}
+.partner-card-actions a,.partner-card-actions button{display:inline-flex;align-items:center;justify-content:center;min-height:36px;padding:7px 10px;border:0;border-radius:10px;background:#EAF3F9;color:#1B5E87;font-size:11px;font-weight:900;text-decoration:none;cursor:pointer}
+.partner-card-actions .partner-call{background:#E9F7EF;color:#18743C}.partner-card-actions .partner-map{background:#F1EAFF;color:#6B2CA1}
+.partner-empty{grid-column:1/-1;min-height:150px;display:grid;place-items:center;padding:22px;border:1px dashed #C8D9E5;border-radius:14px;background:#fff;color:#607789;text-align:center;line-height:1.5}
+.partner-editor{display:none;margin-top:10px;padding:13px;border:1px solid #D9E5ED;border-radius:15px;background:#fff}.partner-editor.open{display:block}
+.partner-editor-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.partner-editor-grid label{display:grid;gap:5px;color:#405B6E;font-size:11px;font-weight:900}.partner-editor-grid .wide{grid-column:1/-1}
+.partner-editor input,.partner-editor select,.partner-editor textarea{width:100%;min-height:42px;padding:9px 10px;border:1px solid #C7D8E4;border-radius:10px;background:#fff;color:#243F52;font:700 13px system-ui}.partner-editor textarea{min-height:72px;resize:vertical}
+.partner-service-editor{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}.partner-service-editor label{display:flex;align-items:center;gap:6px;min-height:38px;padding:7px 8px;border:1px solid #D8E4EC;border-radius:10px;background:#F7FAFC}.partner-service-editor input{width:16px;min-height:auto}
+.partner-editor-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:12px}.partner-editor-actions button{min-height:40px;padding:8px 14px;border:0;border-radius:10px;font-weight:900;cursor:pointer}
+.partner-save{background:#1E3A5F;color:#fff}.partner-cancel{background:#FDEDEC;color:#A93226}
+@media(max-width:680px){#partnerOverlay{padding:8px}.partner-modal{width:100%;max-height:calc(100dvh - 16px);padding:11px;border-radius:18px}.partner-filters{grid-template-columns:1fr}.partner-add{width:100%}.partner-list{grid-template-columns:1fr}.partner-editor-grid{grid-template-columns:1fr}.partner-editor-grid .wide{grid-column:auto}.partner-service-editor{grid-template-columns:1fr 1fr}.private-access-modal{padding:21px 17px}}
+@media(max-width:390px){.partner-service-editor{grid-template-columns:1fr}.private-access-actions{grid-template-columns:1fr}}
+</style>
 </head>
 <body>
 <div class="sticky">
@@ -4912,13 +5917,109 @@ button,[role="button"],a[href],input,select,textarea{
 </div>
 <div class="footer-credit"><span class="footer-credit-text">· Design by : Pham Van Chuong · © 2026</span></div>
 
+<nav class="macos-dock" id="customerQrDock" aria-label="Khách hàng, đối tác và QR Code">
+  <button class="macos-dock-app" id="customerDockButton" data-dock-index="0" type="button" aria-label="KHÁCH HÀNG" aria-haspopup="dialog" aria-controls="privateAccessOverlay" title="Mở hồ sơ khách hàng" onclick="requestPrivateAccess('customer')">
+    <span class="macos-dock-app-icon macos-dock-customer" aria-hidden="true">
+      <svg viewBox="0 0 24 24"><circle cx="8.8" cy="7.1" r="3.2"></circle><path d="M2.9 20.2c.2-4.35 2.25-6.55 5.9-6.55s5.7 2.2 5.9 6.55H2.9Z"></path><rect x="16.9" y="4.9" width="2.2" height="7.4" rx="1.1"></rect><rect x="14.3" y="7.5" width="7.4" height="2.2" rx="1.1"></rect></svg>
+    </span>
+    <span class="macos-dock-mobile-label">KHÁCH HÀNG</span>
+    <span class="macos-dock-tooltip" aria-hidden="true">KHÁCH HÀNG</span>
+  </button>
+
+  <button class="macos-dock-app" id="partnerDockButton" data-dock-index="1" type="button" aria-label="ĐỐI TÁC" aria-haspopup="dialog" aria-controls="privateAccessOverlay" title="Mở danh bạ đối tác" onclick="requestPrivateAccess('partner')">
+    <span class="macos-dock-app-icon macos-dock-partner" aria-hidden="true">
+      <svg viewBox="0 0 24 24"><circle cx="8" cy="7.6" r="3.25"></circle><path d="M1.9 20.3c.18-4.55 2.3-6.85 6.1-6.85s5.92 2.3 6.1 6.85H1.9Z"></path><circle cx="16.7" cy="8.4" r="2.65" opacity=".82"></circle><path d="M14.7 14.15c.62-.3 1.3-.45 2.05-.45 3.35 0 5.18 2.15 5.35 6.6h-6.55c-.08-2.55-.8-4.6-2.12-6.02.4-.06.82-.1 1.27-.13Z" opacity=".82"></path></svg>
+    </span>
+    <span class="macos-dock-mobile-label">ĐỐI TÁC</span>
+    <span class="macos-dock-tooltip" aria-hidden="true">ĐỐI TÁC</span>
+  </button>
+
+  <button class="macos-dock-app" id="qrDockButton" data-dock-index="2" type="button" aria-label="QR CODE" aria-haspopup="dialog" aria-controls="qrShowcaseOverlay" title="Mở danh sách QR Code" onclick="openQrShowcase()">
+    <span class="macos-dock-app-icon macos-dock-qr" aria-hidden="true">
+      <svg viewBox="0 0 24 24"><path fill-rule="evenodd" d="M3 3h7v7H3V3Zm2 2v3h3V5H5Zm9-2h7v7h-7V3Zm2 2v3h3V5h-3ZM3 14h7v7H3v-7Zm2 2v3h3v-3H5Z" clip-rule="evenodd"></path><path d="M14 14h3v3h-3v-3Zm4 0h3v2h-3v-2Zm0 3h2v4h-2v-4Zm-4 1h3v3h-3v-3Zm6 1h1v2h-1v-2Z"></path></svg>
+    </span>
+    <span class="macos-dock-mobile-label">QR CODE</span>
+    <span class="macos-dock-tooltip" aria-hidden="true">QR CODE</span>
+  </button>
+</nav>
+
+<div class="qr-showcase-overlay" id="qrShowcaseOverlay" hidden aria-hidden="true" onclick="if(event.target===this)closeQrShowcase()">
+  <section class="qr-showcase-dialog" id="qrShowcaseDialog" role="dialog" aria-modal="true" aria-labelledby="qrShowcaseTitle">
+    <header class="qr-showcase-header">
+      <span class="qr-showcase-header-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path fill-rule="evenodd" d="M3 3h7v7H3V3Zm2 2v3h3V5H5Zm9-2h7v7h-7V3Zm2 2v3h3V5h-3ZM3 14h7v7H3v-7Zm2 2v3h3v-3H5Z" clip-rule="evenodd"></path><path d="M14 14h3v3h-3v-3Zm4 0h3v2h-3v-2Zm0 3h2v4h-2v-4Zm-4 1h3v3h-3v-3Zm6 1h1v2h-1v-2Z"></path></svg>
+      </span>
+      <div class="qr-showcase-heading">
+        <h2 id="qrShowcaseTitle">QR CODE DÀNH CHO KHÁCH HÀNG</h2>
+        <p>Chọn đúng mã rồi đưa màn hình cho khách quét</p>
+      </div>
+      <button class="qr-showcase-close" id="qrShowcaseClose" type="button" aria-label="Đóng danh sách QR" onclick="closeQrShowcase()">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"></path></svg>
+      </button>
+    </header>
+
+    <div class="qr-showcase-browse" id="qrShowcaseBrowse">
+      <p class="qr-showcase-intro">Bấm vào một mã để phóng lớn toàn bộ ảnh, giúp khách hàng quét nhanh và chính xác.</p>
+      <div class="qr-showcase-grid">
+        <button class="qr-showcase-card" type="button" data-qr-title="QR CTY" data-qr-src="https://drive.google.com/thumbnail?id=1FcxEsU9JxB2r9wq-OOmEjkIS-gmae7oA&amp;sz=w1200" data-qr-link="https://drive.google.com/file/d/1FcxEsU9JxB2r9wq-OOmEjkIS-gmae7oA/view?usp=sharing" onclick="showQrForCustomer(this)">
+          <span class="qr-image-shell">
+            <img src="https://drive.google.com/thumbnail?id=1FcxEsU9JxB2r9wq-OOmEjkIS-gmae7oA&amp;sz=w1200" alt="Ảnh QR CTY" loading="lazy" decoding="async" onerror="handleQrImageError(this)">
+            <span class="qr-image-fallback">Không tải được ảnh QR</span>
+          </span>
+          <span class="qr-showcase-card-copy"><span class="qr-showcase-card-text"><strong class="qr-showcase-card-title">QR CTY</strong><small class="qr-showcase-card-hint">Bấm để phóng lớn</small></span><span class="qr-showcase-card-arrow" aria-hidden="true">›</span></span>
+        </button>
+
+        <button class="qr-showcase-card" type="button" data-qr-title="QR HỘ KINH DOANH" data-qr-src="https://drive.google.com/thumbnail?id=1n0OSZPy8w9-MTGVcSziBImT93tW_-uia&amp;sz=w1200" data-qr-link="https://drive.google.com/file/d/1n0OSZPy8w9-MTGVcSziBImT93tW_-uia/view?usp=sharing" onclick="showQrForCustomer(this)">
+          <span class="qr-image-shell">
+            <img src="https://drive.google.com/thumbnail?id=1n0OSZPy8w9-MTGVcSziBImT93tW_-uia&amp;sz=w1200" alt="Ảnh QR Hộ kinh doanh" loading="lazy" decoding="async" onerror="handleQrImageError(this)">
+            <span class="qr-image-fallback">Không tải được ảnh QR</span>
+          </span>
+          <span class="qr-showcase-card-copy"><span class="qr-showcase-card-text"><strong class="qr-showcase-card-title">QR HỘ KINH DOANH</strong><small class="qr-showcase-card-hint">Bấm để phóng lớn</small></span><span class="qr-showcase-card-arrow" aria-hidden="true">›</span></span>
+        </button>
+
+        <button class="qr-showcase-card" type="button" data-qr-title="LÃ THỊ THÚY" data-qr-src="https://drive.google.com/thumbnail?id=16NC3u8jnrsMGJKUYhjGxQkBKadvDLKNo&amp;sz=w1200" data-qr-link="https://drive.google.com/file/d/16NC3u8jnrsMGJKUYhjGxQkBKadvDLKNo/view?usp=sharing" onclick="showQrForCustomer(this)">
+          <span class="qr-image-shell">
+            <img src="https://drive.google.com/thumbnail?id=16NC3u8jnrsMGJKUYhjGxQkBKadvDLKNo&amp;sz=w1200" alt="Ảnh QR Lã Thị Thúy" loading="lazy" decoding="async" onerror="handleQrImageError(this)">
+            <span class="qr-image-fallback">Không tải được ảnh QR</span>
+          </span>
+          <span class="qr-showcase-card-copy"><span class="qr-showcase-card-text"><strong class="qr-showcase-card-title">LÃ THỊ THÚY</strong><small class="qr-showcase-card-hint">Bấm để phóng lớn</small></span><span class="qr-showcase-card-arrow" aria-hidden="true">›</span></span>
+        </button>
+
+        <button class="qr-showcase-card" type="button" data-qr-title="GOOGLE MAPS" data-qr-src="https://drive.google.com/thumbnail?id=1qyuwZJ3L36yobcYMRrAJZMyL2hOYlMiU&amp;sz=w1200" data-qr-link="https://drive.google.com/file/d/1qyuwZJ3L36yobcYMRrAJZMyL2hOYlMiU/view?usp=sharing" onclick="showQrForCustomer(this)">
+          <span class="qr-image-shell">
+            <img src="https://drive.google.com/thumbnail?id=1qyuwZJ3L36yobcYMRrAJZMyL2hOYlMiU&amp;sz=w1200" alt="Ảnh QR Google Maps" loading="lazy" decoding="async" onerror="handleQrImageError(this)">
+            <span class="qr-image-fallback">Không tải được ảnh QR</span>
+          </span>
+          <span class="qr-showcase-card-copy"><span class="qr-showcase-card-text"><strong class="qr-showcase-card-title">GOOGLE MAPS</strong><small class="qr-showcase-card-hint">Bấm để phóng lớn</small></span><span class="qr-showcase-card-arrow" aria-hidden="true">›</span></span>
+        </button>
+      </div>
+    </div>
+
+    <div class="qr-showcase-focus" id="qrShowcaseFocus" hidden>
+      <button class="qr-showcase-back" id="qrShowcaseBack" type="button" onclick="resetQrShowcase(true)"><span aria-hidden="true">←</span> Chọn mã khác</button>
+      <div class="qr-showcase-stage">
+        <div class="qr-image-shell qr-showcase-main-shell" id="qrShowcaseMainShell">
+          <img id="qrShowcaseMainImage" alt="" decoding="async" onerror="handleQrImageError(this)">
+          <span class="qr-image-fallback">Không tải được ảnh QR</span>
+        </div>
+        <h3 class="qr-showcase-main-title" id="qrShowcaseMainTitle"></h3>
+        <p class="qr-showcase-main-note">Đưa màn hình cho khách hàng quét mã QR này.</p>
+        <div class="qr-showcase-actions">
+          <a class="qr-showcase-original" id="qrShowcaseOriginal" href="#" target="_blank" rel="noopener noreferrer">Mở ảnh gốc</a>
+          <button class="qr-showcase-choose" type="button" onclick="resetQrShowcase(true)">Chọn mã khác</button>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
 <div class="fab-wrap">
   <div id="fabMenuItems" style="display:flex;flex-direction:column;gap:10px;align-items:flex-end;overflow:hidden;max-height:0;opacity:0;transition:max-height .35s ease,opacity .3s ease;">
     <button class="fab fab-add admin-only" onclick="openAddModal()">➕ Thêm thiết bị</button>
     <button class="fab admin-only" style="background:#1A5276;color:#fff" onclick="openGroupOrderModal()">↕️ Sắp xếp nhóm</button>
     <button class="fab admin-only" style="background:#5B2C6F;color:#fff" onclick="openQuickOrderModal()">↕️ Sắp xếp lọc</button>
     <button class="fab admin-only" style="background:#8E44AD;color:#fff" onclick="openNVModal()">👥 Nhân viên</button>
-    <button class="fab admin-only" style="background:#21618C;color:#fff" onclick="openCustomerPanel()">👤 Khách hàng</button>
+    <button class="fab admin-only" style="background:#21618C;color:#fff" onclick="requestPrivateAccess('customer')">👤 Khách hàng</button>
     <button class="fab admin-only" style="background:#1F618D;color:#fff" onclick="exportMonthlyAccountingExcel()">🧾 Xuất file Excel</button>
     <button class="fab admin-only" style="background:#922B21;color:#fff" onclick="exportMonthlyAccountingPdf()">📄 Xuất file PDF</button>
     <button class="fab admin-only" style="background:#A04000;color:#fff" onclick="openTrashModal()">♻️ Thùng rác</button>
@@ -5310,10 +6411,53 @@ button,[role="button"],a[href],input,select,textarea{
   </div>
 </div>
 
+<div class="overlay" id="privateAccessOverlay" onclick="if(event.target===this)closePrivateAccess()">
+  <div class="modal private-access-modal" role="dialog" aria-modal="true" aria-labelledby="privateAccessTitle" onclick="event.stopPropagation()">
+    <div class="private-access-badge" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="11" rx="3"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v3"></path></svg></div>
+    <h2 class="private-access-title" id="privateAccessTitle">MỞ HỒ SƠ KHÁCH HÀNG</h2>
+    <p class="private-access-subtitle" id="privateAccessSubtitle">Mật khẩu được kiểm tra trực tiếp tại API, không được lưu trong mã HTML.</p>
+    <div class="admin-password-wrap">
+      <input id="privateAccessPassword" type="password" autocomplete="current-password" placeholder="Nhập mật khẩu" onkeydown="if(event.key==='Enter')submitPrivateAccess()">
+      <button type="button" class="admin-password-toggle" aria-label="Hiện hoặc ẩn mật khẩu" title="Hiện hoặc ẩn mật khẩu" onclick="const input=document.getElementById('privateAccessPassword');input.type=input.type==='password'?'text':'password';this.classList.toggle('password-visible',input.type==='text')"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"></path><circle cx="12" cy="12" r="2.7"></circle></svg></button>
+    </div>
+    <div class="private-access-error" id="privateAccessError" aria-live="polite"></div>
+    <div class="private-access-actions"><button class="btn-cancel btn-cancel-danger" type="button" onclick="closePrivateAccess()">Huỷ</button><button class="btn-submit" id="privateAccessSubmit" type="button" onclick="submitPrivateAccess()">Đăng Nhập</button></div>
+  </div>
+</div>
+
+<div class="overlay" id="partnerOverlay" onclick="if(event.target===this)closePartnerPanel()">
+  <section class="partner-modal" role="dialog" aria-modal="true" aria-labelledby="partnerTitle" onclick="event.stopPropagation()">
+    <header class="partner-head"><div class="partner-title" id="partnerTitle">🤝 DANH BẠ ĐỐI TÁC KỸ THUẬT</div><button type="button" class="partner-close" aria-label="Đóng" onclick="closePartnerPanel()">×</button></header>
+    <div class="partner-filters">
+      <select id="partnerDistrict" aria-label="Chọn quận huyện" onchange="renderPartners()"><option value="">Tất cả quận / huyện</option></select>
+      <input id="partnerSearch" type="search" autocomplete="off" placeholder="Tìm tên, số điện thoại, địa chỉ..." oninput="renderPartners()">
+      <button class="partner-add" type="button" onclick="openPartnerEditor()">＋ Thêm đối tác</button>
+    </div>
+    <div class="partner-service-filter" id="partnerServiceFilter" aria-label="Lọc theo dịch vụ"></div>
+    <div class="partner-summary" id="partnerSummary"></div>
+    <div class="partner-list" id="partnerList"><div class="partner-empty">Đang tải danh sách đối tác...</div></div>
+    <div class="partner-editor" id="partnerEditor">
+      <input id="partnerEditId" type="hidden">
+      <div class="partner-editor-grid">
+        <label>Tên đối tác *<input id="partnerEditName" type="text" autocomplete="off" placeholder="Tên cá nhân hoặc cửa hàng"></label>
+        <label>Quận / huyện *<input id="partnerEditDistrict" type="text" list="partnerDistrictSuggestions" autocomplete="off" placeholder="VD: TP Thủ Đức"></label>
+        <datalist id="partnerDistrictSuggestions"></datalist>
+        <div class="wide"><div style="margin-bottom:6px;color:#405B6E;font-size:11px;font-weight:900">Dịch vụ phụ trách</div><div class="partner-service-editor" id="partnerServiceEditor"><label><input type="checkbox" value="Máy tính"> Máy tính</label><label><input type="checkbox" value="Máy in"> Máy in</label><label><input type="checkbox" value="Camera"> Camera</label><label><input type="checkbox" value="Internet"> Internet</label></div></div>
+        <label>Số điện thoại<input id="partnerEditPhone" type="tel" inputmode="tel" autocomplete="off" placeholder="0901234567"></label>
+        <label>Link định vị Google Maps<input id="partnerEditMap" type="url" inputmode="url" autocomplete="off" placeholder="https://maps.google.com/..."></label>
+        <label class="wide">Địa chỉ<textarea id="partnerEditAddress" placeholder="Số nhà, đường, phường, quận..."></textarea></label>
+        <label class="wide">Ghi chú<textarea id="partnerEditNote" placeholder="Thế mạnh, khung giờ liên hệ, lưu ý khi chuyển việc..."></textarea></label>
+      </div>
+      <div class="partner-editor-actions"><button class="partner-cancel" type="button" onclick="closePartnerEditor()">Huỷ</button><button class="partner-save" id="partnerSaveButton" type="button" onclick="savePartner()">💾 Lưu đối tác</button></div>
+    </div>
+    <div class="simple-sticky-actions"><div class="edit-save-buttons"><button class="btn-submit" type="button" onclick="closePartnerPanel()">Đóng</button></div></div>
+  </section>
+</div>
+
 <div class="overlay" id="customerOverlay">
-  <div class="modal customer-modal" onclick="event.stopPropagation()">
+  <div class="modal customer-modal" role="dialog" aria-modal="true" aria-labelledby="customerPanelTitle" onclick="event.stopPropagation()">
     <div class="customer-head">
-      <div class="customer-title">👤 HỒ SƠ KHÁCH HÀNG</div>
+      <div class="customer-title" id="customerPanelTitle">👤 HỒ SƠ KHÁCH HÀNG</div>
       <button type="button" class="customer-close" aria-label="Đóng" onclick="closeCustomerPanel()">×</button>
     </div>
     <div class="customer-search-wrap">
@@ -5322,7 +6466,7 @@ button,[role="button"],a[href],input,select,textarea{
     </div>
     <div class="customer-search-help">Có thể nhập đầy đủ số điện thoại, 4 số cuối hoặc tên khách hàng.</div>
     <div class="customer-toolbar">
-      <button type="button" class="customer-primary admin-only" onclick="openCustomerEditor()">＋ Thêm khách hàng</button>
+      <button type="button" class="customer-primary" onclick="openCustomerEditor()">＋ Thêm khách hàng</button>
     </div>
     <div id="customerResults" class="customer-results"></div>
     <div id="customerDetail" class="customer-detail"></div>
@@ -5875,13 +7019,11 @@ function revealAdminEntry(openLogin){
 function handleOwnerTap(){
   ownerTapCount++;
   clearTimeout(ownerTapTimer);
-  // Chờ người dùng ngừng chạm rồi mới quyết định, để lần thứ 5 không mở
-  // khách hàng khi họ đang tiếp tục chạm đến lần thứ 7 để vào Admin.
+  // Chờ người dùng ngừng chạm rồi mới quyết định. Hồ sơ khách hàng chỉ mở từ Dock.
   ownerTapTimer = setTimeout(()=>{
     const taps = ownerTapCount;
     ownerTapCount = 0;
     if(taps >= 7) revealAdminEntry(true);
-    else if(taps >= 5) openCustomerPanel();
     else if(taps >= 3) openSyncErrorLog();
   }, 320);
 }
@@ -5970,7 +7112,7 @@ function checkAdminSession(){
 
 // Dòng URL duy nhất
 const SHEET_API_URL = "https://script.google.com/macros/s/AKfycby6YH69F7sfO1ZoUJsDm4BeX6Luj2GrhUfYWWJWNvqjraAEhkBck16EphrPBBm1BT3YqA/exec";
-const REQUIRED_API_VERSION = "2026.07.30-stable-26";
+const REQUIRED_API_VERSION = "2026.08.01-private-customer-partner-27";
 // Apps Script có thể phải chờ khóa ghi khi nhiều thao tác diễn ra gần nhau.
 // 45 giây dài hơn thời gian chờ khóa phía máy chủ, tránh báo lỗi giả trong khi Sheet vẫn đang ghi.
 const SHEET_TIMEOUT_MS = 45000;
@@ -11807,17 +12949,103 @@ function filterByBrand(brand){
   showToast(`Đang xem thương hiệu: ${value}`);
 }
 
-const CUSTOMER_CACHE_KEY = "kho_cntt_customers_cache";
+let privateAccessTarget = "customer";
+let privateAccessToken = "";
+let privateAccessBusy = false;
+const PRIVATE_DISTRICTS = ["TP Thủ Đức","Quận 1","Quận 3","Quận 4","Quận 5","Quận 6","Quận 7","Quận 8","Quận 10","Quận 11","Quận 12","Bình Thạnh","Gò Vấp","Phú Nhuận","Tân Bình","Tân Phú","Bình Tân","Bình Chánh","Hóc Môn","Củ Chi","Nhà Bè","Cần Giờ"];
+const PARTNER_SERVICES = ["Máy tính","Máy in","Camera","Internet"];
+try{ localStorage.removeItem("kho_cntt_customers_cache"); }catch(_){ }
+
+function requestPrivateAccess(target){
+  privateAccessTarget = target === "partner" ? "partner" : "customer";
+  privateAccessToken = "";
+  const overlay=document.getElementById("privateAccessOverlay");
+  const password=document.getElementById("privateAccessPassword");
+  const isPartner=privateAccessTarget==="partner";
+  document.getElementById("privateAccessTitle").textContent=isPartner?"MỞ DANH BẠ ĐỐI TÁC":"MỞ HỒ SƠ KHÁCH HÀNG";
+  document.getElementById("privateAccessSubtitle").textContent="Mật khẩu được kiểm tra trực tiếp tại API và không được lưu trong mã HTML.";
+  document.getElementById("privateAccessError").textContent="";
+  if(password){ password.value=""; password.type="password"; password.disabled=false; }
+  document.querySelector("#privateAccessOverlay .admin-password-toggle")?.classList.remove("password-visible");
+  overlay?.classList.add("open");
+  document.body.classList.add("private-panel-open");
+  setTimeout(()=>password?.focus({preventScroll:true}),90);
+}
+function closePrivateAccess(){
+  document.getElementById("privateAccessOverlay")?.classList.remove("open");
+  if(!document.getElementById("customerOverlay")?.classList.contains("open") && !document.getElementById("partnerOverlay")?.classList.contains("open")) document.body.classList.remove("private-panel-open");
+  const password=document.getElementById("privateAccessPassword");
+  if(password){password.value="";password.disabled=false;}
+  privateAccessBusy=false;
+}
+async function submitPrivateAccess(){
+  if(privateAccessBusy) return;
+  const password=document.getElementById("privateAccessPassword");
+  const submit=document.getElementById("privateAccessSubmit");
+  const errorBox=document.getElementById("privateAccessError");
+  const value=password?.value || "";
+  if(!value){ errorBox.textContent="Vui lòng nhập mật khẩu."; password?.focus(); return; }
+  privateAccessBusy=true;
+  if(password) password.disabled=true;
+  if(submit){submit.disabled=true;submit.textContent="Đang xác thực...";}
+  errorBox.textContent="";
+  try{
+    const verified=await fetchSheetJson(SHEET_API_URL,{
+      method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},
+      body:JSON.stringify({action:"verify_private_access",password:value})
+    },20000);
+    if(!verified.token) throw new Error("API không cấp phiên truy cập");
+    privateAccessToken=verified.token;
+    const target=privateAccessTarget;
+    closePrivateAccess();
+    if(target==="partner") await openPartnerPanel();
+    else await openCustomerPanel();
+  }catch(e){
+    privateAccessToken="";
+    const message=String(e);
+    errorBox.textContent=message.includes("PRIVATE_LOGIN_FAILED")?"Sai mật khẩu. Vui lòng thử lại.":message.includes("RATE_LIMIT")?"Đã thử sai nhiều lần. Vui lòng đợi 1 phút.":"Không thể xác thực với API. Hãy kiểm tra kết nối.";
+    password?.select();
+  }finally{
+    privateAccessBusy=false;
+    if(password) password.disabled=false;
+    if(submit){submit.disabled=false;submit.textContent="Đăng Nhập";}
+  }
+}
+function clearPrivateSession(){
+  privateAccessToken="";
+  CUSTOMER_DATA=[];
+  CUSTOMER_RECORDS=[];
+  PARTNER_DATA=[];
+}
+function hasPrivateFeatureAccess(){
+  return !!privateAccessToken || (isAdminMode() && !!sessionStorage.getItem("kho_admin_session_token"));
+}
+function requirePrivateFeatureAccess(){
+  if(hasPrivateFeatureAccess()) return true;
+  showToast("Phiên truy cập đã hết hạn. Vui lòng nhập mật khẩu lại.",3500);
+  requestPrivateAccess(privateAccessTarget);
+  return false;
+}
+async function privateSheet(action,data={},timeoutMs=SHEET_TIMEOUT_MS){
+  const adminToken=sessionStorage.getItem("kho_admin_session_token") || "";
+  try{
+    return await fetchSheetJson(SHEET_API_URL,{
+      method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},
+      body:JSON.stringify({action,data,privateAuth:privateAccessToken,auth:adminToken})
+    },timeoutMs);
+  }catch(e){
+    if(String(e).includes("PRIVATE_AUTH_REQUIRED")){
+      clearPrivateSession();
+      throw new Error("Phiên bảo mật đã hết hạn. Vui lòng đóng bảng và nhập mật khẩu lại.");
+    }
+    throw e;
+  }
+}
+
 let CUSTOMER_DATA = [];
 let CUSTOMER_RECORDS = [];
 let selectedCustomer = null;
 let customerSearchTimer = null;
-let customerHoldTimer = null;
-let customerHoldOpened = false;
-let customerHoldPointerId = null;
-let customerHoldStartX = 0;
-let customerHoldStartY = 0;
-let suppressOwnerTapOnce = false;
 let customerSaving = false;
 let customerCreatingCombined = false;
 
@@ -11849,19 +13077,18 @@ function cacheSavedCustomer(customer){
   const index=CUSTOMER_DATA.findIndex(item=>item.id===normalized.id || item.phone===normalized.phone);
   if(index>=0) CUSTOMER_DATA[index]=normalized;
   else CUSTOMER_DATA.unshift(normalized);
-  safeLocalStorageSet(CUSTOMER_CACHE_KEY,JSON.stringify(CUSTOMER_DATA));
   return normalized;
 }
 async function upsertCustomerSafely(payload){
   const data={...payload};
   if(!data.id) data.id=makeCustomerRequestId("KH");
   try{
-    return await postSheet("upsert_customer",data,70000);
+    return await privateSheet("upsert_customer",data,70000);
   }catch(originalError){
     // POST có thể đã ghi xong nhưng phản hồi bị mất hoặc hết giờ chờ.
     // Đọc lại bằng ID/số điện thoại trước khi báo lỗi để tránh người dùng bấm lưu lần hai.
     try{
-      const json=await fetchSheetJson(sheetUrl({type:"customers",_ts:Date.now()}),{},45000);
+      const json=await privateSheet("private_customers",{},45000);
       const found=normalizeCustomerList(json.customers).find(item=>item.id===data.id || item.phone===normalizeCustomerPhone(data.phone));
       if(found && found.name===cleanQuickLabel(data.name||"") && found.note===String(data.note||"")){
         return {ok:true,customer:found,verifiedAfterError:true};
@@ -11874,10 +13101,10 @@ async function upsertCustomerRecordSafely(payload){
   const data={...payload};
   if(!data.id) data.id=makeCustomerRequestId("HS");
   try{
-    return await postSheet("upsert_customer_record",data,70000);
+    return await privateSheet("upsert_customer_record",data,70000);
   }catch(originalError){
     try{
-      const json=await fetchSheetJson(sheetUrl({type:"customer_records",phone:data.phone,_ts:Date.now()}),{},45000);
+      const json=await privateSheet("private_customer_records",{phone:data.phone},45000);
       const found=(Array.isArray(json.records)?json.records:[]).find(item=>String(item.id)===String(data.id));
       if(found) return {ok:true,record:found,verifiedAfterError:true};
     }catch(_){}
@@ -11886,21 +13113,13 @@ async function upsertCustomerRecordSafely(payload){
 }
 async function loadCustomers(force=false){
   if(!force && CUSTOMER_DATA.length) return CUSTOMER_DATA;
-  try{
-    const cached = JSON.parse(localStorage.getItem(CUSTOMER_CACHE_KEY) || "[]");
-    if(!CUSTOMER_DATA.length) CUSTOMER_DATA = normalizeCustomerList(cached);
-  }catch(e){}
-  try{
-    const json = await fetchSheetJson(sheetUrl({type:"customers",_ts:Date.now()}),{},35000);
-    CUSTOMER_DATA = normalizeCustomerList(json.customers);
-    safeLocalStorageSet(CUSTOMER_CACHE_KEY,JSON.stringify(CUSTOMER_DATA));
-  }catch(e){
-    if(!CUSTOMER_DATA.length) throw e;
-    showToast("⚠️ Đang dùng danh sách khách đã lưu trên máy",3200);
-  }
+  const json = await privateSheet("private_customers",{},35000);
+  CUSTOMER_DATA = normalizeCustomerList(json.customers);
   return CUSTOMER_DATA;
 }
 async function openCustomerPanel(){
+  privateAccessTarget="customer";
+  if(!requirePrivateFeatureAccess()) return;
   const overlay = document.getElementById("customerOverlay");
   overlay.classList.add("open");
   document.body.style.overflow = "hidden";
@@ -11918,6 +13137,8 @@ function closeCustomerPanel(){
   selectedCustomer = null;
   CUSTOMER_RECORDS = [];
   closeCustomerEditors();
+  clearPrivateSession();
+  document.body.classList.remove("private-panel-open");
 }
 function scheduleCustomerSearch(){
   clearTimeout(customerSearchTimer);
@@ -11949,7 +13170,7 @@ async function openCustomerDetail(phone){
   document.getElementById("customerResults").innerHTML="";
   renderCustomerDetail(true);
   try{
-    const json = await fetchSheetJson(sheetUrl({type:"customer_records",phone:selectedCustomer.phone,_ts:Date.now()}),{},35000);
+    const json = await privateSheet("private_customer_records",{phone:selectedCustomer.phone},35000);
     CUSTOMER_RECORDS = Array.isArray(json.records) ? json.records : [];
     renderCustomerDetail(false);
   }catch(e){
@@ -11999,9 +13220,9 @@ function renderCustomerDetail(loading=false){
   const c=selectedCustomer;
   const recordsHtml = loading ? '<div class="customer-empty">⏳ Đang tải lịch sử bill...</div>' : (CUSTOMER_RECORDS.length ? CUSTOMER_RECORDS.map(record=>{
     const images=splitCustomerImages(record.images);
-    return `<article class="customer-record ${record.status==="CANCELLED"?"cancelled":""}"><div class="customer-record-head"><span>🕒 ${escapeHtml(formatCustomerRecordTime(record.time))} · ${escapeHtml(record.branch || "Q2")}</span><span>${escapeHtml(record.employee || "")}${record.status==="CANCELLED"?" · ĐÃ HỦY":""}</span></div><div class="customer-record-device">${escapeHtml(record.device || "Thiết bị chưa ghi tên")}</div><div class="customer-record-specs">${record.model?`<span class="customer-record-spec">Model: ${escapeHtml(record.model)}</span>`:""}${record.serialTag?`<span class="customer-record-spec">Serial: ${escapeHtml(record.serialTag)}</span>`:""}${Number(record.amount)>0?`<span class="customer-record-spec amount">💰 ${formatVndNumber(record.amount)} VND</span>`:""}</div><div class="customer-record-work">${escapeHtml(record.work || "Chưa ghi nội dung đã làm")}</div>${record.note?`<div class="customer-record-note">📝 ${escapeHtml(record.note)}</div>`:""}${images.length?`<div class="customer-bill-grid">${images.map(url=>`<img class="customer-bill-img" src="${escapeHtml(resolveImageUrl(url))}" data-full="${escapeHtml(resolveImageUrl(url))}" alt="Ảnh bill" loading="lazy" referrerpolicy="no-referrer" onclick="openCustomerBillImage(this)">`).join("")}</div>`:""}<div class="customer-toolbar admin-only"><button type="button" class="customer-secondary" data-record-id="${escapeHtml(record.id)}" onclick="openCustomerRecordEditor(this.dataset.recordId)">✏️ Sửa hồ sơ</button><button type="button" class="btn-delete" data-record-id="${escapeHtml(record.id)}" onclick="deleteCustomerRecord(this.dataset.recordId)">🗑️ Xóa</button></div></article>`;
+    return `<article class="customer-record ${record.status==="CANCELLED"?"cancelled":""}"><div class="customer-record-head"><span>🕒 ${escapeHtml(formatCustomerRecordTime(record.time))} · ${escapeHtml(record.branch || "Q2")}</span><span>${escapeHtml(record.employee || "")}${record.status==="CANCELLED"?" · ĐÃ HỦY":""}</span></div><div class="customer-record-device">${escapeHtml(record.device || "Thiết bị chưa ghi tên")}</div><div class="customer-record-specs">${record.model?`<span class="customer-record-spec">Model: ${escapeHtml(record.model)}</span>`:""}${record.serialTag?`<span class="customer-record-spec">Serial: ${escapeHtml(record.serialTag)}</span>`:""}${Number(record.amount)>0?`<span class="customer-record-spec amount">💰 ${formatVndNumber(record.amount)} VND</span>`:""}</div><div class="customer-record-work">${escapeHtml(record.work || "Chưa ghi nội dung đã làm")}</div>${record.note?`<div class="customer-record-note">📝 ${escapeHtml(record.note)}</div>`:""}${images.length?`<div class="customer-bill-grid">${images.map(url=>`<img class="customer-bill-img" src="${escapeHtml(resolveImageUrl(url))}" data-full="${escapeHtml(resolveImageUrl(url))}" alt="Ảnh bill" loading="lazy" referrerpolicy="no-referrer" onclick="openCustomerBillImage(this)">`).join("")}</div>`:""}<div class="customer-toolbar"><button type="button" class="customer-secondary" data-record-id="${escapeHtml(record.id)}" onclick="openCustomerRecordEditor(this.dataset.recordId)">✏️ Sửa hồ sơ</button><button type="button" class="btn-delete admin-only" data-record-id="${escapeHtml(record.id)}" onclick="deleteCustomerRecord(this.dataset.recordId)">🗑️ Xóa</button></div></article>`;
   }).join("") : '<div class="customer-empty">Khách này chưa có bill hoặc lịch sử sửa chữa.</div>');
-  document.getElementById("customerDetail").innerHTML=`<div class="customer-profile"><div class="customer-profile-name">${escapeHtml(c.name || "KHÁCH CHƯA GHI TÊN")}</div><div class="customer-profile-phone">☎ ${escapeHtml(formatCustomerPhone(c.phone))}</div>${c.note?`<div class="customer-profile-note">${escapeHtml(c.note)}</div>`:""}</div><div class="customer-toolbar admin-only"><button type="button" class="customer-secondary" onclick="openCustomerEditor('${c.phone}')">✏️ Sửa khách</button><button type="button" class="customer-primary" onclick="openCustomerRecordEditor()">＋ Thêm bill / lần sửa</button><button type="button" class="btn-delete" onclick="deleteSelectedCustomer()">🗑️ Xóa khách</button></div><div class="customer-records">${recordsHtml}</div>`;
+  document.getElementById("customerDetail").innerHTML=`<div class="customer-profile"><div class="customer-profile-name">${escapeHtml(c.name || "KHÁCH CHƯA GHI TÊN")}</div><div class="customer-profile-phone">☎ ${escapeHtml(formatCustomerPhone(c.phone))}</div>${c.note?`<div class="customer-profile-note">${escapeHtml(c.note)}</div>`:""}</div><div class="customer-toolbar"><button type="button" class="customer-secondary" onclick="openCustomerEditor('${c.phone}')">✏️ Sửa khách</button><button type="button" class="customer-primary" onclick="openCustomerRecordEditor()">＋ Thêm bill / lần sửa</button><button type="button" class="btn-delete admin-only" onclick="deleteSelectedCustomer()">🗑️ Xóa khách</button></div><div class="customer-records">${recordsHtml}</div>`;
 }
 function openCustomerBillImage(img){
   const record=img?.closest?.(".customer-record");
@@ -12017,7 +13238,7 @@ function closeCustomerEditors(){
   customerCreatingCombined=false;
 }
 function openCustomerEditor(phone=""){
-  if(!requireAdmin()) return;
+  if(!requirePrivateFeatureAccess()) return;
   const customer=CUSTOMER_DATA.find(item=>item.phone===normalizeCustomerPhone(phone));
   closeCustomerEditors();
   document.getElementById("customerEditId").value=customer?.id || "";
@@ -12037,7 +13258,7 @@ function openCustomerEditor(phone=""){
   setTimeout(()=>document.getElementById("customerEditPhone")?.focus(),60);
 }
 async function saveCustomerProfile(){
-  if(!requireAdmin() || customerSaving) return;
+  if(!requirePrivateFeatureAccess() || customerSaving) return;
   const phone=normalizeCustomerPhone(document.getElementById("customerEditPhone").value);
   if(phone.length<9){ alert("Số điện thoại không hợp lệ!"); return; }
   customerSaving=true;
@@ -12073,7 +13294,7 @@ function fillCustomerRecordEditor(record=null){
   document.getElementById("customerEmployeeSuggestions").innerHTML=NV_LIST.map(n=>`<option value="${escapeHtml(getNVName(n))}"></option>`).join("");
 }
 function openCustomerRecordEditor(recordId=""){
-  if(!requireAdmin() || !selectedCustomer) return;
+  if(!requirePrivateFeatureAccess() || !selectedCustomer) return;
   const record=CUSTOMER_RECORDS.find(item=>String(item.id)===String(recordId));
   closeCustomerEditors();
   fillCustomerRecordEditor(record);
@@ -12082,7 +13303,7 @@ function openCustomerRecordEditor(recordId=""){
   document.getElementById("customerRecordEditor").classList.add("open");
 }
 async function saveCustomerRecord(){
-  if(!requireAdmin() || customerSaving || !selectedCustomer) return;
+  if(!requirePrivateFeatureAccess() || customerSaving || !selectedCustomer) return;
   let recordPhone=selectedCustomer.phone;
   let recordCustomerName=selectedCustomer.name || "";
   if(customerCreatingCombined){
@@ -12134,7 +13355,6 @@ async function deleteSelectedCustomer(){
   try{
     await postSheet("delete_customer",{id:selectedCustomer.id,phone:selectedCustomer.phone},35000);
     CUSTOMER_DATA=CUSTOMER_DATA.filter(item=>item.phone!==selectedCustomer.phone);
-    safeLocalStorageSet(CUSTOMER_CACHE_KEY,JSON.stringify(CUSTOMER_DATA));
     selectedCustomer=null; CUSTOMER_RECORDS=[];
     document.getElementById("customerDetail").innerHTML="";
     document.getElementById("customerSearch").value="";
@@ -12142,13 +13362,129 @@ async function deleteSelectedCustomer(){
     showToast("Đã chuyển khách hàng vào Thùng rác");
   }catch(e){ showToast("⚠️ Không xóa được khách hàng: "+String(e),4500); }
 }
+let PARTNER_DATA=[];
+let partnerServiceFilter="";
+let partnerSaving=false;
+function normalizePartnerList(list){
+  if(!Array.isArray(list)) return [];
+  return list.map(item=>({
+    id:String(item?.id||""),name:cleanQuickLabel(item?.name||""),district:cleanQuickLabel(item?.district||""),
+    services:String(item?.services||""),phone:normalizeCustomerPhone(item?.phone),address:String(item?.address||""),
+    mapUrl:String(item?.mapUrl||""),note:String(item?.note||""),status:String(item?.status||"ACTIVE"),updatedAt:String(item?.updatedAt||"")
+  })).filter(item=>item.id&&item.name);
+}
+function splitPartnerServices(value){
+  return [...new Set(String(value||"").split(/[,;|\n]+/).map(v=>v.trim()).filter(Boolean))];
+}
+function safePartnerMapUrl(value){
+  try{const url=new URL(String(value||"").trim());return /^(https?):$/.test(url.protocol)?url.href:"";}catch(_){return "";}
+}
+function fillPartnerDistricts(){
+  const select=document.getElementById("partnerDistrict");
+  const current=select?.value||"";
+  const districts=[...new Set([...PRIVATE_DISTRICTS,...PARTNER_DATA.map(item=>item.district).filter(Boolean)])].sort((a,b)=>a.localeCompare(b,"vi",{numeric:true}));
+  if(select){select.innerHTML='<option value="">Tất cả quận / huyện</option>'+districts.map(value=>`<option value="${escapeHtml(value)}">${escapeHtml(value)}</option>`).join("");select.value=districts.includes(current)?current:"";}
+  const suggestions=document.getElementById("partnerDistrictSuggestions");
+  if(suggestions) suggestions.innerHTML=districts.map(value=>`<option value="${escapeHtml(value)}"></option>`).join("");
+}
+function renderPartnerServiceFilters(){
+  const box=document.getElementById("partnerServiceFilter");
+  if(!box) return;
+  box.innerHTML=['',...PARTNER_SERVICES].map(value=>`<button type="button" class="partner-service-chip ${partnerServiceFilter===value?'active':''}" data-service="${escapeHtml(value)}" onclick="setPartnerServiceFilter(this.dataset.service)">${value?escapeHtml(value):"Tất cả dịch vụ"}</button>`).join("");
+}
+function setPartnerServiceFilter(value){partnerServiceFilter=String(value||"");renderPartnerServiceFilters();renderPartners();}
+function renderPartners(){
+  const list=document.getElementById("partnerList");
+  if(!list) return;
+  const district=document.getElementById("partnerDistrict")?.value||"";
+  const query=removeAccents(document.getElementById("partnerSearch")?.value||"");
+  const matches=PARTNER_DATA.filter(item=>{
+    if(district&&item.district!==district) return false;
+    const services=splitPartnerServices(item.services);
+    if(partnerServiceFilter&&!services.some(service=>removeAccents(service).includes(removeAccents(partnerServiceFilter)))) return false;
+    if(query&&!removeAccents([item.name,item.phone,item.address,item.district,item.services,item.note].join(" ")).includes(query)) return false;
+    return true;
+  });
+  document.getElementById("partnerSummary").textContent=`${matches.length} đối tác${district?` tại ${district}`:""}${partnerServiceFilter?` · ${partnerServiceFilter}`:""}`;
+  if(!matches.length){list.innerHTML='<div class="partner-empty"><span><b>Chưa có đối tác phù hợp.</b><br>Bấm “Thêm đối tác” để lưu người liên hệ đầu tiên cho khu vực này.</span></div>';return;}
+  list.innerHTML=matches.map(item=>{
+    const services=splitPartnerServices(item.services);
+    const mapUrl=safePartnerMapUrl(item.mapUrl);
+    const tel=normalizeCustomerPhone(item.phone);
+    return `<article class="partner-card"><div class="partner-name">${escapeHtml(item.name)}</div><div class="partner-district">📍 ${escapeHtml(item.district||"Chưa ghi khu vực")}</div>${services.length?`<div class="partner-services">${services.map(service=>`<span class="partner-service-tag">${escapeHtml(service)}</span>`).join("")}</div>`:""}<div class="partner-contact">${tel?`<a href="tel:${tel}">☎ ${escapeHtml(formatCustomerPhone(tel))}</a>`:""}${item.address?`<span>🏠 ${escapeHtml(item.address)}</span>`:""}</div>${item.note?`<div class="partner-note">${escapeHtml(item.note)}</div>`:""}<div class="partner-card-actions">${tel?`<a class="partner-call" href="tel:${tel}">Gọi ngay</a>`:""}${mapUrl?`<a class="partner-map" href="${escapeHtml(mapUrl)}" target="_blank" rel="noopener noreferrer">Mở định vị</a>`:""}<button type="button" data-partner-id="${escapeHtml(item.id)}" onclick="openPartnerEditor(this.dataset.partnerId)">Sửa thông tin</button></div></article>`;
+  }).join("");
+}
+async function openPartnerPanel(){
+  privateAccessTarget="partner";
+  if(!requirePrivateFeatureAccess()) return;
+  const overlay=document.getElementById("partnerOverlay");
+  overlay?.classList.add("open");
+  document.body.classList.add("private-panel-open");
+  document.getElementById("partnerSearch").value="";
+  partnerServiceFilter="";
+  closePartnerEditor();
+  renderPartnerServiceFilters();
+  document.getElementById("partnerList").innerHTML='<div class="partner-empty">Đang tải danh sách đối tác...</div>';
+  try{
+    const json=await privateSheet("private_partners",{},35000);
+    PARTNER_DATA=normalizePartnerList(json.partners);
+    fillPartnerDistricts();
+    renderPartners();
+  }catch(e){document.getElementById("partnerList").innerHTML=`<div class="partner-empty">⚠️ Không tải được đối tác: ${escapeHtml(String(e))}</div>`;}
+}
+function closePartnerPanel(){
+  document.getElementById("partnerOverlay")?.classList.remove("open");
+  closePartnerEditor();
+  clearPrivateSession();
+  document.body.classList.remove("private-panel-open");
+}
+function openPartnerEditor(id=""){
+  if(!requirePrivateFeatureAccess()) return;
+  const item=PARTNER_DATA.find(partner=>partner.id===String(id))||null;
+  document.getElementById("partnerEditId").value=item?.id||"";
+  document.getElementById("partnerEditName").value=item?.name||"";
+  document.getElementById("partnerEditDistrict").value=item?.district||document.getElementById("partnerDistrict")?.value||"";
+  document.getElementById("partnerEditPhone").value=item?.phone||"";
+  document.getElementById("partnerEditAddress").value=item?.address||"";
+  document.getElementById("partnerEditMap").value=item?.mapUrl||"";
+  document.getElementById("partnerEditNote").value=item?.note||"";
+  const selected=splitPartnerServices(item?.services).map(removeAccents);
+  document.querySelectorAll("#partnerServiceEditor input[type='checkbox']").forEach(input=>{input.checked=selected.includes(removeAccents(input.value));});
+  document.getElementById("partnerEditor")?.classList.add("open");
+  setTimeout(()=>document.getElementById("partnerEditName")?.focus({preventScroll:true}),60);
+}
+function closePartnerEditor(){document.getElementById("partnerEditor")?.classList.remove("open");}
+async function savePartner(){
+  if(!requirePrivateFeatureAccess()||partnerSaving) return;
+  const name=document.getElementById("partnerEditName").value.trim();
+  const district=document.getElementById("partnerEditDistrict").value.trim();
+  const phone=normalizeCustomerPhone(document.getElementById("partnerEditPhone").value);
+  const mapRaw=document.getElementById("partnerEditMap").value.trim();
+  const mapUrl=mapRaw?safePartnerMapUrl(mapRaw):"";
+  if(!name){showToast("Vui lòng nhập tên đối tác");document.getElementById("partnerEditName").focus();return;}
+  if(!district){showToast("Vui lòng nhập quận/huyện");document.getElementById("partnerEditDistrict").focus();return;}
+  if(phone&&(phone.length<9||phone.length>12)){showToast("Số điện thoại không hợp lệ");return;}
+  if(mapRaw&&!mapUrl){showToast("Link định vị phải bắt đầu bằng http:// hoặc https://");return;}
+  const services=[...document.querySelectorAll("#partnerServiceEditor input:checked")].map(input=>input.value).join(", ");
+  const saveButton=document.getElementById("partnerSaveButton");
+  partnerSaving=true;if(saveButton){saveButton.disabled=true;saveButton.textContent="Đang lưu...";}
+  try{
+    const json=await privateSheet("upsert_partner",{id:document.getElementById("partnerEditId").value||makeCustomerRequestId("DT"),name,district,services,phone,address:document.getElementById("partnerEditAddress").value.trim(),mapUrl,note:document.getElementById("partnerEditNote").value.trim()},70000);
+    const saved=normalizePartnerList([json.partner])[0];
+    const index=PARTNER_DATA.findIndex(item=>item.id===saved.id);
+    if(index>=0) PARTNER_DATA[index]=saved;else PARTNER_DATA.unshift(saved);
+    fillPartnerDistricts();closePartnerEditor();renderPartners();showToast("✅ Đã lưu đối tác");
+  }catch(e){showToast("⚠️ Không lưu được đối tác: "+String(e),4500);}
+  finally{partnerSaving=false;if(saveButton){saveButton.disabled=false;saveButton.textContent="💾 Lưu đối tác";}}
+}
+
 async function openTrashModal(){
   if(!requireAdmin()) return;
   document.getElementById("trashOverlay").classList.add("open");
   const list=document.getElementById("trashList");
   list.innerHTML='<div class="customer-empty">⏳ Đang tải thùng rác...</div>';
   try{
-    const json=await fetchSheetJson(sheetUrl({type:"trash",_ts:Date.now()}),{},35000);
+    const json=await postSheet("get_trash",{},35000);
     renderTrashList(Array.isArray(json.trash)?json.trash:[]);
   }catch(e){ list.innerHTML=`<div class="customer-empty">⚠️ ${escapeHtml(String(e))}</div>`; }
 }
@@ -12179,38 +13515,10 @@ async function restoreTrashItem(id){
     showToast("✅ Đã khôi phục dữ liệu");
   }catch(e){ showToast("⚠️ Không khôi phục được: "+String(e),4500); }
 }
-function setupCustomerSecretHold(){
-  const icon=document.querySelector(".title-icon");
-  if(!icon || icon.dataset.customerHoldBound) return;
-  icon.dataset.customerHoldBound="1";
-  // Tách hoàn toàn biểu tượng khỏi thao tác bấm 7 lần trên phần tiêu đề còn lại.
-  icon.addEventListener("click",event=>{ event.preventDefault(); event.stopPropagation(); });
-  const cancel=()=>{ clearTimeout(customerHoldTimer); customerHoldTimer=null; icon.classList.remove("customer-holding"); customerHoldPointerId=null; };
-  icon.addEventListener("pointerdown",event=>{
-    if(event.button!==undefined && event.button!==0) return;
-    customerHoldOpened=false;
-    cancel();
-    customerHoldPointerId=event.pointerId;
-    customerHoldStartX=event.clientX;
-    customerHoldStartY=event.clientY;
-    try{ icon.setPointerCapture(event.pointerId); }catch(e){}
-    icon.classList.add("customer-holding");
-    customerHoldTimer=setTimeout(()=>{
-      customerHoldOpened=true;
-      suppressOwnerTapOnce=true;
-      icon.classList.remove("customer-holding");
-      try{ navigator.vibrate?.(45); }catch(e){}
-      openCustomerPanel();
-    },3400);
-  });
-  icon.addEventListener("pointermove",event=>{
-    if(customerHoldPointerId!==event.pointerId) return;
-    if(Math.hypot(event.clientX-customerHoldStartX,event.clientY-customerHoldStartY)>48) cancel();
-  });
-  ["pointerup","pointercancel"].forEach(type=>icon.addEventListener(type,cancel));
-}
 function closeOverlay(id){
   if(id==="customerOverlay"){ closeCustomerPanel(); return; }
+  if(id==="partnerOverlay"){ closePartnerPanel(); return; }
+  if(id==="privateAccessOverlay"){ closePrivateAccess(); return; }
   document.getElementById(id).classList.remove("open");
   if(id==="txOverlay"){
     document.documentElement.classList.remove("tx-overlay-open");
@@ -13689,6 +14997,179 @@ window.addEventListener("resize",()=>{
   clearTimeout(mobileTabMarqueeResizeTimer);
   mobileTabMarqueeResizeTimer=setTimeout(startMobileTabLabelMarquee,120);
 },{passive:true});
+
+// Thư viện QR demo: chọn một trong bốn ảnh rồi phóng lớn để khách hàng quét.
+let qrShowcaseLastFocus=null;
+let qrShowcaseCloseTimer=0;
+function openQrShowcase(){
+  const overlay=document.getElementById("qrShowcaseOverlay");
+  if(!overlay) return;
+  clearTimeout(qrShowcaseCloseTimer);
+  qrShowcaseLastFocus=document.activeElement;
+  resetQrShowcase(false);
+  overlay.hidden=false;
+  overlay.setAttribute("aria-hidden","false");
+  document.body.classList.add("qr-showcase-open");
+  requestAnimationFrame(()=>overlay.classList.add("is-open"));
+  setTimeout(()=>document.getElementById("qrShowcaseClose")?.focus(),80);
+}
+function closeQrShowcase(){
+  const overlay=document.getElementById("qrShowcaseOverlay");
+  if(!overlay||overlay.hidden) return;
+  overlay.classList.remove("is-open");
+  overlay.setAttribute("aria-hidden","true");
+  document.body.classList.remove("qr-showcase-open");
+  clearTimeout(qrShowcaseCloseTimer);
+  qrShowcaseCloseTimer=setTimeout(()=>{
+    overlay.hidden=true;
+    if(qrShowcaseLastFocus&&typeof qrShowcaseLastFocus.focus==="function") qrShowcaseLastFocus.focus();
+  },210);
+}
+function resetQrShowcase(restoreFocus=false){
+  const browse=document.getElementById("qrShowcaseBrowse");
+  const focusView=document.getElementById("qrShowcaseFocus");
+  const mainImage=document.getElementById("qrShowcaseMainImage");
+  const mainShell=document.getElementById("qrShowcaseMainShell");
+  if(browse) browse.hidden=false;
+  if(focusView) focusView.hidden=true;
+  if(mainImage){
+    mainImage.removeAttribute("src");
+    mainImage.alt="";
+    mainImage.hidden=false;
+  }
+  mainShell?.classList.remove("is-error");
+  if(restoreFocus) setTimeout(()=>document.querySelector(".qr-showcase-card")?.focus(),30);
+}
+function showQrForCustomer(card){
+  if(!card) return;
+  const browse=document.getElementById("qrShowcaseBrowse");
+  const focusView=document.getElementById("qrShowcaseFocus");
+  const mainImage=document.getElementById("qrShowcaseMainImage");
+  const mainShell=document.getElementById("qrShowcaseMainShell");
+  const mainTitle=document.getElementById("qrShowcaseMainTitle");
+  const originalLink=document.getElementById("qrShowcaseOriginal");
+  const title=card.dataset.qrTitle||"QR CODE";
+  if(!browse||!focusView||!mainImage) return;
+  mainShell?.classList.remove("is-error");
+  mainImage.hidden=false;
+  mainImage.onload=()=>{
+    mainImage.hidden=false;
+    mainShell?.classList.remove("is-error");
+  };
+  mainImage.src=card.dataset.qrSrc||"";
+  mainImage.alt=`Mã ${title} phóng lớn để khách hàng quét`;
+  if(mainTitle) mainTitle.textContent=title;
+  if(originalLink) originalLink.href=card.dataset.qrLink||card.dataset.qrSrc||"#";
+  browse.hidden=true;
+  focusView.hidden=false;
+  focusView.scrollTop=0;
+  setTimeout(()=>document.getElementById("qrShowcaseBack")?.focus(),40);
+}
+function handleQrImageError(image){
+  if(!image) return;
+  image.hidden=true;
+  image.closest(".qr-image-shell")?.classList.add("is-error");
+}
+document.addEventListener("keydown",event=>{
+  if(event.key!=="Escape" || document.getElementById("imageLightbox")?.classList.contains("open")) return;
+  if(document.getElementById("privateAccessOverlay")?.classList.contains("open")){ closePrivateAccess(); return; }
+  if(document.getElementById("partnerOverlay")?.classList.contains("open")){ closePartnerPanel(); return; }
+  if(document.getElementById("customerOverlay")?.classList.contains("open")){ closeCustomerPanel(); }
+});
+document.addEventListener("keydown",event=>{
+  if(event.key!=="Escape") return;
+  const overlay=document.getElementById("qrShowcaseOverlay");
+  if(!overlay||overlay.hidden) return;
+  event.preventDefault();
+  event.stopPropagation();
+  const focusView=document.getElementById("qrShowcaseFocus");
+  if(focusView&&!focusView.hidden) resetQrShowcase(true);
+  else closeQrShowcase();
+},true);
+
+// Hiệu ứng phóng đại kiểu macOS: mức phóng đại giảm dần theo khoảng cách đến con trỏ.
+(()=>{
+  const dock=document.getElementById("customerQrDock");
+  if(!dock||dock.dataset.magnifyReady==="true") return;
+  const apps=[...dock.querySelectorAll(".macos-dock-app")];
+  const finePointer=window.matchMedia("(hover:hover) and (pointer:fine)");
+  let animationFrame=0;
+  let lastPointerX=0;
+
+  const applyMagnification=(app,scale,lift,shift=0,slotGrow=0)=>{
+    app.style.setProperty("--dock-scale",scale.toFixed(3));
+    app.style.setProperty("--dock-lift",`${(-Math.max(0,lift)).toFixed(2)}px`);
+    app.style.setProperty("--dock-shift-x",`${shift.toFixed(2)}px`);
+    app.style.setProperty("--dock-slot-grow",`${Math.max(0,slotGrow).toFixed(2)}px`);
+  };
+  const resetMagnification=()=>{
+    if(animationFrame){
+      cancelAnimationFrame(animationFrame);
+      animationFrame=0;
+    }
+    dock.classList.remove("is-tracking");
+    apps.forEach(app=>{
+      app.classList.remove("dock-active");
+      applyMagnification(app,1,0,0,0);
+    });
+  };
+  const renderMagnification=()=>{
+    animationFrame=0;
+    const influenceRadius=100;
+    const dockRect=dock.getBoundingClientRect();
+    const baseSlot=parseFloat(getComputedStyle(dock).getPropertyValue("--dock-app-width"))||44;
+    const gap=parseFloat(getComputedStyle(dock).columnGap)||0;
+    const spacing=baseSlot+gap;
+    const dockCenter=dockRect.left+dockRect.width/2;
+    let activeIndex=-1;
+    let strongestInfluence=0;
+    apps.forEach((app,index)=>{
+      const virtualCenter=dockCenter+(index-(apps.length-1)/2)*spacing;
+      const delta=virtualCenter-lastPointerX;
+      const distance=Math.abs(delta);
+      const normalized=Math.min(1,distance/influenceRadius);
+      const smooth=.5+.5*Math.cos(Math.PI*normalized);
+      const shift=distance<1?0:Math.sign(delta)*16*smooth*(1-smooth);
+      applyMagnification(app,1+.82*smooth,13*smooth,shift,12*smooth);
+      if(smooth>strongestInfluence){
+        strongestInfluence=smooth;
+        activeIndex=index;
+      }
+    });
+    apps.forEach((app,index)=>app.classList.toggle("dock-active",index===activeIndex&&strongestInfluence>.08));
+  };
+
+  dock.addEventListener("pointermove",event=>{
+    if(!finePointer.matches||(event.pointerType&&event.pointerType!=="mouse")) return;
+    lastPointerX=event.clientX;
+    dock.classList.add("is-tracking");
+    if(!animationFrame) animationFrame=requestAnimationFrame(renderMagnification);
+  },{passive:true});
+  dock.addEventListener("pointerleave",resetMagnification,{passive:true});
+  dock.addEventListener("pointercancel",resetMagnification,{passive:true});
+
+  apps.forEach((app,index)=>{
+    app.addEventListener("focus",()=>{
+      if(!finePointer.matches) return;
+      resetMagnification();
+      apps.forEach((candidate,candidateIndex)=>{
+        const offset=Math.abs(candidateIndex-index);
+        const direction=Math.sign(candidateIndex-index);
+        candidate.classList.toggle("dock-active",offset===0);
+        applyMagnification(candidate,offset===0?1.78:offset===1?1.26:1,offset===0?12:offset===1?4:0,offset===1?direction*4:0,offset===0?12:offset===1?5:0);
+      });
+    });
+    app.addEventListener("blur",()=>{
+      requestAnimationFrame(()=>{
+        if(!dock.matches(":focus-within")) resetMagnification();
+      });
+    });
+  });
+  if(typeof finePointer.addEventListener==="function"){
+    finePointer.addEventListener("change",event=>{if(!event.matches) resetMagnification()});
+  }
+  dock.dataset.magnifyReady="true";
+})();
 
 // Cảnh báo trước khi đóng/tab reload nếu vẫn còn dữ liệu cục bộ chưa gửi xong.
 // Trình duyệt tự hiển thị nội dung cảnh báo chuẩn để tránh mất thao tác vừa làm.
