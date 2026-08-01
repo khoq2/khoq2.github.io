@@ -319,6 +319,8 @@ button:disabled,input:disabled,select:disabled,[aria-disabled="true"] { cursor:n
 .prod-img { width: 64px; height: 64px; border-radius: 10px; object-fit: cover; flex-shrink: 0; border: 1px solid #eee; background: #fafafa; cursor: zoom-in; }
 .prod-img-ph { display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: bold; }
 .prod-media { width:64px; flex:0 0 64px; display:flex; flex-direction:column; align-items:stretch; gap:3px; }
+.prod-extra-desktop { display:flex; flex-direction:column; align-items:stretch; gap:3px; }
+.prod-extra-mobile-row { display:none; }
 .prod-extra-image { border:0; padding:0; background:transparent; color:#2471A3; font-size:9px; line-height:1.25; text-align:center; cursor:pointer; text-decoration:underline; }
 .product-name-row { display: block; max-width: 100%; margin-bottom: 5px; cursor: copy; user-select: none; }
 .product-name { font-size: 14px; font-weight: bold; line-height: 1.35; margin-bottom: 0; display: inline; }
@@ -878,6 +880,34 @@ body.admin-mode .card-actions.admin-only { display:grid!important; }
   #editOverlay .group-check { padding:5px; font-size:12px; }
   .prod-media { width:68px; flex-basis:68px; gap:4px; }
   .prod-media .prod-img { width:68px; height:68px; }
+  .prod-extra-desktop { display:none!important; }
+  .card-main > .prod-extra-mobile-row {
+    display:flex;
+    width:calc(100% + 74px);
+    margin:7px 0 0 -74px;
+    padding:6px 7px;
+    gap:6px;
+    overflow-x:auto;
+    overflow-y:hidden;
+    overscroll-behavior-x:contain;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+    border:1px solid #D8E8F3;
+    border-radius:9px;
+    background:#F7FBFE;
+  }
+  .card-main > .prod-extra-mobile-row::-webkit-scrollbar { display:none; }
+  .card-main > .prod-extra-mobile-row .prod-extra-image {
+    flex:0 0 auto;
+    min-width:max-content;
+    max-width:220px;
+    min-height:34px;
+    margin:0;
+    padding:6px 10px;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
   .prod-extra-image { min-height:30px; display:flex; align-items:center; justify-content:center; padding:5px 2px; border-radius:7px; background:#EBF5FB; font-size:11px; font-weight:800; line-height:1.2; text-decoration:none; touch-action:manipulation; }
   .img-link-row { margin-top:10px; }
   .img-link-input { min-height:44px; padding:10px 11px; font-size:16px; }
@@ -4714,7 +4744,7 @@ button,[role="button"],a[href],input,select,textarea{
           <path d="M16.2 16.2L21 21" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"></path>
         </svg>
       </span>
-      <input id="search" type="search" placeholder="Bạn đang cần tìm gì...?" aria-label="Tìm kiếm kho hàng" autocomplete="off" autocorrect="off" spellcheck="false">
+      <input id="search" type="search" inputmode="search" enterkeyhint="done" placeholder="Bạn đang cần tìm gì...?" aria-label="Tìm kiếm kho hàng" autocomplete="off" autocorrect="off" spellcheck="false">
       <button class="clear-btn" id="clear-btn" onclick="clearSearch()">×</button>
       <button id="headerFilterBtn" onclick="toggleComponentSelectionMode()" type="button" title="Chọn nhiều linh kiện" aria-label="Chọn nhiều linh kiện" data-count="0"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="5" height="5" rx="1"></rect><path d="m4.5 6.5 1.2 1.2L8 5.2M11 6.5h10"></path><rect x="3" y="15" width="5" height="5" rx="1"></rect><path d="M11 17.5h10"></path></svg></button>
       <button id="headerToggleBtn" onclick="toggleHeader()" type="button" aria-expanded="true" title="Thu gọn menu">
@@ -8432,12 +8462,14 @@ function renderCard(r,i,displayNo){
   const imageTitle2 = cleanQuickLabel(warrantyTitle2 || "") || "Ảnh 3";
   const imageTitle3 = cleanQuickLabel(warrantyTitle3 || "") || "Ảnh 4";
   const imageTitle4 = cleanQuickLabel(warrantyTitle4 || "") || "Ảnh 5";
-  const extraImagesHtml = `<div class="prod-media">${imgHtml}
-    ${warrantyImg1?`<button type="button" class="prod-extra-image" data-url="${escapeHtml(warrantyImg1)}" data-title="${escapeHtml(ten)} - ${escapeHtml(imageTitle1)}" onclick="openImageViewer(this.dataset.url,this.dataset.title)">${escapeHtml(imageTitle1)}</button>`:""}
-    ${warrantyImg2?`<button type="button" class="prod-extra-image" data-url="${escapeHtml(warrantyImg2)}" data-title="${escapeHtml(ten)} - ${escapeHtml(imageTitle2)}" onclick="openImageViewer(this.dataset.url,this.dataset.title)">${escapeHtml(imageTitle2)}</button>`:""}
-    ${warrantyImg3?`<button type="button" class="prod-extra-image" data-url="${escapeHtml(warrantyImg3)}" data-title="${escapeHtml(ten)} - ${escapeHtml(imageTitle3)}" onclick="openImageViewer(this.dataset.url,this.dataset.title)">${escapeHtml(imageTitle3)}</button>`:""}
-    ${warrantyImg4?`<button type="button" class="prod-extra-image" data-url="${escapeHtml(warrantyImg4)}" data-title="${escapeHtml(ten)} - ${escapeHtml(imageTitle4)}" onclick="openImageViewer(this.dataset.url,this.dataset.title)">${escapeHtml(imageTitle4)}</button>`:""}
-  </div>`;
+  const extraImageButtonsHtml = [
+    warrantyImg1?`<button type="button" class="prod-extra-image" data-url="${escapeHtml(warrantyImg1)}" data-title="${escapeHtml(ten)} - ${escapeHtml(imageTitle1)}" onclick="openImageViewer(this.dataset.url,this.dataset.title)">${escapeHtml(imageTitle1)}</button>`:"",
+    warrantyImg2?`<button type="button" class="prod-extra-image" data-url="${escapeHtml(warrantyImg2)}" data-title="${escapeHtml(ten)} - ${escapeHtml(imageTitle2)}" onclick="openImageViewer(this.dataset.url,this.dataset.title)">${escapeHtml(imageTitle2)}</button>`:"",
+    warrantyImg3?`<button type="button" class="prod-extra-image" data-url="${escapeHtml(warrantyImg3)}" data-title="${escapeHtml(ten)} - ${escapeHtml(imageTitle3)}" onclick="openImageViewer(this.dataset.url,this.dataset.title)">${escapeHtml(imageTitle3)}</button>`:"",
+    warrantyImg4?`<button type="button" class="prod-extra-image" data-url="${escapeHtml(warrantyImg4)}" data-title="${escapeHtml(ten)} - ${escapeHtml(imageTitle4)}" onclick="openImageViewer(this.dataset.url,this.dataset.title)">${escapeHtml(imageTitle4)}</button>`:""
+  ].filter(Boolean).join("");
+  const extraImagesHtml = `<div class="prod-media">${imgHtml}<div class="prod-extra-desktop">${extraImageButtonsHtml}</div></div>`;
+  const extraImagesMobileHtml = extraImageButtonsHtml ? `<div class="prod-extra-mobile-row" aria-label="Ảnh bổ sung của sản phẩm">${extraImageButtonsHtml}</div>` : "";
   const isAdmin = document.body.classList.contains("admin-mode");
   const isSelected = selectedItems.has(i);
   const selectHtml = bulkSelectMode
@@ -8481,6 +8513,7 @@ function renderCard(r,i,displayNo){
         <span class="brand-tag" data-brand="${escapeHtml(th)}" title="Xem tất cả sản phẩm thương hiệu ${escapeHtml(th)}" onclick="filterByBrand(this.dataset.brand)">🏷️ <span class="brand-name" style="font-size:${Math.max(8.5,Math.min(10.5,12-String(th||'').length*.09)).toFixed(1)}px">${escapeHtml(th)}</span></span>
         <span class="card-price-desktop">${priceHtml}</span>
       </div>
+      ${extraImagesMobileHtml}
       ${note?`<div class="note">📝 ${escapeHtml(note)}</div>`:""}
       ${renderRelatedProducts(r)}
       <div class="ton-ctrl">
@@ -12482,9 +12515,16 @@ document.getElementById("search").addEventListener("keydown", function(e){
   else if(e.key==="Escape") closeSearchSuggestions();
 });
 document.getElementById("search").addEventListener("blur", ()=>{
-  // Đóng gợi ý sau một nhịp ngắn để thao tác bấm vào chính gợi ý vẫn kịp chạy.
+  // Trên điện thoại, nút Done/✓ của bàn phím chỉ đóng bàn phím. Giữ nguyên
+  // danh sách kết quả để người dùng tiếp tục xem và chọn sau khi bàn phím ẩn.
   setTimeout(()=>{
     const active = document.activeElement;
+    const searchEl=document.getElementById("search");
+    const mobileTouch=window.matchMedia("(hover:none), (pointer:coarse)").matches;
+    if(mobileTouch && searchEl?.value.trim()){
+      renderSearchSuggestions(searchEl.value);
+      return;
+    }
     if(!active || !active.closest || !active.closest(".search-box")) closeSearchSuggestions();
   }, 140);
   // Khởi động lại hiệu ứng ngay sau khi người dùng rời ô trống.
