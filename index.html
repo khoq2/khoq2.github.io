@@ -1032,6 +1032,17 @@ body.admin-mode .admin-only { display: flex!important; }
 .sync-error-copy { background:#1E8449; color:#fff; }
 .sync-error-clear { background:#F4F6F7; color:#922B21; }
 .admin-btn { background: rgba(255,255,255,.15); color: #fff; border: 1.5px solid rgba(255,255,255,.4); border-radius: 8px; padding: 4px 10px; font-size: 11px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 4px; opacity: 0; transition: opacity .3s; }
+#adminBtn.admin-profile-btn{min-width:126px;min-height:44px;padding:5px 8px 5px 6px;gap:7px;border:1px solid rgba(120,190,255,.32);border-radius:12px;background:linear-gradient(135deg,#0A3566 0%,#082B55 55%,#061F40 100%);color:#fff;box-shadow:0 7px 18px rgba(3,20,42,.28),inset 0 1px 0 rgba(255,255,255,.13);text-align:left}
+#adminBtn .admin-profile-avatar{width:31px;height:31px;flex:0 0 31px;display:grid;place-items:center;overflow:hidden;border:2px solid #fff;border-radius:50%;background:linear-gradient(145deg,#D9EEFF,#78BCEC);color:#123D68;font-size:13px;font-weight:950;box-shadow:0 0 0 2px #2A8DE0,0 3px 9px rgba(0,0,0,.28)}
+#adminBtn .admin-profile-avatar img{width:100%;height:100%;display:block;object-fit:cover}
+#adminBtn .admin-profile-copy{min-width:0;display:flex;flex:1 1 auto;flex-direction:column;justify-content:center;line-height:1.08}
+#adminBtn .admin-profile-name{max-width:76px;overflow:hidden;color:#fff;font-size:10px;font-weight:900;text-overflow:ellipsis;white-space:nowrap}
+#adminBtn .admin-profile-role{margin-top:3px;color:#BFD9F1;font-size:8px;font-weight:700;white-space:nowrap}
+#adminBtn .admin-profile-chevron{width:12px;height:12px;flex:0 0 12px;fill:none;stroke:#BFD9F1;stroke-width:2.3;stroke-linecap:round;stroke-linejoin:round;transition:transform .2s ease}
+body.admin-mode #adminBtn.admin-profile-btn{border-color:rgba(72,217,142,.48);background:linear-gradient(135deg,#0B4C59,#0A3D59 52%,#082D4D);box-shadow:0 7px 18px rgba(3,20,42,.28),inset 0 1px 0 rgba(255,255,255,.14),0 0 0 1px rgba(56,211,134,.08)}
+body.admin-mode #adminBtn .admin-profile-role{color:#72E3AA}
+body.admin-mode #adminBtn .admin-profile-chevron{stroke:#72E3AA;transform:rotate(180deg)}
+@media(max-width:520px){#adminBtn.admin-profile-btn{min-width:105px;min-height:38px;padding:4px 6px 4px 5px;gap:6px;border-radius:10px}#adminBtn .admin-profile-avatar{width:27px;height:27px;flex-basis:27px}#adminBtn .admin-profile-name{max-width:58px;font-size:8.5px}#adminBtn .admin-profile-role{margin-top:2px;font-size:6.8px}#adminBtn .admin-profile-chevron{width:10px;height:10px;flex-basis:10px}}
 #syncBtn { width:18px; height:18px; flex:0 0 18px; justify-content:center; padding:0; border:0 !important; border-radius:0; background:transparent !important; color:#fff !important; box-shadow:none !important; font-size:10px; line-height:1; }
 #syncBtn:hover,#syncBtn:active { background:transparent !important; color:#fff !important; box-shadow:none !important; transform:none !important; }
 #syncBtn svg { width:13px; height:13px; display:block; fill:none; stroke:currentColor; stroke-width:2.2; stroke-linecap:round; stroke-linejoin:round; }
@@ -4817,7 +4828,7 @@ button,[role="button"],a[href],input,select,textarea{
       <span class="sync-badge" id="syncBadge" role="button" tabindex="0" aria-label="Trạng thái đồng bộ" title="Trạng thái đồng bộ" onclick="handleSyncBadgeActivation()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();handleSyncBadgeActivation();}">💾 Lưu trên máy</span>
       <span id="lastSyncText" style="font-size:10px;color:#718096"></span>
       <button class="admin-btn admin-only" id="syncBtn" type="button" title="Đồng bộ thủ công lên máy chủ" aria-label="Đồng bộ thủ công lên máy chủ" onclick="manualSync()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7h-5V2"></path><path d="M4 17h5v5"></path><path d="M5.2 9A8 8 0 0 1 18.5 5.5L20 7"></path><path d="M18.8 15A8 8 0 0 1 5.5 18.5L4 17"></path></svg></button>
-      <button class="admin-btn" id="adminBtn" onclick="onAdminBtnClick()">🔒 Admin</button>
+      <button class="admin-btn admin-profile-btn" id="adminBtn" type="button" aria-label="Mở quản trị" onclick="onAdminBtnClick()"><span class="admin-profile-avatar">A</span><span class="admin-profile-copy"><span class="admin-profile-name">Quản trị</span><span class="admin-profile-role">Đăng nhập</span></span><svg class="admin-profile-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m7 9 5 5 5-5"></path></svg></button>
     </div>
     <div class="title"><span class="title-logo-slot"><img class="title-icon title-brand-logo" id="headerBrandLogo" src="" alt="Logo cửa hàng" hidden onerror="this.hidden=true;document.getElementById('headerBrandFallback').hidden=false"><span class="title-icon title-brand-fallback" id="headerBrandFallback" aria-hidden="true">🏪</span></span><span class="title-text"><span class="title-base">HOÀNG GIA COMPUTER</span><span class="title-shine" aria-hidden="true"></span></span><div class="recent-activity-wrap" id="recentActivityWrap"><button type="button" class="recent-activity-bell" id="recentActivityBell" aria-label="Mở thông báo giao dịch mới" aria-expanded="false" onclick="toggleRecentActivity(event)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"></path><path d="M10 21h4"></path></svg><span class="recent-activity-count" id="recentActivityCount"></span></button><div class="recent-activity-panel" id="recentActivityPanel"><div class="recent-activity-head"><span class="recent-activity-title">HOẠT ĐỘNG GẦN ĐÂY</span><span class="recent-activity-head-actions"><button type="button" class="recent-activity-all" id="recentActivityAll" onclick="toggleAllRecentActivity(event)">Xem tất cả</button><button type="button" class="recent-activity-close" aria-label="Đóng hoạt động gần đây" onclick="closeRecentActivity();event.stopPropagation()">×</button></span></div><div class="recent-activity-list" id="recentActivityList"></div></div></div><span class="warehouse-switcher" role="group" aria-label="Chọn kho đang xem"><button type="button" class="warehouse-switch" data-warehouse="Q2" onclick="selectWarehouseBranch('Q2')"><span class="warehouse-pin">📍</span> Q2</button><button type="button" class="warehouse-switch" data-warehouse="Q5" onclick="selectWarehouseBranch('Q5')"><span class="warehouse-pin">📍</span> Q5</button></span></div>
     <div class="kpi-row">
@@ -5867,7 +5878,7 @@ function setAdminMode(on){
     sessionStorage.setItem("kho_cntt_admin","1");
     document.body.classList.add("admin-entry-visible");
     document.body.classList.add("admin-mode");
-    document.getElementById("adminBtn").textContent = "🔓 Admin (đang mở)";
+    updateAdminProfileButton(true);
   } else {
     sessionStorage.removeItem("kho_cntt_admin");
     sessionStorage.removeItem("kho_admin_session_token");
@@ -5880,7 +5891,7 @@ function setAdminMode(on){
     if(new URLSearchParams(location.search).get("admin")!=="1"){
       document.body.classList.remove("admin-entry-visible");
     }
-    document.getElementById("adminBtn").textContent = "🔒 Admin";
+    updateAdminProfileButton(false);
     bulkSelectMode = false;
     selectedItems.clear();
     updateBulkControls();
@@ -9457,9 +9468,24 @@ function setNVAvatarPreview(dataUrl){
     ? `<img src="${dataUrl}" alt="Avatar nhân viên" referrerpolicy="no-referrer" onerror="this.parentElement.innerHTML='👤'; if(document.getElementById('nvAvatar')) document.getElementById('nvAvatar').value=''; showToast('⚠️ Không tải được ảnh avatar từ link này.',4000);">`
     : "👤";
 }
-function loadNV(){ try{ NV_LIST = normalizeNVList(JSON.parse(localStorage.getItem("kho_cntt_nv")||"[]")); }catch(e){ NV_LIST=[]; } }
+function getAdminProfileNV(){
+  const list=normalizeNVList(NV_LIST);
+  return list.find(nv=>normalizeNVRole(nv.role)==="ADMIN") || list.find(nv=>normalizeNVRole(nv.role)==="CEO") || null;
+}
+function updateAdminProfileButton(open=document.body.classList.contains("admin-mode")){
+  const btn=document.getElementById("adminBtn");
+  if(!btn) return;
+  const nv=getAdminProfileNV(), name=nv?.name||"Quản trị", avatar=nv?.avatar||"";
+  const initial=escapeHtml(name.charAt(0).toUpperCase()||"A");
+  const avatarHtml=avatar?`<span class="admin-profile-avatar"><img src="${escapeHtml(resolveImageUrl(avatar))}" alt="Ảnh ${escapeHtml(name)}" onerror="this.parentElement.textContent='${initial}'"></span>`:`<span class="admin-profile-avatar">${initial}</span>`;
+  btn.innerHTML=`${avatarHtml}<span class="admin-profile-copy"><span class="admin-profile-name">${escapeHtml(name)}</span><span class="admin-profile-role">Admin${open?" · đang mở":""}</span></span><svg class="admin-profile-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m7 9 5 5 5-5"></path></svg>`;
+  btn.setAttribute("aria-label",open?`Khóa quyền Admin của ${name}`:`Mở quản trị với ${name}`);
+  btn.title=open?"Bấm để khóa quyền quản trị":"Bấm để đăng nhập quản trị";
+}
+function loadNV(){ try{ NV_LIST = normalizeNVList(JSON.parse(localStorage.getItem("kho_cntt_nv")||"[]")); }catch(e){ NV_LIST=[]; } updateAdminProfileButton(); }
 async function saveNV(){
   NV_LIST = normalizeNVList(NV_LIST);
+  updateAdminProfileButton();
   try{ safeLocalStorageSet("kho_cntt_nv", JSON.stringify(NV_LIST)); }catch(e){}
   if(!SHEET_API_URL) return true;
   const snapshot = JSON.parse(JSON.stringify(NV_LIST));
@@ -9488,6 +9514,7 @@ async function loadNVFromSheet(){
       if(!hasAuxPendingSync(PENDING_NV_SYNC_KEY) && (sheetNV.length || !NV_LIST.length)){
         NV_LIST = sheetNV;
         safeLocalStorageSet("kho_cntt_nv", JSON.stringify(NV_LIST));
+        updateAdminProfileButton();
       }
     }
   }catch(e){ console.warn("Lỗi tải NV:", e); setSyncBadge("error", String(e)); }
