@@ -1297,6 +1297,7 @@ body.fab-menu-open .category-view-bar .view-mode-switch { pointer-events:none; }
 .customer-modal .simple-sticky-actions { margin-left:-16px; margin-right:-16px; }
 .order-modal-footer { position:sticky; z-index:8; left:0; right:0; bottom:0; display:grid; grid-template-columns:1fr 1fr; gap:8px; margin:10px -16px 0; padding:10px 16px max(14px,env(safe-area-inset-bottom)); border-top:1px solid rgba(30,58,95,.14); background:rgba(255,255,255,.94); box-shadow:0 -7px 18px rgba(30,58,95,.12); backdrop-filter:blur(12px); }
 .order-modal-footer .btn-cancel,.order-modal-footer .btn-submit { margin:0; min-height:44px; padding:10px; font-size:13px; }
+.order-modal-footer > .btn-submit:only-child { grid-column:1 / -1; }
 .condition-note { margin-top:5px; color:#788896; font-size:11px; line-height:1.35; }
 .designer-engraving,
 #importOverlay .modal::after,
@@ -5837,6 +5838,323 @@ body.private-panel-open{overflow:hidden}
 @media(max-width:680px){#partnerOverlay{padding:8px}.partner-modal{width:100%;max-height:calc(100dvh - 16px);padding:11px;border-radius:18px}.partner-filters{grid-template-columns:1fr}.partner-add{width:100%}.partner-list{grid-template-columns:1fr}.partner-editor-grid{grid-template-columns:1fr}.partner-editor-grid .wide{grid-column:auto}.partner-service-editor{grid-template-columns:1fr 1fr}.private-access-modal{padding:21px 17px}}
 @media(max-width:390px){.partner-service-editor{grid-template-columns:1fr}.private-access-actions{grid-template-columns:1fr}}
 </style>
+<style id="modern-private-hubs-2026">
+/* Customer & Partner Control Center 2026 — lớp giao diện cuối, không đổi nghiệp vụ. */
+#customerOverlay,#partnerOverlay,#privateAccessOverlay{
+  padding:18px;
+  background:
+    radial-gradient(circle at 14% 12%,rgba(27,184,255,.2),transparent 31%),
+    radial-gradient(circle at 88% 18%,rgba(187,84,255,.17),transparent 32%),
+    radial-gradient(circle at 72% 92%,rgba(255,65,121,.13),transparent 31%),
+    rgba(5,17,32,.78);
+  -webkit-backdrop-filter:blur(20px) saturate(1.25);
+  backdrop-filter:blur(20px) saturate(1.25);
+}
+#customerOverlay .customer-modal,#partnerOverlay .partner-modal{
+  position:relative;
+  width:min(1080px,calc(100vw - 36px));
+  max-height:calc(100dvh - 36px);
+  padding:18px;
+  overflow:auto;
+  border:1px solid rgba(255,255,255,.78);
+  border-radius:28px;
+  background:
+    linear-gradient(135deg,rgba(255,255,255,.96),rgba(244,249,255,.93)),
+    #f7fbff;
+  color:#173047;
+  box-shadow:0 34px 90px rgba(0,12,30,.46),inset 0 1px 0 #fff;
+  scrollbar-width:thin;
+  scrollbar-color:#afc9db transparent;
+}
+#customerOverlay .customer-modal::before,#partnerOverlay .partner-modal::before{
+  content:"";
+  position:absolute;
+  z-index:0;
+  inset:0 0 auto;
+  height:180px;
+  border-radius:28px 28px 50% 50%;
+  background:linear-gradient(115deg,rgba(14,116,190,.09),rgba(130,63,224,.07),rgba(255,76,122,.06));
+  pointer-events:none;
+}
+#customerOverlay .customer-modal>*,#partnerOverlay .partner-modal>*{position:relative;z-index:1}
+#customerOverlay .customer-head,#partnerOverlay .partner-head{
+  display:flex;
+  align-items:stretch;
+  gap:10px;
+  min-height:78px;
+  margin:0 0 12px;
+  padding:0;
+  border:0;
+}
+#customerOverlay .modern-hub-title,#partnerOverlay .modern-hub-title{
+  position:relative;
+  display:flex;
+  flex:1;
+  align-items:center;
+  gap:13px;
+  min-width:0;
+  min-height:78px;
+  padding:13px 16px;
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,.26);
+  border-radius:21px;
+  color:#fff;
+  text-shadow:none;
+  box-shadow:0 13px 30px rgba(22,59,98,.23),inset 0 1px 0 rgba(255,255,255,.22);
+}
+#customerOverlay .modern-hub-title{background:linear-gradient(120deg,#0b2948 0%,#0d659f 54%,#03a4ca 100%)}
+#partnerOverlay .modern-hub-title{background:linear-gradient(120deg,#39145e 0%,#7e2ca7 52%,#e43c73 100%)}
+#customerOverlay .modern-hub-title::after,#partnerOverlay .modern-hub-title::after{
+  content:"";
+  position:absolute;
+  right:-46px;
+  top:-80px;
+  width:220px;
+  height:220px;
+  border:1px solid rgba(255,255,255,.16);
+  border-radius:50%;
+  box-shadow:0 0 0 34px rgba(255,255,255,.045),0 0 0 68px rgba(255,255,255,.025);
+}
+.modern-hub-icon{
+  position:relative;
+  z-index:1;
+  display:grid;
+  flex:0 0 50px;
+  place-items:center;
+  width:50px;
+  height:50px;
+  border:1px solid rgba(255,255,255,.32);
+  border-radius:16px;
+  background:rgba(255,255,255,.16);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 8px 20px rgba(0,0,0,.12);
+  -webkit-backdrop-filter:blur(8px);
+  backdrop-filter:blur(8px);
+}
+.modern-hub-icon svg{width:27px;height:27px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.modern-hub-copy{position:relative;z-index:1;display:grid;gap:4px;min-width:0;text-align:left}
+.modern-hub-copy b{font-size:17px;font-weight:950;letter-spacing:.45px;line-height:1.05}
+.modern-hub-copy small{overflow:hidden;color:rgba(255,255,255,.78);font-size:11px;font-weight:700;letter-spacing:.08px;text-overflow:ellipsis;white-space:nowrap}
+.modern-live-badge{
+  position:relative;
+  z-index:1;
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  margin-left:auto;
+  padding:7px 10px;
+  border:1px solid rgba(255,255,255,.26);
+  border-radius:999px;
+  background:rgba(3,16,30,.2);
+  color:#fff;
+  font-size:9.5px;
+  font-weight:950;
+  letter-spacing:.65px;
+}
+.modern-live-badge i{width:7px;height:7px;border-radius:50%;background:#65f3b2;box-shadow:0 0 0 4px rgba(101,243,178,.14),0 0 14px #65f3b2}
+#customerOverlay .customer-close,#partnerOverlay .partner-close{
+  align-self:stretch;
+  width:54px;
+  height:auto;
+  flex:0 0 54px;
+  border:1px solid rgba(184,202,215,.75);
+  border-radius:18px;
+  background:rgba(255,255,255,.88);
+  color:#b32743;
+  font:500 27px/1 system-ui;
+  box-shadow:0 8px 18px rgba(31,61,87,.1),inset 0 1px 0 #fff;
+  transition:transform .18s ease,background .18s ease,color .18s ease;
+}
+#customerOverlay .customer-close:hover,#partnerOverlay .partner-close:hover{transform:translateY(-2px);background:#fff0f3;color:#e02750}
+.modern-hub-metrics{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:9px;
+  margin:0 0 12px;
+}
+.modern-hub-metrics>div{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  min-width:0;
+  min-height:66px;
+  padding:10px 12px;
+  border:1px solid rgba(191,211,224,.72);
+  border-radius:17px;
+  background:rgba(255,255,255,.79);
+  box-shadow:0 8px 22px rgba(35,75,108,.07),inset 0 1px 0 #fff;
+}
+.modern-hub-metrics p{display:grid;gap:2px;min-width:0;margin:0}
+.modern-hub-metrics b{overflow:hidden;color:#173a57;font-size:14px;font-weight:950;text-overflow:ellipsis;white-space:nowrap}
+.modern-hub-metrics small{overflow:hidden;color:#718596;font-size:9.5px;font-weight:750;text-overflow:ellipsis;white-space:nowrap}
+.modern-metric-icon{display:grid;flex:0 0 38px;place-items:center;width:38px;height:38px;border-radius:12px;color:#fff;font-size:10px;font-weight:950;letter-spacing:.2px;box-shadow:0 7px 15px rgba(27,88,130,.2)}
+.modern-metric-icon.cyan{background:linear-gradient(145deg,#14c8db,#087dac)}
+.modern-metric-icon.blue{background:linear-gradient(145deg,#448cff,#3852c8)}
+.modern-metric-icon.violet{background:linear-gradient(145deg,#9a62ff,#6330bd)}
+.modern-metric-icon.coral{background:linear-gradient(145deg,#ff6685,#d92c5c)}
+.modern-metric-icon.emerald{background:linear-gradient(145deg,#24cf9b,#07856a)}
+#customerOverlay .customer-search-wrap{
+  position:relative;
+  min-height:58px;
+  padding:0;
+  overflow:hidden;
+  border:1.5px solid #b8d3e5;
+  border-radius:17px;
+  background:#fff;
+  box-shadow:0 9px 24px rgba(30,80,116,.09),0 0 0 4px rgba(30,143,204,.04);
+}
+#customerOverlay .customer-search{min-height:58px;padding:0 56px 0 17px;border:0;border-radius:16px;background:transparent;color:#153b57;font-size:14px;font-weight:750}
+#customerOverlay .customer-search::placeholder{color:#8ca1b1;font-weight:650}
+#customerOverlay .customer-search-icon{right:12px;left:auto;display:grid;width:36px;height:36px;place-items:center;border-radius:11px;background:linear-gradient(145deg,#e7f7ff,#d8edf9);color:#1578ae}
+#customerOverlay .customer-search-help{margin:7px 5px 3px;color:#718697;font-size:10px;font-weight:650}
+#customerOverlay>.customer-modal>.customer-toolbar{display:flex;justify-content:flex-end;margin:6px 0 10px}
+#customerOverlay .customer-primary{min-height:42px;padding:9px 15px;border:0;border-radius:12px;background:linear-gradient(135deg,#0875ad,#13a9cb);color:#fff;font-size:11.5px;font-weight:950;box-shadow:0 8px 18px rgba(8,117,173,.2)}
+#customerOverlay .customer-secondary{border:1px solid #cbdde8;background:#f4f9fc;color:#245875}
+#customerOverlay .customer-results{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;max-height:360px;padding:0;background:transparent;box-shadow:none}
+#customerOverlay .customer-results:not(:empty){padding:0;border:0;background:transparent;box-shadow:none}
+#customerOverlay .customer-results>.customer-empty{grid-column:1/-1}
+#customerOverlay .customer-result{
+  min-height:78px;
+  padding:12px 13px 12px 18px;
+  border:1px solid #d8e7f0;
+  border-radius:15px;
+  background:linear-gradient(145deg,#fff,#f8fbfd);
+  box-shadow:0 6px 16px rgba(27,70,103,.06);
+}
+#customerOverlay .customer-result::before{top:14px;bottom:14px;width:4px;background:linear-gradient(#13a8cf,#476cef)}
+#customerOverlay .customer-result:hover{transform:translateY(-2px);border-color:#82c4e6;box-shadow:0 12px 22px rgba(22,86,127,.11)}
+#customerOverlay .customer-result-phone{color:#0b78af;font-size:14px;font-weight:950}
+#customerOverlay .customer-result-name{color:#234258;font-size:12px;font-weight:850}
+#customerOverlay .customer-result-note{color:#7890a0;font-size:10px}
+#customerOverlay .customer-detail:not(:empty),#customerOverlay .customer-editor.open{padding:0;border:0;background:transparent;box-shadow:none}
+#customerOverlay .customer-profile{
+  position:relative;
+  padding:17px 18px;
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,.25);
+  border-radius:19px;
+  background:linear-gradient(120deg,#102d4a,#185e85 58%,#1494a9);
+  color:#fff;
+  box-shadow:0 14px 30px rgba(20,73,106,.2),inset 0 1px 0 rgba(255,255,255,.18);
+}
+#customerOverlay .customer-profile::after{content:"";position:absolute;right:-40px;top:-75px;width:180px;height:180px;border:26px solid rgba(255,255,255,.06);border-radius:50%}
+#customerOverlay .customer-profile-name{position:relative;z-index:1;color:#fff;font-size:19px;font-weight:950;letter-spacing:.25px}
+#customerOverlay .customer-profile-phone{position:relative;z-index:1;margin-top:5px;color:#aeeeff;font-size:14px;font-weight:900}
+#customerOverlay .customer-profile-note{position:relative;z-index:1;margin-top:8px;color:rgba(255,255,255,.78);font-size:11px}
+#customerOverlay .customer-records{display:grid;gap:9px;margin-top:10px}
+#customerOverlay .customer-record{
+  position:relative;
+  padding:14px 14px 14px 18px;
+  overflow:hidden;
+  border:1px solid #dae7ef;
+  border-radius:16px;
+  background:#fff;
+  box-shadow:0 7px 18px rgba(30,67,94,.07);
+}
+#customerOverlay .customer-record::before{content:"";position:absolute;left:0;top:14px;bottom:14px;width:4px;border-radius:0 5px 5px 0;background:linear-gradient(#2c7bea,#13b8bf)}
+#customerOverlay .customer-record-head{color:#708798;font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.2px}
+#customerOverlay .customer-record-device{margin-top:7px;color:#183d57;font-size:14px;font-weight:950}
+#customerOverlay .customer-record-work{margin-top:7px;color:#405d70;line-height:1.5}
+#customerOverlay .customer-record-spec{border-radius:999px;background:#edf6fb;color:#34647e}
+#customerOverlay .customer-record-spec.amount{background:#eaf9f3;color:#137254}
+#customerOverlay .customer-editor{
+  padding:15px!important;
+  border:1px solid #d6e5ee!important;
+  border-radius:18px!important;
+  background:linear-gradient(145deg,#fff,#f7fbfd)!important;
+  box-shadow:0 12px 28px rgba(26,71,103,.1)!important;
+}
+#customerOverlay .customer-editor input,#customerOverlay .customer-editor select,#customerOverlay .customer-editor textarea{border:1px solid #c6dbe7;border-radius:11px;background:#fbfdff;transition:border-color .16s ease,box-shadow .16s ease}
+#customerOverlay .customer-editor input:focus,#customerOverlay .customer-editor select:focus,#customerOverlay .customer-editor textarea:focus{border-color:#2aa6ce;box-shadow:0 0 0 3px rgba(42,166,206,.12);outline:0}
+#partnerOverlay .partner-filters{
+  grid-template-columns:minmax(190px,.82fr) minmax(260px,1.3fr) auto;
+  gap:9px;
+  padding:10px;
+  border:1px solid #d8e5ee;
+  border-radius:17px;
+  background:rgba(255,255,255,.82);
+  box-shadow:0 8px 22px rgba(40,66,98,.07);
+}
+#partnerOverlay .partner-filters select,#partnerOverlay .partner-filters input{min-height:47px;border:1px solid #c9dce8;border-radius:12px;background:#fafdff;color:#263f55;font-weight:750}
+#partnerOverlay .partner-add{min-height:47px;border-radius:12px;background:linear-gradient(135deg,#7134ae,#df3a72);box-shadow:0 8px 18px rgba(126,44,167,.19)}
+#partnerOverlay .partner-service-filter{margin:10px 0 7px}
+#partnerOverlay .partner-service-chip{min-height:36px;border-color:#d5e0e8;background:rgba(255,255,255,.86);color:#52697c;transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease}
+#partnerOverlay .partner-service-chip:hover{transform:translateY(-1px);border-color:#c08adb}
+#partnerOverlay .partner-service-chip.active{border-color:#b64fd2;background:linear-gradient(135deg,#f8edff,#fff0f6);color:#812798;box-shadow:0 5px 14px rgba(133,43,159,.1)}
+#partnerOverlay .partner-summary{margin:6px 2px 9px;color:#6d8191;font-size:10.5px;font-weight:850;letter-spacing:.15px}
+#partnerOverlay .partner-list{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+#partnerOverlay .partner-card{
+  padding:15px 15px 14px 19px;
+  overflow:hidden;
+  border:1px solid #dbe6ed;
+  border-radius:18px;
+  background:linear-gradient(145deg,#fff,#fafcff);
+  box-shadow:0 8px 20px rgba(47,62,92,.07);
+  transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease;
+}
+#partnerOverlay .partner-card:hover{transform:translateY(-3px);border-color:#c99cdf;box-shadow:0 15px 30px rgba(85,49,113,.12)}
+#partnerOverlay .partner-card::before{top:16px;bottom:16px;width:4px;background:linear-gradient(#e14278,#8c36bb)}
+#partnerOverlay .partner-name{color:#3d2655;font-size:15px;font-weight:950}
+#partnerOverlay .partner-district{color:#c62f65;font-size:10.5px}
+#partnerOverlay .partner-service-tag{background:#f2ebfa;color:#71358f}
+#partnerOverlay .partner-contact{color:#526878}
+#partnerOverlay .partner-note{border:1px solid #f0dfb5;background:#fff9ea;color:#775d23}
+#partnerOverlay .partner-card-actions a,#partnerOverlay .partner-card-actions button{border-radius:10px;transition:transform .15s ease,filter .15s ease}
+#partnerOverlay .partner-card-actions a:hover,#partnerOverlay .partner-card-actions button:hover{transform:translateY(-1px);filter:saturate(1.08)}
+#partnerOverlay .partner-editor{padding:16px;border-color:#d9e4ec;border-radius:18px;background:linear-gradient(145deg,#fff,#fbf8ff);box-shadow:0 14px 30px rgba(70,45,94,.1)}
+#partnerOverlay .partner-editor input,#partnerOverlay .partner-editor select,#partnerOverlay .partner-editor textarea{border-color:#d5dce8;border-radius:11px;background:#fff}
+#partnerOverlay .partner-save{background:linear-gradient(135deg,#6e31aa,#d53870);box-shadow:0 8px 17px rgba(112,45,145,.18)}
+#customerOverlay .simple-sticky-actions,#partnerOverlay .simple-sticky-actions{margin-top:12px;padding-top:10px;border-top:1px solid #dbe5ec;background:linear-gradient(180deg,rgba(248,251,253,0),rgba(248,251,253,.97) 30%)}
+#customerOverlay .simple-sticky-actions .btn-submit,#partnerOverlay .simple-sticky-actions .btn-submit{min-height:43px;border:0;border-radius:12px;background:linear-gradient(135deg,#1b3b55,#285e7d);box-shadow:0 8px 17px rgba(25,55,77,.17)}
+#privateAccessOverlay .private-access-modal{
+  position:relative;
+  width:min(430px,calc(100vw - 28px));
+  padding:28px 25px 24px;
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,.78);
+  border-radius:28px;
+  background:linear-gradient(145deg,rgba(255,255,255,.97),rgba(241,248,253,.94));
+  box-shadow:0 35px 90px rgba(0,14,35,.48),inset 0 1px 0 #fff;
+}
+#privateAccessOverlay .private-access-modal::before{content:"";position:absolute;left:-70px;top:-110px;width:250px;height:250px;border-radius:50%;background:radial-gradient(circle,rgba(22,161,221,.21),transparent 66%);pointer-events:none}
+#privateAccessOverlay .private-access-badge{position:relative;width:70px;height:70px;margin-bottom:15px;border:1px solid rgba(255,255,255,.3);border-radius:21px;background:linear-gradient(145deg,#123b60,#0d88ba);box-shadow:0 16px 30px rgba(14,100,147,.28),inset 0 1px 0 rgba(255,255,255,.28)}
+#privateAccessOverlay .private-access-badge svg{width:32px;height:32px}
+#privateAccessOverlay .private-access-title{position:relative;color:#153a56;font-size:21px;font-weight:950;letter-spacing:.3px}
+#privateAccessOverlay .private-access-subtitle{position:relative;margin:8px auto 19px;max-width:340px;color:#6e8393;font-size:11.5px;line-height:1.5}
+#privateAccessOverlay .admin-password-wrap{min-height:52px;border:1.5px solid #bfd5e3;border-radius:14px;background:#fff;box-shadow:0 7px 18px rgba(25,75,110,.08)}
+#privateAccessOverlay .admin-password-wrap input{min-height:50px;border:0;background:transparent;color:#163c57;font-weight:800}
+#privateAccessOverlay .private-access-actions button{min-height:46px;border-radius:13px;font-weight:950}
+#privateAccessOverlay #privateAccessSubmit{border:0;background:linear-gradient(135deg,#0b6fa5,#0ca3bf);box-shadow:0 9px 20px rgba(10,128,170,.22)}
+@media(max-width:760px){
+  #customerOverlay,#partnerOverlay,#privateAccessOverlay{padding:8px}
+  #customerOverlay .customer-modal,#partnerOverlay .partner-modal{width:100%;max-height:calc(100dvh - 16px);padding:10px;border-radius:21px}
+  #customerOverlay .customer-modal::before,#partnerOverlay .partner-modal::before{border-radius:21px 21px 50% 50%}
+  #customerOverlay .customer-head,#partnerOverlay .partner-head{min-height:66px;margin-bottom:8px}
+  #customerOverlay .modern-hub-title,#partnerOverlay .modern-hub-title{min-height:66px;padding:10px 11px;border-radius:17px}
+  .modern-hub-icon{width:43px;height:43px;flex-basis:43px;border-radius:13px}.modern-hub-icon svg{width:24px;height:24px}
+  .modern-hub-copy b{font-size:14px}.modern-hub-copy small{font-size:9px}
+  .modern-live-badge{display:none}
+  #customerOverlay .customer-close,#partnerOverlay .partner-close{width:44px;flex-basis:44px;border-radius:15px}
+  .modern-hub-metrics{grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px}
+  .modern-hub-metrics>div{min-height:54px;padding:8px;border-radius:14px}.modern-hub-metrics>div:nth-child(3){display:none}
+  .modern-metric-icon{width:34px;height:34px;flex-basis:34px;border-radius:10px;font-size:9px}
+  .modern-hub-metrics b{font-size:12px}.modern-hub-metrics small{font-size:8.5px}
+  #customerOverlay .customer-search-wrap{min-height:52px;border-radius:14px}#customerOverlay .customer-search{min-height:52px;font-size:13px}
+  #customerOverlay .customer-results{grid-template-columns:1fr;max-height:330px}
+  #customerOverlay .customer-result{min-height:70px;border-radius:14px}
+  #customerOverlay .customer-profile{padding:14px;border-radius:16px}#customerOverlay .customer-profile-name{font-size:17px}
+  #customerOverlay .customer-record{padding:12px 11px 12px 16px;border-radius:14px}
+  #partnerOverlay .partner-filters{grid-template-columns:1fr;padding:8px;border-radius:14px}
+  #partnerOverlay .partner-list{grid-template-columns:1fr}
+  #partnerOverlay .partner-card{border-radius:15px}
+  #privateAccessOverlay .private-access-modal{padding:24px 17px 20px;border-radius:23px}
+}
+@media(max-width:390px){
+  .modern-hub-copy small{display:none}
+  .modern-hub-metrics>div{gap:7px;padding:7px}.modern-hub-metrics small{white-space:normal;line-height:1.15}
+  #customerOverlay .customer-search-help{font-size:9px}
+}
+@media(prefers-reduced-motion:reduce){#customerOverlay *,#partnerOverlay *,#privateAccessOverlay *{transition:none!important}}
+</style>
 </head>
 <body>
 <div class="sticky">
@@ -6414,8 +6732,8 @@ body.private-panel-open{overflow:hidden}
 <div class="overlay" id="privateAccessOverlay" onclick="if(event.target===this)closePrivateAccess()">
   <div class="modal private-access-modal" role="dialog" aria-modal="true" aria-labelledby="privateAccessTitle" onclick="event.stopPropagation()">
     <div class="private-access-badge" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="11" rx="3"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v3"></path></svg></div>
-    <h2 class="private-access-title" id="privateAccessTitle">MỞ HỒ SƠ KHÁCH HÀNG</h2>
-    <p class="private-access-subtitle" id="privateAccessSubtitle">Mật khẩu được kiểm tra trực tiếp tại API, không được lưu trong mã HTML.</p>
+    <h2 class="private-access-title" id="privateAccessTitle">ĐĂNG NHẬP QUẢN TRỊ</h2>
+    <p class="private-access-subtitle" id="privateAccessSubtitle">Đăng nhập bằng tài khoản quản trị toàn quyền. Mật khẩu chỉ được kiểm tra tại API và không lưu trong HTML.</p>
     <div class="admin-password-wrap">
       <input id="privateAccessPassword" type="password" autocomplete="current-password" placeholder="Nhập mật khẩu" onkeydown="if(event.key==='Enter')submitPrivateAccess()">
       <button type="button" class="admin-password-toggle" aria-label="Hiện hoặc ẩn mật khẩu" title="Hiện hoặc ẩn mật khẩu" onclick="const input=document.getElementById('privateAccessPassword');input.type=input.type==='password'?'text':'password';this.classList.toggle('password-visible',input.type==='text')"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"></path><circle cx="12" cy="12" r="2.7"></circle></svg></button>
@@ -6427,7 +6745,8 @@ body.private-panel-open{overflow:hidden}
 
 <div class="overlay" id="partnerOverlay" onclick="if(event.target===this)closePartnerPanel()">
   <section class="partner-modal" role="dialog" aria-modal="true" aria-labelledby="partnerTitle" onclick="event.stopPropagation()">
-    <header class="partner-head"><div class="partner-title" id="partnerTitle">🤝 DANH BẠ ĐỐI TÁC KỸ THUẬT</div><button type="button" class="partner-close" aria-label="Đóng" onclick="closePartnerPanel()">×</button></header>
+    <header class="partner-head"><div class="partner-title modern-hub-title" id="partnerTitle"><span class="modern-hub-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm8.5 1a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z"></path><path d="M1.8 21c.2-5 2.3-7.5 6.2-7.5s6 2.5 6.2 7.5H1.8Zm12.1-6.8c.8-.45 1.7-.7 2.7-.7 3.45 0 5.3 2.5 5.6 7.5h-5.7"></path></svg></span><span class="modern-hub-copy"><b>MẠNG LƯỚI ĐỐI TÁC</b><small>Điều phối kỹ thuật theo khu vực và chuyên môn</small></span><span class="modern-live-badge"><i></i> ADMIN</span></div><button type="button" class="partner-close" aria-label="Đóng" onclick="closePartnerPanel()">×</button></header>
+    <div class="modern-hub-metrics partner-hub-metrics"><div><span class="modern-metric-icon violet">01</span><p><b id="modernPartnerTotal">0</b><small>Đối tác đang hoạt động</small></p></div><div><span class="modern-metric-icon coral">04</span><p><b>4 nhóm</b><small>Máy tính · In · Camera · Internet</small></p></div><div><span class="modern-metric-icon emerald">24/7</span><p><b>Liên hệ nhanh</b><small>Gọi điện và mở định vị tức thì</small></p></div></div>
     <div class="partner-filters">
       <select id="partnerDistrict" aria-label="Chọn quận huyện" onchange="renderPartners()"><option value="">Tất cả quận / huyện</option></select>
       <input id="partnerSearch" type="search" autocomplete="off" placeholder="Tìm tên, số điện thoại, địa chỉ..." oninput="renderPartners()">
@@ -6457,9 +6776,10 @@ body.private-panel-open{overflow:hidden}
 <div class="overlay" id="customerOverlay">
   <div class="modal customer-modal" role="dialog" aria-modal="true" aria-labelledby="customerPanelTitle" onclick="event.stopPropagation()">
     <div class="customer-head">
-      <div class="customer-title" id="customerPanelTitle">👤 HỒ SƠ KHÁCH HÀNG</div>
+      <div class="customer-title modern-hub-title" id="customerPanelTitle"><span class="modern-hub-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="9" cy="7" r="4"></circle><path d="M2 21c.25-5.2 2.6-7.8 7-7.8s6.75 2.6 7 7.8H2Zm16-13v7m-3.5-3.5h7"></path></svg></span><span class="modern-hub-copy"><b>TRUNG TÂM KHÁCH HÀNG</b><small>Tra cứu hồ sơ, lịch sử sửa chữa và bảo hành</small></span><span class="modern-live-badge"><i></i> ADMIN</span></div>
       <button type="button" class="customer-close" aria-label="Đóng" onclick="closeCustomerPanel()">×</button>
     </div>
+    <div class="modern-hub-metrics customer-hub-metrics"><div><span class="modern-metric-icon cyan">KH</span><p><b id="modernCustomerTotal">0</b><small>Hồ sơ khách hàng</small></p></div><div><span class="modern-metric-icon blue">04</span><p><b>4 số cuối</b><small>Tìm nhanh bằng điện thoại</small></p></div><div><span class="modern-metric-icon emerald">API</span><p><b>Bảo mật máy chủ</b><small>Không lưu dữ liệu khách trên máy</small></p></div></div>
     <div class="customer-search-wrap">
       <input id="customerSearch" class="customer-search" type="search" inputmode="search" autocomplete="off" placeholder="Tìm bằng số điện thoại hoặc tên khách..." oninput="scheduleCustomerSearch()">
       <span class="customer-search-icon">🔎</span>
@@ -6625,7 +6945,6 @@ body.private-panel-open{overflow:hidden}
     <div id="groupOrderList" class="order-list"></div>
     <div style="font-size:11px;color:#777;margin:10px 0;line-height:1.45;">Đổi thứ tự hiển thị của các nhóm như RAM, SSD, HDD. Nhóm 0 sản phẩm vẫn được giữ nguyên.</div>
     <div class="order-modal-footer">
-      <button class="btn-cancel btn-cancel-danger" onclick="resetGroupOrderForTab()">Khôi phục thứ tự mặc định</button>
       <button class="btn-submit" onclick="closeOverlay('groupOrderOverlay')">Đóng</button>
     </div>
   </div>
@@ -6637,9 +6956,8 @@ body.private-panel-open{overflow:hidden}
     <div class="form-row"><label>Nhóm sản phẩm</label><select id="quickOrderGroup" onchange="renderQuickOrderList()"></select></div>
     <div class="form-row"><label>Thêm bộ lọc mới</label><div class="order-add-row"><input id="quickOrderNewItem" type="text" placeholder="VD: 1200W" onkeydown="if(event.key==='Enter'){event.preventDefault();addQuickOrderItem();}"><button type="button" class="btn-img-pick" onclick="addQuickOrderItem()">＋ Thêm</button></div></div>
     <div id="quickOrderList" class="order-list"></div>
-    <div style="font-size:11px;color:#777;margin:10px 0;line-height:1.45;">Dùng ↑ ↓ để đổi thứ tự hoặc Xóa mục không cần dùng. Nút khôi phục mặc định sẽ hiện lại các mục cố định đã xóa.</div>
+    <div style="font-size:11px;color:#777;margin:10px 0;line-height:1.45;">Dùng ↑ ↓ để đổi thứ tự hoặc Xóa mục không cần dùng.</div>
     <div class="order-modal-footer">
-      <button class="btn-cancel btn-cancel-danger" onclick="resetQuickOrderForGroup()">Khôi phục thứ tự mặc định</button>
       <button class="btn-submit" onclick="closeOverlay('quickOrderOverlay')">Đóng</button>
     </div>
   </div>
@@ -9196,13 +9514,6 @@ function moveQuickOrder(itemIndex, delta){
   showToast("✓ Đã đổi thứ tự bộ lọc");
   saveDisplayConfig();
 }
-function resetQuickOrderForGroup(){
-  const key = quickOrderKey(document.getElementById("quickOrderGroup").value);
-  delete QUICK_ORDER[key];
-  delete QUICK_HIDDEN_TAGS[key];
-  saveDisplayConfig();
-  renderQuickOrderList(); render();
-}
 function groupOrderKey(label){
   let key = normalizeQuickText(String(label || "").replace(/^[^\p{L}]+/u,""));
   // Tương thích dữ liệu cũ từng bị rơi chữ M ở đầu "Máy in".
@@ -9321,8 +9632,6 @@ function moveGroupOrder(index, delta){
   showToast("✓ Đã đổi thứ tự nhóm lớn");
   saveDisplayConfig();
 }
-function resetGroupOrderForTab(){ const tab=document.getElementById("groupOrderTab").value; delete GROUP_ORDER[tab]; saveDisplayConfig(); renderGroupOrderList(); render(); }
-
 function resolveQuickGroupLabelFromRow(r, fallbackGroupLabel=""){
   // Phân loại nhanh chỉ dùng nhóm đầu tiên, tránh làm thay đổi quy tắc cũ khi
   // một sản phẩm được gắn thêm các nhóm phụ.
@@ -12962,8 +13271,8 @@ function requestPrivateAccess(target){
   const overlay=document.getElementById("privateAccessOverlay");
   const password=document.getElementById("privateAccessPassword");
   const isPartner=privateAccessTarget==="partner";
-  document.getElementById("privateAccessTitle").textContent=isPartner?"MỞ DANH BẠ ĐỐI TÁC":"MỞ HỒ SƠ KHÁCH HÀNG";
-  document.getElementById("privateAccessSubtitle").textContent="Mật khẩu được kiểm tra trực tiếp tại API và không được lưu trong mã HTML.";
+  document.getElementById("privateAccessTitle").textContent="ĐĂNG NHẬP QUẢN TRỊ";
+  document.getElementById("privateAccessSubtitle").textContent=`${isPartner?"Mở Mạng lưới Đối tác":"Mở Trung tâm Khách hàng"} bằng tài khoản quản trị toàn quyền. Mật khẩu chỉ được kiểm tra tại API.`;
   document.getElementById("privateAccessError").textContent="";
   if(password){ password.value=""; password.type="password"; password.disabled=false; }
   document.querySelector("#privateAccessOverlay .admin-password-toggle")?.classList.remove("password-visible");
@@ -12992,10 +13301,12 @@ async function submitPrivateAccess(){
   try{
     const verified=await fetchSheetJson(SHEET_API_URL,{
       method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},
-      body:JSON.stringify({action:"verify_private_access",password:value})
+      body:JSON.stringify({action:"verify_admin",password:value})
     },20000);
-    if(!verified.token) throw new Error("API không cấp phiên truy cập");
-    privateAccessToken=verified.token;
+    if(!verified.token) throw new Error("API không cấp phiên quản trị");
+    privateAccessToken="";
+    sessionStorage.setItem("kho_admin_session_token",verified.token);
+    setAdminMode(true);
     const target=privateAccessTarget;
     closePrivateAccess();
     if(target==="partner") await openPartnerPanel();
@@ -13003,7 +13314,7 @@ async function submitPrivateAccess(){
   }catch(e){
     privateAccessToken="";
     const message=String(e);
-    errorBox.textContent=message.includes("PRIVATE_LOGIN_FAILED")?"Sai mật khẩu. Vui lòng thử lại.":message.includes("RATE_LIMIT")?"Đã thử sai nhiều lần. Vui lòng đợi 1 phút.":"Không thể xác thực với API. Hãy kiểm tra kết nối.";
+    errorBox.textContent=message.includes("ADMIN_LOGIN_FAILED")?"Sai mật khẩu quản trị. Vui lòng thử lại.":message.includes("RATE_LIMIT")?"Đã thử sai nhiều lần. Vui lòng đợi 1 phút.":"Không thể xác thực với API. Hãy kiểm tra kết nối.";
     password?.select();
   }finally{
     privateAccessBusy=false;
@@ -13115,6 +13426,8 @@ async function loadCustomers(force=false){
   if(!force && CUSTOMER_DATA.length) return CUSTOMER_DATA;
   const json = await privateSheet("private_customers",{},35000);
   CUSTOMER_DATA = normalizeCustomerList(json.customers);
+  const totalBox=document.getElementById("modernCustomerTotal");
+  if(totalBox) totalBox.textContent=String(CUSTOMER_DATA.length);
   return CUSTOMER_DATA;
 }
 async function openCustomerPanel(){
@@ -13396,6 +13709,8 @@ function setPartnerServiceFilter(value){partnerServiceFilter=String(value||"");r
 function renderPartners(){
   const list=document.getElementById("partnerList");
   if(!list) return;
+  const totalBox=document.getElementById("modernPartnerTotal");
+  if(totalBox) totalBox.textContent=String(PARTNER_DATA.length);
   const district=document.getElementById("partnerDistrict")?.value||"";
   const query=removeAccents(document.getElementById("partnerSearch")?.value||"");
   const matches=PARTNER_DATA.filter(item=>{
