@@ -61,9 +61,9 @@ button:disabled,input:disabled,select:disabled,[aria-disabled="true"] { cursor:n
 .warehouse-pin { position:relative; z-index:1; display:inline-block; transform-origin:50% 85%; }
 .recent-activity-wrap { position:relative; flex:0 0 auto; margin-left:auto; }
 .recent-activity-wrap + .warehouse-switcher { margin-left:0; }
-.recent-activity-bell { position:relative; display:grid; place-items:center; width:38px; height:38px; padding:0; border:1px solid rgba(255,255,255,.22); border-radius:50%; background:rgba(9,35,67,.72); color:#fff; box-shadow:0 5px 16px rgba(5,25,45,.24); cursor:pointer; transition:transform .18s ease,background .18s ease,border-color .18s ease; }
+.recent-activity-bell { position:relative; display:grid; place-items:center; width:35px; height:35px; padding:0; border:1px solid rgba(255,255,255,.22); border-radius:50%; background:rgba(9,35,67,.72); color:#fff; box-shadow:0 5px 16px rgba(5,25,45,.24); cursor:pointer; transition:transform .18s ease,background .18s ease,border-color .18s ease; }
 .recent-activity-bell:hover,.recent-activity-bell[aria-expanded="true"] { transform:translateY(-1px); border-color:rgba(255,255,255,.62); background:#173B67; }
-.recent-activity-bell svg { width:20px; height:20px; fill:none; stroke:currentColor; stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round; }
+.recent-activity-bell svg { width:18px; height:18px; fill:none; stroke:currentColor; stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round; }
 .recent-activity-count { position:absolute; z-index:3; top:1px; right:1px; display:none; min-width:18px; height:18px; padding:0 4px; align-items:center; justify-content:center; border:2px solid #173B67; border-radius:999px; background:#F02849; color:#fff; font-size:9px; font-weight:950; line-height:1; box-shadow:0 2px 7px rgba(240,40,73,.5); }
 .recent-activity-count.show { display:flex; animation:recentBadgePop .28s ease-out both; }
 @keyframes recentBadgePop { from{transform:scale(.55)} to{transform:scale(1)} }
@@ -88,6 +88,8 @@ button:disabled,input:disabled,select:disabled,[aria-disabled="true"] { cursor:n
 .recent-activity-action { display:block; max-width:100%; overflow:hidden; color:#25394B; font-size:11px; font-weight:850; text-overflow:ellipsis; white-space:nowrap; }
 .recent-activity-product { display:block; max-width:100%; margin-top:2px; overflow:hidden; color:#6B7D8C; font-size:10px; text-overflow:ellipsis; white-space:nowrap; }
 .recent-activity-time { color:#738494; font-size:9px; font-weight:750; white-space:nowrap; }
+.recent-activity-row > .recent-activity-avatar { width:32px; height:32px; min-width:32px; font-size:12px; border:2px solid #fff; box-shadow:0 3px 9px rgba(19,75,111,.18); }
+.recent-activity-row > .recent-activity-avatar.has-preview { position:relative; z-index:2; cursor:zoom-in!important; }
 .recent-activity-empty { padding:25px 14px; color:#718291; font-size:11px; text-align:center; }
 @media(max-width:520px){
   .recent-activity-bell{width:34px;height:34px;border-radius:11px}
@@ -96,7 +98,7 @@ button:disabled,input:disabled,select:disabled,[aria-disabled="true"] { cursor:n
   .recent-activity-panel{position:fixed;top:58px;right:8px;left:8px;width:auto;max-height:calc(100dvh - 70px);border-radius:14px}
   .recent-activity-list{max-height:calc(100dvh - 132px);padding:6px}
   .recent-activity-row{grid-template-columns:34px minmax(0,1fr);grid-template-rows:auto auto;gap:3px 8px;align-items:start;padding:9px 8px}
-  .recent-activity-kind-icon{grid-column:1;grid-row:1 / span 2;width:30px;height:30px;margin-top:1px}
+  .recent-activity-kind-icon,.recent-activity-row > .recent-activity-avatar{grid-column:1;grid-row:1 / span 2;width:30px;height:30px;min-width:30px;margin-top:1px}
   .recent-activity-copy{grid-column:2;grid-row:1;width:100%}
   .recent-activity-action{font-size:10.5px;line-height:1.3}
   .recent-activity-product{font-size:9.5px;line-height:1.3}
@@ -2069,12 +2071,12 @@ html::-webkit-scrollbar-corner { background: #EAF2F8; }
 .network-status {
   display:inline-flex;
   align-items:center;
-  gap:4px;
-  height:14px;
-  min-height:14px;
-  padding:1px 5px 1px 2px;
+  gap:3px;
+  height:13px;
+  min-height:13px;
+  padding:1px 4px 1px 2px;
   border-radius:999px;
-  font-size:8px;
+  font-size:7.5px;
   font-weight:950;
   line-height:1;
   border:1px solid transparent;
@@ -2085,9 +2087,9 @@ html::-webkit-scrollbar-corner { background: #EAF2F8; }
 .network-status.offline { border-color:#D4D8DE; background:linear-gradient(#F7F8FA,#E7EAEE); color:#6B7280; }
 .yahoo-presence-icon{
   position:relative;
-  width:8px;
-  height:8px;
-  flex:0 0 8px;
+  width:7px;
+  height:7px;
+  flex:0 0 7px;
   display:grid;
   place-items:center;
   border:1px solid rgba(0,0,0,.12);
@@ -2095,7 +2097,7 @@ html::-webkit-scrollbar-corner { background: #EAF2F8; }
   color:#fff;
   box-shadow:inset 0 1px 2px rgba(255,255,255,.72),0 1px 3px rgba(30,58,95,.2);
 }
-.yahoo-presence-icon svg{width:7px;height:7px;display:block;overflow:visible}
+.yahoo-presence-icon svg{width:6px;height:6px;display:block;overflow:visible}
 .yahoo-presence-icon .yahoo-eye{fill:#fff}
 .yahoo-presence-icon .yahoo-mouth{fill:none;stroke:#fff;stroke-width:2.25;stroke-linecap:round}
 .network-status.online .yahoo-presence-icon{background:radial-gradient(circle at 35% 25%,#A9FF9F 0,#2FD365 38%,#07923C 100%)}
@@ -2115,9 +2117,9 @@ html::-webkit-scrollbar-corner { background: #EAF2F8; }
 @media(max-width:520px){
   .title-status-line{gap:3px;font-size:7px}
   .title-status-line .sync-badge,.title-status-line #lastSyncText{font-size:7px!important}
-  .network-status{height:13px;min-height:13px;padding:1px 4px 1px 2px;font-size:7px}
-  .yahoo-presence-icon{width:8px;height:8px;flex-basis:8px}
-  .yahoo-presence-icon svg{width:7px;height:7px}
+  .network-status{gap:2px;height:11px;min-height:11px;padding:1px 3px 1px 1px;font-size:6.5px}
+  .yahoo-presence-icon{width:7px;height:7px;flex-basis:7px}
+  .yahoo-presence-icon svg{width:6px;height:6px}
 }
 
 /* Đồng bộ nút cuộn nhanh với cụm List/Grid. */
@@ -3724,6 +3726,8 @@ button:disabled{opacity:.55;cursor:not-allowed;filter:saturate(.5)}
   .modal::before{margin-top:-8px}.fab-wrap{right:12px!important;bottom:max(12px,env(safe-area-inset-bottom))!important}
   .build-selection-tray{left:8px!important;right:8px!important;bottom:max(8px,env(safe-area-inset-bottom))!important}
 }
+/* Trang chủ mặc định đã có KPI tổng mặt hàng; ẩn số kết quả lặp lại để thanh lọc thấp hơn. */
+body.home-landing-mode #homeInventoryBar #count{display:none!important}
 @media(max-width:480px){
   .title-base{font-size:clamp(15px,4.6vw,20px)!important}.warehouse-switch{padding-inline:9px!important}
   .title-logo-slot{width:32px!important;height:32px!important;border-radius:9px!important}
@@ -3797,21 +3801,21 @@ body .scroll-btns .scroll-btn svg{
   .header .title{gap:4px!important}
   .recent-activity-wrap{margin-left:auto!important}
   .recent-activity-bell{
-    width:29px!important;
-    height:29px!important;
-    min-width:29px!important;
-    min-height:29px!important;
-    border-radius:9px!important;
+    width:26px!important;
+    height:26px!important;
+    min-width:26px!important;
+    min-height:26px!important;
+    border-radius:8px!important;
   }
-  .recent-activity-bell svg{width:15px!important;height:15px!important}
+  .recent-activity-bell svg{width:13px!important;height:13px!important}
   .recent-activity-count{
     top:-4px!important;
     right:-4px!important;
-    min-width:14px!important;
-    height:14px!important;
-    padding:0 3px!important;
+    min-width:12px!important;
+    height:12px!important;
+    padding:0 2px!important;
     border-width:1.5px!important;
-    font-size:7px!important;
+    font-size:6px!important;
   }
   .warehouse-switcher{
     gap:1px!important;
@@ -9702,12 +9706,13 @@ function recentActivityTimeLabel(value){
   const full=formatTxTime(value);
   const m=full.match(/^(\d{2})\/(\d{2})\/(\d{4})\s+(\d{2}:\d{2})/);
   if(!m) return full;
-  const now=formatTxTime(new Date());
-  return now.slice(0,10)===`${m[1]}/${m[2]}/${m[3]}` ? m[4] : `${m[1]}/${m[2]} ${m[4]}`;
+  return `${m[1]}/${m[2]}/${m[3]} ${m[4]}`;
 }
 function renderRecentActivity(){
   const list=document.getElementById("recentActivityList");
   if(!list) return;
+  const title=document.querySelector(".recent-activity-title");
+  if(title) title.textContent="GIAO DỊCH GẦN ĐÂY";
   const rows=recentTxSorted();
   const shown=recentActivityExpanded ? rows : rows.slice(0,5);
   const allBtn=document.getElementById("recentActivityAll");
@@ -9724,9 +9729,8 @@ function renderRecentActivity(){
     const info=getTransactionProductDisplay(tx,null);
     const qty=Math.abs(Number(tx.qty)||0);
     const action=kind==="IMPORT" ? "nhập hàng" : kind==="ADJUST" ? "điều chỉnh kho" : "xuất hàng";
-    const icon=kind==="IMPORT" ? "📥" : kind==="ADJUST" ? "⚙️" : "🛒";
-    const kindClass=kind==="IMPORT" ? "import" : kind==="ADJUST" ? "adjust" : "sale";
-    return `<button type="button" class="recent-activity-row" data-code="${escapeHtml(tx.ma||"")}" data-branch="${escapeHtml(tx.branch||"Q2")}" title="Mở sản phẩm này" onclick="openRecentActivityProduct(this,event)"><span class="recent-activity-kind-icon ${kindClass}">${icon}</span><span class="recent-activity-copy"><span class="recent-activity-action">${escapeHtml(tx.nv||"Chưa rõ nhân viên")} ${action}</span><span class="recent-activity-product">${escapeHtml(info.currentName||tx.ma||"Sản phẩm")}${qty?` (${qty} cái)`:""}</span></span><span class="recent-activity-time">${escapeHtml(recentActivityTimeLabel(tx.time))}</span></button>`;
+    const employeeAvatar=renderNVAvatar(tx.nv||"Chưa rõ nhân viên","recent-activity-avatar");
+    return `<button type="button" class="recent-activity-row" data-code="${escapeHtml(tx.ma||"")}" data-branch="${escapeHtml(tx.branch||"Q2")}" title="Mở sản phẩm này" onclick="openRecentActivityProduct(this,event)">${employeeAvatar}<span class="recent-activity-copy"><span class="recent-activity-action">${escapeHtml(tx.nv||"Chưa rõ nhân viên")} ${action}</span><span class="recent-activity-product">${escapeHtml(info.currentName||tx.ma||"Sản phẩm")}${qty?` (${qty} cái)`:""}</span></span><span class="recent-activity-time">${escapeHtml(recentActivityTimeLabel(tx.time))}</span></button>`;
   }).join("");
 }
 function openRecentActivityProduct(button,event){
