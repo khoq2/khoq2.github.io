@@ -1289,6 +1289,10 @@ body.fab-menu-open .category-view-bar .view-mode-switch { pointer-events:none; }
 .edit-save-buttons .btn-submit:disabled { opacity:.6; cursor:wait; }
 .simple-sticky-actions { position:sticky; z-index:20; bottom:0; margin:12px -16px 0; padding:10px 16px max(14px,env(safe-area-inset-bottom)); border-top:1px solid #D5DEE7; background:rgba(255,255,255,.97); box-shadow:0 -8px 20px rgba(30,58,95,.12); backdrop-filter:blur(8px); }
 .simple-sticky-actions .edit-save-buttons > button { min-height:46px; }
+#saleOverlay .sale-sticky-actions{margin-top:12px;background:rgba(255,255,255,.98)}
+#saleOverlay .sale-sticky-actions .edit-save-buttons{display:grid;grid-template-columns:.78fr 1.22fr;gap:8px}
+#saleOverlay .sale-sticky-actions button{width:100%;min-height:46px;margin:0}
+@media(max-width:520px){#saleOverlay .sale-sticky-actions{bottom:-1px;padding-bottom:max(10px,env(safe-area-inset-bottom))}#saleOverlay .sale-sticky-actions button{min-height:44px;font-size:12px}}
 .kpi-sticky-actions .btn-submit { background:var(--kpi-accent,#1E3A5F); color:var(--kpi-accent-text,#fff); box-shadow:0 3px 10px rgba(30,58,95,.2); }
 .customer-modal .simple-sticky-actions { margin-left:-16px; margin-right:-16px; }
 .order-modal-footer { position:sticky; z-index:8; left:0; right:0; bottom:0; display:grid; grid-template-columns:1fr 1fr; gap:8px; margin:10px -16px 0; padding:10px 16px max(14px,env(safe-area-inset-bottom)); border-top:1px solid rgba(30,58,95,.14); background:rgba(255,255,255,.94); box-shadow:0 -7px 18px rgba(30,58,95,.12); backdrop-filter:blur(12px); }
@@ -4922,7 +4926,7 @@ button,[role="button"],a[href],input,select,textarea{
   <button class="fab admin-only" id="fabToggleBtn" style="background:#1E3A5F;color:#fff;" onclick="toggleFabMenu()">⚙️ Quản trị</button>
 </div>
 
-<div class="overlay" id="editOverlay" onclick="overlayClose(event,'editOverlay')">
+<div class="overlay" id="editOverlay">
   <div class="modal" onclick="event.stopPropagation()">
     <div class="modal-title" id="editTitle">➕ Thêm thiết bị mới</div>
     <input type="hidden" id="editIdx" value="">
@@ -5115,7 +5119,7 @@ button,[role="button"],a[href],input,select,textarea{
   </div>
 </div>
 
-<div class="overlay" id="importOverlay" onclick="overlayClose(event,'importOverlay')">
+<div class="overlay" id="importOverlay">
   <div class="modal" onclick="event.stopPropagation()">
     <div class="modal-title">📤 Tải File lên (Excel)</div>
     <div class="import-guide">
@@ -5144,12 +5148,14 @@ button,[role="button"],a[href],input,select,textarea{
         <input type="radio" name="importMode" value="replace"> 🔄 Thay thế toàn bộ dữ liệu
       </label>
     </div>
-    <button class="btn-submit" id="btnImport" style="display:none" onclick="doImport()">📤 Tải lên ngay</button>
-    <button class="btn-cancel btn-cancel-danger" onclick="closeOverlay('importOverlay')">Huỷ</button>
+    <div class="simple-sticky-actions"><div class="edit-save-buttons">
+      <button class="btn-cancel btn-cancel-danger" type="button" onclick="closeOverlay('importOverlay')">Huỷ</button>
+      <button class="btn-submit" id="btnImport" type="button" style="display:none" onclick="doImport()">📤 Tải lên ngay</button>
+    </div></div>
   </div>
 </div>
 
-<div class="overlay" id="nvOverlay" onclick="overlayClose(event,'nvOverlay')">
+<div class="overlay" id="nvOverlay">
   <div class="modal" onclick="event.stopPropagation()">
     <div class="modal-title">👥 Quản lý nhân viên</div>
     <div class="form-row nv-add-row">
@@ -5176,7 +5182,7 @@ button,[role="button"],a[href],input,select,textarea{
   </div>
 </div>
 
-<div class="overlay" id="saleOverlay" onclick="overlayClose(event,'saleOverlay')">
+<div class="overlay" id="saleOverlay">
   <div class="modal" onclick="event.stopPropagation()">
     <div class="modal-title" id="saleModalTitle">🛒 Ghi nhận giao dịch</div>
     <input type="hidden" id="saleIdx">
@@ -5228,12 +5234,14 @@ button,[role="button"],a[href],input,select,textarea{
       </div>
       <div class="img-link-hint">Trên Drive: đặt quyền chia sẻ “Bất kỳ ai có liên kết” rồi dán URL vào đây.</div>
     </div>
-    <button class="btn-submit" id="saleSaveBtn" type="button" onclick="saveSale()">💾 Lưu giao dịch</button>
-    <button class="btn-cancel btn-cancel-danger" onclick="closeOverlay('saleOverlay')">Huỷ</button>
+    <div class="simple-sticky-actions sale-sticky-actions"><div class="edit-save-buttons">
+      <button class="btn-cancel btn-cancel-danger" type="button" onclick="closeOverlay('saleOverlay')">Huỷ</button>
+      <button class="btn-submit" id="saleSaveBtn" type="button" onclick="saveSale()">💾 Lưu giao dịch</button>
+    </div></div>
   </div>
 </div>
 
-<div class="overlay" id="restockOverlay" onclick="overlayClose(event,'restockOverlay')">
+<div class="overlay" id="restockOverlay">
   <div class="modal" onclick="event.stopPropagation()">
     <div class="modal-title">📥 Nhập thêm hàng</div>
     <input type="hidden" id="restockIdx">
@@ -5241,8 +5249,10 @@ button,[role="button"],a[href],input,select,textarea{
     <div class="form-row"><label>Người nhập</label><select id="restockNV" style="width:100%;padding:9px;border-radius:8px;border:1.5px solid #ddd;font-size:14px"><option value="">-- Chọn người nhập --</option></select></div>
     <div class="form-row"><label>Số lượng nhập thêm *</label><input type="number" id="restockQty" value="1" min="1" inputmode="numeric"></div>
     <div class="form-row"><label>Ghi chú</label><input type="text" id="restockGhi" placeholder="VD: Nhập NCC A, bổ sung kho, kiểm kê..."></div>
-    <button class="btn-submit" onclick="saveRestock()">📥 Xác nhận nhập hàng</button>
-    <button class="btn-cancel btn-cancel-danger" onclick="closeOverlay('restockOverlay')">Huỷ</button>
+    <div class="simple-sticky-actions"><div class="edit-save-buttons">
+      <button class="btn-cancel btn-cancel-danger" type="button" onclick="closeOverlay('restockOverlay')">Huỷ</button>
+      <button class="btn-submit" type="button" onclick="saveRestock()">📥 Xác nhận nhập hàng</button>
+    </div></div>
   </div>
 </div>
 
@@ -5359,18 +5369,18 @@ button,[role="button"],a[href],input,select,textarea{
   </div>
 </div>
 
-<div class="overlay" id="unitOverlay" onclick="overlayClose(event,'unitOverlay')">
+<div class="overlay" id="unitOverlay">
   <div class="modal" onclick="event.stopPropagation()">
     <div class="modal-title">📷 Quản lý từng chiếc</div>
     <input type="hidden" id="unitProductIndex">
     <div id="unitProductSummary" class="unit-summary"></div>
     <div class="unit-create-row"><input type="number" id="unitCreateCount" min="1" max="200" value="1" aria-label="Số thiết bị cần tạo"><button type="button" class="btn-submit" onclick="createProductUnits()">＋ Tạo danh sách từng chiếc</button></div>
     <div id="unitList" class="unit-list"></div>
-    <button class="btn-cancel" type="button" onclick="closeOverlay('unitOverlay')">Đóng</button>
+    <div class="simple-sticky-actions"><div class="edit-save-buttons"><button class="btn-submit" type="button" onclick="closeOverlay('unitOverlay')">Đóng</button></div></div>
   </div>
 </div>
 
-<div class="overlay" id="transferOverlay" onclick="overlayClose(event,'transferOverlay')">
+<div class="overlay" id="transferOverlay">
   <div class="modal" onclick="event.stopPropagation()">
     <div class="modal-title">⇄ Chuyển kho an toàn</div>
     <input type="hidden" id="transferProductIndex">
@@ -5381,11 +5391,11 @@ button,[role="button"],a[href],input,select,textarea{
     <div class="form-row"><label>Nhân viên thực hiện *</label><select id="transferEmployee"></select></div>
     <div class="form-row"><label>Ghi chú</label><textarea id="transferNote" placeholder="Lý do hoặc người nhận hàng"></textarea></div>
     <div id="transferPreview" class="transfer-confirm-box"></div>
-    <div class="form-actions"><button class="btn-cancel btn-cancel-danger" type="button" onclick="closeOverlay('transferOverlay')">Hủy</button><button class="btn-submit" id="transferSubmitBtn" type="button" onclick="submitInventoryTransfer()">Xác nhận chuyển kho</button></div>
+    <div class="simple-sticky-actions"><div class="edit-save-buttons"><button class="btn-cancel btn-cancel-danger" type="button" onclick="closeOverlay('transferOverlay')">Hủy</button><button class="btn-submit" id="transferSubmitBtn" type="button" onclick="submitInventoryTransfer()">Xác nhận chuyển kho</button></div></div>
   </div>
 </div>
 
-<div class="overlay" id="adminOverlay" onclick="overlayClose(event,'adminOverlay')">
+<div class="overlay" id="adminOverlay">
   <div class="modal admin-login-modal" onclick="event.stopPropagation()">
     <div class="admin-login-icon" aria-hidden="true">🔐</div>
     <div class="admin-login-title">ĐĂNG NHẬP</div>
@@ -5410,7 +5420,7 @@ button,[role="button"],a[href],input,select,textarea{
   </button>
 </div>
 
-<div class="overlay" id="syncErrorOverlay" onclick="if(event.target===this) closeSyncErrorLog()">
+<div class="overlay" id="syncErrorOverlay">
   <div class="modal sync-error-modal">
     <div id="syncErrorGate">
       <div class="admin-login-icon" aria-hidden="true">☁️</div>
@@ -5460,7 +5470,7 @@ button,[role="button"],a[href],input,select,textarea{
   </div>
 </div>
 
-<div class="overlay" id="groupOrderOverlay" onclick="overlayClose(event,'groupOrderOverlay')">
+<div class="overlay" id="groupOrderOverlay">
   <div class="modal" onclick="event.stopPropagation()">
     <div class="modal-title">↕️ Sắp xếp nhóm lớn</div>
     <div class="form-row"><label>Danh mục</label><select id="groupOrderTab" onchange="renderGroupOrderList()"><option value="MT">💻 Máy Tính</option><option value="MI">🖨️ Máy In</option><option value="CAM">📷 Camera</option><option value="INT">🌐 Internet</option></select></div>
@@ -5477,7 +5487,7 @@ button,[role="button"],a[href],input,select,textarea{
   </div>
 </div>
 
-<div class="overlay" id="quickOrderOverlay" onclick="overlayClose(event,'quickOrderOverlay')">
+<div class="overlay" id="quickOrderOverlay">
   <div class="modal" onclick="event.stopPropagation()">
     <div class="modal-title">↕️ Sắp xếp bộ lọc nhanh</div>
     <div class="form-row"><label>Nhóm sản phẩm</label><select id="quickOrderGroup" onchange="renderQuickOrderList()"></select></div>
