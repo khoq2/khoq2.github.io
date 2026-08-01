@@ -1032,6 +1032,9 @@ body.admin-mode .admin-only { display: flex!important; }
 .sync-error-copy { background:#1E8449; color:#fff; }
 .sync-error-clear { background:#F4F6F7; color:#922B21; }
 .admin-btn { background: rgba(255,255,255,.15); color: #fff; border: 1.5px solid rgba(255,255,255,.4); border-radius: 8px; padding: 4px 10px; font-size: 11px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 4px; opacity: 0; transition: opacity .3s; }
+.sync-action-active{cursor:wait!important;opacity:.78!important;filter:saturate(.82);pointer-events:none!important}
+.sync-action-success{background:#16844A!important;color:#fff!important;border-color:#16844A!important}
+.sync-action-error{background:#B42318!important;color:#fff!important;border-color:#B42318!important}
 #adminBtn.admin-profile-btn{min-width:126px;min-height:44px;padding:5px 8px 5px 6px;gap:7px;border:1px solid rgba(120,190,255,.32);border-radius:12px;background:linear-gradient(135deg,#0A3566 0%,#082B55 55%,#061F40 100%);color:#fff;box-shadow:0 7px 18px rgba(3,20,42,.28),inset 0 1px 0 rgba(255,255,255,.13);text-align:left}
 #adminBtn .admin-profile-avatar{width:31px;height:31px;flex:0 0 31px;display:grid;place-items:center;overflow:hidden;border:2px solid #fff;border-radius:50%;background:linear-gradient(145deg,#D9EEFF,#78BCEC);color:#123D68;font-size:13px;font-weight:950;box-shadow:0 0 0 2px #2A8DE0,0 3px 9px rgba(0,0,0,.28)}
 #adminBtn .admin-profile-avatar img{width:100%;height:100%;display:block;object-fit:cover}
@@ -5219,7 +5222,7 @@ button,[role="button"],a[href],input,select,textarea{
       </div>
       <div class="img-link-hint">Trên Drive: đặt quyền chia sẻ “Bất kỳ ai có liên kết” rồi dán URL vào đây.</div>
     </div>
-    <button class="btn-submit" onclick="saveSale()">💾 Lưu giao dịch</button>
+    <button class="btn-submit" id="saleSaveBtn" type="button" onclick="saveSale()">💾 Lưu giao dịch</button>
     <button class="btn-cancel btn-cancel-danger" onclick="closeOverlay('saleOverlay')">Huỷ</button>
   </div>
 </div>
@@ -6430,19 +6433,68 @@ function sheetUrl(params){
   return SHEET_API_URL + "?" + new URLSearchParams(params).toString();
 }
 
+let syncActionCandidate=null;
+const SYNC_FEEDBACK_MANAGED_IDS=new Set(["saleSaveBtn","fSaveBtn","customerProfileSaveBtn","customerRecordSaveBtn","transferSubmitBtn"]);
+document.addEventListener("click",event=>{
+  const btn=event.target.closest?.("button");
+  if(!btn || btn.disabled || SYNC_FEEDBACK_MANAGED_IDS.has(btn.id)) return;
+  const handler=String(btn.getAttribute("onclick")||"");
+  if(!/(save|submit|delete|restore|transfer|import|apply|clear|remove|commit|manualSync)/i.test(handler)) return;
+  syncActionCandidate={btn,time:Date.now()};
+},true);
+function claimSyncActionButton(){
+  const ctx=syncActionCandidate;
+  if(!ctx || !ctx.btn?.isConnected || Date.now()-ctx.time>15000) return null;
+  syncActionCandidate=null;
+  return ctx.btn;
+}
+function beginSyncActionFeedback(btn){
+  if(!btn) return;
+  if(!btn.dataset.syncOriginalText) btn.dataset.syncOriginalText=btn.textContent.trim();
+  btn.dataset.syncPendingCount=String((Number(btn.dataset.syncPendingCount)||0)+1);
+  btn.disabled=true;
+  btn.classList.remove("sync-action-success","sync-action-error");
+  btn.classList.add("sync-action-active");
+  btn.textContent="⏳ Đang đồng bộ...";
+}
+function finishSyncActionFeedback(btn,ok){
+  if(!btn) return;
+  const pending=Math.max(0,(Number(btn.dataset.syncPendingCount)||1)-1);
+  btn.dataset.syncPendingCount=String(pending);
+  if(pending) return;
+  btn.classList.remove("sync-action-active");
+  btn.classList.add(ok?"sync-action-success":"sync-action-error");
+  btn.textContent=ok?"✅ Đã đồng bộ":"⚠️ Thử lại";
+  btn.disabled=!!ok;
+  clearTimeout(btn._syncFeedbackTimer);
+  btn._syncFeedbackTimer=setTimeout(()=>{
+    if(!btn.isConnected) return;
+    btn.classList.remove("sync-action-success","sync-action-error");
+    btn.textContent=btn.dataset.syncOriginalText||btn.textContent;
+    btn.disabled=false;
+    delete btn.dataset.syncPendingCount;
+  },ok?900:1600);
+}
 async function postSheet(action, data, timeoutMs=SHEET_TIMEOUT_MS){
+  const feedbackBtn=claimSyncActionButton();
+  beginSyncActionFeedback(feedbackBtn);
   const send = auth=>fetchSheetJson(SHEET_API_URL, {
     method:"POST",
     headers:{"Content-Type":"text/plain;charset=utf-8"},
     body:JSON.stringify({action,data,auth:auth||""})
   },timeoutMs);
   const sessionToken = sessionStorage.getItem("kho_admin_session_token") || "";
-  try{ return await send(sessionToken); }
+  try{
+    const result=await send(sessionToken);
+    finishSyncActionFeedback(feedbackBtn,true);
+    return result;
+  }
   catch(e){
-    if(!String(e).includes("AUTH_REQUIRED")) throw e;
+    if(!String(e).includes("AUTH_REQUIRED")){ finishSyncActionFeedback(feedbackBtn,false); throw e; }
     sessionStorage.removeItem("kho_admin_session_token");
     sessionStorage.removeItem("kho_cntt_admin");
     if(isAdminMode()) setAdminMode(false);
+    finishSyncActionFeedback(feedbackBtn,false);
     throw new Error("Phiên Admin đã hết hạn. Vui lòng đăng nhập Admin lại rồi thực hiện thao tác.");
   }
 }
@@ -9906,6 +9958,15 @@ function updateSaleVatPreview(){
 }
 function newTransactionId(){ return (crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`); }
 let SALE_UNITS=[];
+let saleSaving=false;
+function setSaleSaveState(state,editing=false){
+  const btn=document.getElementById("saleSaveBtn");
+  if(!btn) return;
+  if(state==="saving"){saleSaving=true;btn.disabled=true;btn.textContent=editing?"⏳ Đang lưu chỉnh sửa...":"⏳ Đang lưu giao dịch...";return;}
+  if(state==="saved"){btn.disabled=true;btn.textContent=editing?"✅ Đã sửa giao dịch":"✅ Đã lưu giao dịch";return;}
+  if(state==="retry"){saleSaving=false;btn.disabled=false;btn.textContent="🔄 Thử lưu lại";return;}
+  saleSaving=false;btn.disabled=false;btn.textContent=editing?"💾 Lưu chỉnh sửa":"💾 Lưu giao dịch";
+}
 async function openSaleModal(idx){ if(!requireAdmin()) return;
   const r = DATA[idx];
   if(!r) return;
@@ -9915,6 +9976,7 @@ async function openSaleModal(idx){ if(!requireAdmin()) return;
   document.getElementById("saleIdx").value = idx;
   document.getElementById("saleTxId").value = "";
   document.getElementById("saleRequestId").value = newTransactionId();
+  setSaleSaveState("idle",false);
   refreshNVSelect();
   document.getElementById("saleQty").value = "1";
   document.getElementById("saleQty").max = String(availableStock);
@@ -9964,7 +10026,7 @@ async function saveRestock(){ if(!requireAdmin()) return;
     showToast(`✅ Đã nhập thêm ${qty}: ${r[2]}`);
   }catch(e){ setSyncBadge("error",String(e)); showToast("⚠️ Không nhập hàng: "+String(e),5000); }
 }
-async function saveSale(){ if(!requireAdmin()) return;
+async function saveSale(){ if(!requireAdmin() || saleSaving) return;
   const idx = parseInt(document.getElementById("saleIdx").value);
   const txId = document.getElementById("saleTxId").value;
   const nv  = document.getElementById("saleNV").value.trim();
@@ -9991,6 +10053,7 @@ async function saveSale(){ if(!requireAdmin()) return;
   if(txId){
     const tx = TX_DATA.find(t=>String(t.id)===String(txId));
     if(!tx){ alert("Không tìm thấy giao dịch cần sửa!"); return; }
+    setSaleSaveState("saving",true);
     try{
       await ensureAtomicApi();
       const updated = {...tx,nv,gia,ghi,img,warranty1,warranty2,time:transactionTime,vatRate,basePrice};
@@ -10005,15 +10068,19 @@ async function saveSale(){ if(!requireAdmin()) return;
       // Dùng chính dữ liệu máy chủ trả về; không giả định bản cục bộ đã đồng bộ.
       Object.assign(tx,savedTx);
       safeLocalStorageSet("kho_cntt_tx",JSON.stringify(normalizeTxList(TX_DATA)));
+      setSaleSaveState("saved",true);
+      await new Promise(resolve=>setTimeout(resolve,320));
       closeOverlay("saleOverlay");
       setSyncBadge("synced"); markLastSync();
       renderTxHistory();
       render();
       showToast("✅ Đã sửa giao dịch");
     }catch(e){
+      setSaleSaveState("retry",true);
       setSyncBadge("error",String(e));
       showToast("⚠️ Không sửa được giao dịch: "+String(e),5000);
     }
+    if(!document.getElementById("saleOverlay").classList.contains("open")) setSaleSaveState("idle",true);
     return;
   }
   const r = DATA[idx];
@@ -10022,16 +10089,20 @@ async function saveSale(){ if(!requireAdmin()) return;
   const saleUnitIds=[...document.querySelectorAll('#saleUnitPicker input:checked')].map(input=>input.value);
   if(SALE_UNITS.length && saleUnitIds.length!==qty){alert(`Vui lòng chọn đúng ${qty} mã từng chiếc đã bán`);return;}
   const tx = { id:document.getElementById("saleRequestId").value || newTransactionId(), ma:r[1], ten:r[2], sh:r[0], nv, qty, gia, ghi, img, warranty1, warranty2, time:transactionTime, branch:r[13]||"Q2", vatRate, basePrice, unitIds:saleUnitIds };
+  setSaleSaveState("saving",false);
   try{
     const result = await commitInventoryTransaction("SALE",r,tx,{qty,unitIds:saleUnitIds});
     DATA[idx][5] = Number(result.stock);
     DATA[idx][6] = getStockStatusValue(DATA[idx][5],DATA[idx][12]);
     TX_DATA.unshift(tx);
     cacheAtomicInventoryState();
+    setSaleSaveState("saved",false);
+    await new Promise(resolve=>setTimeout(resolve,320));
     closeOverlay("saleOverlay");
     render();
     showToast(`✅ Đã ghi giao dịch: ${r[2]} x${qty}`);
-  }catch(e){ setSyncBadge("error",String(e)); showToast("⚠️ Không ghi giao dịch: "+String(e),5000); }
+  }catch(e){ setSaleSaveState("retry",false); setSyncBadge("error",String(e)); showToast("⚠️ Không ghi giao dịch: "+String(e),5000); }
+  if(!document.getElementById("saleOverlay").classList.contains("open")) setSaleSaveState("idle",false);
 }
 
 const VIETNAM_TIME_ZONE = "Asia/Ho_Chi_Minh";
@@ -10503,6 +10574,7 @@ function editTX(id){ if(!requireAdmin()) return;
   document.getElementById("saleModalTitle").textContent = "📅 Sửa ngày giờ giao dịch";
   document.getElementById("saleIdx").value = idx >= 0 ? idx : "";
   document.getElementById("saleTxId").value = tx.id;
+  setSaleSaveState("idle",true);
   refreshNVSelect();
   const nvSel = document.getElementById("saleNV");
   if(tx.nv && !findNVByName(tx.nv)){
