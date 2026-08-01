@@ -62,6 +62,8 @@ button:disabled,input:disabled,select:disabled,[aria-disabled="true"] { cursor:n
 .recent-activity-wrap { position:relative; flex:0 0 auto; margin-left:auto; }
 .recent-activity-wrap + .warehouse-switcher { margin-left:0; }
 .recent-activity-bell { position:relative; display:grid; place-items:center; width:35px; height:35px; padding:0; border:1px solid rgba(255,255,255,.22); border-radius:50%; background:rgba(9,35,67,.72); color:#fff; box-shadow:0 5px 16px rgba(5,25,45,.24); cursor:pointer; transition:transform .18s ease,background .18s ease,border-color .18s ease; }
+.recent-activity-bell{overflow:visible!important}
+.recent-activity-bell::after{display:none!important}
 .recent-activity-bell:hover,.recent-activity-bell[aria-expanded="true"] { transform:translateY(-1px); border-color:rgba(255,255,255,.62); background:#173B67; }
 .recent-activity-bell svg { width:18px; height:18px; fill:none; stroke:currentColor; stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round; }
 .recent-activity-count { position:absolute; z-index:3; top:1px; right:1px; display:none; min-width:18px; height:18px; padding:0 4px; align-items:center; justify-content:center; border:2px solid #173B67; border-radius:999px; background:#F02849; color:#fff; font-size:9px; font-weight:950; line-height:1; box-shadow:0 2px 7px rgba(240,40,73,.5); }
@@ -3823,13 +3825,17 @@ body .scroll-btns .scroll-btn svg{
   }
   .recent-activity-bell svg{width:13px!important;height:13px!important}
   .recent-activity-count{
-    top:-4px!important;
-    right:-4px!important;
-    min-width:12px!important;
-    height:12px!important;
-    padding:0 2px!important;
+    z-index:20!important;
+    top:-5px!important;
+    right:-5px!important;
+    min-width:14px!important;
+    height:14px!important;
+    padding:0 3px!important;
     border-width:1.5px!important;
-    font-size:6px!important;
+    font-size:8px!important;
+    line-height:14px!important;
+    font-variant-numeric:tabular-nums!important;
+    box-shadow:0 2px 7px rgba(240,40,73,.62)!important;
   }
   .warehouse-switcher{
     gap:1px!important;
