@@ -5179,8 +5179,12 @@ body .card .nguoi-ban-row > .nguoi-ban-kind-icon {
 
 // ====== Tự động dọn banner/overlay lạ do hosting chèn vào ======
 (function(){
-  const APP_IDS = new Set(["results","editOverlay","importOverlay","adminOverlay","toast","imageLightbox"]);
-  const APP_CLASSES = ["sticky","fab-wrap","overlay","toast","image-lightbox","cursor-halo","cursor-dot","cursor-click-wave","footer-credit","build-selection-tray","category-view-bar","latest-items-ticker","scroll-btns"];
+  // Các phần tử nổi hợp lệ của ứng dụng phải được miễn khỏi bộ dọn overlay.
+  // recentActivityPanel được chuyển thành con trực tiếp của body khi mở; nếu
+  // không có trong danh sách này, cleanup() sẽ nhận nhầm là popup do hosting
+  // chèn vào và xóa nó ngay sau khi người dùng bấm chuông thông báo.
+  const APP_IDS = new Set(["results","editOverlay","importOverlay","adminOverlay","toast","imageLightbox","recentActivityPanel"]);
+  const APP_CLASSES = ["sticky","fab-wrap","overlay","toast","image-lightbox","cursor-halo","cursor-dot","cursor-click-wave","footer-credit","build-selection-tray","category-view-bar","latest-items-ticker","scroll-btns","recent-activity-panel"];
   function isAppEl(el){
     if(el.id && APP_IDS.has(el.id)) return true;
     if(el.classList){
