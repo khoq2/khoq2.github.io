@@ -6,6 +6,18 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
+<meta name="theme-color" content="#0F5F9F" />
+<meta name="color-scheme" content="light" />
+<meta name="application-name" content="KHO Q2" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+<meta name="apple-mobile-web-app-title" content="KHO Q2" />
+<meta name="description" content="Quản lý kho và giao dịch Hoàng Gia Computer" />
+<link rel="manifest" href="manifest.webmanifest" />
+<link rel="icon" href="app-icon.svg" type="image/svg+xml" />
+<link rel="preconnect" href="https://script.google.com" crossorigin />
+<link rel="preconnect" href="https://lh3.googleusercontent.com" crossorigin />
+<link rel="dns-prefetch" href="https://drive.google.com" />
 <title>🏪 KHO Q2 (HOÀNG GIA COMPUTER) [v-fix2]</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.10/pdfmake.min.js"></script>
@@ -1997,9 +2009,11 @@ html::-webkit-scrollbar-corner { background: #EAF2F8; }
   display:inline-flex;
   align-items:center;
   gap:4px;
-  padding:2px 6px 2px 3px;
+  height:14px;
+  min-height:14px;
+  padding:1px 5px 1px 2px;
   border-radius:999px;
-  font-size:7.5px;
+  font-size:8px;
   font-weight:950;
   line-height:1;
   border:1px solid transparent;
@@ -2010,9 +2024,9 @@ html::-webkit-scrollbar-corner { background: #EAF2F8; }
 .network-status.offline { border-color:#D4D8DE; background:linear-gradient(#F7F8FA,#E7EAEE); color:#6B7280; }
 .yahoo-presence-icon{
   position:relative;
-  width:10px;
-  height:10px;
-  flex:0 0 10px;
+  width:8px;
+  height:8px;
+  flex:0 0 8px;
   display:grid;
   place-items:center;
   border:1px solid rgba(0,0,0,.12);
@@ -2020,7 +2034,7 @@ html::-webkit-scrollbar-corner { background: #EAF2F8; }
   color:#fff;
   box-shadow:inset 0 1px 2px rgba(255,255,255,.72),0 1px 3px rgba(30,58,95,.2);
 }
-.yahoo-presence-icon svg{width:8px;height:8px;display:block;overflow:visible}
+.yahoo-presence-icon svg{width:7px;height:7px;display:block;overflow:visible}
 .yahoo-presence-icon .yahoo-eye{fill:#fff}
 .yahoo-presence-icon .yahoo-mouth{fill:none;stroke:#fff;stroke-width:2.25;stroke-linecap:round}
 .network-status.online .yahoo-presence-icon{background:radial-gradient(circle at 35% 25%,#A9FF9F 0,#2FD365 38%,#07923C 100%)}
@@ -2040,8 +2054,9 @@ html::-webkit-scrollbar-corner { background: #EAF2F8; }
 @media(max-width:520px){
   .title-status-line{gap:3px;font-size:7px}
   .title-status-line .sync-badge,.title-status-line #lastSyncText{font-size:7px!important}
-  .network-status{padding:2px 5px 2px 3px;font-size:7px}
-  .yahoo-presence-icon{width:10px;height:10px;flex-basis:10px}
+  .network-status{height:13px;min-height:13px;padding:1px 4px 1px 2px;font-size:7px}
+  .yahoo-presence-icon{width:8px;height:8px;flex-basis:8px}
+  .yahoo-presence-icon svg{width:7px;height:7px}
 }
 
 /* Đồng bộ nút cuộn nhanh với cụm List/Grid. */
@@ -4524,6 +4539,32 @@ body .card .nguoi-ban-row > .nguoi-ban-kind-icon {
   justify-self:start!important;
 }
 
+/* Professional polish 2026: focus rõ, chạm nhanh và số liệu dễ quét. */
+button,[role="button"],a[href],input,select,textarea{
+  -webkit-tap-highlight-color:transparent;
+  touch-action:manipulation;
+}
+:where(button,[role="button"],a[href],input,select,textarea,[tabindex]):focus-visible{
+  outline:3px solid #F5A623!important;
+  outline-offset:2px!important;
+  box-shadow:0 0 0 2px rgba(255,255,255,.96),0 0 0 5px rgba(245,166,35,.28)!important;
+}
+.kpi-v,.ton-val,.price,.count-badge,.recent-activity-count,.kpi-detail-count{
+  font-variant-numeric:tabular-nums;
+}
+.modal,.recent-activity-panel,.kpi-hover-menu,.customer-detail-body{
+  overscroll-behavior:contain;
+  scrollbar-gutter:stable;
+}
+@media(max-width:600px){
+  body .card .note{font-size:11.5px!important;line-height:1.5!important}
+  body .card .product-related-title{font-size:11px!important;line-height:1.35!important}
+  body .card .product-related-link{min-height:36px!important;font-size:10.5px!important;line-height:1.25!important}
+  body .card .nguoi-ban-label,
+  body .card .nguoi-ban-history-link{font-size:11px!important}
+  body .card .btn-location{font-size:10px!important}
+}
+
 /* Nhãn menu dạng marquee chỉ dành cho điện thoại. Desktop vẫn hiển thị tĩnh. */
 .tab-icon{flex:0 0 auto}
 .tab-label-viewport{display:inline-block;min-width:0;max-width:100%;overflow:hidden;vertical-align:middle}
@@ -5255,7 +5296,7 @@ body .card .nguoi-ban-row > .nguoi-ban-kind-icon {
   </div>
 </div>
 
-<div class="toast" id="toast"></div>
+<div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
 
 <div id="imageLightbox" class="image-lightbox" role="dialog" aria-modal="true" aria-label="Xem ảnh phóng to" onclick="closeImageViewer(event)">
   <div id="imageLightboxActions" class="image-lightbox-actions">
@@ -5358,7 +5399,9 @@ body .card .nguoi-ban-row > .nguoi-ban-kind-icon {
         const overlayLike = (style.position==="fixed"||style.position==="absolute") && big;
         const highZ = (parseInt(style.zIndex)||0) > 500;
         const looksAd = /ad|banner|popup|sponsor|quangcao|xt_|interstitial/i.test((el.id||"")+" "+(el.className||""));
-        if(el.tagName==="IFRAME" || overlayLike || highZ || looksAd){
+        // Chỉ xóa iframe/phần tử có dấu hiệu quảng cáo rõ ràng. Không xóa mù
+        // mọi lớp nổi có z-index cao vì đó có thể là chức năng hợp lệ của app.
+        if(el.tagName==="IFRAME" || looksAd){
           el.remove();
         }
       });
@@ -5994,6 +6037,10 @@ function scheduleSyncRetry(detail){
 
 function setSyncBadge(state, detail){
   const el = document.getElementById("syncBadge");
+  if(!el) return;
+  el.setAttribute("role","status");
+  el.setAttribute("aria-live","polite");
+  el.setAttribute("aria-busy",String(state==="loading"||state==="syncing"));
   if(state === "error") recordSyncError(detail);
   if(state !== "error") clearSyncRetry(state === "synced" || state === "empty");
   el.title = state === "error" ? "Có lỗi đồng bộ" : "Trạng thái đồng bộ";
@@ -9304,7 +9351,7 @@ function renderNVAvatar(name, extraClass=""){
   const avatar = nv && nv.avatar ? nv.avatar : "";
   const label = String(name || "").trim();
   const initial = label ? escapeHtml(label.charAt(0).toUpperCase()) : "👤";
-  if(avatar) return `<span class="nv-avatar has-preview ${extraClass}" title="Bấm để phóng to avatar" onclick="event.stopPropagation();openImageViewer(this.querySelector('img').src,this.querySelector('img').alt)"><img src="${escapeHtml(avatar)}" alt="Avatar ${escapeHtml(label)}" referrerpolicy="no-referrer" onerror="this.parentElement.outerHTML='<span class=\\'nv-avatar ${extraClass}\\' title=\\'${escapeHtml(label)}\\'>${initial}</span>';"></span>`;
+  if(avatar) return `<span class="nv-avatar has-preview ${extraClass}" title="Bấm để phóng to avatar" onclick="event.stopPropagation();openImageViewer(this.querySelector('img').src,this.querySelector('img').alt)"><img src="${escapeHtml(avatar)}" alt="Avatar ${escapeHtml(label)}" loading="lazy" decoding="async" referrerpolicy="no-referrer" onerror="this.parentElement.outerHTML='<span class=\\'nv-avatar ${extraClass}\\' title=\\'${escapeHtml(label)}\\'>${initial}</span>';"></span>`;
   return `<span class="nv-avatar ${extraClass}" title="${escapeHtml(label)}">${initial}</span>`;
 }
 function renderNVRoleBadge(name){
@@ -9312,7 +9359,7 @@ function renderNVRoleBadge(name){
   if(!nv) return "";
   const role=normalizeNVRole(nv.role);
   const cfg={CEO:{label:"CEO",icon:"👑",cls:"ceo"},ADMIN:{label:"ADMIN",icon:"🔑",cls:"admin"},MOD:{label:"MOD",icon:"🛡️",cls:"mod"},ACCOUNTANT:{label:"KẾ TOÁN",icon:"🧾",cls:"accountant"},TECHNICIAN:{label:"KỸ THUẬT",icon:"🔧",cls:"technician"},STAFF:{label:"NHÂN VIÊN",icon:"👤",cls:"staff"}}[role];
-  const custom=nv.badgeIcon ? `<img class="nv-role-icon" src="${escapeHtml(resolveImageUrl(nv.badgeIcon))}" alt="" referrerpolicy="no-referrer" onerror="this.style.display='none'">` : `<span aria-hidden="true">${cfg.icon}</span>`;
+  const custom=nv.badgeIcon ? `<img class="nv-role-icon" src="${escapeHtml(resolveImageUrl(nv.badgeIcon))}" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer" onerror="this.style.display='none'">` : `<span aria-hidden="true">${cfg.icon}</span>`;
   return `<span class="nv-role-badge ${cfg.cls}" title="Vai trò: ${cfg.label}">${custom}<span>${cfg.label}</span></span>`;
 }
 function setNVAvatarPreview(dataUrl){
@@ -13411,6 +13458,38 @@ window.addEventListener("resize",()=>{
   clearTimeout(mobileTabMarqueeResizeTimer);
   mobileTabMarqueeResizeTimer=setTimeout(startMobileTabLabelMarquee,120);
 },{passive:true});
+
+// Cảnh báo trước khi đóng/tab reload nếu vẫn còn dữ liệu cục bộ chưa gửi xong.
+// Trình duyệt tự hiển thị nội dung cảnh báo chuẩn để tránh mất thao tác vừa làm.
+window.addEventListener("beforeunload",event=>{
+  const pending=hasPendingSync()
+    || hasAuxPendingSync(PENDING_TX_SYNC_KEY)
+    || hasAuxPendingSync(PENDING_NV_SYNC_KEY)
+    || hasAuxPendingSync(PENDING_CONFIG_SYNC_KEY);
+  if(!pending) return;
+  event.preventDefault();
+  event.returnValue="";
+});
+
+// PWA chỉ hoạt động khi đã đưa lên HTTPS; bản file:// review vẫn chạy bình thường.
+if("serviceWorker" in navigator && /^https?:$/.test(location.protocol)){
+  window.addEventListener("load",()=>{
+    navigator.serviceWorker.register("./sw.js",{scope:"./"}).catch(error=>{
+      console.warn("Không đăng ký được chế độ ứng dụng ngoại tuyến:",error);
+    });
+  },{once:true});
+}
+
+// Bổ sung ngữ nghĩa dialog mà không đổi cách mở/đóng modal hiện tại.
+document.querySelectorAll(".overlay .modal").forEach((modal,index)=>{
+  modal.setAttribute("role","dialog");
+  modal.setAttribute("aria-modal","true");
+  const heading=modal.querySelector(".modal-title");
+  if(heading){
+    if(!heading.id) heading.id=`appModalTitle${index+1}`;
+    modal.setAttribute("aria-labelledby",heading.id);
+  }
+});
 </script>
 </body>
 </html>
