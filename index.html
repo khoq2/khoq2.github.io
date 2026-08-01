@@ -1996,16 +1996,36 @@ html::-webkit-scrollbar-corner { background: #EAF2F8; }
 .network-status {
   display:inline-flex;
   align-items:center;
-  gap:3px;
-  padding:2px 5px;
+  gap:4px;
+  padding:2px 6px 2px 3px;
   border-radius:999px;
-  font-size:7px;
+  font-size:7.5px;
   font-weight:950;
   line-height:1;
+  border:1px solid transparent;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.8),0 1px 3px rgba(30,58,95,.12);
 }
-.network-status::before { content:""; width:5px; height:5px; border-radius:50%; background:currentColor; box-shadow:0 0 0 2px rgba(255,255,255,.8); }
-.network-status.online { background:#DDF7E8; color:#148447; }
-.network-status.offline { background:#FDE4E2; color:#C0392B; }
+.network-status::before { content:none; }
+.network-status.online { border-color:#A8E2BD; background:linear-gradient(#F0FFF5,#D8F6E3); color:#117A3E; }
+.network-status.offline { border-color:#D4D8DE; background:linear-gradient(#F7F8FA,#E7EAEE); color:#6B7280; }
+.yahoo-presence-icon{
+  position:relative;
+  width:10px;
+  height:10px;
+  flex:0 0 10px;
+  display:grid;
+  place-items:center;
+  border:1px solid rgba(0,0,0,.12);
+  border-radius:50%;
+  color:#fff;
+  box-shadow:inset 0 1px 2px rgba(255,255,255,.72),0 1px 3px rgba(30,58,95,.2);
+}
+.yahoo-presence-icon svg{width:8px;height:8px;display:block;overflow:visible}
+.yahoo-presence-icon .yahoo-eye{fill:#fff}
+.yahoo-presence-icon .yahoo-mouth{fill:none;stroke:#fff;stroke-width:2.25;stroke-linecap:round}
+.network-status.online .yahoo-presence-icon{background:radial-gradient(circle at 35% 25%,#A9FF9F 0,#2FD365 38%,#07923C 100%)}
+.network-status.offline .yahoo-presence-icon{background:radial-gradient(circle at 35% 25%,#F4F5F7 0,#AAB0B8 44%,#6B7280 100%)}
+.network-status.offline .yahoo-mouth{stroke-width:2.5}
 .title-status-line #syncBtn {
   width:16px!important;
   height:16px!important;
@@ -2020,7 +2040,8 @@ html::-webkit-scrollbar-corner { background: #EAF2F8; }
 @media(max-width:520px){
   .title-status-line{gap:3px;font-size:7px}
   .title-status-line .sync-badge,.title-status-line #lastSyncText{font-size:7px!important}
-  .network-status{padding:2px 4px;font-size:6px}
+  .network-status{padding:2px 5px 2px 3px;font-size:7px}
+  .yahoo-presence-icon{width:10px;height:10px;flex-basis:10px}
 }
 
 /* Đồng bộ nút cuộn nhanh với cụm List/Grid. */
@@ -2123,7 +2144,21 @@ html::-webkit-scrollbar-corner { background: #EAF2F8; }
   .card-main { width:100%; min-width:0; overflow:visible; }
   .product-name-row { width:100%; max-width:none; overflow:visible; }
   .product-name { display:block; width:100%; font-size:13px; line-height:1.32; white-space:normal; overflow-wrap:anywhere; word-break:normal; }
-  .card-main > .note { width:calc(100% + 74px); max-width:none; margin-left:-74px; margin-right:0; padding-left:10px; padding-right:10px; }
+  /* Trên iPhone, vùng ghi chú cuộn lồng nhau có thể bị rubber-band và vẽ
+     dòng cuối ra ngoài khung, đè lên tiêu đề sản phẩm liên quan. Cho ghi chú
+     tự giãn chiều cao trên mobile để luôn chừa đúng không gian cho nội dung. */
+  .card-main > .note {
+    width:calc(100% + 74px);
+    max-width:none;
+    max-height:none;
+    margin-left:-74px;
+    margin-right:0;
+    padding-left:10px;
+    padding-right:10px;
+    overflow:visible;
+    overscroll-behavior:auto;
+    -webkit-overflow-scrolling:auto;
+  }
   .card-footer { justify-content:flex-start; align-items:flex-start; gap:5px; }
   .card-price-desktop { display:none; }
   .card-price-mobile { display:flex; align-items:center; justify-content:center; gap:6px; min-height:58px; margin:7px 0 0 -74px; width:calc(100% + 74px); padding:7px 8px; border:1px solid #E1E8EF; border-left:3px solid #2E86C1; border-radius:8px; background:#F8FAFC; }
@@ -4489,6 +4524,125 @@ body .card .nguoi-ban-row > .nguoi-ban-kind-icon {
   justify-self:start!important;
 }
 
+/* Nhãn menu dạng marquee chỉ dành cho điện thoại. Desktop vẫn hiển thị tĩnh. */
+.tab-icon{flex:0 0 auto}
+.tab-label-viewport{display:inline-block;min-width:0;max-width:100%;overflow:hidden;vertical-align:middle}
+.tab-label-track{display:inline-flex;width:max-content;transform:translateX(0)}
+.tab-label-copy{display:inline-block;white-space:nowrap}
+.tab-label-copy[aria-hidden="true"]{display:none}
+@keyframes mobileTabLabelMarquee{
+  0%,16%{transform:translateX(0)}
+  84%,100%{transform:translateX(-50%)}
+}
+@media(max-width:600px){
+  /* Tiêu đề cửa hàng co giãn theo màn hình, không lấn chuông và nút kho. */
+  body .header .title-text{
+    flex:1 1 auto!important;
+    min-width:0!important;
+    max-width:100%!important;
+  }
+  body .header .title-base{
+    font-size:clamp(11px,3.35vw,14px)!important;
+    line-height:1.15!important;
+    letter-spacing:-.01em!important;
+  }
+
+  /* Giao dịch trên thẻ sản phẩm: avatar, nhãn và lịch sử cùng một hàng. */
+  body .card .nguoi-ban-row.has-transaction{
+    display:grid!important;
+    grid-template-columns:26px minmax(0,1fr) auto!important;
+    grid-template-rows:1fr!important;
+    align-items:center!important;
+    min-height:48px!important;
+    padding:7px 8px!important;
+    column-gap:7px!important;
+    row-gap:0!important;
+    overflow:hidden!important;
+  }
+  body .card .nguoi-ban-row.has-transaction > .nv-avatar-latest{
+    grid-column:1!important;
+    grid-row:1!important;
+    align-self:center!important;
+    justify-self:start!important;
+    width:26px!important;
+    min-width:26px!important;
+    height:26px!important;
+    margin:0!important;
+  }
+  body .card .nguoi-ban-row.has-transaction > .nguoi-ban-label{
+    grid-column:2!important;
+    grid-row:1!important;
+    align-self:center!important;
+    width:auto!important;
+    margin:0!important;
+    font-size:10.5px!important;
+    line-height:1.2!important;
+    white-space:nowrap!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+  }
+  body .card .nguoi-ban-row.has-transaction > .nguoi-ban-history-link{
+    position:static!important;
+    grid-column:3!important;
+    grid-row:1!important;
+    align-self:center!important;
+    justify-self:end!important;
+    width:auto!important;
+    min-width:82px!important;
+    margin:0!important;
+    padding:5px 7px!important;
+    transform:none!important;
+    white-space:nowrap!important;
+  }
+  body .card .nguoi-ban-row.has-transaction > .nguoi-ban-kind-icon,
+  body .card .nguoi-ban-row.has-transaction > .nguoi-ban-count,
+  body .card .nguoi-ban-row.has-transaction > .nguoi-ban-flow-arrow{display:none!important}
+
+  body > .sticky .tab-btn{
+    gap:4px!important;
+    overflow:hidden!important;
+  }
+  body > .sticky .tab-label-viewport{
+    flex:1 1 auto;
+    width:auto;
+    min-width:0;
+    overflow:hidden;
+    -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 7px,#000 calc(100% - 7px),transparent 100%);
+    mask-image:linear-gradient(90deg,transparent 0,#000 7px,#000 calc(100% - 7px),transparent 100%);
+  }
+  body > .sticky .tab-label-track{
+    animation:none!important;
+    will-change:transform;
+  }
+  body > .sticky .tab-label-copy{
+    display:inline-block;
+    padding-right:22px;
+  }
+  body > .sticky .tab-label-copy[aria-hidden="true"]{display:inline-block}
+  body > .sticky .tab-btn:nth-child(2) .tab-label-track{animation-delay:-1.4s}
+  body > .sticky .tab-btn:nth-child(3) .tab-label-track{animation-delay:-2.8s}
+  body > .sticky .tab-btn:nth-child(4) .tab-label-track{animation-delay:-4.2s}
+  body > .sticky .tab-btn:nth-child(5) .tab-label-track{animation-delay:-5.6s}
+
+  /* Footer của bảng KPI: gọn trên điện thoại, vẫn giữ vùng chạm 42px. */
+  #kpiOverlay .kpi-sticky-actions{
+    margin-top:7px!important;
+    padding:6px 12px clamp(8px,env(safe-area-inset-bottom),14px)!important;
+  }
+  #kpiOverlay .kpi-sticky-actions .edit-save-buttons{gap:7px!important}
+  #kpiOverlay .kpi-sticky-actions .edit-save-buttons > button{
+    height:42px!important;
+    min-height:42px!important;
+    max-height:42px!important;
+    margin:0!important;
+    padding:6px 9px!important;
+    border-radius:10px!important;
+    font-size:11.5px!important;
+    line-height:1.1!important;
+    white-space:nowrap!important;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -4532,11 +4686,11 @@ body .card .nguoi-ban-row > .nguoi-ban-kind-icon {
   </div>
   </div>
   <div class="tabs" id="tabs">
-    <button class="tab-btn active" style="--c:#1E3A5F" data-tab="ALL" onclick="setTab(this)">🏠 Trang chủ</button>
-    <button class="tab-btn" style="--c:#1A5276" data-tab="MT" onclick="setTab(this)">💻 Máy Tính</button>
-    <button class="tab-btn" style="--c:#784212" data-tab="MI" onclick="setTab(this)">🖨️ Máy In</button>
-    <button class="tab-btn" style="--c:#641E16" data-tab="CAM" onclick="setTab(this)">📷 Camera</button>
-    <button class="tab-btn" style="--c:#0B5345" data-tab="INT" onclick="setTab(this)">🌐 Internet</button>
+    <button class="tab-btn active" style="--c:#1E3A5F" data-tab="ALL" title="Trang chủ" onclick="setTab(this)"><span class="tab-icon" aria-hidden="true">🏠</span><span class="tab-label-viewport"><span class="tab-label-track"><span class="tab-label-copy">Trang chủ</span><span class="tab-label-copy" aria-hidden="true">Trang chủ</span></span></span></button>
+    <button class="tab-btn" style="--c:#1A5276" data-tab="MT" title="Máy Tính" onclick="setTab(this)"><span class="tab-icon" aria-hidden="true">💻</span><span class="tab-label-viewport"><span class="tab-label-track"><span class="tab-label-copy">Máy Tính</span><span class="tab-label-copy" aria-hidden="true">Máy Tính</span></span></span></button>
+    <button class="tab-btn" style="--c:#784212" data-tab="MI" title="Máy In" onclick="setTab(this)"><span class="tab-icon" aria-hidden="true">🖨️</span><span class="tab-label-viewport"><span class="tab-label-track"><span class="tab-label-copy">Máy In</span><span class="tab-label-copy" aria-hidden="true">Máy In</span></span></span></button>
+    <button class="tab-btn" style="--c:#641E16" data-tab="CAM" title="Camera" onclick="setTab(this)"><span class="tab-icon" aria-hidden="true">📷</span><span class="tab-label-viewport"><span class="tab-label-track"><span class="tab-label-copy">Camera</span><span class="tab-label-copy" aria-hidden="true">Camera</span></span></span></button>
+    <button class="tab-btn" style="--c:#0B5345" data-tab="INT" title="Internet" onclick="setTab(this)"><span class="tab-icon" aria-hidden="true">🌐</span><span class="tab-label-viewport"><span class="tab-label-track"><span class="tab-label-copy">Internet</span><span class="tab-label-copy" aria-hidden="true">Internet</span></span></span></button>
   </div>
   <div class="tab-dropdown" id="tabDropdown" aria-label="Danh mục con"></div>
   <div class="filters" id="homeInventoryBar">
@@ -12974,7 +13128,11 @@ function updateHeaderNetworkStatus(){
   if(!badge) return;
   const online=navigator.onLine;
   badge.className=`network-status ${online?"online":"offline"}`;
-  badge.textContent=online?"Online":"Offline";
+  const face=online
+    ? '<svg viewBox="0 0 24 24"><circle class="yahoo-eye" cx="8" cy="8" r="1.7"/><circle class="yahoo-eye" cx="16" cy="8" r="1.7"/><path class="yahoo-mouth" d="M6.5 13.5c1.4 4.2 9.6 4.2 11 0"/></svg>'
+    : '<svg viewBox="0 0 24 24"><circle class="yahoo-eye" cx="8" cy="8" r="1.7"/><circle class="yahoo-eye" cx="16" cy="8" r="1.7"/><path class="yahoo-mouth" d="M7 16h10"/></svg>';
+  badge.innerHTML=`<span class="yahoo-presence-icon" aria-hidden="true">${face}</span><span class="network-status-text">${online?"Online":"Offline"}</span>`;
+  badge.setAttribute("aria-label",online?"Online - thiết bị đang có kết nối mạng":"Offline - thiết bị đang mất kết nối mạng");
   badge.title=online?"Thiết bị đang có kết nối mạng":"Thiết bị đang mất kết nối mạng";
 }
 function setupCompactHeaderStatus(){
@@ -13214,6 +13372,45 @@ const uiColorIconObserver=new MutationObserver(list=>{
   });
 });
 uiColorIconObserver.observe(document.body,{childList:true,subtree:true});
+
+// Chạy nhãn menu trên điện thoại theo đúng phần chữ thực tế bị cắt. Dùng
+// Web Animations thay cho CSS marquee để hoạt động ổn định cả trong iframe
+// review của Codex, Safari iPhone và Chrome Android.
+let mobileTabMarqueeResizeTimer=0;
+function startMobileTabLabelMarquee(){
+  document.querySelectorAll(".tabs .tab-label-track").forEach(track=>{
+    track.getAnimations().forEach(animation=>animation.cancel());
+    track.style.transform="translateX(0)";
+  });
+  if(!window.matchMedia("(max-width:600px)").matches) return;
+  document.querySelectorAll(".tabs .tab-label-viewport").forEach((viewport,index)=>{
+    const track=viewport.querySelector(".tab-label-track");
+    const label=track?.querySelector(".tab-label-copy:not([aria-hidden='true'])");
+    if(!track||!label) return;
+    const paddingRight=parseFloat(getComputedStyle(label).paddingRight)||0;
+    const textWidth=Math.max(0,label.getBoundingClientRect().width-paddingRight);
+    const distance=Math.ceil(textWidth-viewport.clientWidth+5);
+    if(distance<=1) return;
+    track.animate([
+      {transform:"translateX(0)",offset:0},
+      {transform:"translateX(0)",offset:.18},
+      {transform:`translateX(-${distance}px)`,offset:.82},
+      {transform:`translateX(-${distance}px)`,offset:1}
+    ],{
+      duration:4200,
+      iterations:Infinity,
+      direction:"alternate",
+      easing:"ease-in-out",
+      delay:index*180
+    });
+  });
+}
+requestAnimationFrame(startMobileTabLabelMarquee);
+window.addEventListener("load",startMobileTabLabelMarquee,{once:true});
+window.addEventListener("resize",()=>{
+  clearTimeout(mobileTabMarqueeResizeTimer);
+  mobileTabMarqueeResizeTimer=setTimeout(startMobileTabLabelMarquee,120);
+},{passive:true});
 </script>
 </body>
 </html>
