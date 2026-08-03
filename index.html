@@ -6268,8 +6268,8 @@ body.private-panel-open{overflow:hidden}
         <svg viewBox="0 0 24 24"><path fill-rule="evenodd" d="M3 3h7v7H3V3Zm2 2v3h3V5H5Zm9-2h7v7h-7V3Zm2 2v3h3V5h-3ZM3 14h7v7H3v-7Zm2 2v3h3v-3H5Z" clip-rule="evenodd"></path><path d="M14 14h3v3h-3v-3Zm4 0h3v2h-3v-2Zm0 3h2v4h-2v-4Zm-4 1h3v3h-3v-3Zm6 1h1v2h-1v-2Z"></path></svg>
       </span>
       <div class="qr-showcase-heading">
-        <h2 id="qrShowcaseTitle">QR CODE DÀNH CHO KHÁCH HÀNG</h2>
-        <p>Chọn đúng mã rồi đưa màn hình cho khách quét</p>
+        <h2 id="qrShowcaseTitle">QR CODE HOÀNG GIA COMPUTER</h2>
+        <p>https://maytinhhoanggia.vn/</p>
       </div>
       <button class="qr-showcase-close" id="qrShowcaseClose" type="button" aria-label="Đóng danh sách QR" onclick="closeQrShowcase()">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"></path></svg>
@@ -6277,7 +6277,7 @@ body.private-panel-open{overflow:hidden}
     </header>
 
     <div class="qr-showcase-browse" id="qrShowcaseBrowse">
-      <p class="qr-showcase-intro">Bấm vào một mã để phóng lớn toàn bộ ảnh, giúp khách hàng quét nhanh và chính xác.</p>
+      <p class="qr-showcase-intro">Bấm vào một mã để xem chi tiết</p>
       <div class="qr-showcase-grid">
         <button class="qr-showcase-card" type="button" data-qr-title="QR CTY" data-qr-src="https://drive.google.com/thumbnail?id=1FcxEsU9JxB2r9wq-OOmEjkIS-gmae7oA&amp;sz=w1200" data-qr-link="https://drive.google.com/file/d/1FcxEsU9JxB2r9wq-OOmEjkIS-gmae7oA/view?usp=sharing" onclick="showQrForCustomer(this)">
           <span class="qr-image-shell">
@@ -6321,7 +6321,7 @@ body.private-panel-open{overflow:hidden}
           <span class="qr-image-fallback">Không tải được ảnh QR</span>
         </div>
         <h3 class="qr-showcase-main-title" id="qrShowcaseMainTitle"></h3>
-        <p class="qr-showcase-main-note">Đưa màn hình cho khách hàng quét mã QR này.</p>
+        <p class="qr-showcase-main-note">Mời quý khách quét mã QR</p>
         <div class="qr-showcase-actions">
           <a class="qr-showcase-original" id="qrShowcaseOriginal" href="#" target="_blank" rel="noopener noreferrer">Mở ảnh gốc</a>
           <button class="qr-showcase-choose" type="button" onclick="resetQrShowcase(true)">Chọn mã khác</button>
@@ -6732,8 +6732,8 @@ body.private-panel-open{overflow:hidden}
 <div class="overlay" id="privateAccessOverlay" onclick="if(event.target===this)closePrivateAccess()">
   <div class="modal private-access-modal" role="dialog" aria-modal="true" aria-labelledby="privateAccessTitle" onclick="event.stopPropagation()">
     <div class="private-access-badge" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="11" rx="3"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v3"></path></svg></div>
-    <h2 class="private-access-title" id="privateAccessTitle">ĐĂNG NHẬP QUẢN TRỊ</h2>
-    <p class="private-access-subtitle" id="privateAccessSubtitle">Đăng nhập bằng tài khoản quản trị toàn quyền. Mật khẩu chỉ được kiểm tra tại API và không lưu trong HTML.</p>
+    <h2 class="private-access-title" id="privateAccessTitle">ĐĂNG NHẬP</h2>
+    <p class="private-access-subtitle" id="privateAccessSubtitle">Sử dụng tài khoản quản trị để đăng nhập.</p>
     <div class="admin-password-wrap">
       <input id="privateAccessPassword" type="password" autocomplete="current-password" placeholder="Nhập mật khẩu" onkeydown="if(event.key==='Enter')submitPrivateAccess()">
       <button type="button" class="admin-password-toggle" aria-label="Hiện hoặc ẩn mật khẩu" title="Hiện hoặc ẩn mật khẩu" onclick="const input=document.getElementById('privateAccessPassword');input.type=input.type==='password'?'text':'password';this.classList.toggle('password-visible',input.type==='text')"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"></path><circle cx="12" cy="12" r="2.7"></circle></svg></button>
@@ -13271,8 +13271,8 @@ function requestPrivateAccess(target){
   const overlay=document.getElementById("privateAccessOverlay");
   const password=document.getElementById("privateAccessPassword");
   const isPartner=privateAccessTarget==="partner";
-  document.getElementById("privateAccessTitle").textContent="ĐĂNG NHẬP QUẢN TRỊ";
-  document.getElementById("privateAccessSubtitle").textContent=`${isPartner?"Mở Mạng lưới Đối tác":"Mở Trung tâm Khách hàng"} bằng tài khoản quản trị toàn quyền. Mật khẩu chỉ được kiểm tra tại API.`;
+  document.getElementById("privateAccessTitle").textContent="ĐĂNG NHẬP";
+  document.getElementById("privateAccessSubtitle").textContent=`${isPartner?"Sử dụng tài khoản quản trị để đăng nhập.`;
   document.getElementById("privateAccessError").textContent="";
   if(password){ password.value=""; password.type="password"; password.disabled=false; }
   document.querySelector("#privateAccessOverlay .admin-password-toggle")?.classList.remove("password-visible");
