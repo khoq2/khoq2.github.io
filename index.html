@@ -13272,7 +13272,7 @@ function requestPrivateAccess(target){
   const password=document.getElementById("privateAccessPassword");
   const isPartner=privateAccessTarget==="partner";
   document.getElementById("privateAccessTitle").textContent="ĐĂNG NHẬP";
-  document.getElementById("privateAccessSubtitle").textContent=`${isPartner?"Sử dụng tài khoản quản trị để đăng nhập.`;
+  document.getElementById("privateAccessSubtitle").textContent="Sử dụng tài khoản quản trị để đăng nhập.";
   document.getElementById("privateAccessError").textContent="";
   if(password){ password.value=""; password.type="password"; password.disabled=false; }
   document.querySelector("#privateAccessOverlay .admin-password-toggle")?.classList.remove("password-visible");
