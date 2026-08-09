@@ -6968,6 +6968,185 @@ body .warehouse-switch.warehouse-switch-changing .warehouse-pin{
     box-shadow:0 0 0 7px rgba(255,49,49,.22),0 0 30px rgba(229,57,53,.72);
   }
 }
+
+/* Tooltip đầu trang dùng cùng ngôn ngữ thị giác với List/Grid. */
+.header .title{
+  z-index:1250!important;
+  overflow:visible!important;
+}
+.header .kpi-row{z-index:1!important}
+.header .recent-activity-wrap,
+.header .warehouse-switcher{position:relative;z-index:1260!important;overflow:visible!important}
+.header .recent-activity-bell,
+.header .warehouse-switch{position:relative!important;overflow:visible!important}
+.header .header-control-tooltip{
+  display:none;
+  position:absolute;
+  z-index:1200;
+  top:calc(100% + 10px);
+  bottom:auto;
+  left:50%;
+  width:max-content;
+  min-width:72px;
+  max-width:min(220px,calc(100vw - 20px));
+  padding:7px 10px;
+  border:1px solid rgba(255,255,255,.2);
+  border-radius:8px;
+  background:rgba(24,30,38,.96);
+  color:#fff;
+  box-shadow:0 8px 22px rgba(5,20,35,.28),inset 0 1px 0 rgba(255,255,255,.08);
+  font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
+  text-align:center;
+  white-space:nowrap;
+  opacity:0;
+  pointer-events:none;
+  transform:translate(-50%,-6px) scale(.96);
+  transition:opacity .13s ease,transform .17s cubic-bezier(.2,.8,.2,1);
+}
+.header .header-control-tooltip::after{
+  content:"";
+  position:absolute;
+  top:-5px;
+  left:50%;
+  width:9px;
+  height:9px;
+  border-radius:1px;
+  background:rgba(24,30,38,.96);
+  transform:translateX(-50%) rotate(45deg);
+}
+.header .header-tooltip-title{
+  display:block;
+  color:#fff;
+  font-size:10.5px;
+  font-weight:850;
+  line-height:1.15;
+  letter-spacing:.18px;
+}
+.header .header-tooltip-status{
+  display:block;
+  margin-top:4px;
+  color:#A9D9F5;
+  font-size:9px;
+  font-weight:700;
+  line-height:1.15;
+}
+.header .warehouse-switch:last-child .header-control-tooltip{
+  right:0;
+  left:auto;
+  transform:translateY(-6px) scale(.96);
+}
+.header .warehouse-switch:last-child .header-control-tooltip::after{
+  right:15px;
+  left:auto;
+  transform:rotate(45deg);
+}
+@media(hover:hover) and (pointer:fine){
+  .header .header-control-tooltip{display:block}
+  .header .recent-activity-bell:hover .header-control-tooltip,
+  .header .recent-activity-bell:focus-visible .header-control-tooltip,
+  .header .warehouse-switch:hover .header-control-tooltip,
+  .header .warehouse-switch:focus-visible .header-control-tooltip{
+    opacity:1;
+    transform:translate(-50%,0) scale(1);
+  }
+  .header .warehouse-switch:last-child:hover .header-control-tooltip,
+  .header .warehouse-switch:last-child:focus-visible .header-control-tooltip{
+    transform:translateY(0) scale(1);
+  }
+}
+
+/* Tooltip cho Chọn nhiều/Thu gọn và số liệu danh mục ngang. */
+.search-box{z-index:1180!important;overflow:visible!important}
+.search-box #headerFilterBtn,
+.search-box #headerToggleBtn,
+.quick-nav-btn.metric-tooltip-host,
+.group-header-count.metric-tooltip-host{
+  position:relative!important;
+  overflow:visible!important;
+}
+.search-control-tooltip,
+.inventory-metric-tooltip{
+  display:none;
+  position:absolute;
+  z-index:1500;
+  width:max-content;
+  max-width:min(220px,calc(100vw - 20px));
+  padding:7px 10px;
+  border:1px solid rgba(255,255,255,.2);
+  border-radius:8px;
+  background:rgba(24,30,38,.96);
+  color:#fff;
+  box-shadow:0 8px 22px rgba(5,20,35,.28),inset 0 1px 0 rgba(255,255,255,.08);
+  font:800 10.5px/1.15 system-ui,-apple-system,"Segoe UI",sans-serif;
+  letter-spacing:.18px;
+  text-align:center;
+  white-space:nowrap;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .13s ease,transform .17s cubic-bezier(.2,.8,.2,1);
+}
+.search-control-tooltip{
+  right:0;
+  bottom:calc(100% + 9px);
+  transform:translateY(6px) scale(.96);
+}
+.search-control-tooltip::after{
+  content:"";
+  position:absolute;
+  right:12px;
+  bottom:-5px;
+  width:9px;
+  height:9px;
+  border-radius:1px;
+  background:rgba(24,30,38,.96);
+  transform:rotate(45deg);
+}
+.inventory-metric-tooltip{
+  top:calc(100% + 8px);
+  left:50%;
+  transform:translate(-50%,-6px) scale(.96);
+}
+.inventory-metric-tooltip::after{
+  content:"";
+  position:absolute;
+  top:-5px;
+  left:50%;
+  width:9px;
+  height:9px;
+  border-radius:1px;
+  background:rgba(24,30,38,.96);
+  transform:translateX(-50%) rotate(45deg);
+}
+.group-header-count .inventory-metric-tooltip{
+  right:0;
+  left:auto;
+  transform:translateY(-6px) scale(.96);
+}
+.group-header-count .inventory-metric-tooltip::after{
+  right:16px;
+  left:auto;
+  transform:rotate(45deg);
+}
+@media(hover:hover) and (pointer:fine){
+  .search-control-tooltip,.inventory-metric-tooltip{display:block}
+  #headerFilterBtn:hover .search-control-tooltip,
+  #headerFilterBtn:focus-visible .search-control-tooltip,
+  #headerToggleBtn:hover .search-control-tooltip,
+  #headerToggleBtn:focus-visible .search-control-tooltip{
+    opacity:1;
+    transform:translateY(0) scale(1);
+  }
+  .quick-nav-btn.metric-tooltip-host:hover .inventory-metric-tooltip,
+  .quick-nav-btn.metric-tooltip-host:focus-visible .inventory-metric-tooltip{
+    opacity:1;
+    transform:translate(-50%,0) scale(1);
+  }
+  .group-header-count.metric-tooltip-host:hover .inventory-metric-tooltip,
+  .group-header-count.metric-tooltip-host:focus-visible .inventory-metric-tooltip{
+    opacity:1;
+    transform:translateY(0) scale(1);
+  }
+}
 @media(max-width:520px){
   #txOverlay .tx-modern-icon{width:22px;height:22px;flex-basis:22px}
   #txOverlay .tx-kpi-icon.tx-modern-icon{width:30px;height:30px;flex-basis:30px}
@@ -6985,7 +7164,7 @@ body .warehouse-switch.warehouse-switch-changing .warehouse-pin{
       <button class="admin-btn admin-only" id="syncBtn" type="button" title="Đồng bộ thủ công lên máy chủ" aria-label="Đồng bộ thủ công lên máy chủ" onclick="manualSync()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7h-5V2"></path><path d="M4 17h5v5"></path><path d="M5.2 9A8 8 0 0 1 18.5 5.5L20 7"></path><path d="M18.8 15A8 8 0 0 1 5.5 18.5L4 17"></path></svg></button>
       <button class="admin-btn admin-profile-btn" id="adminBtn" type="button" aria-label="Mở quản trị" onclick="onAdminBtnClick()"><span class="admin-profile-avatar">A</span><span class="admin-profile-copy"><span class="admin-profile-name">Quản trị</span><span class="admin-profile-role">Đăng nhập</span></span><svg class="admin-profile-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m7 9 5 5 5-5"></path></svg></button>
     </div>
-    <div class="title"><span class="title-logo-slot"><img class="title-icon title-brand-logo" id="headerBrandLogo" src="" alt="Logo cửa hàng" hidden onerror="this.hidden=true;document.getElementById('headerBrandFallback').hidden=false"><span class="title-icon title-brand-fallback" id="headerBrandFallback" aria-hidden="true">🏪</span></span><span class="title-text"><span class="title-base">HOÀNG GIA COMPUTER</span><span class="title-shine" aria-hidden="true"></span></span><div class="recent-activity-wrap" id="recentActivityWrap"><button type="button" class="recent-activity-bell" id="recentActivityBell" aria-label="Mở thông báo giao dịch mới" aria-expanded="false" onclick="toggleRecentActivity(event)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"></path><path d="M10 21h4"></path></svg><span class="recent-activity-count" id="recentActivityCount"></span></button><div class="recent-activity-panel" id="recentActivityPanel"><div class="recent-activity-head"><span class="recent-activity-title">HOẠT ĐỘNG GẦN ĐÂY</span><span class="recent-activity-head-actions"><button type="button" class="recent-activity-all" id="recentActivityAll" onclick="toggleAllRecentActivity(event)">Xem tất cả</button><button type="button" class="recent-activity-close" aria-label="Đóng hoạt động gần đây" onclick="closeRecentActivity();event.stopPropagation()">×</button></span></div><div class="recent-activity-list" id="recentActivityList"></div></div></div><span class="warehouse-switcher" role="group" aria-label="Chọn kho đang xem"><button type="button" class="warehouse-switch" data-warehouse="Q2" onclick="selectWarehouseBranch('Q2')"><span class="warehouse-pin">📍</span> Q2</button><button type="button" class="warehouse-switch" data-warehouse="Q5" onclick="selectWarehouseBranch('Q5')"><span class="warehouse-pin">📍</span> Q5</button></span></div>
+    <div class="title"><span class="title-logo-slot"><img class="title-icon title-brand-logo" id="headerBrandLogo" src="" alt="Logo cửa hàng" hidden onerror="this.hidden=true;document.getElementById('headerBrandFallback').hidden=false"><span class="title-icon title-brand-fallback" id="headerBrandFallback" aria-hidden="true">🏪</span></span><span class="title-text"><span class="title-base">HOÀNG GIA COMPUTER</span><span class="title-shine" aria-hidden="true"></span></span><div class="recent-activity-wrap" id="recentActivityWrap"><button type="button" class="recent-activity-bell" id="recentActivityBell" aria-label="Mở thông báo giao dịch mới" aria-expanded="false" onclick="toggleRecentActivity(event)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"></path><path d="M10 21h4"></path></svg><span class="recent-activity-count" id="recentActivityCount"></span><span class="header-control-tooltip" aria-hidden="true"><span class="header-tooltip-title">GIAO DỊCH GẦN ĐÂY</span><span class="header-tooltip-status" id="recentActivityTooltipStatus">Không có giao dịch mới</span></span></button><div class="recent-activity-panel" id="recentActivityPanel"><div class="recent-activity-head"><span class="recent-activity-title">HOẠT ĐỘNG GẦN ĐÂY</span><span class="recent-activity-head-actions"><button type="button" class="recent-activity-all" id="recentActivityAll" onclick="toggleAllRecentActivity(event)">Xem tất cả</button><button type="button" class="recent-activity-close" aria-label="Đóng hoạt động gần đây" onclick="closeRecentActivity();event.stopPropagation()">×</button></span></div><div class="recent-activity-list" id="recentActivityList"></div></div></div><span class="warehouse-switcher" role="group" aria-label="Chọn kho đang xem"><button type="button" class="warehouse-switch" data-warehouse="Q2" aria-label="KHO Q2" onclick="selectWarehouseBranch('Q2')"><span class="warehouse-pin">📍</span> Q2<span class="header-control-tooltip" aria-hidden="true"><span class="header-tooltip-title">KHO Q2</span></span></button><button type="button" class="warehouse-switch" data-warehouse="Q5" aria-label="KHO Q5" onclick="selectWarehouseBranch('Q5')"><span class="warehouse-pin">📍</span> Q5<span class="header-control-tooltip" aria-hidden="true"><span class="header-tooltip-title">KHO Q5</span></span></button></span></div>
     <div class="kpi-row">
       <div class="kpi" style="background: #2E86C1;" onclick="showKpiDetail('all')" onmouseenter="showKpiHoverMenu('all',this)" onmouseleave="scheduleKpiHoverClose()"><div class="kpi-v"><span class="kpi-icon kpi-icon-box" aria-hidden="true">📦</span><span id="kpi-mh">0</span></div><div class="kpi-l">mặt hàng <span class="kpi-hint">▼</span></div></div>
       <div class="kpi" style="background: #1E8449;" onclick="showKpiDetail('ton')" onmouseenter="showKpiHoverMenu('ton',this)" onmouseleave="scheduleKpiHoverClose()"><div class="kpi-v"><span class="kpi-icon kpi-icon-stock" aria-hidden="true">📊</span><span id="kpi-ton">0</span></div><div class="kpi-l">tổng tồn <span class="kpi-hint">▼</span></div></div>
@@ -7005,10 +7184,11 @@ body .warehouse-switch.warehouse-switch-changing .warehouse-pin{
       </span>
       <input id="search" type="search" inputmode="search" enterkeyhint="done" placeholder="Bạn đang cần tìm gì...?" aria-label="Tìm kiếm kho hàng" autocomplete="off" autocorrect="off" spellcheck="false">
       <button class="clear-btn" id="clear-btn" onclick="clearSearch()">×</button>
-      <button id="headerFilterBtn" onclick="toggleComponentSelectionMode()" type="button" title="Chọn nhiều linh kiện" aria-label="Chọn nhiều linh kiện" data-count="0"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="5" height="5" rx="1"></rect><path d="m4.5 6.5 1.2 1.2L8 5.2M11 6.5h10"></path><rect x="3" y="15" width="5" height="5" rx="1"></rect><path d="M11 17.5h10"></path></svg></button>
-      <button id="headerToggleBtn" onclick="toggleHeader()" type="button" aria-expanded="true" title="Thu gọn menu">
+      <button id="headerFilterBtn" onclick="toggleComponentSelectionMode()" type="button" aria-label="Chọn nhiều linh kiện" data-count="0"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="5" height="5" rx="1"></rect><path d="m4.5 6.5 1.2 1.2L8 5.2M11 6.5h10"></path><rect x="3" y="15" width="5" height="5" rx="1"></rect><path d="M11 17.5h10"></path></svg><span class="search-control-tooltip" id="headerFilterTooltip" aria-hidden="true">CHỌN NHIỀU LINH KIỆN</span></button>
+      <button id="headerToggleBtn" onclick="toggleHeader()" type="button" aria-expanded="true" aria-label="Thu gọn menu">
         <span id="headerToggleIcon">▲</span>
         <span id="headerToggleText">Thu gọn</span>
+        <span class="search-control-tooltip" id="headerToggleTooltip" aria-hidden="true">THU GỌN</span>
       </button>
       <div class="search-suggestions" id="searchSuggestions"></div>
 </div>
@@ -11562,8 +11742,10 @@ function render(){
     if(navGroups.length>0){
       html += `<div class="quick-nav-wrap"><div class="quick-nav">` + navGroups.map((g,idx)=>{
         const groupCount = (buckets[g]||[]).length;
+        const groupStock = sumQuickStock(buckets[g]||[]);
+        const groupMetric = `${groupCount} mục · ${groupStock.toLocaleString("vi-VN")} tồn`;
         const isEmpty = groupCount === 0;
-        return `<button type="button" class="quick-nav-btn${isEmpty?' quick-nav-empty':''}" style="--c:${GROUP_COLORS[idx%GROUP_COLORS.length]};${isEmpty?'opacity:0.38;pointer-events:none;':''}" onclick="jumpToGroup('grp-${idx}')">${g} (${groupCount})</button>`;
+        return `<button type="button" class="quick-nav-btn metric-tooltip-host${isEmpty?' quick-nav-empty':''}" style="--c:${GROUP_COLORS[idx%GROUP_COLORS.length]};${isEmpty?'opacity:0.38;pointer-events:none;':''}" aria-label="${escapeHtml(g)} · ${groupMetric}" onclick="jumpToGroup('grp-${idx}')">${g} (${groupCount})<span class="inventory-metric-tooltip" aria-hidden="true">${groupMetric}</span></button>`;
       }).join("") + `</div><div class="quick-nav-scroll" aria-label="Kéo để xem thêm menu"><div class="quick-nav-scroll-track"><div class="quick-nav-scroll-thumb"></div></div></div></div>`;
     }
     currentGroupDetailSets = {};
@@ -11581,7 +11763,7 @@ function render(){
           <div class="group-header-main">
             <span class="group-header-label">${g}</span>
           </div>
-          <button type="button" class="group-header-count" title="Bấm để xem chi tiết từng mặt hàng và tồn kho" onclick="showGroupInventoryDetail('${detailKey}')">${groupSummary}</button>
+          <button type="button" class="group-header-count metric-tooltip-host" aria-label="Xem chi tiết ${groupSummary}" onclick="showGroupInventoryDetail('${detailKey}')">${groupSummary}<span class="inventory-metric-tooltip" aria-hidden="true">${groupSummary}</span></button>
         </div>
         ${renderQuickSummary(buckets[g], g)}
         ${sortProductItemsForView(buckets[g]).map((item,itemIdx)=>renderCard(item.r,item.i,itemIdx+1)).join("")}
@@ -11622,8 +11804,11 @@ function updateBulkControls(){
     headerSelectBtn.classList.toggle("selection-active",bulkSelectMode);
     headerSelectBtn.classList.toggle("has-selection",count>0);
     headerSelectBtn.dataset.count=String(count);
-    headerSelectBtn.title = bulkSelectMode ? `Đang chọn ${count} linh kiện` : "Chọn nhiều linh kiện";
-    headerSelectBtn.setAttribute("aria-label",headerSelectBtn.title);
+    const selectLabel=bulkSelectMode ? `Đang chọn ${count} linh kiện` : "Chọn nhiều linh kiện";
+    headerSelectBtn.removeAttribute("title");
+    headerSelectBtn.setAttribute("aria-label",selectLabel);
+    const selectTooltip=document.getElementById("headerFilterTooltip");
+    if(selectTooltip) selectTooltip.textContent=selectLabel.toLocaleUpperCase("vi-VN");
   }
   const tray = document.getElementById("buildSelectionTray");
   if(tray){
@@ -12568,13 +12753,16 @@ function refreshRecentActivityNotification(){
   const count=recentTxUnreadCount(rows);
   const badge=document.getElementById("recentActivityCount");
   const bell=document.getElementById("recentActivityBell");
+  const tooltipStatus=document.getElementById("recentActivityTooltipStatus");
+  const statusText=count ? `${count} giao dịch mới` : "Không có giao dịch mới";
   if(badge){
     badge.textContent=count>99 ? "99+" : String(count);
     badge.classList.toggle("show",count>0);
   }
+  if(tooltipStatus) tooltipStatus.textContent=statusText;
   if(bell){
-    bell.title=count ? `${count} giao dịch mới chưa xem` : "Không có giao dịch mới";
-    bell.setAttribute("aria-label",bell.title);
+    bell.removeAttribute("title");
+    bell.setAttribute("aria-label",`Giao dịch gần đây · ${statusText}`);
   }
   renderRecentActivity();
 }
@@ -15871,10 +16059,14 @@ function setHeaderCollapsed(collapsed, persist=false, options={}){
   if(instant) sticky.classList.add('header-auto-changing');
   sticky.classList.toggle('collapsed', isCollapsed);
   const btn = document.getElementById('headerToggleBtn');
+  const toggleLabel = isCollapsed ? 'Mở rộng' : 'Thu gọn';
   document.getElementById('headerToggleIcon').textContent = isCollapsed ? '▼' : '▲';
-  document.getElementById('headerToggleText').textContent = isCollapsed ? 'Mở rộng' : 'Thu gọn';
+  document.getElementById('headerToggleText').textContent = toggleLabel;
   btn.setAttribute('aria-expanded', String(!isCollapsed));
-  btn.title = isCollapsed ? 'Mở rộng menu' : 'Thu gọn menu';
+  btn.removeAttribute('title');
+  btn.setAttribute('aria-label',`${toggleLabel} menu`);
+  const toggleTooltip=document.getElementById('headerToggleTooltip');
+  if(toggleTooltip) toggleTooltip.textContent=toggleLabel.toLocaleUpperCase('vi-VN');
   document.getElementById('results').style.paddingTop = isCollapsed ? '6px' : '';
   if(persist){
     try{ localStorage.setItem(HEADER_COLLAPSE_PREF_KEY, isCollapsed ? '1' : '0'); }catch(e){}
