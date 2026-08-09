@@ -682,19 +682,22 @@ body.employee-mode .card-actions.admin-only.employee-permitted { display:grid!im
 .bulk-check input { width: 16px; height: 16px; accent-color: #F39C12; }
 .card.bulk-mode { position: relative; padding-top: 34px; }
 .card.bulk-selected { border-color: #F39C12; box-shadow: 0 0 0 3px rgba(243,156,18,.25); }
-.build-selection-tray { position:fixed; z-index:310; left:50%; bottom:max(12px,calc(env(safe-area-inset-bottom) + 7px)); transform:translate(-50%,18px); width:min(390px,calc(100vw - 20px)); min-height:44px; padding:5px 6px 5px 10px; display:flex; align-items:center; gap:6px; border:1px solid rgba(255,255,255,.72); border-radius:14px; background:linear-gradient(135deg,rgba(255,255,255,.76),rgba(224,237,247,.62)); color:#1E3A5F; box-shadow:0 8px 26px rgba(30,58,95,.2),inset 0 1px 0 rgba(255,255,255,.86); opacity:0; visibility:hidden; pointer-events:none; transition:.22s ease; -webkit-backdrop-filter:blur(22px) saturate(1.35); backdrop-filter:blur(22px) saturate(1.35); }
+.build-selection-tray { position:fixed; z-index:310; left:50%; bottom:max(12px,calc(env(safe-area-inset-bottom) + 7px)); transform:translate(-50%,18px); width:min(460px,calc(100vw - 20px)); min-height:78px; padding:8px 10px 10px; display:grid; grid-template-columns:minmax(0,1fr); justify-items:center; gap:7px; border:1px solid rgba(255,255,255,.78); border-radius:16px; background:linear-gradient(135deg,rgba(255,255,255,.88),rgba(224,237,247,.76)); color:#1E3A5F; box-shadow:0 10px 30px rgba(30,58,95,.24),inset 0 1px 0 rgba(255,255,255,.92); opacity:0; visibility:hidden; pointer-events:none; transition:.22s ease; -webkit-backdrop-filter:blur(22px) saturate(1.35); backdrop-filter:blur(22px) saturate(1.35); }
 .build-selection-tray.show { opacity:1; visibility:visible; pointer-events:auto; transform:translate(-50%,0); }
-.build-tray-open { flex:1; min-width:0; border:0; background:transparent; color:#1E3A5F; padding:3px 4px; text-align:left; cursor:pointer; }
+.build-tray-open { width:100%; min-width:0; color:#1E3A5F; padding:1px 4px; text-align:center; }
 .build-tray-open b,.build-tray-open small { display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-.build-tray-open b { font-size:12px; }.build-tray-open small { margin-top:1px; color:#5E7486; font-size:10px; }
-.build-tray-view { min-height:34px; border:0; border-radius:10px; padding:7px 12px; background:#F5B041; color:#3D2A05; font-size:11px; font-weight:900; cursor:pointer; white-space:nowrap; box-shadow:inset 0 1px 0 rgba(255,255,255,.38),0 2px 7px rgba(125,79,0,.18); }
+.build-tray-open b { font-size:12px; }.build-tray-open small { margin-top:2px; color:#5E7486; font-size:10px; }
+.build-tray-view { width:min(250px,100%); min-height:42px; display:inline-flex; align-items:center; justify-content:center; gap:8px; border:1px solid rgba(255,255,255,.76); border-radius:12px; padding:9px 18px; background:linear-gradient(135deg,#0F5F9F,#168BC5); color:#fff; font-size:12px; font-weight:950; letter-spacing:.35px; cursor:pointer; white-space:nowrap; box-shadow:inset 0 1px 0 rgba(255,255,255,.28),0 6px 16px rgba(15,95,159,.3); transition:transform .16s ease,filter .16s ease,box-shadow .16s ease; }
+.build-tray-view svg { width:16px; height:16px; flex:0 0 16px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+.build-tray-view:hover { transform:translateY(-1px); filter:brightness(1.08); box-shadow:inset 0 1px 0 rgba(255,255,255,.32),0 9px 21px rgba(15,95,159,.36),0 0 0 3px rgba(22,139,197,.12); }
+.build-tray-view:active { transform:translateY(0) scale(.98); }
 @media(max-width:600px){
   .build-selection-tray{
     z-index:460;
     bottom:max(92px,calc(env(safe-area-inset-bottom) + 84px));
     width:calc(100vw - 22px);
-    min-height:46px;
-    padding:5px 6px 5px 10px;
+    min-height:74px;
+    padding:7px 8px 8px;
     border-color:rgba(30,58,95,.18);
     background:rgba(245,249,252,.97);
     -webkit-backdrop-filter:none;
@@ -702,7 +705,7 @@ body.employee-mode .card-actions.admin-only.employee-permitted { display:grid!im
     box-shadow:0 6px 20px rgba(30,58,95,.22);
   }
   .build-tray-open small{display:none}
-  .build-tray-view{min-height:34px;padding:7px 11px}
+  .build-tray-view{width:min(270px,100%);min-height:40px;padding:8px 14px}
 }
 .build-summary-modal { width:min(900px,calc(100vw - 24px)); max-width:900px; max-height:90vh; max-height:90svh; }
 .build-summary-head { display:flex; align-items:flex-start; justify-content:space-between; gap:10px; margin-bottom:12px; }
@@ -7372,8 +7375,8 @@ body .warehouse-switch.warehouse-switch-changing .warehouse-pin{
 
 <div id="results"></div>
 <div class="build-selection-tray" id="buildSelectionTray" aria-live="polite">
-  <button type="button" class="build-tray-open" onclick="openBuildSummary()"><b id="buildTrayTitle">Đã chọn 0 linh kiện</b><small id="buildTrayStock">Bấm để lập báo giá</small></button>
-  <button type="button" class="build-tray-view" onclick="openBuildSummary()">Xem báo giá</button>
+  <div class="build-tray-open"><b id="buildTrayTitle">Đã chọn 0 linh kiện</b><small id="buildTrayStock">Sẵn sàng chỉnh sửa báo giá</small></div>
+  <button type="button" class="build-tray-view" onclick="openBuildSummary()" aria-label="Xem danh sách linh kiện đã chọn"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6h12M9 12h12M9 18h12"></path><circle cx="4.5" cy="6" r="1"></circle><circle cx="4.5" cy="12" r="1"></circle><circle cx="4.5" cy="18" r="1"></circle></svg><span>XEM DANH SÁCH</span></button>
 </div>
 
 <aside class="side-control-rail" id="sideControlRail" aria-label="Điều khiển hiển thị và điều hướng nhanh">
@@ -7896,7 +7899,7 @@ body .warehouse-switch.warehouse-switch-changing .warehouse-pin{
 <div class="overlay" id="buildSummaryOverlay" onclick="overlayClose(event,'buildSummaryOverlay')">
   <div class="modal build-summary-modal" onclick="event.stopPropagation()">
     <div class="build-summary-head">
-      <div><div class="modal-title">🖥️ Báo giá linh kiện</div></div>
+      <div><div class="modal-title">🖥️ Danh sách linh kiện đã chọn</div><div class="build-summary-sub">Chỉnh tên, số lượng, đơn giá và bảo hành trước khi xuất báo giá.</div></div>
       <button type="button" class="build-summary-close" onclick="closeOverlay('buildSummaryOverlay')">✕ Đóng</button>
     </div>
     <div id="buildSummaryBody"></div>
@@ -11999,7 +12002,7 @@ function updateBulkControls(){
     const stock=document.getElementById("buildTrayStock");
     const totalQty=[...selectedItems].reduce((sum,idx)=>sum+(buildQtyByIndex.get(idx)||1),0);
     if(title) title.textContent=`Đã chọn ${count} linh kiện`;
-    if(stock) stock.textContent=`${totalQty} sản phẩm · Bấm để lập báo giá`;
+    if(stock) stock.textContent=`${totalQty} sản phẩm · Sẵn sàng chỉnh báo giá`;
   }
 }
 
@@ -12099,7 +12102,7 @@ function renderBuildSummary(){
     </div>`;
   }).join("")}</div>
   <div class="build-summary-total"><span class="build-summary-total-copy" id="buildSummaryCount">${rows.length} linh kiện · ${totals.totalQty} sản phẩm</span><span class="build-summary-grand ${totals.missing?"":"complete"}" id="buildSummaryGrand"><small>TỔNG CỘNG</small><strong id="buildSummaryGrandTotal">${formatBuildMoney(totals.total)}</strong><em id="buildSummaryPriceNote">${totals.missing?`Còn ${totals.missing} linh kiện chưa nhập giá`:`Nếu thêm 8% VAT = ${formatBuildMoney(totals.totalWithVat)}`}</em></span></div>
-  <div class="build-summary-actions"><button type="button" class="build-export-image" onclick="exportBuildSummaryImage()">📷 Xuất ảnh</button><button type="button" class="build-export-print" onclick="printBuildSummary()">📄 In / Lưu PDF</button><button type="button" class="build-export-excel" onclick="exportBuildSummaryExcel()">📊 Xuất Excel</button><button type="button" class="build-clear-all" onclick="clearBuildSelection()">🗑️ Bỏ chọn tất cả</button></div>`;
+  <div class="build-summary-actions"><button type="button" class="build-export-image" onclick="exportBuildSummaryImage()">📷 Xuất ảnh</button><button type="button" class="build-export-print" onclick="printBuildSummary()">📄 In / Lưu PDF</button><button type="button" class="build-export-excel" onclick="exportBuildSummaryExcel(this)">📊 Xuất Excel</button><button type="button" class="build-clear-all" onclick="clearBuildSelection()">🗑️ Bỏ chọn tất cả</button></div>`;
 }
 function openBuildSummary(){
   if(!selectedItems.size){ showToast("Chưa chọn linh kiện nào"); return; }
@@ -12181,7 +12184,7 @@ async function exportBuildSummaryImage(){
   else{ctx.fillStyle="#1E8449";ctx.font="bold 16px Arial";ctx.fillText(`Nếu thêm 8% VAT = ${formatBuildMoney(totals.totalWithVat)}`,1150,footerY+57);} ctx.textAlign="left";
   const a=document.createElement("a"); a.download=`Bao-gia-linh-kien-${quickInventoryFileStamp()}.png`; a.href=canvas.toDataURL("image/png"); a.click(); showToast("✅ Đã xuất ảnh báo giá");
 }
-function exportBuildSummaryExcel(){
+function exportBuildSummaryExcelBasic(){
   const rows=getBuildSelectedRows();
   if(!rows.length) return;
   if(typeof XLSX==="undefined"){ showToast("⚠️ Chưa tải được công cụ Excel. Hãy kiểm tra mạng rồi thử lại.",4500); return; }
@@ -12240,6 +12243,161 @@ function exportBuildSummaryExcel(){
   XLSX.utils.book_append_sheet(wb,ws,"Báo giá");
   XLSX.writeFile(wb,`Bao-gia-linh-kien-${quickInventoryFileStamp()}.xlsx`,{cellStyles:true});
   showToast("✅ Đã xuất file Excel báo giá");
+}
+let buildExcelJsPromise=null;
+function ensureBuildExcelJs(){
+  if(window.ExcelJS) return Promise.resolve(window.ExcelJS);
+  if(buildExcelJsPromise) return buildExcelJsPromise;
+  buildExcelJsPromise=new Promise((resolve,reject)=>{
+    const script=document.createElement("script");
+    script.src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js";
+    script.async=true;
+    script.dataset.buildExceljs="1";
+    script.onload=()=>window.ExcelJS?resolve(window.ExcelJS):reject(new Error("ExcelJS không khởi tạo"));
+    script.onerror=()=>reject(new Error("Không tải được ExcelJS"));
+    document.head.appendChild(script);
+  }).catch(error=>{buildExcelJsPromise=null;throw error;});
+  return buildExcelJsPromise;
+}
+function getBuildExcelLogoData(){
+  const direct=String(document.getElementById("headerBrandLogo")?.src||"");
+  if(/^data:image\/(?:png|jpe?g);base64,/i.test(direct)) return direct;
+  try{
+    const slot=document.querySelector(".title-logo-slot");
+    const bg=slot?getComputedStyle(slot).backgroundImage:"";
+    const match=String(bg).match(/url\(["']?(data:image\/(?:png|jpe?g);base64,[A-Za-z0-9+/=]+)["']?\)/i);
+    return match?.[1]||"";
+  }catch(e){ return ""; }
+}
+function applyBuildExcelStyle(sheet,r1,c1,r2,c2,style){
+  for(let row=r1;row<=r2;row++){
+    for(let col=c1;col<=c2;col++){
+      const cell=sheet.getCell(row,col);
+      if(style.font) cell.font=style.font;
+      if(style.fill) cell.fill=style.fill;
+      if(style.border) cell.border=style.border;
+      if(style.alignment) cell.alignment=style.alignment;
+      if(style.numFmt) cell.numFmt=style.numFmt;
+    }
+  }
+}
+async function exportBuildSummaryExcel(button){
+  const rows=getBuildSelectedRows();
+  if(!rows.length) return;
+  const originalButtonHtml=button?.innerHTML||"";
+  if(button){ button.disabled=true; button.textContent="⏳ Đang tạo Excel..."; }
+  try{
+    const ExcelApi=await ensureBuildExcelJs();
+    const now=new Date();
+    const dateText=`${String(now.getDate()).padStart(2,"0")}/${String(now.getMonth()+1).padStart(2,"0")}/${now.getFullYear()}`;
+    const quoteCode=`BG-${now.getFullYear()}${String(now.getMonth()+1).padStart(2,"0")}${String(now.getDate()).padStart(2,"0")}-${String(now.getHours()).padStart(2,"0")}${String(now.getMinutes()).padStart(2,"0")}`;
+    const quoteTitle=String(buildQuoteTitle||"BÁO GIÁ LINH KIỆN").trim()||"BÁO GIÁ LINH KIỆN";
+    const customer=String(buildQuoteCustomer||"").trim();
+    const workbook=new ExcelApi.Workbook();
+    workbook.creator="HOÀNG GIA COMPUTER";
+    workbook.lastModifiedBy="HOÀNG GIA COMPUTER";
+    workbook.created=now;
+    workbook.modified=now;
+    workbook.calcProperties.fullCalcOnLoad=true;
+    const sheet=workbook.addWorksheet("Báo giá",{
+      properties:{defaultRowHeight:20},
+      pageSetup:{orientation:"landscape",paperSize:9,fitToPage:true,fitToWidth:1,fitToHeight:1,horizontalCentered:true,margins:{left:.25,right:.25,top:.35,bottom:.35,header:.15,footer:.18}}
+    });
+    sheet.columns=[
+      {key:"stt",width:6},{key:"name",width:48},{key:"code",width:15},{key:"unit",width:10},
+      {key:"qty",width:8},{key:"price",width:18},{key:"amount",width:20},{key:"warranty",width:16}
+    ];
+    sheet.mergeCells("A1:B4");
+    sheet.mergeCells("C1:F1");
+    sheet.mergeCells("C2:F2");
+    sheet.mergeCells("C3:F3");
+    sheet.mergeCells("C4:F4");
+    sheet.mergeCells("G1:H2");
+    sheet.mergeCells("G3:H4");
+    sheet.mergeCells("A5:H5");
+    sheet.mergeCells("A6:D6");
+    sheet.mergeCells("E6:H6");
+    sheet.getCell("C1").value="HOÀNG GIA COMPUTER";
+    sheet.getCell("C2").value="CN1: 200 Nguyễn Hoàng, P. An Phú, TP. Thủ Đức";
+    sheet.getCell("C3").value="CN2: 334 An Dương Vương, P. Chợ Quán, TP.HCM";
+    sheet.getCell("C4").value="Hotline: 0375 111 112";
+    sheet.getCell("G1").value="BÁO GIÁ";
+    sheet.getCell("G3").value=`Ngày ${dateText}\nMã: ${quoteCode}`;
+    sheet.getCell("A5").value=quoteTitle.toLocaleUpperCase("vi-VN");
+    sheet.getCell("A6").value=`Khách hàng: ${customer||"........................................"}`;
+    sheet.getCell("E6").value=`Kho lập báo giá: ${currentBranch||"Q2"}`;
+    const logoData=getBuildExcelLogoData();
+    if(logoData){
+      const extension=/image\/png/i.test(logoData)?"png":"jpeg";
+      const logoId=workbook.addImage({base64:logoData,extension});
+      sheet.addImage(logoId,{tl:{col:.32,row:.25},ext:{width:118,height:78},editAs:"oneCell"});
+    }else{
+      sheet.getCell("A1").value="MÁY TÍNH\nHOÀNG GIA.VN";
+    }
+    [27,20,20,24,28,23,26].forEach((height,index)=>{sheet.getRow(index+1).height=height;});
+    const green="FF0B6B3A", green2="FF158447", yellow="FFF5C84C", pale="FFF4F8F6", white="FFFFFFFF", ink="FF23313D", red="FFD92828", line="FFB7C5BE";
+    const solid=color=>({type:"pattern",pattern:"solid",fgColor:{argb:color}});
+    const thinBorder={top:{style:"thin",color:{argb:line}},left:{style:"thin",color:{argb:line}},bottom:{style:"thin",color:{argb:line}},right:{style:"thin",color:{argb:line}}};
+    applyBuildExcelStyle(sheet,1,1,4,2,{fill:solid(white),border:thinBorder,alignment:{horizontal:"center",vertical:"middle",wrapText:true},font:{name:"Arial",bold:true,size:13,color:{argb:green}}});
+    applyBuildExcelStyle(sheet,1,3,4,6,{fill:solid(white),border:thinBorder,alignment:{horizontal:"center",vertical:"middle",wrapText:true},font:{name:"Arial",size:9,color:{argb:ink}}});
+    sheet.getCell("C1").font={name:"Arial",bold:true,size:15,color:{argb:green}};
+    sheet.getCell("C4").font={name:"Arial",bold:true,size:11,color:{argb:ink}};
+    applyBuildExcelStyle(sheet,1,7,2,8,{fill:solid(green),border:thinBorder,alignment:{horizontal:"center",vertical:"middle"},font:{name:"Arial",bold:true,size:18,color:{argb:white}}});
+    applyBuildExcelStyle(sheet,3,7,4,8,{fill:solid(yellow),border:thinBorder,alignment:{horizontal:"center",vertical:"middle",wrapText:true},font:{name:"Arial",bold:true,size:11,color:{argb:ink}}});
+    applyBuildExcelStyle(sheet,5,1,5,8,{fill:solid(green2),border:thinBorder,alignment:{horizontal:"left",vertical:"middle"},font:{name:"Arial",bold:true,size:13,color:{argb:white}}});
+    applyBuildExcelStyle(sheet,6,1,6,8,{fill:solid(pale),border:thinBorder,alignment:{horizontal:"left",vertical:"middle"},font:{name:"Arial",bold:true,size:10,color:{argb:ink}}});
+    const headers=["STT","TÊN HÀNG HÓA","MÃ HÀNG","ĐVT","SL","ĐƠN GIÁ","THÀNH TIỀN","BẢO HÀNH"];
+    sheet.getRow(7).values=headers;
+    applyBuildExcelStyle(sheet,7,1,7,8,{fill:solid(green),border:thinBorder,alignment:{horizontal:"center",vertical:"middle",wrapText:true},font:{name:"Arial",bold:true,size:10,color:{argb:white}}});
+    rows.forEach((item,index)=>{
+      const excelRow=8+index;
+      const customService=/dịch vụ|phí|cài đặt|lắp đặt|vận chuyển/i.test(item.title);
+      const row=sheet.getRow(excelRow);
+      row.values=[index+1,item.title,String(item.r?.[1]||""),customService?"Gói":"Cái",item.qty,item.price||0,{formula:`E${excelRow}*F${excelRow}`,result:item.qty*item.price},item.warranty||""];
+      row.height=34;
+      applyBuildExcelStyle(sheet,excelRow,1,excelRow,8,{fill:solid(index%2?pale:white),border:thinBorder,alignment:{vertical:"middle",wrapText:true},font:{name:"Arial",size:10,color:{argb:ink}}});
+      [1,3,4,5,8].forEach(col=>{sheet.getCell(excelRow,col).alignment={horizontal:"center",vertical:"middle",wrapText:true};});
+      [6,7].forEach(col=>{sheet.getCell(excelRow,col).alignment={horizontal:"right",vertical:"middle"};sheet.getCell(excelRow,col).numFmt='#,##0 "đ"';});
+      sheet.getCell(excelRow,2).font={name:"Arial",bold:true,size:10,color:{argb:ink}};
+    });
+    const firstDataRow=8, lastDataRow=7+rows.length;
+    const subtotalRow=lastDataRow+1, vatRow=subtotalRow+1, grandRow=vatRow+1, thanksRow=grandRow+1, noteRow=thanksRow+1;
+    [[subtotalRow,"TẠM TÍNH"],[vatRow,"VAT (8%)"],[grandRow,"TỔNG CỘNG"]].forEach(([row,label])=>{
+      sheet.mergeCells(row,1,row,6); sheet.mergeCells(row,7,row,8);
+      sheet.getCell(row,1).value=label;
+      applyBuildExcelStyle(sheet,row,1,row,8,{border:thinBorder,alignment:{horizontal:"right",vertical:"middle"},font:{name:"Arial",bold:true,size:11,color:{argb:ink}}});
+      sheet.getRow(row).height=24;
+    });
+    sheet.getCell(subtotalRow,7).value={formula:`SUM(G${firstDataRow}:G${lastDataRow})`,result:rows.reduce((sum,item)=>sum+item.qty*item.price,0)};
+    sheet.getCell(vatRow,7).value={formula:`G${subtotalRow}*8%`,result:Math.round(rows.reduce((sum,item)=>sum+item.qty*item.price,0)*.08)};
+    sheet.getCell(grandRow,7).value={formula:`G${subtotalRow}+G${vatRow}`,result:Math.round(rows.reduce((sum,item)=>sum+item.qty*item.price,0)*1.08)};
+    [subtotalRow,vatRow,grandRow].forEach(row=>{sheet.getCell(row,7).numFmt='#,##0 "đ"';});
+    applyBuildExcelStyle(sheet,subtotalRow,1,vatRow,8,{fill:solid(pale)});
+    applyBuildExcelStyle(sheet,grandRow,1,grandRow,8,{fill:solid(yellow),border:thinBorder,alignment:{horizontal:"right",vertical:"middle"},font:{name:"Arial",bold:true,size:13,color:{argb:ink}},numFmt:'#,##0 "đ"'});
+    sheet.mergeCells(thanksRow,1,thanksRow,8);
+    sheet.getCell(thanksRow,1).value="Rất hân hạnh được đồng hành và phục vụ Quý Khách.";
+    applyBuildExcelStyle(sheet,thanksRow,1,thanksRow,8,{fill:solid(white),border:thinBorder,alignment:{horizontal:"left",vertical:"middle"},font:{name:"Arial",bold:true,italic:true,size:10,color:{argb:red}}});
+    sheet.mergeCells(noteRow,1,noteRow,8);
+    sheet.getCell(noteRow,1).value="Giá và thời hạn bảo hành có thể được chỉnh trực tiếp trong file. Thành tiền và tổng cộng sẽ tự tính lại khi mở bằng Excel.";
+    applyBuildExcelStyle(sheet,noteRow,1,noteRow,8,{fill:solid(pale),border:thinBorder,alignment:{horizontal:"left",vertical:"middle",wrapText:true},font:{name:"Arial",italic:true,size:9,color:{argb:ink}}});
+    sheet.getRow(thanksRow).height=23; sheet.getRow(noteRow).height=29;
+    sheet.views=[{state:"frozen",xSplit:0,ySplit:7,topLeftCell:"A8",activeCell:"B8"}];
+    sheet.autoFilter={from:{row:7,column:1},to:{row:lastDataRow,column:8}};
+    sheet.pageSetup.printArea=`A1:H${noteRow}`;
+    sheet.headerFooter.oddFooter="&LHOÀNG GIA COMPUTER&CTrang &P / &N&R0375 111 112";
+    const buffer=await workbook.xlsx.writeBuffer();
+    const blob=new Blob([buffer],{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});
+    const url=URL.createObjectURL(blob),link=document.createElement("a");
+    link.href=url; link.download=`Bao-gia-Hoang-Gia-${quickInventoryFileStamp()}.xlsx`;
+    document.body.appendChild(link); link.click(); link.remove(); setTimeout(()=>URL.revokeObjectURL(url),1500);
+    showToast("✅ Đã xuất Excel báo giá có khung mẫu và công thức",4200);
+  }catch(e){
+    console.error("Lỗi tạo Excel báo giá nâng cao:",e);
+    showToast("⚠️ Không tạo được mẫu Excel nâng cao; đang xuất bản cơ bản.",4200);
+    exportBuildSummaryExcelBasic();
+  }finally{
+    if(button){ button.disabled=false; button.innerHTML=originalButtonHtml; }
+  }
 }
 function printBuildSummaryLegacy(){
   const rows=getBuildSelectedRows(); if(!rows.length) return;
