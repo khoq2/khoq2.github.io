@@ -618,7 +618,7 @@ mark.kw-hit { background: #FFEB3B; color: #1A1A1A; padding: 0 1px; border-radius
   .note { max-height:54px; padding:6px 8px; }
   .card-main > .product-related { width:calc(100% + 74px); margin-left:-74px; }
 }
-.card-actions { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:6px; margin-top:8px; border-top:1px solid #eee; padding-top:8px; }
+.card-actions { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:6px; margin-top:8px; border-top:1px solid #eee; padding-top:8px; }
 body.admin-mode .card-actions.admin-only { display:grid!important; }
 body.employee-mode .admin-only.employee-permitted { display:flex!important; }
 body.employee-mode .card-actions.admin-only.employee-permitted { display:grid!important; }
@@ -626,7 +626,7 @@ body.employee-mode .card-actions.admin-only.employee-permitted { display:grid!im
 .card-actions > .btn-edit { background:#2874A6; }
 .card-actions > .btn-delete { background:#C0392B; }
 .btn-history { background:#566573; }
-@media(max-width:560px){body.admin-mode .card-actions.admin-only,body.employee-mode .card-actions.admin-only.employee-permitted{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.card-actions>button{min-height:46px;font-size:11px;white-space:normal;overflow-wrap:normal;word-break:keep-all}.card-actions>button:last-child{grid-column:1/-1}}
+@media(max-width:560px){body.admin-mode .card-actions.admin-only,body.employee-mode .card-actions.admin-only.employee-permitted{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.card-actions>button{min-height:46px;font-size:11px;white-space:normal;overflow-wrap:normal;word-break:keep-all}.card-actions>button:last-child{grid-column:auto}}
 .view-mode-switch { position:relative; display:flex; flex-direction:column; gap:6px; margin-left:auto; padding:4px; border:1px solid transparent; border-radius:13px; background:linear-gradient(rgba(255,255,255,.94),rgba(240,246,250,.9)) padding-box,linear-gradient(145deg,#5DADE2,#F39C12,#8E44AD) border-box; box-shadow:0 5px 14px rgba(30,58,95,.14),inset 0 1px 0 #fff; }
 .view-mode-switch::before { content:""; position:absolute; z-index:0; left:50%; top:34px; bottom:34px; width:2px; border-radius:999px; background:linear-gradient(#2E86C1,#F39C12); transform:translateX(-50%); opacity:.65; pointer-events:none; }
 .view-mode-switch.hidden { display:none; }
@@ -1606,6 +1606,19 @@ body.fab-menu-open .category-view-bar .view-mode-switch { pointer-events:none; }
 .sticky.collapsed .header { padding: 8px 10px; box-shadow: 0 2px 7px rgba(0,0,0,.18); }
 .sticky.collapsed .search-box { padding: 7px 8px; border-width: 2px; }
 .sticky.collapsed #headerToggleText { max-width: 0; opacity: 0; }
+/* Auto hide/show changes the sticky height in one layout pass. This avoids
+   animating max-height on every frame and keeps the product currently read in place. */
+.sticky.header-auto-changing .header-collapsible,
+.sticky.header-auto-changing .admin-bar,
+.sticky.header-auto-changing .header .title,
+.sticky.header-auto-changing .kpi-row,
+.sticky.header-auto-changing .tabs,
+.sticky.header-auto-changing .filters,
+.sticky.header-auto-changing .header,
+.sticky.header-auto-changing .search-box,
+.sticky.header-auto-changing #headerToggleText {
+  transition: none !important;
+}
 #headerToggleBtn { border: 1px solid rgba(255,255,255,.28); background: #1E3A5F; color: #fff; border-radius: 999px; padding: 4px 9px 4px 5px; min-height: 30px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; font-size: 12px; font-weight: 800; line-height: 1; white-space: nowrap; box-shadow: 0 3px 10px rgba(30,58,95,.22); transition: background-color .18s ease, box-shadow .18s ease, transform .18s ease; user-select: none; }
 #headerToggleBtn:hover { background: #24476F; box-shadow: 0 5px 14px rgba(30,58,95,.26); transform: translateY(-1px); }
 #headerToggleBtn:active { transform: scale(.96); box-shadow: 0 2px 6px rgba(30,58,95,.18); }
@@ -2373,7 +2386,7 @@ html::-webkit-scrollbar-corner { background: #EAF2F8; }
   .nguoi-ban-label,.nguoi-ban-count,.nguoi-ban-latest-text { min-width:0; white-space:normal; overflow:visible; text-overflow:clip; overflow-wrap:anywhere; }
   body.admin-mode .card-actions.admin-only { display:grid!important; grid-template-columns:repeat(2,minmax(0,1fr)); gap:7px; }
   .card-actions > button { min-height:46px; padding:8px 7px; font-size:11px; line-height:1.2; white-space:normal; overflow-wrap:normal; word-break:keep-all; }
-  .card-actions > button:last-child { grid-column:1/-1; }
+  .card-actions > button:last-child { grid-column:auto; }
   .tapered-separator { height:2px; margin-top:4px; opacity:.42; filter:none; }
   .category-view-bar { right:3px; opacity:.78; }
   .view-mode-switch { padding:3px; }
@@ -2879,7 +2892,7 @@ body {
   .group-section > .card-shell > .card .product-name { min-height:0; }
   .group-section > .card-shell > .card .note { max-height:72px; }
   .group-section > .card-shell > .card .ton-ctrl { margin-top:8px; }
-  .group-section > .card-shell > .card .card-actions { grid-template-columns:repeat(5,minmax(0,1fr)); }
+  .group-section > .card-shell > .card .card-actions { grid-template-columns:repeat(4,minmax(0,1fr)); }
 }
 
 @media (min-width:700px) and (max-width:1049px) {
@@ -6645,6 +6658,225 @@ body .side-control-rail .scroll-btn>svg{
   .side-control-rail button,
   .side-control-rail button>svg,
   .side-control-rail .macos-dock-app-icon{animation:none!important}
+}
+
+/* Giao dịch gần đây là thông tin công khai, không còn là liên kết chi tiết.
+   Nút nhật ký riêng chỉ xuất hiện sau khi đăng nhập Admin. */
+body .card .nguoi-ban-row{cursor:default!important}
+body .card .nguoi-ban-row::after{display:none!important}
+body:not(.admin-mode) .card .nguoi-ban-row.has-transaction{
+  grid-template-columns:26px minmax(0,1fr)!important;
+  grid-template-rows:1fr!important;
+  min-height:44px!important;
+  padding:7px 8px!important;
+  column-gap:7px!important;
+}
+body:not(.admin-mode) .card .nguoi-ban-row.has-transaction>.nv-avatar-latest{
+  grid-column:1!important;grid-row:1!important
+}
+body:not(.admin-mode) .card .nguoi-ban-row.has-transaction>.nguoi-ban-label{
+  grid-column:2!important;grid-row:1!important;cursor:default!important
+}
+body.admin-mode .card .nguoi-ban-row.has-transaction{
+  grid-template-columns:26px minmax(0,1fr) auto!important;
+  grid-template-rows:1fr!important;
+  min-height:48px!important;
+  padding:7px 8px!important;
+  column-gap:7px!important;
+}
+body.admin-mode .card .nguoi-ban-row.has-transaction>.nv-avatar-latest{
+  grid-column:1!important;grid-row:1!important
+}
+body.admin-mode .card .nguoi-ban-row.has-transaction>.nguoi-ban-label{
+  grid-column:2!important;grid-row:1!important;cursor:default!important
+}
+body.admin-mode .card .nguoi-ban-row.has-transaction>.nguoi-ban-history-link{
+  position:static!important;
+  grid-column:3!important;
+  grid-row:1!important;
+  align-self:center!important;
+  justify-self:end!important;
+  width:auto!important;
+  min-width:82px!important;
+  margin:0!important;
+  padding:5px 7px!important;
+  transform:none!important;
+  white-space:nowrap!important;
+}
+body.admin-mode .card .nguoi-ban-row.no-transaction{
+  grid-template-columns:24px minmax(0,1fr) auto!important;
+  grid-template-rows:1fr!important;
+  min-height:48px!important;
+}
+body.admin-mode .card .nguoi-ban-row.no-transaction>.nguoi-ban-kind-icon{
+  grid-column:1!important;grid-row:1!important
+}
+body.admin-mode .card .nguoi-ban-row.no-transaction>.nguoi-ban-label{
+  grid-column:2!important;grid-row:1!important
+}
+body.admin-mode .card .nguoi-ban-row.no-transaction>.nguoi-ban-count{display:none!important}
+body.admin-mode .card .nguoi-ban-row.no-transaction>.nguoi-ban-history-link{
+  grid-column:3!important;
+  grid-row:1!important;
+  justify-self:end!important;
+  min-width:82px!important;
+}
+
+/* Bộ biểu tượng SVG hiện đại và ô ngày Việt Nam trong lịch sử giao dịch. */
+#txOverlay .tx-modern-icon{
+  --tx-icon:#1769C2;
+  --tx-icon-bg:#EAF3FF;
+  display:inline-grid!important;
+  place-items:center!important;
+  flex:0 0 24px;
+  width:24px;
+  height:24px;
+  border:1px solid color-mix(in srgb,var(--tx-icon) 18%,transparent);
+  border-radius:8px;
+  background:var(--tx-icon-bg)!important;
+  color:var(--tx-icon)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.75),0 3px 8px color-mix(in srgb,var(--tx-icon) 13%,transparent);
+  vertical-align:middle;
+}
+#txOverlay .tx-modern-icon svg{
+  width:14px;
+  height:14px;
+  fill:none;
+  stroke:currentColor;
+  stroke-width:1.9;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+}
+#txOverlay .tx-modern-icon.green{--tx-icon:#16883F;--tx-icon-bg:#E8F8EF}
+#txOverlay .tx-modern-icon.orange{--tx-icon:#D97706;--tx-icon-bg:#FFF3DE}
+#txOverlay .tx-modern-icon.purple{--tx-icon:#7647B5;--tx-icon-bg:#F2EAFC}
+#txOverlay .tx-modern-icon.red{--tx-icon:#C33D4C;--tx-icon-bg:#FDECEF}
+#txOverlay .tx-modern-icon.teal{--tx-icon:#0B807A;--tx-icon-bg:#E4F7F5}
+#txOverlay .tx-title-icon .tx-modern-icon{width:30px;height:30px;border-radius:10px}
+#txOverlay .tx-title-icon .tx-modern-icon svg{width:17px;height:17px}
+#txOverlay .tx-date-input{position:relative}
+#txOverlay .tx-date-input>.tx-modern-icon{
+  position:absolute!important;
+  z-index:2;
+  left:7px;
+  top:50%;
+  width:26px;
+  height:26px;
+  transform:translateY(-50%);
+  pointer-events:none;
+}
+#txOverlay #txFilterDate{
+  padding-left:40px!important;
+  font-variant-numeric:tabular-nums;
+  letter-spacing:.035em;
+}
+#txOverlay #txFilterDate::placeholder{color:rgba(255,255,255,.7);opacity:1}
+#txOverlay .tx-kpi-icon.tx-modern-icon{
+  flex-basis:32px;
+  width:32px;
+  height:32px;
+  border-radius:10px;
+}
+#txOverlay .tx-kpi-icon.tx-modern-icon svg{width:17px;height:17px}
+#txOverlay .tx-detail-label{
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  min-width:0;
+}
+#txOverlay .tx-detail-label .tx-modern-icon{width:25px;height:25px;flex-basis:25px}
+#txOverlay .tx-kind{
+  gap:5px!important;
+  padding:4px 8px 4px 5px!important;
+}
+#txOverlay .tx-kind .tx-modern-icon{width:21px;height:21px;flex-basis:21px;border-radius:7px}
+#txOverlay .tx-kind .tx-modern-icon svg{width:12px;height:12px}
+#txOverlay .tx-time{display:inline-flex;align-items:center;gap:5px}
+#txOverlay .tx-time .tx-modern-icon{width:20px;height:20px;flex-basis:20px;border:0;border-radius:6px;box-shadow:none}
+#txOverlay .tx-time .tx-modern-icon svg{width:11px;height:11px}
+#txOverlay .tx-action{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:5px;
+  min-height:32px;
+  padding:4px 8px!important;
+  border:1px solid #D5E3EF!important;
+  border-radius:9px!important;
+  background:#FFFFFF!important;
+  box-shadow:0 3px 8px rgba(22,66,104,.08);
+}
+#txOverlay .tx-action .tx-modern-icon{width:21px;height:21px;flex-basis:21px;border:0;box-shadow:none}
+#txOverlay .tx-delete{padding:4px!important}
+#txOverlay .tx-clear-filter{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+}
+#txOverlay .tx-clear-filter .tx-modern-icon{width:22px;height:22px;flex-basis:22px;border:0;box-shadow:none}
+#txOverlay .tx-note{
+  display:flex;
+  align-items:flex-start;
+  gap:7px;
+}
+#txOverlay .tx-note .tx-modern-icon{width:23px;height:23px;flex-basis:23px}
+
+/* Khôi phục dấu hiệu điều hướng của bộ lọc nhanh sau lớp giao diện 2026.
+   Dùng !important vì theme chung của thẻ sản phẩm được khai báo sau CSS cũ. */
+#results .card.quick-match.match-focus,
+#results .product-list-row.quick-match.match-focus,
+#results .card.jump-alert,
+#results .product-list-row.jump-alert{
+  position:relative;
+  z-index:6;
+  border-color:#E53935!important;
+  outline:3px solid rgba(229,57,53,.92)!important;
+  outline-offset:3px;
+  background:linear-gradient(155deg,#FFF5F5,#FFFFFF)!important;
+  box-shadow:0 0 0 5px rgba(229,57,53,.16),0 0 24px rgba(229,57,53,.52),0 12px 28px rgba(92,18,18,.16)!important;
+  animation:quickTargetRedBlink .56s ease-in-out 4!important;
+}
+#results .group-header.jump-alert{
+  position:relative;
+  z-index:6;
+  border-color:#E53935!important;
+  outline:3px solid rgba(229,57,53,.92)!important;
+  outline-offset:3px;
+  animation:groupTargetRedBlink .56s ease-in-out 4!important;
+}
+@keyframes quickTargetRedBlink{
+  0%,100%{
+    border-color:#E53935;
+    outline-color:rgba(229,57,53,.35);
+    background:linear-gradient(155deg,#FFF9F9,#FFFFFF);
+    box-shadow:0 0 0 2px rgba(229,57,53,.10),0 8px 20px rgba(92,18,18,.10);
+  }
+  50%{
+    border-color:#C62828;
+    outline-color:#FF3131;
+    background:linear-gradient(155deg,#FFD9D9,#FFF7F7);
+    box-shadow:0 0 0 7px rgba(255,49,49,.22),0 0 30px rgba(229,57,53,.72),0 14px 30px rgba(92,18,18,.18);
+  }
+}
+@keyframes groupTargetRedBlink{
+  0%,100%{
+    outline-color:rgba(229,57,53,.35);
+    background:linear-gradient(90deg,#FFF5F5,#FFFFFF);
+    color:#8E2020;
+    box-shadow:0 0 0 2px rgba(229,57,53,.10);
+  }
+  50%{
+    outline-color:#FF3131;
+    background:linear-gradient(90deg,#E53935,#C62828);
+    color:#FFFFFF;
+    box-shadow:0 0 0 7px rgba(255,49,49,.22),0 0 30px rgba(229,57,53,.72);
+  }
+}
+@media(max-width:520px){
+  #txOverlay .tx-modern-icon{width:22px;height:22px;flex-basis:22px}
+  #txOverlay .tx-kpi-icon.tx-modern-icon{width:30px;height:30px;flex-basis:30px}
+  #txOverlay .tx-action-label{display:none}
 }
 </style>
 </head>
@@ -10538,13 +10770,23 @@ function openZaloContact(btn){
 
 function focusFirstQuickMatch(){
   clearTimeout(quickFocusTimer);
-  const first = document.querySelector("#results .card.quick-match");
-  if(!first) return;
-  const stickyHeight=document.querySelector(".sticky")?.getBoundingClientRect().height||0;
-  const top=first.getBoundingClientRect().top+window.pageYOffset-stickyHeight-8;
-  window.scrollTo({top:Math.max(0,top),left:0,behavior:"auto"});
-  first.classList.add("match-focus");
-  quickFocusTimer=setTimeout(()=>first.classList.remove("match-focus"),1200);
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    const first = document.querySelector("#results .card.quick-match, #results .product-list-row.quick-match");
+    if(!first) return;
+    const stickyHeight=document.querySelector(".sticky")?.getBoundingClientRect().height||0;
+    const top=first.getBoundingClientRect().top+window.pageYOffset-stickyHeight-10;
+    try{ headerAutoScrollGuardUntil=performance.now()+750; }catch(_err){}
+    window.scrollTo({top:Math.max(0,top),left:0,behavior:"auto"});
+    requestAnimationFrame(()=>{
+      const currentStickyHeight=document.querySelector(".sticky")?.getBoundingClientRect().height||0;
+      const correction=first.getBoundingClientRect().top-currentStickyHeight-10;
+      if(Math.abs(correction)>1) window.scrollBy({top:correction,left:0,behavior:"auto"});
+      first.classList.remove("match-focus");
+      void first.offsetWidth;
+      first.classList.add("match-focus");
+      quickFocusTimer=setTimeout(()=>first.classList.remove("match-focus"),2400);
+    });
+  }));
 }
 
 function isProductViewModeAvailable(){
@@ -10612,15 +10854,16 @@ function renderCard(r,i,displayNo){
   const productCategoryLabel=cleanKpiPathLabel(cfg.label);
   const productGroupLabel=getPrimaryRowGroup(r[8]||"") || NO_GROUP;
   const productGroupText=cleanKpiPathLabel(productGroupLabel);
+  const quickClass = quickGroupFilter ? " quick-match" : "";
   if(productViewMode==="list" && isProductViewModeAvailable()){
     const listStockClass=isHet?"het":isSap?"sap":"con";
-    return `<button type="button" class="product-list-row" data-index="${i}" style="--list-color:${cfg.c}" title="Mở ${escapeHtml(ten)}" onclick="openProductFromList(${i})"><span class="product-list-main"><span class="product-list-title">${renderProductTitleWithCondition(ten,kwTokens)}</span><span class="product-list-meta">${highlightMatch(ma,kwTokens)} · ${escapeHtml(th||"Chưa rõ hãng")} · ${escapeHtml(branch||"Q2")}</span></span><span class="product-list-stock ${listStockClass}">${escapeHtml(stTxt)} · ${Number(ton)||0}</span></button>`;
+    return `<button type="button" class="product-list-row${quickClass}" data-index="${i}" style="--list-color:${cfg.c}" title="Mở ${escapeHtml(ten)}" onclick="openProductFromList(${i})"><span class="product-list-main"><span class="product-list-title">${renderProductTitleWithCondition(ten,kwTokens)}</span><span class="product-list-meta">${highlightMatch(ma,kwTokens)} · ${escapeHtml(th||"Chưa rõ hãng")} · ${escapeHtml(branch||"Q2")}</span></span><span class="product-list-stock ${listStockClass}">${escapeHtml(stTxt)} · ${Number(ton)||0}</span></button>`;
   }
   const productTransactions = getTransactionsForProduct(r);
   const latestTransaction = productTransactions[0];
   const latestTransactionText = latestTransaction
     ? `${latestTransaction.nv || "Chưa rõ nhân viên"} · ${formatTxTime(latestTransaction.time) || "Chưa rõ thời gian"}`
-    : "Xem lịch sử ›";
+    : "Chưa có giao dịch";
   const latestEmployeeAvatarHtml = latestTransaction
     ? renderNVAvatar(latestTransaction.nv, "nv-avatar-latest")
     : "";
@@ -10647,7 +10890,6 @@ function renderCard(r,i,displayNo){
   const selectHtml = bulkSelectMode
     ? `<label class="bulk-check" onclick="event.stopPropagation()"><input type="checkbox" ${isSelected?"checked":""} onchange="toggleItemSelected(${i},this.checked)"> Chọn</label>`
     : "";
-  const quickClass = quickGroupFilter ? " quick-match" : "";
   const priceHtml = isAdmin
     ? `<div class="price-row">
         <span class="price-label">Nhập:</span><span class="price admin-price">${giaNhap>0?fmt(giaNhap):"Chưa nhập giá"}</span>
@@ -10696,19 +10938,18 @@ function renderCard(r,i,displayNo){
         <button class="btn-ton btn-plus admin-only" data-permission="RESTOCK" title="Nhập thêm hàng" aria-label="Nhập thêm hàng" onclick="openRestockModal(${i})">+</button>
       </div>
       <div class="card-price-mobile">${priceHtml}</div>
-      <div class="nguoi-ban-row ${latestTransaction ? "has-transaction" : "no-transaction"}" onclick="showTxHistory(${i})">
+      <div class="nguoi-ban-row ${latestTransaction ? "has-transaction" : "no-transaction"}">
         <img class="nguoi-ban-kind-icon" src="https://drive.google.com/thumbnail?id=1gDQYpyWqwlHtJbDhSNHBRybWKkIjimXd&sz=w128" alt="" aria-label="Giao dịch nhân viên" referrerpolicy="no-referrer" onerror="this.outerHTML='<span class=\\'nguoi-ban-kind-icon\\' aria-hidden=\\'true\\'>👤</span>';">
         ${latestEmployeeAvatarHtml}
-        <span class="nguoi-ban-label" ${latestTransaction ? `role="link" tabindex="0" aria-label="Mở giao dịch gần đây" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();showTxHistory(${i})}"` : ""}>${latestTransaction ? "Giao dịch gần đây" : "Người bán"}</span>
+        <span class="nguoi-ban-label">${latestTransaction ? "Giao dịch gần đây" : "Người bán"}</span>
         <span class="nguoi-ban-count" title="${escapeHtml(latestTransactionText)}">${latestTransactionHtml}</span>
-        ${latestTransaction ? `<span class="nguoi-ban-flow-arrow" aria-hidden="true">→</span><span class="nguoi-ban-history-link" role="link" tabindex="0" aria-label="Xem chi tiết giao dịch" onclick="event.stopPropagation();showTxHistory(${i})" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();event.stopPropagation();showTxHistory(${i})}">Xem chi tiết ›</span>` : ""}
+        <button type="button" class="nguoi-ban-history-link admin-only" aria-label="Xem lịch sử thay đổi sản phẩm" onclick="event.stopPropagation();openProductActivity(${i})">Xem lịch sử ›</button>
       </div>
       <div class="card-actions admin-only" data-permission="PRODUCT_EDIT,PRODUCT_DELETE,TRANSFER">
         <button class="btn-units admin-only" data-permission="PRODUCT_EDIT" onclick="openUnitManager(${i})">＋ Thêm mã</button>
         <button class="btn-transfer admin-only" data-permission="TRANSFER" onclick="openTransferModal(${i})">⇄ Chuyển kho</button>
         <button class="btn-edit admin-only" data-permission="PRODUCT_EDIT" onclick="openEditModal(${i})">✏️ Sửa</button>
         <button class="btn-delete admin-only" data-permission="PRODUCT_DELETE" onclick="deleteItem(${i})">🗑️ Xóa</button>
-        <button class="btn-history admin-only" onclick="openProductActivity(${i})">🕒 Lịch sử</button>
       </div>
       </div>
     </div>
@@ -10748,17 +10989,32 @@ function openProductFromList(idx){
 }
 
 const NO_GROUP = "🆕 Khác";
+const jumpAlertTimers = new WeakMap();
+function scrollToMarkedTarget(target){
+  if(!target) return;
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    const stickyHeight=document.querySelector(".sticky")?.getBoundingClientRect().height||0;
+    const top=target.getBoundingClientRect().top+window.pageYOffset-stickyHeight-10;
+    try{ headerAutoScrollGuardUntil=performance.now()+750; }catch(_err){}
+    window.scrollTo({top:Math.max(0,top),left:0,behavior:"auto"});
+    requestAnimationFrame(()=>{
+      const currentStickyHeight=document.querySelector(".sticky")?.getBoundingClientRect().height||0;
+      const correction=target.getBoundingClientRect().top-currentStickyHeight-10;
+      if(Math.abs(correction)>1) window.scrollBy({top:correction,left:0,behavior:"auto"});
+      target.classList.remove("jump-alert");
+      void target.offsetWidth;
+      target.classList.add("jump-alert");
+      clearTimeout(jumpAlertTimers.get(target));
+      jumpAlertTimers.set(target,setTimeout(()=>{
+        target.classList.remove("jump-alert");
+        jumpAlertTimers.delete(target);
+      },2400));
+    });
+  }));
+}
 function jumpToGroup(id){
   const target = document.getElementById(id);
-  if(!target) return;
-  const sticky = document.querySelector(".sticky");
-  const stickyHeight = sticky ? sticky.getBoundingClientRect().height : 0;
-  const top = target.getBoundingClientRect().top + window.pageYOffset - stickyHeight - 10;
-  window.scrollTo({top:Math.max(0,top),left:0,behavior:"auto"});
-  target.classList.remove("jump-alert");
-  void target.offsetWidth;
-  target.classList.add("jump-alert");
-  setTimeout(()=>target.classList.remove("jump-alert"),1200);
+  scrollToMarkedTarget(target);
 }
 function showGroupInventoryDetail(key){
   const detail=currentGroupDetailSets[key];
@@ -10787,15 +11043,7 @@ let openSummaryListKey = "";
 let summaryProductSets = {};
 function jumpToInventoryItem(idx){
   const target = document.querySelector(`#results .card[data-index="${idx}"], #results .product-list-row[data-index="${idx}"]`);
-  if(!target) return;
-  const sticky = document.querySelector(".sticky");
-  const stickyHeight = sticky ? sticky.getBoundingClientRect().height : 0;
-  const top = target.getBoundingClientRect().top + window.pageYOffset - stickyHeight - 10;
-  window.scrollTo({top:Math.max(0,top),left:0,behavior:"auto"});
-  target.classList.remove("jump-alert");
-  void target.offsetWidth;
-  target.classList.add("jump-alert");
-  setTimeout(()=>target.classList.remove("jump-alert"),1200);
+  scrollToMarkedTarget(target);
 }
 function openSummaryInventoryItem(idx){
   if(!DATA[idx]) return;
@@ -11104,8 +11352,8 @@ function render(){
   if(results.length===0){
     const hasSearch = !!kwTokens.length;
     const emptyTitle = hasSearch ? "Không tìm thấy kết quả" : "Danh mục chưa có thiết bị";
-    const emptySub = hasSearch ? "Thử từ khóa khác hoặc xóa bộ lọc đang chọn" : "Khi thêm thiết bị vào danh mục này, sản phẩm sẽ tự động xuất hiện tại đây";
-    el.innerHTML = `<div class="empty"><div class="empty-icon">${hasSearch ? "😕" : "📭"}</div><div class="empty-title">${emptyTitle}</div><div class="empty-sub">${emptySub}</div></div>`;
+    const emptySub = hasSearch ? `<div class="empty-sub">Thử từ khóa khác hoặc xóa bộ lọc đang chọn</div>` : "";
+    el.innerHTML = `<div class="empty"><div class="empty-icon">${hasSearch ? "😕" : "📭"}</div><div class="empty-title">${emptyTitle}</div>${emptySub}</div>`;
     return;
   }
 
@@ -12560,9 +12808,9 @@ function getTransactionKind(tx){
 }
 function getTransactionKindLabel(tx){
   const kind = getTransactionKind(tx);
-  if(kind === "IMPORT") return "📥 Nhập thêm hàng";
-  if(kind === "ADJUST") return "⚙️ Điều chỉnh kho";
-  return "🛒 Giao dịch bán";
+  if(kind === "IMPORT") return "Nhập thêm hàng";
+  if(kind === "ADJUST") return "Điều chỉnh kho";
+  return "Giao dịch bán";
 }
 
 function getTransactionsForProduct(row){
@@ -12855,6 +13103,54 @@ function getTransactionProductDisplay(tx, fallbackRow){
   };
 }
 
+const TX_HISTORY_ICON_PATHS={
+  history:'<path d="M4 5.5h16v14H4z"></path><path d="M8 3v5M16 3v5M4 9.5h16M8 13h3M8 16h6"></path>',
+  calendar:'<rect x="3.5" y="5" width="17" height="15" rx="3"></rect><path d="M8 3v4M16 3v4M3.5 9.5h17M8 13h3M8 16h6"></path>',
+  list:'<rect x="4" y="4" width="16" height="16" rx="3"></rect><path d="M8 9h8M8 13h8M8 17h5"></path>',
+  sale:'<path d="M3 5h2l2 10h10l2-7H6"></path><circle cx="9" cy="19" r="1.4"></circle><circle cx="17" cy="19" r="1.4"></circle>',
+  import:'<path d="M12 3v11M8 10l4 4 4-4"></path><path d="M4 14v5h16v-5"></path>',
+  adjust:'<path d="M4 7h10M18 7h2M4 17h2M10 17h10"></path><circle cx="16" cy="7" r="2"></circle><circle cx="8" cy="17" r="2"></circle>',
+  money:'<rect x="3" y="5" width="18" height="14" rx="3"></rect><circle cx="12" cy="12" r="3"></circle><path d="M6 9h.01M18 15h.01"></path>',
+  box:'<path d="m4 8 8-4 8 4-8 4-8-4Z"></path><path d="m4 8v9l8 4 8-4V8M12 12v9"></path>',
+  id:'<rect x="3" y="5" width="18" height="14" rx="3"></rect><path d="M8 9h4M8 13h8M8 16h6"></path>',
+  quantity:'<path d="M5 7h14M5 17h14M8 4 6 20M16 4l-2 16"></path>',
+  price:'<path d="M20 13 13 20 4 11V4h7l9 9Z"></path><circle cx="8.5" cy="8.5" r="1.2"></circle>',
+  total:'<path d="M3 7h18v12H3zM3 10h18"></path><path d="M7 15h4"></path>',
+  serial:'<path d="M4 5v14M7 5v14M11 5v14M14 5v14M18 5v14M20 5v14"></path>',
+  note:'<path d="M5 3h11l3 3v15H5z"></path><path d="M15 3v5h4M8 12h8M8 16h6"></path>',
+  edit:'<path d="m4 20 4.5-1 10-10-3.5-3.5-10 10L4 20Z"></path><path d="m13.5 7 3.5 3.5"></path>',
+  trash:'<path d="M4 7h16M9 7V4h6v3M7 7l1 13h8l1-13M10 11v5M14 11v5"></path>',
+  clock:'<circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path>'
+};
+function txHistoryIcon(name,tone="blue"){
+  const safeTone=["blue","green","orange","purple","red","teal"].includes(tone)?tone:"blue";
+  return `<span class="tx-modern-icon ${safeTone}" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false">${TX_HISTORY_ICON_PATHS[name]||TX_HISTORY_ICON_PATHS.list}</svg></span>`;
+}
+function txHistoryKindView(tx){
+  const kind=getTransactionKind(tx);
+  if(kind==="IMPORT") return {icon:"import",tone:"orange"};
+  if(kind==="ADJUST") return {icon:"adjust",tone:"purple"};
+  return {icon:"sale",tone:"green"};
+}
+function txHistoryDateDisplay(value){
+  const match=String(value||"").match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  return match?`${match[3]}/${match[2]}/${match[1]}`:"";
+}
+function parseTxHistoryDateDisplay(value){
+  const match=String(value||"").trim().match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if(!match) return "";
+  const day=Number(match[1]),month=Number(match[2]),year=Number(match[3]);
+  const date=new Date(year,month-1,day);
+  if(date.getFullYear()!==year || date.getMonth()!==month-1 || date.getDate()!==day) return "";
+  return `${String(year).padStart(4,"0")}-${String(month).padStart(2,"0")}-${String(day).padStart(2,"0")}`;
+}
+function formatTxHistoryDateInput(input){
+  if(!input) return;
+  const digits=String(input.value||"").replace(/\D/g,"").slice(0,8);
+  input.value=digits.length>4?`${digits.slice(0,2)}/${digits.slice(2,4)}/${digits.slice(4)}`:digits.length>2?`${digits.slice(0,2)}/${digits.slice(2)}`:digits;
+  input.setCustomValidity("");
+}
+
 function renderTxHistory(){
   const idx = TX_HISTORY_STATE.idx;
   if(idx < 0 || !DATA[idx]) return;
@@ -12862,14 +13158,15 @@ function renderTxHistory(){
   const txs = getTransactionsForProduct(r);
   const filtered = sortTxHistoryRows(txHistoryFilteredRows(txs));
   const nvOptions = [...new Set(txs.map(t=>t.nv).filter(Boolean))];
-  document.getElementById("txModalTitle").innerHTML = `<span class="tx-title-icon">📋</span><span class="tx-title-text">${renderProductTitleWithCondition(r[2] || "Chưa có tên")}</span>`;
+  document.getElementById("txModalTitle").innerHTML = `<span class="tx-title-icon">${txHistoryIcon("history","blue")}</span><span class="tx-title-text">${renderProductTitleWithCondition(r[2] || "Chưa có tên")}</span>`;
   const dateVal = TX_HISTORY_STATE.date || "";
+  const dateDisplay = txHistoryDateDisplay(dateVal);
   const nvVal = TX_HISTORY_STATE.nv || "";
   const sortVal = TX_HISTORY_STATE.sort || "newest";
   const filterBar = `<div class="tx-filter">
     <div class="tx-filter-field">
-      <label class="tx-filter-label" for="txFilterDate">Ngày giao dịch (dd/mm/yyyy)</label>
-      <div class="tx-date-input${dateVal?" has-value":""}"><input type="date" id="txFilterDate" value="${dateVal}" aria-label="Ngày giao dịch theo định dạng ngày/tháng/năm" onchange="applyTxHistoryFilters()"></div>
+      <label class="tx-filter-label" for="txFilterDate">Chọn ngày giao dịch</label>
+      <div class="tx-date-input${dateVal?" has-value":""}">${txHistoryIcon("calendar","blue")}<input type="text" inputmode="numeric" id="txFilterDate" value="${dateDisplay}" placeholder="dd/mm/yyyy" maxlength="10" pattern="[0-9]{2}/[0-9]{2}/[0-9]{4}" autocomplete="off" aria-label="Ngày giao dịch theo định dạng ngày/tháng/năm" oninput="formatTxHistoryDateInput(this)" onchange="applyTxHistoryFilters()" onkeydown="if(event.key==='Enter'){event.preventDefault();applyTxHistoryFilters()}"></div>
     </div>
     <div class="tx-filter-field">
       <label class="tx-filter-label" for="txFilterNV">Nhân viên</label>
@@ -12886,7 +13183,7 @@ function renderTxHistory(){
         <option value="employee" ${sortVal==="employee"?"selected":""}>Theo nhân viên</option>
       </select>
     </div>
-    <button type="button" class="tx-clear-filter" onclick="clearTxHistoryFilters()">🗑️ Xóa lọc</button>
+    <button type="button" class="tx-clear-filter" onclick="clearTxHistoryFilters()">${txHistoryIcon("trash","red")}<span>Xóa lọc</span></button>
   </div>`;
   if(!txs.length){
     document.getElementById("txModalBody").innerHTML = filterBar + `<div style="text-align: center; padding: 20px; color: #888;">Chưa có giao dịch nào</div>`;
@@ -12898,32 +13195,33 @@ function renderTxHistory(){
   const totalImportedQty = importedRows.reduce((s,t)=>s + Math.abs(Number(t.qty) || 0),0);
   const totalGia = soldRows.reduce((s,t)=>s+(Number(t.gia)||0)*Math.abs(Number(t.qty)||0),0);
   const summary = `<div class="tx-summary tx-kpi-grid">
-      <div class="tx-kpi"><span class="tx-kpi-icon">◉</span><span><small>Hiển thị</small><b>${filtered.length}</b></span></div>
-      <div class="tx-kpi tx-kpi-out"><span class="tx-kpi-icon">⇧</span><span><small>Đã xuất</small><b>${totalSoldQty}</b></span></div>
-      <div class="tx-kpi tx-kpi-in"><span class="tx-kpi-icon">⇩</span><span><small>Đã nhập</small><b>${totalImportedQty}</b></span></div>
-      <div class="tx-kpi tx-kpi-money"><span class="tx-kpi-icon">◉</span><span><small>Doanh thu</small><b>${fmt(totalGia)}</b></span></div>
+      <div class="tx-kpi"><span class="tx-kpi-icon tx-modern-icon blue" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false">${TX_HISTORY_ICON_PATHS.list}</svg></span><span><small>Hiển thị</small><b>${filtered.length}</b></span></div>
+      <div class="tx-kpi tx-kpi-out"><span class="tx-kpi-icon tx-modern-icon green" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false">${TX_HISTORY_ICON_PATHS.sale}</svg></span><span><small>Đã xuất</small><b>${totalSoldQty}</b></span></div>
+      <div class="tx-kpi tx-kpi-in"><span class="tx-kpi-icon tx-modern-icon orange" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false">${TX_HISTORY_ICON_PATHS.import}</svg></span><span><small>Đã nhập</small><b>${totalImportedQty}</b></span></div>
+      <div class="tx-kpi tx-kpi-money"><span class="tx-kpi-icon tx-modern-icon teal" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false">${TX_HISTORY_ICON_PATHS.money}</svg></span><span><small>Doanh thu</small><b>${fmt(totalGia)}</b></span></div>
     </div>`;
   const rows = filtered.length ? filtered.map(t=>{
         const productDisplay=getTransactionProductDisplay(t,r);
         const unitDetailText=(Array.isArray(t.unitDetails)&&t.unitDetails.length?t.unitDetails.map(item=>item.serial?`${item.id} · Serial ${item.serial}`:item.id):(Array.isArray(t.unitIds)?t.unitIds:[])).join(" | ");
+        const kindView=txHistoryKindView(t);
         return `
         <div class="tx-row">
           <div class="tx-header">
-	            <span class="tx-nv"><span class="tx-person">${renderNVAvatar(t.nv)} <span class="tx-name">${escapeHtml(t.nv || "")}</span> ${renderNVRoleBadge(t.nv)}</span><span class="tx-pill tx-kind" style="${getTransactionKind(t)==="IMPORT" ? "background:#E8F8F0;color:#1E8449;border:1px solid #A9DFBF;" : getTransactionKind(t)==="ADJUST" ? "background:#FEF9E7;color:#7D6608;border:1px solid #F7DC6F;" : "background:#FDEDEC;color:#C0392B;border:1px solid #F5B7B1;"}">${getTransactionKindLabel(t)}</span></span>
+	            <span class="tx-nv"><span class="tx-person">${renderNVAvatar(t.nv)} <span class="tx-name">${escapeHtml(t.nv || "")}</span> ${renderNVRoleBadge(t.nv)}</span><span class="tx-pill tx-kind" style="${getTransactionKind(t)==="IMPORT" ? "background:#FFF4DD;color:#B96800;border:1px solid #F3C87A;" : getTransactionKind(t)==="ADJUST" ? "background:#F2EAFC;color:#6F42A5;border:1px solid #D9C2F0;" : "background:#E7F8ED;color:#147A39;border:1px solid #A9DCB9;"}">${txHistoryIcon(kindView.icon,kindView.tone)}<span>${getTransactionKindLabel(t)}</span></span></span>
             <div class="tx-head-right">
-              <span class="tx-time">${formatTxTime(t.time)}</span>
-              ${hasEmployeePermission("TRANSACTION_EDIT")?`<button class="tx-action tx-edit" title="Sửa ngày giờ và thông tin giao dịch" onclick="event.stopPropagation(); editTX('${escapeHtml(t.id)}')">📅 Sửa ngày giờ</button><button class="tx-action tx-delete" title="Xóa giao dịch" onclick="event.stopPropagation(); deleteTX('${escapeHtml(t.id)}')">🗑️</button>`:""}
+              <span class="tx-time">${txHistoryIcon("clock","blue")}<span>${formatTxTime(t.time)}</span></span>
+              ${hasEmployeePermission("TRANSACTION_EDIT")?`<button class="tx-action tx-edit" title="Sửa ngày giờ và thông tin giao dịch" onclick="event.stopPropagation(); editTX('${escapeHtml(t.id)}')">${txHistoryIcon("edit","blue")}<span class="tx-action-label">Sửa ngày giờ</span></button><button class="tx-action tx-delete" title="Xóa giao dịch" aria-label="Xóa giao dịch" onclick="event.stopPropagation(); deleteTX('${escapeHtml(t.id)}')">${txHistoryIcon("trash","red")}</button>`:""}
             </div>
           </div>
 	          <div class="tx-detail-grid">
-	            <div><span>📦 Sản phẩm</span><b>${escapeHtml(productDisplay.currentName)}${productDisplay.changed?`<small class="tx-historical-name">Tên lúc giao dịch: ${escapeHtml(productDisplay.historicalName)}</small>`:""}</b></div>
-	            <div><span>#️⃣ Mã giao dịch</span><b>${escapeHtml(String(t.id||""))}</b></div>
-	            <div><span>🏷️ Số lượng</span><b>${Math.abs(Number(t.qty)||0)}</b></div>
-	            <div><span>🪙 Đơn giá</span><b>${t.gia>0?fmt(t.gia):"Không ghi giá"}</b></div>
-	            <div class="tx-total"><span>💰 Thành tiền</span><b>${fmt((Number(t.gia)||0)*Math.abs(Number(t.qty)||0))}</b></div>
-	            ${unitDetailText?`<div class="tx-total"><span>🔢 Serial / mã cá thể</span><b>${escapeHtml(unitDetailText)}</b></div>`:""}
+	            <div><span class="tx-detail-label">${txHistoryIcon("box","blue")}<span>Sản phẩm</span></span><b>${escapeHtml(productDisplay.currentName)}${productDisplay.changed?`<small class="tx-historical-name">Tên lúc giao dịch: ${escapeHtml(productDisplay.historicalName)}</small>`:""}</b></div>
+	            <div><span class="tx-detail-label">${txHistoryIcon("id","purple")}<span>Mã giao dịch</span></span><b>${escapeHtml(String(t.id||""))}</b></div>
+	            <div><span class="tx-detail-label">${txHistoryIcon("quantity","orange")}<span>Số lượng</span></span><b>${Math.abs(Number(t.qty)||0)}</b></div>
+	            <div><span class="tx-detail-label">${txHistoryIcon("price","teal")}<span>Đơn giá</span></span><b>${t.gia>0?fmt(t.gia):"Không ghi giá"}</b></div>
+	            <div class="tx-total"><span class="tx-detail-label">${txHistoryIcon("total","green")}<span>Thành tiền</span></span><b>${fmt((Number(t.gia)||0)*Math.abs(Number(t.qty)||0))}</b></div>
+	            ${unitDetailText?`<div class="tx-total"><span class="tx-detail-label">${txHistoryIcon("serial","purple")}<span>Serial / mã cá thể</span></span><b>${escapeHtml(unitDetailText)}</b></div>`:""}
 	          </div>
-          ${t.ghi?`<span class="tx-note">📝 ${escapeHtml(t.ghi)}</span>`:""}
+          ${t.ghi?`<span class="tx-note">${txHistoryIcon("note","orange")}<span>${escapeHtml(t.ghi)}</span></span>`:""}
           ${renderSameDayEmployeeLinks(t, r)}
           ${t.img?`<img class="tx-img" src="${escapeHtml(t.img)}" alt="Ảnh giao dịch" referrerpolicy="no-referrer" onclick="openImageViewer(this.src, this.alt)" onerror="this.style.display='none';">`:""}
           ${(t.warranty1||t.warranty2)?`<div class="prod-media">
@@ -12939,7 +13237,18 @@ function applyTxHistoryFilters(){
   const dateEl = document.getElementById("txFilterDate");
   const nvEl = document.getElementById("txFilterNV");
   const sortEl = document.getElementById("txFilterSort");
-  if(dateEl) TX_HISTORY_STATE.date = dateEl.value || "";
+  if(dateEl){
+    const rawDate=String(dateEl.value||"").trim();
+    const parsedDate=rawDate?parseTxHistoryDateDisplay(rawDate):"";
+    if(rawDate && !parsedDate){
+      dateEl.setCustomValidity("Vui lòng nhập ngày đúng định dạng dd/mm/yyyy, ví dụ 09/08/2026.");
+      dateEl.reportValidity();
+      showToast("Ngày phải theo định dạng dd/mm/yyyy",3200);
+      return;
+    }
+    dateEl.setCustomValidity("");
+    TX_HISTORY_STATE.date=parsedDate;
+  }
   if(nvEl) TX_HISTORY_STATE.nv = nvEl.value || "";
   if(sortEl) TX_HISTORY_STATE.sort = sortEl.value || "newest";
   renderTxHistory();
@@ -15422,20 +15731,29 @@ const HEADER_COLLAPSE_PREF_KEY = "kho_cntt_header_collapsed";
 let headerTransitioning = false;
 let headerTransitionTimer = null;
 let headerManualLockUntil = 0;
-let mobileHeaderGestureTimer = null;
-function setHeaderCollapsed(collapsed, persist=false){
+let headerAutoScrollGuardUntil = 0;
+function setHeaderCollapsed(collapsed, persist=false, options={}){
   const sticky = document.querySelector('.sticky');
   if(!sticky) return;
   const isCollapsed = Boolean(collapsed);
-  if(sticky.classList.contains('collapsed') === isCollapsed) return;
+  if(sticky.classList.contains('collapsed') === isCollapsed) return false;
+  const automatic = Boolean(options.automatic);
+  const instant = automatic || Boolean(options.instant);
+  const preserveAnchor = options.preserveAnchor !== false;
   const probeY=Math.min(window.innerHeight-20,(sticky.getBoundingClientRect().bottom||0)+12);
-  const anchor=[...document.querySelectorAll("#results .card[data-index],#results .product-list-row[data-index],#results .group-header[id]")]
-    .find(el=>el.getBoundingClientRect().bottom>probeY);
+  const probeX=Math.max(12,Math.min(window.innerWidth-12,window.innerWidth/2));
+  const hit=preserveAnchor ? document.elementFromPoint(probeX,probeY) : null;
+  let anchor=hit?.closest?.("#results .card[data-index],#results .product-list-row[data-index],#results .group-header[id]") || null;
+  if(preserveAnchor && !anchor){
+    anchor=[...document.querySelectorAll("#results .card[data-index],#results .product-list-row[data-index],#results .group-header[id]")]
+      .find(el=>el.getBoundingClientRect().bottom>probeY) || null;
+  }
   const anchorTop=anchor?.getBoundingClientRect().top;
   headerTransitioning = true;
   clearTimeout(headerTransitionTimer);
   const touchLike = window.matchMedia("(hover:none),(pointer:coarse)").matches;
-  headerTransitionTimer = setTimeout(()=>{ headerTransitioning = false; }, touchLike ? 100 : 430);
+  headerTransitionTimer = setTimeout(()=>{ headerTransitioning = false; }, instant ? 150 : (touchLike ? 100 : 430));
+  if(instant) sticky.classList.add('header-auto-changing');
   sticky.classList.toggle('collapsed', isCollapsed);
   const btn = document.getElementById('headerToggleBtn');
   document.getElementById('headerToggleIcon').textContent = isCollapsed ? '▼' : '▲';
@@ -15450,14 +15768,17 @@ function setHeaderCollapsed(collapsed, persist=false){
     const restoreAnchor=()=>{
       if(!anchor.isConnected) return;
       const delta=anchor.getBoundingClientRect().top-anchorTop;
-      if(Math.abs(delta)>1) window.scrollBy({top:delta,left:0,behavior:"auto"});
+      if(Math.abs(delta)>1){
+        if(automatic) headerAutoScrollGuardUntil=performance.now()+240;
+        window.scrollBy({top:delta,left:0,behavior:"auto"});
+      }
     };
-    // Mobile đã tắt transition chiều cao: bù vị trí ngay trong cùng lượt bố cục để
-    // không xuất hiện hai nhịp nhảy. Desktop vẫn chờ transition hoàn tất khung hình.
-    if(touchLike) restoreAnchor();
+    // Automatic changes are instant, so compensation happens in the same layout pass.
+    if(instant) restoreAnchor();
     else requestAnimationFrame(()=>requestAnimationFrame(restoreAnchor));
   }
-  setTimeout(updateSearchFixedState, 0);
+  if(instant) requestAnimationFrame(()=>sticky.classList.remove('header-auto-changing'));
+  return true;
 }
 function toggleHeader(){
   const sticky = document.querySelector('.sticky');
@@ -15469,114 +15790,79 @@ function openHeaderFilters(){
   setTimeout(()=>document.getElementById('tabs')?.scrollIntoView({block:'nearest', behavior:'smooth'}), 80);
 }
 function restoreHeaderState(){
-  try{ setHeaderCollapsed(localStorage.getItem(HEADER_COLLAPSE_PREF_KEY) === '1', false); }catch(e){}
+  try{ setHeaderCollapsed(localStorage.getItem(HEADER_COLLAPSE_PREF_KEY) === '1', false, {instant:true, preserveAnchor:false}); }catch(e){}
 }
 function setupHeaderAutoCollapse(){
-  let previousY = window.scrollY;
-  let ticking = false;
-  let downwardDistance = 0;
-  let upwardDistance = 0;
-  let desktopWheelUpSteps = 0;
-  let desktopWheelDownSteps = 0;
-  let desktopWheelResetTimer = null;
-  let touchStartY = null;
-  let downwardSwipeCount = 0;
-  let lastDownwardSwipeAt = 0;
+  const sticky=document.querySelector('.sticky');
+  if(!sticky) return;
+  let previousY=Math.max(0,window.scrollY);
+  let ticking=false;
+  let direction=0;
+  let intentDistance=0;
+  let lastMovementAt=0;
+  let cooldownUntil=0;
+  const resetIntent=()=>{
+    direction=0;
+    intentDistance=0;
+  };
+  const interactionBlocksAutoToggle=()=>{
+    const search=document.getElementById('search');
+    return document.activeElement===search
+      || Boolean(document.querySelector('.search-suggestions.open,.overlay.open'))
+      || sticky.classList.contains('suggestions-open')
+      || sticky.classList.contains('kpi-menu-open')
+      || sticky.classList.contains('recent-activity-open')
+      || document.body.classList.contains('fab-menu-open');
+  };
   window.addEventListener('scroll', ()=>{
     if(ticking) return;
-    ticking = true;
+    ticking=true;
     requestAnimationFrame(()=>{
-      const y = Math.max(0, window.scrollY);
-      const delta = y - previousY;
-      previousY = y;
-      ticking = false;
-      if(headerTransitioning || Date.now() < headerManualLockUntil) return;
-      if(window.matchMedia("(hover:none),(pointer:coarse)").matches){
-        downwardDistance=0;
-        upwardDistance=0;
+      ticking=false;
+      const now=performance.now();
+      const y=Math.max(0,window.scrollY);
+      const delta=y-previousY;
+      previousY=y;
+      if(now<headerAutoScrollGuardUntil){
+        resetIntent();
         return;
       }
-      if(document.activeElement === document.getElementById('search') || document.querySelector('.search-suggestions.open')){
-        downwardDistance = 0;
-        upwardDistance = 0;
+      if(headerTransitioning || Date.now()<headerManualLockUntil || interactionBlocksAutoToggle()){
+        resetIntent();
         return;
       }
-      // Máy tính thường phát nhiều bước cuộn nhỏ: cộng dồn để tự thu gọn ổn định.
-      if(delta > 0){
-        downwardDistance += delta;
-        upwardDistance = 0;
-      } else if(delta < 0){
-        upwardDistance += Math.abs(delta);
-        downwardDistance = 0;
+      if(y<=52){
+        resetIntent();
+        if(sticky.classList.contains('collapsed')){
+          setHeaderCollapsed(false,false,{automatic:true});
+          cooldownUntil=now+700;
+        }
+        return;
       }
-      // Chỉ tự thu khi đã cuộn đủ xa; không tự mở lại theo từng cú vuốt ngược nhỏ,
-      // vì việc đổi chiều cao header liên tục trên điện thoại tạo cảm giác trang bị nhảy.
-      if(y < 40){
-        downwardDistance = 0;
-        upwardDistance = 0;
-        setHeaderCollapsed(false, false);
-      } else if(y > 130 && downwardDistance >= 56){
-        downwardDistance = 0;
-        setHeaderCollapsed(true, false);
-      } else if(window.innerWidth > 768
-        && document.querySelector('.sticky')?.classList.contains('collapsed')
-        && upwardDistance >= 180){
-        // Trên máy tính: khoảng 3–4 nấc lăn ngược sẽ mở lại toàn bộ đầu trang.
-        upwardDistance = 0;
-        setHeaderCollapsed(false, false);
+      const magnitude=Math.abs(delta);
+      if(magnitude<2 || now<cooldownUntil) return;
+      const nextDirection=delta>0 ? 1 : -1;
+      // Separate gestures must not accumulate over a long reading pause.
+      if(nextDirection!==direction || now-lastMovementAt>340){
+        direction=nextDirection;
+        intentDistance=0;
+      }
+      lastMovementAt=now;
+      // Cap a single sample so browser momentum or a programmatic jump cannot toggle by itself.
+      intentDistance+=Math.min(magnitude,48);
+      const touchLike=window.matchMedia("(hover:none),(pointer:coarse)").matches;
+      const collapsed=sticky.classList.contains('collapsed');
+      const collapseAtY=touchLike ? 230 : 180;
+      const collapseIntent=touchLike ? 150 : 110;
+      const expandIntent=touchLike ? 170 : 125;
+      if(!collapsed && direction>0 && y>=collapseAtY && intentDistance>=collapseIntent){
+        resetIntent();
+        if(setHeaderCollapsed(true,false,{automatic:true})) cooldownUntil=now+760;
+      } else if(collapsed && direction<0 && intentDistance>=expandIntent){
+        resetIntent();
+        if(setHeaderCollapsed(false,false,{automatic:true})) cooldownUntil=now+760;
       }
     });
-  }, {passive:true});
-  // Trên điện thoại, nhận diện theo từng cử chỉ touchstart/touchend để một lần vuốt
-  // không bị đếm thành nhiều sự kiện scroll. Hai lần vuốt xuống liên tiếp sẽ mở header.
-  // Bắt trực tiếp con lăn trên máy tính vì sticky có thể làm scrollY thay đổi quá ít.
-  window.addEventListener('wheel', event=>{
-    if(headerTransitioning || Date.now()<headerManualLockUntil) return;
-    const sticky=document.querySelector('.sticky');
-    const delta=Number(event.deltaY)||0;
-    if(!sticky?.classList.contains('collapsed')){
-      desktopWheelUpSteps=0;
-      if(document.querySelector('.search-suggestions.open') || document.querySelector('.overlay.open')) return;
-      if(delta>0) desktopWheelDownSteps+=1;
-      else if(delta<0) desktopWheelDownSteps=0;
-      clearTimeout(desktopWheelResetTimer);
-      desktopWheelResetTimer=setTimeout(()=>{ desktopWheelDownSteps=0; },1100);
-      if(desktopWheelDownSteps>=3){
-        desktopWheelDownSteps=0;
-        setHeaderCollapsed(true,false);
-      }
-      return;
-    }
-    desktopWheelDownSteps=0;
-    if(document.querySelector('.search-suggestions.open') || document.querySelector('.overlay.open')) return;
-    if(delta<0) desktopWheelUpSteps+=1;
-    else if(delta>0) desktopWheelUpSteps=0;
-    clearTimeout(desktopWheelResetTimer);
-    desktopWheelResetTimer=setTimeout(()=>{ desktopWheelUpSteps=0; },1100);
-    if(desktopWheelUpSteps>=3){
-      desktopWheelUpSteps=0;
-      setHeaderCollapsed(false,false);
-    }
-  }, {passive:true});
-  window.addEventListener('touchstart', e=>{
-    touchStartY = e.changedTouches?.[0]?.clientY ?? null;
-  }, {passive:true});
-  window.addEventListener('touchend', e=>{
-    if(touchStartY===null) return;
-    const endY = e.changedTouches?.[0]?.clientY;
-    const distance = Number.isFinite(endY) ? endY-touchStartY : 0;
-    touchStartY = null;
-    const sticky = document.querySelector('.sticky');
-    if(document.activeElement===document.getElementById('search') || document.querySelector('.search-suggestions.open') || document.querySelector('.overlay.open')) return;
-    clearTimeout(mobileHeaderGestureTimer);
-    const nextState = distance<=-70 && !sticky?.classList.contains('collapsed')
-      ? true
-      : (distance>=70 && sticky?.classList.contains('collapsed') ? false : null);
-    if(nextState!==null){
-      // Đợi quán tính vuốt kết thúc một nhịp ngắn rồi mới đổi chiều cao đầu trang,
-      // tránh Safari vừa cuộn vừa thay layout gây rung liên tục.
-      mobileHeaderGestureTimer=setTimeout(()=>setHeaderCollapsed(nextState,false),90);
-    }
   }, {passive:true});
 }
 restoreHeaderState();
@@ -15586,14 +15872,40 @@ let scrollBtnsTimer;
 function setupScrollButtonsAutoHide(){
   const controls = [...document.querySelectorAll(".side-control-rail")];
   if(!controls.length) return;
-  const hideControlsWhileMoving=()=>{
-    controls.forEach(control=>control.classList.add("is-hidden"));
+  let ticking=false;
+  let previousY=Math.max(0,window.scrollY);
+  let pointerInside=false;
+  const setHidden=hidden=>controls.forEach(control=>control.classList.toggle("is-hidden",hidden));
+  const scheduleIdleShow=()=>{
     clearTimeout(scrollBtnsTimer);
-    scrollBtnsTimer = setTimeout(()=>controls.forEach(control=>control.classList.remove("is-hidden")), 520);
+    scrollBtnsTimer=setTimeout(()=>{
+      if(!pointerInside && !document.body.classList.contains('fab-menu-open')) setHidden(false);
+    },760);
   };
-  window.addEventListener("scroll", hideControlsWhileMoving, {passive: true});
-  window.addEventListener("wheel", hideControlsWhileMoving, {passive: true});
-  window.addEventListener("touchmove", hideControlsWhileMoving, {passive: true});
+  controls.forEach(control=>{
+    control.addEventListener('pointerenter',()=>{ pointerInside=true; setHidden(false); clearTimeout(scrollBtnsTimer); });
+    control.addEventListener('pointerleave',()=>{ pointerInside=false; scheduleIdleShow(); });
+    control.addEventListener('focusin',()=>{ pointerInside=true; setHidden(false); clearTimeout(scrollBtnsTimer); });
+    control.addEventListener('focusout',()=>{ pointerInside=false; scheduleIdleShow(); });
+  });
+  window.addEventListener("scroll",()=>{
+    if(ticking) return;
+    ticking=true;
+    requestAnimationFrame(()=>{
+      ticking=false;
+      const y=Math.max(0,window.scrollY);
+      const moved=Math.abs(y-previousY);
+      previousY=y;
+      if(y<50){
+        setHidden(false);
+        clearTimeout(scrollBtnsTimer);
+        return;
+      }
+      if(moved<3 || pointerInside || document.querySelector('.overlay.open')) return;
+      setHidden(true);
+      scheduleIdleShow();
+    });
+  },{passive:true});
 }
 setupScrollButtonsAutoHide();
 
@@ -15838,11 +16150,10 @@ function updateSearchFixedState(){
   if(!box || !spacer) return;
   // Toàn bộ header đã dùng position:sticky. Giữ ô tìm kiếm trong luồng bố cục
   // trên cả PC và điện thoại để không bị nhảy vị trí khi vừa cuộn vừa thu header.
-  box.classList.remove("is-fixed");
-  spacer.classList.remove("on");
-  spacer.style.height = "0px";
+  if(box.classList.contains("is-fixed")) box.classList.remove("is-fixed");
+  if(spacer.classList.contains("on")) spacer.classList.remove("on");
+  if(spacer.style.height !== "0px") spacer.style.height = "0px";
 }
-window.addEventListener("scroll", updateSearchFixedState, {passive: true});
 window.addEventListener("resize", updateSearchFixedState, {passive: true});
 window.addEventListener("load", updateSearchFixedState);
 
