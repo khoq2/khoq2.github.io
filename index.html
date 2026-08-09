@@ -891,9 +891,9 @@ body.employee-mode .card-actions.admin-only.employee-permitted { display:grid!im
 .admin-password-wrap { position:relative; }
 .admin-password-wrap input { width:100%; min-height:48px; padding:11px 48px 11px 13px; border:1.5px solid #C8D7E3; border-radius:11px; background:#fff; color:#1E3A5F; font-size:15px; font-weight:750; outline:none; transition:border-color .16s ease,box-shadow .16s ease; }
 .admin-password-wrap input:focus { border-color:#2E86C1; box-shadow:0 0 0 4px rgba(46,134,193,.13); }
-#adminOverlay .admin-password-toggle,#syncErrorOverlay .admin-password-toggle { position:absolute; z-index:2; top:6px; right:5px; display:grid; place-items:center; width:38px; height:36px; margin:0; padding:0; transform:none; border:0; border-radius:9px; background:transparent; color:#1A5276; cursor:pointer; }
-#adminOverlay .admin-password-toggle:hover,#syncErrorOverlay .admin-password-toggle:hover { transform:none; background:#EDF4F8; }
-#adminOverlay .admin-password-toggle svg,#syncErrorOverlay .admin-password-toggle svg { display:block; width:20px; height:20px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; pointer-events:none; }
+#adminOverlay .admin-password-toggle,#syncErrorOverlay .admin-password-toggle,#privateAccessOverlay .admin-password-toggle { position:absolute; z-index:2; top:6px; right:5px; display:grid; place-items:center; width:38px; height:36px; margin:0; padding:0; transform:none; border:0; border-radius:9px; background:transparent; color:#1A5276; cursor:pointer; }
+#adminOverlay .admin-password-toggle:hover,#syncErrorOverlay .admin-password-toggle:hover,#privateAccessOverlay .admin-password-toggle:hover { transform:none; background:#EDF4F8; }
+#adminOverlay .admin-password-toggle svg,#syncErrorOverlay .admin-password-toggle svg,#privateAccessOverlay .admin-password-toggle svg { display:block; width:20px; height:20px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; pointer-events:none; }
 .admin-login-actions { display:grid; grid-template-columns:.85fr 1.15fr; gap:9px; margin-top:16px; }
 .admin-login-actions .btn-cancel,.admin-login-actions .btn-submit { min-height:45px; margin:0; padding:10px; border-radius:11px; font-size:13px; }
 .admin-login-actions .btn-submit { background:linear-gradient(135deg,#1E3A5F,#2E86C1); box-shadow:0 5px 13px rgba(30,58,95,.24); }
@@ -6487,6 +6487,7 @@ body.fab-menu-open .side-control-rail{
   box-shadow:0 6px 16px rgba(17,122,75,.24)!important;
 }
 .side-control-rail #employeeDockButton:active{background:linear-gradient(135deg,#176B3B,#0E6251)!important}
+.side-control-rail #employeeDockButton[hidden]{display:none!important}
 .side-control-rail .macos-dock-app-icon,
 .side-control-rail .macos-dock-customer,
 .side-control-rail .macos-dock-partner,
@@ -6667,7 +6668,8 @@ body .card .nguoi-ban-row::after{display:none!important}
 body .card .nguoi-ban-row.has-transaction{
   display:grid!important;
   grid-template-columns:26px minmax(0,1fr)!important;
-  grid-template-rows:1fr!important;
+  grid-template-rows:auto!important;
+  align-items:center!important;
   min-height:48px!important;
   padding:7px 8px!important;
   column-gap:7px!important;
@@ -6690,7 +6692,19 @@ body .card .nguoi-ban-row.has-transaction>.nguoi-ban-label{
 }
 body .card .nguoi-ban-row.has-transaction>.nguoi-ban-count{
   display:flex!important;grid-column:2!important;grid-row:1!important;
-  min-width:0!important;max-width:none!important;justify-content:flex-start!important
+  width:100%!important;min-width:0!important;max-width:none!important;
+  justify-content:flex-start!important;align-items:center!important;
+  flex-wrap:wrap!important;column-gap:5px!important;row-gap:3px!important;
+  overflow:visible!important;white-space:normal!important;line-height:1.35!important
+}
+body .card .nguoi-ban-row.has-transaction .nv-role-badge{
+  flex:0 0 auto!important
+}
+body .card .nguoi-ban-row.has-transaction .nguoi-ban-latest-text{
+  display:block!important;flex:1 1 150px!important;min-width:0!important;
+  overflow:visible!important;white-space:normal!important;
+  text-overflow:clip!important;overflow-wrap:break-word!important;
+  word-break:normal!important;line-height:1.35!important
 }
 body.admin-mode .card .nguoi-ban-row.has-transaction{
   grid-template-columns:26px minmax(0,1fr) auto!important;
@@ -6730,7 +6744,7 @@ body.admin-mode .card .nguoi-ban-row.no-transaction>.nguoi-ban-history-link{
 @media(max-width:600px){
   body .card .nguoi-ban-row.has-transaction{
     grid-template-columns:24px minmax(0,1fr)!important;
-    grid-template-rows:1fr!important;
+    grid-template-rows:auto!important;
     min-height:48px!important;
     padding:7px!important;
     column-gap:5px!important;
@@ -7229,13 +7243,13 @@ body .warehouse-switch.warehouse-switch-changing .warehouse-pin{
     </div>
   </div>
 
-  <nav class="macos-dock" id="customerQrDock" aria-label="Đăng nhập nhân viên, khách hàng, đối tác và QR Code">
-    <button class="macos-dock-app" id="employeeDockButton" data-dock-index="0" type="button" aria-label="NHÂN VIÊN" aria-haspopup="dialog" aria-controls="privateAccessOverlay" title="Đăng nhập tài khoản nhân viên" onclick="toggleEmployeeAccess()">
+  <nav class="macos-dock" id="customerQrDock" aria-label="Khách hàng, đối tác và QR Code">
+    <button class="macos-dock-app" id="employeeDockButton" data-dock-index="0" type="button" aria-label="Tài khoản nhân viên đang đăng nhập" title="Tài khoản nhân viên đang đăng nhập" onclick="toggleEmployeeAccess()" hidden>
       <span class="macos-dock-app-icon macos-dock-employee" aria-hidden="true">
         <svg viewBox="0 0 24 24"><circle cx="12" cy="7" r="4"></circle><path d="M4 21c.25-5.2 2.9-7.8 8-7.8s7.75 2.6 8 7.8H4Z"></path><path d="M17.5 3.5 20 6l-2.5 2.5" opacity=".75"></path></svg>
       </span>
-      <span class="macos-dock-mobile-label" id="employeeDockLabel">NHÂN VIÊN</span>
-      <span class="macos-dock-tooltip" id="employeeDockTooltip" aria-hidden="true">ĐĂNG NHẬP NHÂN VIÊN</span>
+      <span class="macos-dock-mobile-label" id="employeeDockLabel"></span>
+      <span class="macos-dock-tooltip" id="employeeDockTooltip" aria-hidden="true"></span>
     </button>
 
     <button class="macos-dock-app" id="customerDockButton" data-dock-index="1" type="button" aria-label="KHÁCH HÀNG" aria-haspopup="dialog" aria-controls="privateAccessOverlay" title="Mở hồ sơ khách hàng" onclick="requestPrivateAccess('customer')">
@@ -7752,11 +7766,11 @@ body .warehouse-switch.warehouse-switch-changing .warehouse-pin{
   <div class="modal private-access-modal" role="dialog" aria-modal="true" aria-labelledby="privateAccessTitle" onclick="event.stopPropagation()">
     <div class="private-access-badge" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="11" rx="3"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v3"></path></svg></div>
     <h2 class="private-access-title" id="privateAccessTitle">ĐĂNG NHẬP</h2>
-    <p class="private-access-subtitle" id="privateAccessSubtitle">Chọn tên nhân viên và nhập mật khẩu đã được Admin cấp.</p>
-    <input id="privateAccessEmployee" class="employee-login-name" type="text" list="privateAccessEmployeeList" autocomplete="username" placeholder="Tên nhân viên (VD: Phúc)" onkeydown="if(event.key==='Enter')document.getElementById('privateAccessPassword')?.focus()">
+    <p class="private-access-subtitle" id="privateAccessSubtitle">Chọn tên đăng nhập và nhập mật khẩu do Admin cấp.</p>
+    <input id="privateAccessEmployee" class="employee-login-name" type="text" list="privateAccessEmployeeList" autocomplete="username" placeholder="Tên đăng nhập" onkeydown="if(event.key==='Enter')document.getElementById('privateAccessPassword')?.focus()">
     <datalist id="privateAccessEmployeeList"></datalist>
     <div class="admin-password-wrap">
-      <input id="privateAccessPassword" type="password" autocomplete="current-password" placeholder="Nhập mật khẩu" onkeydown="if(event.key==='Enter')submitPrivateAccess()">
+      <input id="privateAccessPassword" type="password" autocomplete="current-password" placeholder="Mật khẩu" onkeydown="if(event.key==='Enter')submitPrivateAccess()">
       <button type="button" class="admin-password-toggle" aria-label="Hiện hoặc ẩn mật khẩu" title="Hiện hoặc ẩn mật khẩu" onclick="const input=document.getElementById('privateAccessPassword');input.type=input.type==='password'?'text':'password';this.classList.toggle('password-visible',input.type==='text')"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"></path><circle cx="12" cy="12" r="2.7"></circle></svg></button>
     </div>
     <div class="private-access-error" id="privateAccessError" aria-live="polite"></div>
@@ -8376,10 +8390,17 @@ function hasAnyEmployeePermission(permissions){
 function updateEmployeeDock(){
   const button=document.getElementById("employeeDockButton"), label=document.getElementById("employeeDockLabel"), tooltip=document.getElementById("employeeDockTooltip");
   const active=!!employeeAccessToken && !!employeeAccessProfile?.name;
-  const name=active ? employeeAccessProfile.name : "NHÂN VIÊN";
-  if(label) label.textContent=active ? name : "NHÂN VIÊN";
-  if(tooltip) tooltip.textContent=active ? `${name} · BẤM ĐỂ ĐĂNG XUẤT` : "ĐĂNG NHẬP NHÂN VIÊN";
-  if(button){ button.classList.toggle("dock-active",active); button.title=active?`${name} đang đăng nhập · bấm để đăng xuất`:"Đăng nhập tài khoản nhân viên"; }
+  const name=active ? String(employeeAccessProfile.name).trim() : "";
+  if(label) label.textContent=name;
+  if(tooltip) tooltip.textContent=active ? `${name} · ĐÃ ĐĂNG NHẬP · BẤM ĐỂ ĐĂNG XUẤT` : "";
+  if(button){
+    button.hidden=!active;
+    button.tabIndex=active?0:-1;
+    button.classList.toggle("dock-active",active);
+    button.setAttribute("aria-hidden",active?"false":"true");
+    button.setAttribute("aria-label",active?`Tài khoản ${name} đang đăng nhập. Bấm để đăng xuất`:"Tài khoản nhân viên chưa đăng nhập");
+    button.title=active?`${name} đang đăng nhập · bấm để đăng xuất`:"";
+  }
 }
 function refreshEmployeePermissionUI(){
   const active=!!employeeAccessToken && !!employeeAccessProfile?.name;
@@ -8424,7 +8445,6 @@ function toggleEmployeeAccess(){
     if(confirm(`Đăng xuất tài khoản nhân viên ${employeeAccessProfile.name}?`)){ clearEmployeeSession(true); render(); }
     return;
   }
-  requestPrivateAccess("workspace");
 }
 
 function isAdminMode(){
@@ -14825,15 +14845,19 @@ function requestPrivateAccess(target){
   privateAccessTarget = target === "partner" ? "partner" : target === "workspace" ? "workspace" : "customer";
   if(privateAccessTarget==="customer" && hasPrivateFeatureAccess("customer")){ void openCustomerPanel(); return; }
   if(privateAccessTarget==="partner" && hasPrivateFeatureAccess("partner")){ void openPartnerPanel(); return; }
+  if(employeeAccessToken&&employeeAccessProfile){
+    const needed=privateAccessTarget==="partner"?"PARTNER_VIEW":privateAccessTarget==="customer"?"CUSTOMER_VIEW":"";
+    if(needed){ showToast(`Tài khoản ${employeeAccessProfile.name} chưa được cấp quyền ${EMPLOYEE_PERMISSION_LABELS[needed]}.`,4200); return; }
+  }
   const overlay=document.getElementById("privateAccessOverlay");
   const password=document.getElementById("privateAccessPassword");
   const employeeInput=document.getElementById("privateAccessEmployee");
   const list=document.getElementById("privateAccessEmployeeList");
   if(list) list.innerHTML=normalizeNVList(NV_LIST).map(nv=>`<option value="${escapeHtml(nv.name)}"></option>`).join("");
-  document.getElementById("privateAccessTitle").textContent=privateAccessTarget==="workspace"?"ĐĂNG NHẬP NHÂN VIÊN":"ĐĂNG NHẬP TRUY CẬP";
+  document.getElementById("privateAccessTitle").textContent="ĐĂNG NHẬP";
   document.getElementById("privateAccessSubtitle").textContent=privateAccessTarget==="workspace"
-    ? "Chọn tên nhân viên và nhập mật khẩu do Admin đặt trong mục Nhân viên."
-    : `Dùng tài khoản nhân viên đã được cấp quyền ${privateAccessTarget==="partner"?"xem Đối tác":"xem Khách hàng"}. Có thể để trống tên để dùng mật khẩu chung cũ.`;
+    ? "Chọn tên đăng nhập và nhập mật khẩu do Admin cấp."
+    : `Đăng nhập một lần bằng tài khoản nhân viên đã được cấp quyền ${privateAccessTarget==="partner"?"xem Đối tác":"xem Khách hàng"}.`;
   document.getElementById("privateAccessError").textContent="";
   if(employeeInput){ employeeInput.value=employeeAccessProfile?.name||""; employeeInput.disabled=false; }
   if(password){ password.value=""; password.type="password"; password.disabled=false; }
@@ -14859,7 +14883,7 @@ async function submitPrivateAccess(){
   const employeeInput=document.getElementById("privateAccessEmployee");
   const employeeName=String(employeeInput?.value||"").trim();
   const value=password?.value || "";
-  if(privateAccessTarget==="workspace" && !employeeName){ errorBox.textContent="Vui lòng chọn hoặc nhập đúng tên nhân viên."; employeeInput?.focus(); return; }
+  if(!employeeName){ errorBox.textContent="Vui lòng chọn hoặc nhập đúng tên đăng nhập."; employeeInput?.focus(); return; }
   if(!value){ errorBox.textContent="Vui lòng nhập mật khẩu."; password?.focus(); return; }
   privateAccessBusy=true;
   if(password) password.disabled=true;
@@ -14869,18 +14893,14 @@ async function submitPrivateAccess(){
   try{
     const verified=await fetchSheetJson(SHEET_API_URL,{
       method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},
-      body:JSON.stringify(employeeName?{action:"verify_employee_access",employee:employeeName,password:value}:{action:"verify_private_access",password:value})
+      body:JSON.stringify({action:"verify_employee_access",employee:employeeName,password:value})
     },20000);
-    if(!verified.token) throw new Error("API không cấp phiên truy cập riêng tư");
+    if(!verified.token) throw new Error("API không cấp phiên đăng nhập nhân viên");
     const target=privateAccessTarget;
-    if(employeeName){
-      if(!verified.employee) throw new Error("API chưa trả lại hồ sơ quyền của nhân viên");
-      setEmployeeSession(verified.token,verified.employee);
-      const needed=target==="customer"?"CUSTOMER_VIEW":target==="partner"?"PARTNER_VIEW":"";
-      if(needed && !hasEmployeePermission(needed)) throw new Error(`EMPLOYEE_PERMISSION_REQUIRED: Tài khoản ${verified.employee.name} chưa được cấp quyền ${EMPLOYEE_PERMISSION_LABELS[needed]}`);
-    }else{
-      privateAccessToken=verified.token;
-    }
+    if(!verified.employee) throw new Error("API chưa trả lại hồ sơ quyền của nhân viên");
+    setEmployeeSession(verified.token,verified.employee);
+    const needed=target==="customer"?"CUSTOMER_VIEW":target==="partner"?"PARTNER_VIEW":"";
+    if(needed && !hasEmployeePermission(needed)) throw new Error(`EMPLOYEE_PERMISSION_REQUIRED: Tài khoản ${verified.employee.name} chưa được cấp quyền ${EMPLOYEE_PERMISSION_LABELS[needed]}`);
     closePrivateAccess();
     if(target==="workspace"){
       render();
@@ -14889,8 +14909,7 @@ async function submitPrivateAccess(){
     else await openCustomerPanel();
   }catch(e){
     const message=String(e);
-    if(!employeeName) privateAccessToken="";
-    errorBox.textContent=message.includes("EMPLOYEE_PERMISSION_REQUIRED")?message.replace(/^.*EMPLOYEE_PERMISSION_REQUIRED:\s*/,""):message.includes("EMPLOYEE_LOGIN_FAILED")?"Sai tên nhân viên hoặc mật khẩu.":message.includes("PRIVATE_LOGIN_FAILED")?"Sai mật khẩu truy cập. Vui lòng thử lại.":message.includes("RATE_LIMIT")?"Đã thử sai nhiều lần. Vui lòng đợi 1 phút.":"Không thể xác thực với API. Hãy kiểm tra kết nối.";
+    errorBox.textContent=message.includes("EMPLOYEE_PERMISSION_REQUIRED")?message.replace(/^.*EMPLOYEE_PERMISSION_REQUIRED:\s*/,""):message.includes("EMPLOYEE_LOGIN_FAILED")?"Sai tên đăng nhập hoặc mật khẩu.":message.includes("RATE_LIMIT")?"Đã thử sai nhiều lần. Vui lòng đợi 1 phút.":"Không thể xác thực với API. Hãy kiểm tra kết nối.";
     password?.select();
   }finally{
     privateAccessBusy=false;
