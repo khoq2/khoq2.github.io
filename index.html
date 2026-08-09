@@ -3879,6 +3879,27 @@ body.home-landing-mode #homeInventoryBar #count{display:none!important}
     filter:drop-shadow(0 0 2px rgba(46,134,193,.28))!important;
     animation:nvNameShine 2.6s linear infinite!important;
   }
+
+  /* Windows thường bật prefers-reduced-motion nên tên vẫn quét nhưng các huy
+     hiệu ADMIN/KỸ THUẬT/MOD trong lịch sử lại đứng yên. Khôi phục riêng đúng
+     cửa sổ giao dịch; không bật hàng loạt trên mọi card để tránh nặng máy. */
+  body #txOverlay .nv-role-badge{
+    animation:nvRoleNeon 1.7s ease-in-out infinite alternate!important;
+    will-change:box-shadow!important;
+  }
+  body #txOverlay .nv-role-badge::after{
+    animation:nvRoleShine 2.35s ease-in-out infinite!important;
+    will-change:left,opacity!important;
+  }
+  body #txOverlay .nv-role-badge::before{
+    animation:nvRoleSparkle 1.45s linear infinite!important;
+    will-change:left,top,opacity,transform!important;
+  }
+  body #txOverlay .nv-role-badge > span:first-child,
+  body #txOverlay .nv-role-badge .nv-role-icon{
+    animation:nvRoleIconTwinkle 1.05s ease-in-out infinite alternate!important;
+    will-change:filter,transform!important;
+  }
 }
 
 /* Lớp cuối: đồng bộ tuyệt đối nút cuộn nhanh với List/Grid 2026. */
