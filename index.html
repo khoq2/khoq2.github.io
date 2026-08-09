@@ -91,6 +91,14 @@ button:disabled,input:disabled,select:disabled,[aria-disabled="true"] { cursor:n
 .recent-activity-copy { display:block; min-width:0; overflow:hidden; }
 .recent-activity-action { display:block; max-width:100%; overflow:hidden; color:#25394B; font-size:11px; font-weight:850; text-overflow:ellipsis; white-space:nowrap; }
 .recent-activity-product { display:block; max-width:100%; margin-top:2px; overflow:hidden; color:#6B7D8C; font-size:10px; text-overflow:ellipsis; white-space:nowrap; }
+.recent-activity-progress { --activity-progress-color:#22A559; display:block; width:100%; height:4px; margin-top:6px; overflow:hidden; border-radius:999px; background:#E8EEF3; box-shadow:inset 0 1px 2px rgba(30,58,95,.08); }
+.recent-activity-progress > i { display:block; width:var(--activity-progress,0%); height:100%; border-radius:inherit; background:var(--activity-progress-color); box-shadow:0 0 6px color-mix(in srgb,var(--activity-progress-color) 42%,transparent); transform-origin:left center; animation:recentActivityProgressIn .48s cubic-bezier(.22,.72,.25,1) var(--activity-progress-delay,0ms) both; }
+.recent-activity-progress.tone-green{--activity-progress-color:#20A957}
+.recent-activity-progress.tone-blue{--activity-progress-color:#2477E8}
+.recent-activity-progress.tone-violet{--activity-progress-color:#8B5CF6}
+.recent-activity-progress.tone-orange{--activity-progress-color:#F28C28}
+.recent-activity-progress.tone-red{--activity-progress-color:#ED4A54}
+@keyframes recentActivityProgressIn{from{transform:scaleX(0);opacity:.45}to{transform:scaleX(1);opacity:1}}
 .recent-activity-route { display:inline-flex; align-items:center; margin-left:4px; padding:2px 6px; border:1px solid #E5BD71; border-radius:999px; background:#FFF0CE; color:#865505; font-size:9px; font-weight:950; white-space:nowrap; vertical-align:1px; }
 .recent-activity-daily { display:block; max-width:100%; margin-top:5px; padding:5px 7px; border-radius:7px; background:#FFF0CE; color:#78500E; font-size:9px; font-weight:750; line-height:1.35; white-space:normal; }
 .recent-activity-daily b { font-weight:950; }
@@ -115,7 +123,7 @@ button:disabled,input:disabled,select:disabled,[aria-disabled="true"] { cursor:n
 .warehouse-switch.active .warehouse-pin::after { content:""; position:absolute; z-index:-1; left:50%; bottom:45%; width:13px; height:17px; border-radius:52% 48% 55% 45%; background:radial-gradient(circle at 50% 72%,#FFF59D 0 18%,#FFB000 24% 48%,#F44336 55% 76%,transparent 80%); opacity:.82; transform:translateX(-50%) rotate(4deg); animation:warehouseFlame .48s ease-in-out infinite alternate; pointer-events:none; }
 @keyframes warehousePinFire { from{transform:translateY(0) rotate(-2deg) scale(1)} to{transform:translateY(-1px) rotate(2deg) scale(1.1)} }
 @keyframes warehouseFlame { from{height:14px;transform:translateX(-50%) rotate(-5deg) scaleX(.86);opacity:.68} to{height:20px;transform:translateX(-50%) rotate(6deg) scaleX(1.05);opacity:.92} }
-@media(prefers-reduced-motion:reduce){.warehouse-switch.active .warehouse-pin,.warehouse-switch.active .warehouse-pin::after{animation:none}}
+@media(prefers-reduced-motion:reduce){.warehouse-switch.active .warehouse-pin,.warehouse-switch.active .warehouse-pin::after,.recent-activity-progress>i{animation:none}}
 @media(max-width:420px){ .warehouse-switcher{gap:2px;padding:2px}.warehouse-switch{min-width:47px;min-height:32px;padding:4px 5px;font-size:10px}.title-text{min-width:0}.title-base{white-space:nowrap;overflow:hidden;text-overflow:ellipsis} }
 .title-icon { flex-shrink: 0; line-height: 1; }
 .title-text { position: relative; display: inline-block; min-width: 0; max-width: 100%; overflow: hidden; line-height: 1.2; white-space: nowrap; }
@@ -12758,7 +12766,9 @@ function renderRecentActivity(){
     list.innerHTML='<div class="recent-activity-empty">Chưa có giao dịch nào.</div>';
     return;
   }
-  list.innerHTML=shown.map(tx=>{
+  const maxShownQty=Math.max(1,...shown.map(item=>Math.abs(Number(item.qty)||0)));
+  const progressTones=["green","blue","violet","orange","red"];
+  list.innerHTML=shown.map((tx,index)=>{
     const kind=getRecentActivityKind(tx);
     const info=getTransactionProductDisplay(tx,null);
     const qty=Math.abs(Number(tx.qty)||0);
@@ -12770,8 +12780,11 @@ function renderRecentActivity(){
     const summary=isTransfer ? getEmployeeTransferDaySummary(tx,rows) : null;
     const dayLabel=recentActivityTimeLabel(tx.time).slice(0,10);
     const daily=isTransfer ? `<span class="recent-activity-daily">Trong ngày ${escapeHtml(dayLabel)}: <b>${escapeHtml(tx.nv||"Nhân viên")}</b> đã chuyển <b>${summary.qty} sản phẩm</b> thuộc <b>${summary.products} mặt hàng</b> sang <b>${to}</b>.</span>` : "";
+    const progressPercent=qty?Math.max(10,Math.min(100,Math.round(qty/maxShownQty*100))):0;
+    const progressTone=progressTones[index%progressTones.length];
+    const progress=`<span class="recent-activity-progress tone-${progressTone}" style="--activity-progress:${progressPercent}%;--activity-progress-delay:${Math.min(index,8)*45}ms" aria-hidden="true"><i></i></span>`;
     const employeeAvatar=renderNVAvatar(tx.nv||"Chưa rõ nhân viên","recent-activity-avatar");
-    return `<button type="button" class="recent-activity-row${isTransfer?" transfer":""}" data-code="${escapeHtml(tx.ma||"")}" data-branch="${escapeHtml(tx.branch||"Q2")}" title="Mở sản phẩm này tại ${escapeHtml(tx.branch||"Q2")}" onclick="openRecentActivityProduct(this,event)">${employeeAvatar}<span class="recent-activity-copy"><span class="recent-activity-action">${escapeHtml(tx.nv||"Chưa rõ nhân viên")} ${action}${route}</span><span class="recent-activity-product">${escapeHtml(info.currentName||tx.ma||"Sản phẩm")}${qty?` (${qty} cái)`:""}</span>${daily}</span><span class="recent-activity-time">${escapeHtml(recentActivityTimeLabel(tx.time))}</span></button>`;
+    return `<button type="button" class="recent-activity-row${isTransfer?" transfer":""}" data-code="${escapeHtml(tx.ma||"")}" data-branch="${escapeHtml(tx.branch||"Q2")}" title="Mở sản phẩm này tại ${escapeHtml(tx.branch||"Q2")}" onclick="openRecentActivityProduct(this,event)">${employeeAvatar}<span class="recent-activity-copy"><span class="recent-activity-action">${escapeHtml(tx.nv||"Chưa rõ nhân viên")} ${action}${route}</span><span class="recent-activity-product">${escapeHtml(info.currentName||tx.ma||"Sản phẩm")}${qty?` (${qty} cái)`:""}</span>${progress}${daily}</span><span class="recent-activity-time">${escapeHtml(recentActivityTimeLabel(tx.time))}</span></button>`;
   }).join("");
 }
 function openRecentActivityProduct(button,event){
