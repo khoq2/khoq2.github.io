@@ -6660,38 +6660,44 @@ body .side-control-rail .scroll-btn>svg{
   .side-control-rail .macos-dock-app-icon{animation:none!important}
 }
 
-/* Giao dịch gần đây là thông tin công khai, không còn là liên kết chi tiết.
-   Nút nhật ký riêng chỉ xuất hiện sau khi đăng nhập Admin. */
+/* “Giao dịch gần đây” là liên kết công khai đến danh sách giao dịch.
+   “Xem lịch sử” vẫn là nhật ký thay đổi riêng và chỉ hiện sau đăng nhập Admin. */
 body .card .nguoi-ban-row{cursor:default!important}
 body .card .nguoi-ban-row::after{display:none!important}
-body:not(.admin-mode) .card .nguoi-ban-row.has-transaction{
+body .card .nguoi-ban-row.has-transaction{
+  display:grid!important;
   grid-template-columns:26px minmax(0,1fr)!important;
-  grid-template-rows:1fr!important;
-  min-height:44px!important;
-  padding:7px 8px!important;
-  column-gap:7px!important;
-}
-body:not(.admin-mode) .card .nguoi-ban-row.has-transaction>.nv-avatar-latest{
-  grid-column:1!important;grid-row:1!important
-}
-body:not(.admin-mode) .card .nguoi-ban-row.has-transaction>.nguoi-ban-label{
-  grid-column:2!important;grid-row:1!important;cursor:default!important
-}
-body.admin-mode .card .nguoi-ban-row.has-transaction{
-  grid-template-columns:26px minmax(0,1fr) auto!important;
   grid-template-rows:1fr!important;
   min-height:48px!important;
   padding:7px 8px!important;
   column-gap:7px!important;
+  cursor:pointer!important;
+  user-select:none;
 }
-body.admin-mode .card .nguoi-ban-row.has-transaction>.nv-avatar-latest{
-  grid-column:1!important;grid-row:1!important
+body .card .nguoi-ban-row.has-transaction:hover,
+body .card .nguoi-ban-row.has-transaction:focus-visible{
+  border-color:#67B4E3!important;
+  background:#EAF5FC!important;
+  box-shadow:0 0 0 3px rgba(46,134,193,.15)!important;
+  outline:none!important;
 }
-body.admin-mode .card .nguoi-ban-row.has-transaction>.nguoi-ban-label{
-  grid-column:2!important;grid-row:1!important;cursor:default!important
+body .card .nguoi-ban-row.has-transaction>.nguoi-ban-kind-icon{display:none!important}
+body .card .nguoi-ban-row.has-transaction>.nv-avatar-latest{
+  display:grid!important;grid-column:1!important;grid-row:1!important
+}
+body .card .nguoi-ban-row.has-transaction>.nguoi-ban-label{
+  display:none!important
+}
+body .card .nguoi-ban-row.has-transaction>.nguoi-ban-count{
+  display:flex!important;grid-column:2!important;grid-row:1!important;
+  min-width:0!important;max-width:none!important;justify-content:flex-start!important
+}
+body.admin-mode .card .nguoi-ban-row.has-transaction{
+  grid-template-columns:26px minmax(0,1fr) auto!important;
 }
 body.admin-mode .card .nguoi-ban-row.has-transaction>.nguoi-ban-history-link{
   position:static!important;
+  display:inline-flex!important;
   grid-column:3!important;
   grid-row:1!important;
   align-self:center!important;
@@ -6720,6 +6726,44 @@ body.admin-mode .card .nguoi-ban-row.no-transaction>.nguoi-ban-history-link{
   grid-row:1!important;
   justify-self:end!important;
   min-width:82px!important;
+}
+@media(max-width:600px){
+  body .card .nguoi-ban-row.has-transaction{
+    grid-template-columns:24px minmax(0,1fr)!important;
+    grid-template-rows:1fr!important;
+    min-height:48px!important;
+    padding:7px!important;
+    column-gap:5px!important;
+  }
+  body.admin-mode .card .nguoi-ban-row.has-transaction{
+    grid-template-columns:24px minmax(0,1fr)!important;
+    grid-template-rows:auto auto!important;
+    row-gap:4px!important;
+  }
+  body.admin-mode .card .nguoi-ban-row.has-transaction>.nguoi-ban-history-link{
+    grid-column:2!important;
+    grid-row:2!important;
+  }
+}
+
+/* Huy hiệu vai trò trong dòng giao dịch gần đây luôn giữ neon, quét sáng và
+   lấp lánh trên cả PC lẫn điện thoại. Ghi đè chế độ tĩnh của các card dài. */
+body .card .nguoi-ban-row.has-transaction .nv-role-badge{
+  animation:nvRoleNeon 1.7s ease-in-out infinite alternate!important;
+  will-change:box-shadow!important;
+}
+body .card .nguoi-ban-row.has-transaction .nv-role-badge::after{
+  animation:nvRoleShine 2.35s ease-in-out infinite!important;
+  will-change:left,opacity!important;
+}
+body .card .nguoi-ban-row.has-transaction .nv-role-badge::before{
+  animation:nvRoleSparkle 1.45s linear infinite!important;
+  will-change:left,top,opacity,transform!important;
+}
+body .card .nguoi-ban-row.has-transaction .nv-role-badge>span:first-child,
+body .card .nguoi-ban-row.has-transaction .nv-role-badge .nv-role-icon{
+  animation:nvRoleIconTwinkle 1.05s ease-in-out infinite alternate!important;
+  will-change:filter,transform!important;
 }
 
 /* Bộ biểu tượng SVG hiện đại và ô ngày Việt Nam trong lịch sử giao dịch. */
@@ -6821,6 +6865,57 @@ body.admin-mode .card .nguoi-ban-row.no-transaction>.nguoi-ban-history-link{
   gap:7px;
 }
 #txOverlay .tx-note .tx-modern-icon{width:23px;height:23px;flex-basis:23px}
+#txOverlay .tx-private-notice{
+  margin:0 0 9px;
+  padding:8px 10px;
+  border:1px solid #D5E4EF;
+  border-radius:10px;
+  background:rgba(255,255,255,.9);
+  color:#587083;
+  font-size:10.5px;
+  font-weight:750;
+  line-height:1.4;
+  text-align:center;
+}
+
+/* Hai chuyển động nhận diện cần luôn hoạt động trên PC, kể cả khi Windows bật
+   prefers-reduced-motion. Chỉ mở lại kính lúp và ghim kho để không làm nặng trang. */
+body #results .search-landing-icon{
+  animation:searchBreathe 2.4s ease-in-out infinite!important;
+  will-change:transform,box-shadow;
+}
+body #results.home-enter .search-landing-icon{
+  animation:homeIconEnter .5s cubic-bezier(.2,.9,.25,1.25) both!important;
+}
+body #results .search-landing-icon::after{
+  animation:searchOrbit 2.6s linear infinite!important;
+  will-change:transform;
+}
+body .warehouse-switch.active .warehouse-pin{
+  animation:warehousePinFire .72s ease-in-out infinite alternate!important;
+  filter:drop-shadow(0 0 3px #FF3B1F) drop-shadow(0 -2px 5px #FFB000);
+  will-change:transform,filter;
+}
+body .warehouse-switch.active .warehouse-pin::after{
+  animation:warehouseFlame .48s ease-in-out infinite alternate!important;
+}
+body .warehouse-switch.warehouse-switch-changing{
+  animation:warehouseSwitchConfirm .78s cubic-bezier(.2,.9,.25,1.28) both!important;
+}
+body .warehouse-switch.warehouse-switch-changing .warehouse-pin{
+  animation:warehousePinSwitch .78s cubic-bezier(.2,.9,.25,1.3) both!important;
+}
+@keyframes warehouseSwitchConfirm{
+  0%{transform:scale(.92);box-shadow:0 0 0 0 rgba(19,135,201,0)}
+  42%{transform:scale(1.1);box-shadow:0 0 0 5px rgba(19,135,201,.22),0 0 18px rgba(19,135,201,.48)}
+  100%{transform:scale(1);box-shadow:0 6px 16px rgba(15,95,159,.24)}
+}
+@keyframes warehousePinSwitch{
+  0%{transform:translateY(7px) rotate(-22deg) scale(.55);opacity:.25;filter:drop-shadow(0 0 0 rgba(255,176,0,0))}
+  48%{transform:translateY(-5px) rotate(14deg) scale(1.42);opacity:1;filter:drop-shadow(0 0 7px #FFB000) drop-shadow(0 0 4px #FF3B1F)}
+  72%{transform:translateY(1px) rotate(-5deg) scale(.94)}
+  100%{transform:translateY(0) rotate(0) scale(1);opacity:1;filter:drop-shadow(0 0 3px #FF3B1F) drop-shadow(0 -2px 5px #FFB000)}
+}
 
 /* Khôi phục dấu hiệu điều hướng của bộ lọc nhanh sau lớp giao diện 2026.
    Dùng !important vì theme chung của thẻ sản phẩm được khai báo sau CSS cũ. */
@@ -7995,12 +8090,29 @@ let currentTab = "ALL";
 let currentStatus = "ALL";
 function getStoredWarehouseBranch(){ try{ const value=localStorage.getItem("kho_active_warehouse"); return value==="Q5"?"Q5":"Q2"; }catch(_){ return "Q2"; } }
 let currentBranch = getStoredWarehouseBranch();
+let warehouseSwitchEffectTimer = null;
+let warehouseSwitchEffectButton = null;
+function playWarehouseSwitchEffect(branch){
+  const btn=document.querySelector(`.warehouse-switch[data-warehouse="${branch}"]`);
+  if(!btn) return;
+  clearTimeout(warehouseSwitchEffectTimer);
+  warehouseSwitchEffectButton?.classList.remove("warehouse-switch-changing");
+  btn.classList.remove("warehouse-switch-changing");
+  void btn.offsetWidth;
+  btn.classList.add("warehouse-switch-changing");
+  warehouseSwitchEffectButton=btn;
+  warehouseSwitchEffectTimer=setTimeout(()=>{
+    btn.classList.remove("warehouse-switch-changing");
+    if(warehouseSwitchEffectButton===btn) warehouseSwitchEffectButton=null;
+  },850);
+}
 function syncWarehouseBranchUI(){
   document.querySelectorAll('.warehouse-switch').forEach(btn=>btn.classList.toggle('active',btn.dataset.warehouse===currentBranch));
   document.querySelectorAll('.filter-btn[data-branch]').forEach(btn=>btn.classList.toggle('active',btn.dataset.branch===currentBranch));
 }
 function selectWarehouseBranch(branch){
   branch=branch==="Q5"?"Q5":"Q2";
+  const previousBranch=currentBranch;
   currentBranch=branch;
   SEARCH_KEYWORDS_THIS_VISIT=[];
   try{ localStorage.setItem("kho_active_warehouse",branch); }catch(_){}
@@ -8009,6 +8121,7 @@ function selectWarehouseBranch(branch){
   closeSearchSuggestions();
   latestItemsTickerIndex=0; latestItemsTickerKey=""; latestItemsTickerHasShown=false;
   syncWarehouseBranchUI();
+  if(previousBranch!==branch) playWarehouseSwitchEffect(branch);
   render();
   if(searchQ.trim()) renderSearchSuggestions(searchQ);
   refreshLatestItemsTicker();
@@ -10938,7 +11051,7 @@ function renderCard(r,i,displayNo){
         <button class="btn-ton btn-plus admin-only" data-permission="RESTOCK" title="Nhập thêm hàng" aria-label="Nhập thêm hàng" onclick="openRestockModal(${i})">+</button>
       </div>
       <div class="card-price-mobile">${priceHtml}</div>
-      <div class="nguoi-ban-row ${latestTransaction ? "has-transaction" : "no-transaction"}">
+      <div class="nguoi-ban-row ${latestTransaction ? "has-transaction" : "no-transaction"}" ${latestTransaction ? `role="button" tabindex="0" aria-haspopup="dialog" title="Bấm để xem giao dịch gần đây" aria-label="Xem giao dịch gần đây của ${escapeHtml(ten)}" onclick="showTxHistory(${i})" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();showTxHistory(${i})}"` : ""}>
         <img class="nguoi-ban-kind-icon" src="https://drive.google.com/thumbnail?id=1gDQYpyWqwlHtJbDhSNHBRybWKkIjimXd&sz=w128" alt="" aria-label="Giao dịch nhân viên" referrerpolicy="no-referrer" onerror="this.outerHTML='<span class=\\'nguoi-ban-kind-icon\\' aria-hidden=\\'true\\'>👤</span>';">
         ${latestEmployeeAvatarHtml}
         <span class="nguoi-ban-label">${latestTransaction ? "Giao dịch gần đây" : "Người bán"}</span>
@@ -13155,6 +13268,7 @@ function renderTxHistory(){
   const idx = TX_HISTORY_STATE.idx;
   if(idx < 0 || !DATA[idx]) return;
   const r = DATA[idx];
+  const canViewPrivateTransactionDetails = isAdminMode();
   const txs = getTransactionsForProduct(r);
   const filtered = sortTxHistoryRows(txHistoryFilteredRows(txs));
   const nvOptions = [...new Set(txs.map(t=>t.nv).filter(Boolean))];
@@ -13198,8 +13312,9 @@ function renderTxHistory(){
       <div class="tx-kpi"><span class="tx-kpi-icon tx-modern-icon blue" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false">${TX_HISTORY_ICON_PATHS.list}</svg></span><span><small>Hiển thị</small><b>${filtered.length}</b></span></div>
       <div class="tx-kpi tx-kpi-out"><span class="tx-kpi-icon tx-modern-icon green" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false">${TX_HISTORY_ICON_PATHS.sale}</svg></span><span><small>Đã xuất</small><b>${totalSoldQty}</b></span></div>
       <div class="tx-kpi tx-kpi-in"><span class="tx-kpi-icon tx-modern-icon orange" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false">${TX_HISTORY_ICON_PATHS.import}</svg></span><span><small>Đã nhập</small><b>${totalImportedQty}</b></span></div>
-      <div class="tx-kpi tx-kpi-money"><span class="tx-kpi-icon tx-modern-icon teal" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false">${TX_HISTORY_ICON_PATHS.money}</svg></span><span><small>Doanh thu</small><b>${fmt(totalGia)}</b></span></div>
+      ${canViewPrivateTransactionDetails?`<div class="tx-kpi tx-kpi-money"><span class="tx-kpi-icon tx-modern-icon teal" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false">${TX_HISTORY_ICON_PATHS.money}</svg></span><span><small>Doanh thu</small><b>${fmt(totalGia)}</b></span></div>`:""}
     </div>`;
+  const privacyNotice = canViewPrivateTransactionDetails ? "" : `<div class="tx-private-notice">Serial, ảnh bảo hành và ghi chú riêng chỉ hiển thị khi đăng nhập Admin.</div>`;
   const rows = filtered.length ? filtered.map(t=>{
         const productDisplay=getTransactionProductDisplay(t,r);
         const unitDetailText=(Array.isArray(t.unitDetails)&&t.unitDetails.length?t.unitDetails.map(item=>item.serial?`${item.id} · Serial ${item.serial}`:item.id):(Array.isArray(t.unitIds)?t.unitIds:[])).join(" | ");
@@ -13217,20 +13332,20 @@ function renderTxHistory(){
 	            <div><span class="tx-detail-label">${txHistoryIcon("box","blue")}<span>Sản phẩm</span></span><b>${escapeHtml(productDisplay.currentName)}${productDisplay.changed?`<small class="tx-historical-name">Tên lúc giao dịch: ${escapeHtml(productDisplay.historicalName)}</small>`:""}</b></div>
 	            <div><span class="tx-detail-label">${txHistoryIcon("id","purple")}<span>Mã giao dịch</span></span><b>${escapeHtml(String(t.id||""))}</b></div>
 	            <div><span class="tx-detail-label">${txHistoryIcon("quantity","orange")}<span>Số lượng</span></span><b>${Math.abs(Number(t.qty)||0)}</b></div>
-	            <div><span class="tx-detail-label">${txHistoryIcon("price","teal")}<span>Đơn giá</span></span><b>${t.gia>0?fmt(t.gia):"Không ghi giá"}</b></div>
+	            <div><span class="tx-detail-label">${txHistoryIcon("price","teal")}<span>Giá bán</span></span><b>${t.gia>0?fmt(t.gia):"Không ghi giá"}</b></div>
 	            <div class="tx-total"><span class="tx-detail-label">${txHistoryIcon("total","green")}<span>Thành tiền</span></span><b>${fmt((Number(t.gia)||0)*Math.abs(Number(t.qty)||0))}</b></div>
-	            ${unitDetailText?`<div class="tx-total"><span class="tx-detail-label">${txHistoryIcon("serial","purple")}<span>Serial / mã cá thể</span></span><b>${escapeHtml(unitDetailText)}</b></div>`:""}
+	            ${canViewPrivateTransactionDetails&&unitDetailText?`<div class="tx-total"><span class="tx-detail-label">${txHistoryIcon("serial","purple")}<span>Serial / mã cá thể</span></span><b>${escapeHtml(unitDetailText)}</b></div>`:""}
 	          </div>
-          ${t.ghi?`<span class="tx-note">${txHistoryIcon("note","orange")}<span>${escapeHtml(t.ghi)}</span></span>`:""}
+          ${canViewPrivateTransactionDetails&&t.ghi?`<span class="tx-note">${txHistoryIcon("note","orange")}<span>${escapeHtml(t.ghi)}</span></span>`:""}
           ${renderSameDayEmployeeLinks(t, r)}
           ${t.img?`<img class="tx-img" src="${escapeHtml(t.img)}" alt="Ảnh giao dịch" referrerpolicy="no-referrer" onclick="openImageViewer(this.src, this.alt)" onerror="this.style.display='none';">`:""}
-          ${(t.warranty1||t.warranty2)?`<div class="prod-media">
+          ${canViewPrivateTransactionDetails&&(t.warranty1||t.warranty2)?`<div class="prod-media">
             ${t.warranty1?`<button type="button" class="prod-extra-image" data-url="${escapeHtml(t.warranty1)}" data-title="Bảo hành 1 - ${escapeHtml(t.ten||t.ma||'Giao dịch')}" onclick="openImageViewer(this.dataset.url,this.dataset.title)">Bảo hành 1</button>`:""}
             ${t.warranty2?`<button type="button" class="prod-extra-image" data-url="${escapeHtml(t.warranty2)}" data-title="Bảo hành 2 - ${escapeHtml(t.ten||t.ma||'Giao dịch')}" onclick="openImageViewer(this.dataset.url,this.dataset.title)">Bảo hành 2</button>`:""}
           </div>`:""}
         </div>`;
       }).join("") : `<div style="text-align: center; padding: 20px; color: #888;">Không có giao dịch phù hợp bộ lọc</div>`;
-  document.getElementById("txModalBody").innerHTML = filterBar + summary + rows;
+  document.getElementById("txModalBody").innerHTML = filterBar + summary + privacyNotice + rows;
 }
 
 function applyTxHistoryFilters(){
