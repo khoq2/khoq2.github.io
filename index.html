@@ -7806,6 +7806,7 @@ function setAdminMode(on){
     document.body.classList.add("admin-entry-visible");
     document.body.classList.add("admin-mode");
     updateAdminProfileButton(true);
+    setTimeout(refreshPrivateOperationalData,0);
   } else {
     sessionStorage.removeItem("kho_cntt_admin");
     sessionStorage.removeItem("kho_admin_session_token");
@@ -7819,6 +7820,8 @@ function setAdminMode(on){
       document.body.classList.remove("admin-entry-visible");
     }
     updateAdminProfileButton(false);
+    clearAdminOperationalView();
+    setTimeout(loadPublicRecentActivityFromSheet,0);
     bulkSelectMode = false;
     selectedItems.clear();
     updateBulkControls();
@@ -7878,7 +7881,7 @@ function checkAdminSession(){
 
 // Dòng URL duy nhất
 const SHEET_API_URL = "https://script.google.com/macros/s/AKfycby6YH69F7sfO1ZoUJsDm4BeX6Luj2GrhUfYWWJWNvqjraAEhkBck16EphrPBBm1BT3YqA/exec";
-const REQUIRED_API_VERSION = "2026.08.01-private-customer-partner-27";
+const REQUIRED_API_VERSION = "2026.08.09-integrity-fix-03";
 // Apps Script có thể phải chờ khóa ghi khi nhiều thao tác diễn ra gần nhau.
 // 45 giây dài hơn thời gian chờ khóa phía máy chủ, tránh báo lỗi giả trong khi Sheet vẫn đang ghi.
 const SHEET_TIMEOUT_MS = 45000;
@@ -8473,6 +8476,8 @@ async function saveProductRow(row, oldCode="", oldBranch="Q2"){
     const safeRow = normalizeSheetRows([row])[0];
     const result=await postSheet("upsert_product", {row: safeRow, oldCode, oldBranch, baseFingerprint:SERVER_DATA_FINGERPRINT}, 45000);
     if(result.fingerprint) SERVER_DATA_FINGERPRINT=result.fingerprint;
+    if(Array.isArray(result.links)) PRODUCT_LINKS=result.links;
+    if(result.productLinksFingerprint) SERVER_PRODUCT_LINKS_FINGERPRINT=String(result.productLinksFingerprint);
     setPendingSync(hadPendingBefore,hadPendingBefore?"Vẫn còn thay đổi khác đang chờ đồng bộ":""); setSyncBadge(hadPendingBefore?"pending":"synced"); markLastSync();
     return true;
   }catch(e){
@@ -8489,6 +8494,7 @@ async function saveProductRow(row, oldCode="", oldBranch="Q2"){
         );
         if(serverRow && JSON.stringify(serverRow)===JSON.stringify(safeRow)){
           SERVER_DATA_FINGERPRINT=String(latest.fingerprint||SERVER_DATA_FINGERPRINT);
+          try{ await loadProductLinks(); }catch(linkRefreshError){ console.warn("Chưa làm mới được liên kết sản phẩm sau khi xác minh lưu:",linkRefreshError); }
           setPendingSync(hadPendingBefore,hadPendingBefore?"Vẫn còn thay đổi khác đang chờ đồng bộ":"");
           setSyncBadge(hadPendingBefore?"pending":"synced");
           markLastSync();
@@ -8507,7 +8513,7 @@ async function deleteProductRow(code, branch){
   if(!SHEET_API_URL) return true;
   const hadPendingBefore = hasPendingSync();
   setPendingSync(true, "Đang chờ xóa sản phẩm");
-  try{ const result=await postSheet("delete_product", {code, branch, baseFingerprint:SERVER_DATA_FINGERPRINT}); if(result.fingerprint) SERVER_DATA_FINGERPRINT=result.fingerprint; setPendingSync(hadPendingBefore,hadPendingBefore?"Vẫn còn thay đổi khác đang chờ đồng bộ":""); setSyncBadge(hadPendingBefore?"pending":"synced"); markLastSync(); return true; }
+  try{ const result=await postSheet("delete_product", {code, branch, baseFingerprint:SERVER_DATA_FINGERPRINT}); if(result.fingerprint) SERVER_DATA_FINGERPRINT=result.fingerprint; if(Array.isArray(result.links)) PRODUCT_LINKS=result.links; if(result.productLinksFingerprint) SERVER_PRODUCT_LINKS_FINGERPRINT=String(result.productLinksFingerprint); setPendingSync(hadPendingBefore,hadPendingBefore?"Vẫn còn thay đổi khác đang chờ đồng bộ":""); setSyncBadge(hadPendingBefore?"pending":"synced"); markLastSync(); return true; }
   catch(e){ setSyncBadge("error", String(e)); return false; }
 }
 
@@ -8536,13 +8542,6 @@ async function loadData(){
         return;
       }
       SERVER_DATA_FINGERPRINT = latestServerFingerprint;
-      if(!sheetRows.length){
-        if(Array.isArray(localSnapshot) && localSnapshot.length){
-          DATA = localSnapshot;
-          setSyncBadge("empty", "Máy chủ đang trống, ứng dụng đang dùng dữ liệu lưu trên máy này");
-          return;
-        }
-      }
       DATA = sheetRows;
 
       DATA.forEach(r=>{ r[8] = joinRowGroups(r[8] || ""); });
@@ -8566,9 +8565,9 @@ async function loadData(){
 function loadLocal(){
   try {
     const saved = localStorage.getItem("kho_cntt_data");
-    DATA = saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(DEFAULT_DATA));
+    DATA = saved ? JSON.parse(saved) : (SHEET_API_URL ? [] : JSON.parse(JSON.stringify(DEFAULT_DATA)));
   } catch(e){
-    DATA = JSON.parse(JSON.stringify(DEFAULT_DATA));
+    DATA = SHEET_API_URL ? [] : JSON.parse(JSON.stringify(DEFAULT_DATA));
   }
 }
 
@@ -10558,8 +10557,8 @@ function renderCard(r,i,displayNo){
         <img class="nguoi-ban-kind-icon" src="https://drive.google.com/thumbnail?id=1gDQYpyWqwlHtJbDhSNHBRybWKkIjimXd&sz=w128" alt="" aria-label="Giao dịch nhân viên" referrerpolicy="no-referrer" onerror="this.outerHTML='<span class=\\'nguoi-ban-kind-icon\\' aria-hidden=\\'true\\'>👤</span>';">
         ${latestEmployeeAvatarHtml}
         <span class="nguoi-ban-label" ${latestTransaction ? `role="link" tabindex="0" aria-label="Mở giao dịch gần đây" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();showTxHistory(${i})}"` : ""}>${latestTransaction ? "Giao dịch gần đây" : "Người bán"}</span>
-        <span class="nguoi-ban-count" title="${escapeHtml(latestTransactionText)}" ${latestTransaction ? "" : `role="link" tabindex="0" aria-label="Xem lịch sử thay đổi sản phẩm" onclick="event.stopPropagation();openProductActivity(${i})" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();event.stopPropagation();openProductActivity(${i})}"`}>${latestTransactionHtml}</span>
-        ${latestTransaction ? `<span class="nguoi-ban-flow-arrow" aria-hidden="true">→</span><span class="nguoi-ban-history-link" role="link" tabindex="0" aria-label="Xem lịch sử thay đổi sản phẩm" onclick="event.stopPropagation();openProductActivity(${i})" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();event.stopPropagation();openProductActivity(${i})}">Xem lịch sử ›</span>` : ""}
+        <span class="nguoi-ban-count" title="${escapeHtml(latestTransactionText)}">${latestTransactionHtml}</span>
+        ${latestTransaction ? `<span class="nguoi-ban-flow-arrow" aria-hidden="true">→</span><span class="nguoi-ban-history-link" role="link" tabindex="0" aria-label="Xem chi tiết giao dịch" onclick="event.stopPropagation();showTxHistory(${i})" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();event.stopPropagation();showTxHistory(${i})}">Xem chi tiết ›</span>` : ""}
       </div>
       <div class="card-actions admin-only">
         <button class="btn-units" onclick="openUnitManager(${i})">＋ Thêm mã</button>
@@ -11436,6 +11435,8 @@ async function deleteAllItems(){
     if(SHEET_API_URL){
       const result=await postSheet("delete_products_by_branch",{branch,baseFingerprint:SERVER_DATA_FINGERPRINT});
       if(result.fingerprint) SERVER_DATA_FINGERPRINT=result.fingerprint;
+      if(Array.isArray(result.links)) PRODUCT_LINKS=result.links;
+      if(result.productLinksFingerprint) SERVER_PRODUCT_LINKS_FINGERPRINT=String(result.productLinksFingerprint);
     }
     DATA=DATA.filter(row=>String(row[13] || "Q2").trim().toUpperCase()!==branch);
     safeLocalStorageSet("kho_cntt_data",JSON.stringify(normalizeSheetRows(DATA)));
@@ -11610,7 +11611,7 @@ function updateAdminProfileButton(open=document.body.classList.contains("admin-m
   btn.setAttribute("aria-label",open?`Khóa quyền Admin của ${name}`:`Mở quản trị với ${name}`);
   btn.title=open?"Bấm để khóa quyền quản trị":"Bấm để đăng nhập quản trị";
 }
-function loadNV(){ try{ NV_LIST = normalizeNVList(JSON.parse(localStorage.getItem("kho_cntt_nv")||"[]")); }catch(e){ NV_LIST=[]; } updateAdminProfileButton(); }
+function loadNV(){ if(!isAdminMode()){if(!NV_LIST.length)loadPublicRecentCache();updateAdminProfileButton();return;} try{ NV_LIST = normalizeNVList(JSON.parse(localStorage.getItem("kho_cntt_nv")||"[]")); }catch(e){ NV_LIST=[]; } updateAdminProfileButton(); }
 async function saveNV(){
   NV_LIST = normalizeNVList(NV_LIST);
   updateAdminProfileButton();
@@ -11633,13 +11634,13 @@ async function saveNV(){
   return nvSaveChain;
 }
 async function loadNVFromSheet(){
-  if(!SHEET_API_URL) return;
+  if(!SHEET_API_URL || !isAdminMode()) return;
   try{
-    const json = await fetchSheetJson(sheetUrl({type:"nv", _ts: Date.now()}));
+    const json = await privateSheet("private_nv",{},35000);
     if(Array.isArray(json.nv)){
       SERVER_NV_FINGERPRINT = hasAuxPendingSync(PENDING_NV_SYNC_KEY) ? getAuxPendingBase(PENDING_NV_SYNC_KEY) : String(json.fingerprint || "");
       const sheetNV = normalizeNVList(json.nv);
-      if(!hasAuxPendingSync(PENDING_NV_SYNC_KEY) && (sheetNV.length || !NV_LIST.length)){
+      if(!hasAuxPendingSync(PENDING_NV_SYNC_KEY)){
         NV_LIST = sheetNV;
         safeLocalStorageSet("kho_cntt_nv", JSON.stringify(NV_LIST));
         updateAdminProfileButton();
@@ -11775,7 +11776,32 @@ function refreshNVSelect(selectId="saleNV"){
 
 let TX_DATA = [];
 let TRANSFER_DATA = [];
+function clearAdminOperationalView(){
+  loadPublicRecentCache();
+  refreshRecentActivityNotification();
+  updateAdminProfileButton(false);
+}
 const TRANSFER_CACHE_KEY = "kho_cntt_transfers";
+const PUBLIC_RECENT_ACTIVITY_CACHE_KEY = "kho_cntt_public_full_activity_v2";
+function applyPublicRecentActivity(data){
+  TX_DATA=normalizeTxList(Array.isArray(data?.tx)?data.tx:[]);
+  TRANSFER_DATA=normalizeTransferList(Array.isArray(data?.transfers)?data.transfers:[]);
+  NV_LIST=normalizeNVList(Array.isArray(data?.nv)?data.nv:[]);
+  refreshRecentActivityNotification();
+}
+function loadPublicRecentCache(){
+  try{applyPublicRecentActivity(JSON.parse(localStorage.getItem(PUBLIC_RECENT_ACTIVITY_CACHE_KEY)||"{}"));}
+  catch(_){TX_DATA=[];TRANSFER_DATA=[];NV_LIST=[];}
+}
+async function loadPublicRecentActivityFromSheet(){
+  if(!SHEET_API_URL || isAdminMode()) return;
+  try{
+    const json=await fetchSheetJson(sheetUrl({type:"recent_activity",_ts:Date.now()}),{},35000);
+    const snapshot={tx:Array.isArray(json.tx)?json.tx:[],transfers:Array.isArray(json.transfers)?json.transfers:[],nv:Array.isArray(json.nv)?json.nv:[]};
+    applyPublicRecentActivity(snapshot);
+    safeLocalStorageSet(PUBLIC_RECENT_ACTIVITY_CACHE_KEY,JSON.stringify(snapshot));
+  }catch(error){console.warn("Chưa tải được giao dịch gần đây dùng chung:",error);}
+}
 function normalizeTxItem(tx){
   if(typeof tx === "string"){
     const raw = tx.trim();
@@ -11799,7 +11825,7 @@ function normalizeTxItem(tx){
       img: String(tx[8] || ""),
       time: String(tx[9] || ""), branch: String(tx[10] || "Q2"),
       vatRate: Number(tx[11]) || 0, basePrice: Number(tx[12]) || Number(tx[6]) || 0,
-      warranty1: String(tx[13] || ""), warranty2: String(tx[14] || ""), unitIds:String(tx[15]||"").split(/\s*\|\s*/).filter(Boolean)
+      warranty1: String(tx[13] || ""), warranty2: String(tx[14] || ""), unitIds:String(tx[15]||"").split(/\s*\|\s*/).filter(Boolean), unitDetails:[]
     };
   }
   if(tx && typeof tx === "object"){
@@ -11815,7 +11841,8 @@ function normalizeTxItem(tx){
       img: String(tx.img || tx.image || ""),
       time: String(tx.time || tx.createdAt || ""), branch: String(tx.branch || "Q2"),
       vatRate: Number(tx.vatRate || 0) || 0, basePrice: Number(tx.basePrice || tx.gia || tx.price || 0) || 0,
-      warranty1: String(tx.warranty1 || ""), warranty2: String(tx.warranty2 || ""), unitIds:Array.isArray(tx.unitIds)?tx.unitIds.map(String):String(tx.unitIds||"").split(/\s*\|\s*/).filter(Boolean)
+      warranty1: String(tx.warranty1 || ""), warranty2: String(tx.warranty2 || ""), unitIds:Array.isArray(tx.unitIds)?tx.unitIds.map(String):String(tx.unitIds||"").split(/\s*\|\s*/).filter(Boolean),
+      unitDetails:Array.isArray(tx.unitDetails)?tx.unitDetails.map(item=>({id:String(item?.id||""),serial:String(item?.serial||"")})).filter(item=>item.id):[]
     };
   }
   return null;
@@ -11856,8 +11883,8 @@ function loadTransferCache(){
   catch(_){ TRANSFER_DATA=[]; }
 }
 function loadTransfersFromSheet(){
-  if(!SHEET_API_URL) return Promise.resolve();
-  return fetchSheetJson(sheetUrl({type:"transfers",_ts:Date.now()}))
+  if(!SHEET_API_URL || !isAdminMode()) return Promise.resolve();
+  return privateSheet("private_transfers",{},35000)
     .then(json=>{
       if(!Array.isArray(json.transfers)) return;
       TRANSFER_DATA=normalizeTransferList(json.transfers);
@@ -12065,6 +12092,7 @@ if(document.getElementById("recentActivityPanel")?.parentElement!==document.body
   document.body.appendChild(document.getElementById("recentActivityPanel"));
 }
 function loadTX(){
+  if(!isAdminMode()){loadPublicRecentCache();refreshRecentActivityNotification();return;}
   try{ TX_DATA=normalizeTxList(JSON.parse(localStorage.getItem("kho_cntt_tx")||"[]")); }catch(e){ TX_DATA=[]; }
   loadTransferCache();
   refreshRecentActivityNotification();
@@ -12087,12 +12115,12 @@ async function saveTX(){
   return txSaveChain;
 }
 function loadTXFromSheet(){
-  if(!SHEET_API_URL) return Promise.resolve();
-  return fetchSheetJson(sheetUrl({type:"tx", _ts: Date.now()}))
+  if(!SHEET_API_URL || !isAdminMode()) return Promise.resolve();
+  return privateSheet("private_tx",{},35000)
     .then(json=>{
       if(!Array.isArray(json.tx)) return;
       const sheetTX = normalizeTxList(json.tx);
-      if(!hasAuxPendingSync(PENDING_TX_SYNC_KEY) && (sheetTX.length || !TX_DATA.length)){
+      if(!hasAuxPendingSync(PENDING_TX_SYNC_KEY)){
         TX_DATA = sheetTX;
         safeLocalStorageSet("kho_cntt_tx", JSON.stringify(TX_DATA));
         refreshRecentActivityNotification();
@@ -12102,6 +12130,13 @@ function loadTXFromSheet(){
       console.warn("Lỗi tải TX:", e);
       setSyncBadge("error", String(e));
     });
+}
+
+async function refreshPrivateOperationalData(){
+  if(!SHEET_API_URL || !isAdminMode()) return;
+  await Promise.allSettled([loadTXFromSheet(),loadTransfersFromSheet(),loadNVFromSheet()]);
+  refreshRecentActivityNotification();
+  render();
 }
 
 function updateSaleVatPreview(){
@@ -12117,6 +12152,7 @@ function updateSaleVatPreview(){
 }
 function newTransactionId(){ return (crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`); }
 let SALE_UNITS=[];
+let saleUnitsLoaded=false;
 let saleSaving=false;
 function setSaleSaveState(state,editing=false){
   const btn=document.getElementById("saleSaveBtn");
@@ -12151,7 +12187,8 @@ async function openSaleModal(idx){ if(!requireAdmin()) return;
   document.getElementById("saleImgFile").value = "";
   document.getElementById("saleUnitPicker").innerHTML = "";
   document.getElementById("saleOverlay").classList.add("open");
-  try{const json=await fetchSheetJson(sheetUrl({type:"units",branch:r[13]||"Q2",code:r[1],_ts:Date.now()}));SALE_UNITS=(json.units||[]).filter(u=>u.status==="IN_STOCK");renderSaleUnitPicker();}catch(_){SALE_UNITS=[];}
+  saleUnitsLoaded=false;
+  try{const json=await privateSheet("private_units",{branch:r[13]||"Q2",code:r[1]},35000);SALE_UNITS=(json.units||[]).filter(u=>u.status==="IN_STOCK");saleUnitsLoaded=true;renderSaleUnitPicker();}catch(e){SALE_UNITS=[];saleUnitsLoaded=false;document.getElementById("saleUnitPicker").innerHTML='<div class="form-live-hint warn">⚠️ Không tải được danh sách từng chiếc; chưa thể bán an toàn.</div>';setSaleSaveState("retry",false);showToast("⚠️ Không tải được mã cá thể: "+String(e),4500);}
 }
 function renderSaleUnitPicker(){const box=document.getElementById("saleUnitPicker");if(!SALE_UNITS.length){box.innerHTML="";return;}box.innerHTML='<b style="font-size:11px;color:#922B21">Chọn đúng thiết bị bán:</b>'+SALE_UNITS.map(u=>`<label class="group-check"><input type="checkbox" value="${escapeHtml(u.id)}" onchange="syncSaleQtyFromUnits()"> ${escapeHtml(u.id)}${u.serial?` · ${escapeHtml(u.serial)}`:""}</label>`).join("");}
 function syncSaleQtyFromUnits(){const count=document.querySelectorAll('#saleUnitPicker input:checked').length;if(count)document.getElementById("saleQty").value=String(count);}
@@ -12176,6 +12213,7 @@ async function saveRestock(){ if(!requireAdmin()) return;
   const tx = { id:document.getElementById("restockRequestId").value || newTransactionId(), ma:r[1], ten:r[2], sh:r[0], nv, qty:-qty, gia:0, ghi:`[NHẬP HÀNG] ${ghi || "Nhập thêm vào kho"}`, img:"", time:formatTxTime(new Date()), branch:r[13]||"Q2" };
   try{
     const result = await commitInventoryTransaction("RESTOCK",r,tx,{qty});
+    tx.unitIds = Array.isArray(result.unitIds) ? result.unitIds : [];
     DATA[idx][5] = Number(result.stock);
     DATA[idx][6] = getStockStatusValue(DATA[idx][5],DATA[idx][12]);
     TX_DATA.unshift(tx);
@@ -12244,6 +12282,7 @@ async function saveSale(){ if(!requireAdmin() || saleSaving) return;
   }
   const r = DATA[idx];
   if(!r){ alert("Không tìm thấy sản phẩm cần xuất!"); return; }
+  if(!saleUnitsLoaded){ alert("Chưa tải được danh sách mã từng chiếc. Vui lòng đóng và mở lại cửa sổ bán hàng khi kết nối ổn định."); return; }
   if(r[5] < qty){ alert(`Tồn kho chỉ còn ${r[5]}, không đủ xuất ${qty}!`); return; }
   const saleUnitIds=[...document.querySelectorAll('#saleUnitPicker input:checked')].map(input=>input.value);
   if(SALE_UNITS.length && saleUnitIds.length!==qty){alert(`Vui lòng chọn đúng ${qty} mã từng chiếc đã bán`);return;}
@@ -12672,6 +12711,7 @@ function renderTxHistory(){
     </div>`;
   const rows = filtered.length ? filtered.map(t=>{
         const productDisplay=getTransactionProductDisplay(t,r);
+        const unitDetailText=(Array.isArray(t.unitDetails)&&t.unitDetails.length?t.unitDetails.map(item=>item.serial?`${item.id} · Serial ${item.serial}`:item.id):(Array.isArray(t.unitIds)?t.unitIds:[])).join(" | ");
         return `
         <div class="tx-row">
           <div class="tx-header">
@@ -12687,6 +12727,7 @@ function renderTxHistory(){
 	            <div><span>🏷️ Số lượng</span><b>${Math.abs(Number(t.qty)||0)}</b></div>
 	            <div><span>🪙 Đơn giá</span><b>${t.gia>0?fmt(t.gia):"Không ghi giá"}</b></div>
 	            <div class="tx-total"><span>💰 Thành tiền</span><b>${fmt((Number(t.gia)||0)*Math.abs(Number(t.qty)||0))}</b></div>
+	            ${unitDetailText?`<div class="tx-total"><span>🔢 Serial / mã cá thể</span><b>${escapeHtml(unitDetailText)}</b></div>`:""}
 	          </div>
           ${t.ghi?`<span class="tx-note">📝 ${escapeHtml(t.ghi)}</span>`:""}
           ${renderSameDayEmployeeLinks(t, r)}
@@ -13460,11 +13501,13 @@ function restoreAfterAdd(state){
 async function openAddModal(){ if(!requireAdmin()) return;
   if(SHEET_API_URL&&!SERVER_PRODUCT_LINKS_FINGERPRINT) try{await loadProductLinks();}catch(e){showToast("⚠️ Chưa tải được liên kết sản phẩm: "+String(e),5000);return;}
   addModalReturnState = captureAddReturnState();
-  document.getElementById("editTitle").textContent = "➕ Thêm thiết bị mới"; document.getElementById("editIdx").value = "";
+  const editIndex=document.getElementById("editIdx");
+  editIndex.value=""; delete editIndex.dataset.originalCode; delete editIndex.dataset.originalBranch;
+  document.getElementById("editTitle").textContent = "➕ Thêm thiết bị mới";
   document.getElementById("fSaveBtn").disabled = false; document.getElementById("fSaveBtn").textContent = "💾 Lưu thiết bị";
   document.getElementById("fCondition").value = "";
   document.getElementById("fQuickTagNew").value = "";
-  document.getElementById("fBranch").value = currentBranch === "Q5" ? "Q5" : "Q2"; document.getElementById("fSheet").value = ["MT","MI","CAM","INT"].includes(currentTab) ? currentTab : "MT"; document.getElementById("fMa").value = ""; document.getElementById("fTen").value = "";
+  document.getElementById("fBranch").disabled=false; document.getElementById("fBranch").value = currentBranch === "Q5" ? "Q5" : "Q2"; document.getElementById("fSheet").value = ["MT","MI","CAM","INT"].includes(currentTab) ? currentTab : "MT"; document.getElementById("fMa").value = ""; document.getElementById("fTen").value = "";
   document.getElementById("fTH").value = ""; setVndInputValue("fGia", 0); setVndInputValue("fGiaBan", 0);
   document.getElementById("fRelatedCodes").value = "";
   document.getElementById("fRelatedSearch").value = ""; setRelatedFormTargets([]);
@@ -13478,10 +13521,12 @@ async function openEditModal(idx){ if(!requireAdmin()) return;
   editModalReturnState = captureEditReturnState(idx);
   const parts = splitNoteLocation(r[7]||"");
   const productCondition = getProductConditionFromTitle(r[2] || "");
-  document.getElementById("editTitle").textContent = "✏️ Sửa thiết bị"; document.getElementById("editIdx").value = idx;
+  const editIndex=document.getElementById("editIdx");
+  editIndex.value=idx; editIndex.dataset.originalCode=String(r[1]||""); editIndex.dataset.originalBranch=String(r[13]||"Q2");
+  document.getElementById("editTitle").textContent = "✏️ Sửa thiết bị";
   document.getElementById("fSaveBtn").disabled = false; document.getElementById("fSaveBtn").textContent = "💾 Lưu thiết bị";
   document.getElementById("fCondition").value = productCondition;
-  document.getElementById("fBranch").value = r[13] || "Q2"; document.getElementById("fSheet").value = r[0]; document.getElementById("fMa").value = r[1];
+  document.getElementById("fBranch").value = r[13] || "Q2"; document.getElementById("fBranch").disabled=true; document.getElementById("fSheet").value = r[0]; document.getElementById("fMa").value = r[1];
   document.getElementById("fTen").value = stripProductConditionFromTitle(r[2]); document.getElementById("fTH").value = r[3];
   document.getElementById("fRelatedCodes").value = directRelatedText(r[13]||"Q2",r[1]);
   document.getElementById("fRelatedSearch").value = ""; setRelatedFormTargets(getRelatedFormTargets());
@@ -13521,8 +13566,9 @@ async function saveItem(){ if(!requireAdmin()) return;
     return;
   }
   const oldRow = idxNum >= 0 ? DATA[idxNum] : null;
-	  const oldCode = idxNum >= 0 ? String(oldRow?.[1] || "") : "";
-	  const oldBranch = idxNum >= 0 ? String(oldRow?.[13] || "Q2") : String(document.getElementById("fBranch").value || "Q2");
+  const editIndex=document.getElementById("editIdx");
+	  const oldCode = idxNum >= 0 ? String(editIndex.dataset.originalCode || oldRow?.[1] || "") : "";
+	  const oldBranch = idxNum >= 0 ? String(editIndex.dataset.originalBranch || oldRow?.[13] || "Q2") : String(document.getElementById("fBranch").value || "Q2");
 	  const newBranch=String(document.getElementById("fBranch").value||"Q2");
 	  const relatedTargets=parseRelatedTargets(document.getElementById("fRelatedCodes").value,newBranch)
 	    .filter(target=>productLinkKey(target.branch,target.code)!==productLinkKey(newBranch,ma));
@@ -13557,12 +13603,19 @@ if(idx===""){
 }
 
 	const saved = await saveProductRow(row, oldCode, oldBranch);
-if(!saved){
+	if(!saved){
   if(idx==="") document.getElementById("editIdx").value = "0";
   if(saveButton){ saveButton.disabled = false; saveButton.textContent = "🔄 Thử lưu lại"; }
   showToast("⚠️ Chưa lưu được lên máy chủ. Biểu mẫu vẫn được giữ để bạn thử lại.", 5000);
 	  return;
 	}
+	if(idxNum>=0 && normalizeProductCode(oldCode)!==normalizeProductCode(ma)){
+	  TX_DATA.forEach(tx=>{if(normalizeProductCode(tx.ma)===normalizeProductCode(oldCode)&&String(tx.branch||"Q2")===oldBranch){tx.ma=ma;tx.ten=ten;}});
+	  safeLocalStorageSet("kho_cntt_tx",JSON.stringify(normalizeTxList(TX_DATA)));
+	  refreshRecentActivityNotification();
+	}
+	editIndex.dataset.originalCode=String(ma);
+	editIndex.dataset.originalBranch=String(newBranch);
 	try{
 	  await saveProductLinks(newBranch,ma,relatedTargets,oldBranch,oldCode||ma);
 	}catch(linkError){
@@ -13614,7 +13667,8 @@ function handleFile(input){ if(!requireAdmin()) return;
             read(r,"Giá nhập",0), read(r,"Tồn kho",0), read(r,"Trạng thái","CÒN HÀNG"), read(r,"Vị trí / ghi chú"),
             read(r,"Nhóm sản phẩm"), read(r,"Link ảnh"), read(r,"Giá bán",0), read(r,"Phân loại nhanh"),
             read(r,"Mức sắp hết",2), read(r,"Chi nhánh","Q2"), read(r,"Hình ảnh 1"), read(r,"Hình ảnh 2"),
-            read(r,"Tên hình ảnh 1"), read(r,"Tên hình ảnh 2")
+            read(r,"Tên hình ảnh 1"), read(r,"Tên hình ảnh 2"), read(r,"Hình ảnh 3"), read(r,"Hình ảnh 4"),
+            read(r,"Tên hình ảnh 3"), read(r,"Tên hình ảnh 4")
           ];
         }
         // Tương thích mẫu Excel cũ A:H và cột giá bán K.
@@ -13993,12 +14047,10 @@ async function submitPrivateAccess(){
   try{
     const verified=await fetchSheetJson(SHEET_API_URL,{
       method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},
-      body:JSON.stringify({action:"verify_admin",password:value})
+      body:JSON.stringify({action:"verify_private_access",password:value})
     },20000);
-    if(!verified.token) throw new Error("API không cấp phiên quản trị");
-    privateAccessToken="";
-    sessionStorage.setItem("kho_admin_session_token",verified.token);
-    setAdminMode(true);
+    if(!verified.token) throw new Error("API không cấp phiên truy cập riêng tư");
+    privateAccessToken=verified.token;
     const target=privateAccessTarget;
     closePrivateAccess();
     if(target==="partner") await openPartnerPanel();
@@ -14006,7 +14058,7 @@ async function submitPrivateAccess(){
   }catch(e){
     privateAccessToken="";
     const message=String(e);
-    errorBox.textContent=message.includes("ADMIN_LOGIN_FAILED")?"Sai mật khẩu quản trị. Vui lòng thử lại.":message.includes("RATE_LIMIT")?"Đã thử sai nhiều lần. Vui lòng đợi 1 phút.":"Không thể xác thực với API. Hãy kiểm tra kết nối.";
+    errorBox.textContent=message.includes("PRIVATE_LOGIN_FAILED")?"Sai mật khẩu truy cập. Vui lòng thử lại.":message.includes("RATE_LIMIT")?"Đã thử sai nhiều lần. Vui lòng đợi 1 phút.":"Không thể xác thực với API. Hãy kiểm tra kết nối.";
     password?.select();
   }finally{
     privateAccessBusy=false;
@@ -14547,7 +14599,7 @@ async function openTrashModal(){
 function trashItemLabel(item){
   try{
     const data=JSON.parse(item.data || "null");
-    if(item.type==="SAN_PHAM") return `${data?.[1] || item.key} · ${data?.[2] || "Sản phẩm"}`;
+    if(item.type==="SAN_PHAM"){ const product=Array.isArray(data)?data:data?.product; return `${product?.[1] || item.key} · ${product?.[2] || "Sản phẩm"}`; }
     if(item.type==="HO_SO_KHACH_HANG") return `${data?.[3] || "Hồ sơ sửa chữa"} · ${data?.[2] || ""}`;
     if(item.type==="KHACH_HANG"){ const customer=Array.isArray(data)?data:data?.customer; return `${customer?.[2] || "Khách hàng"} · ${formatCustomerPhone(customer?.[1] || item.key)}`; }
     if(item.type==="GIAO_DICH") return `${data?.[1] || "Giao dịch"} · ${data?.[2] || item.key}`;
@@ -14565,7 +14617,7 @@ async function restoreTrashItem(id){
   if(!confirm("Khôi phục dữ liệu này?")) return;
   try{
     await postSheet("restore_trash",{id},35000);
-    await Promise.all([loadData(),loadCustomers(true),loadTXFromSheet(),loadTransfersFromSheet(),loadNVFromSheet(),loadDisplayConfig()]);
+    await Promise.all([loadData(),loadCustomers(true),loadTXFromSheet(),loadTransfersFromSheet(),loadNVFromSheet(),loadDisplayConfig(),loadProductLinks()]);
     render();
     await openTrashModal();
     showToast("✅ Đã khôi phục dữ liệu");
@@ -15666,7 +15718,7 @@ async function syncFromServerIfIdle(forceRetry=false){
       options:GROUP_OPTIONS,
     });
     await loadData();
-    await Promise.all([loadTXFromSheet(), loadTransfersFromSheet(), loadNVFromSheet(), loadDisplayConfig(), loadProductLinks()]);
+    await Promise.all([loadTXFromSheet(), loadTransfersFromSheet(), loadNVFromSheet(), loadPublicRecentActivityFromSheet(), loadDisplayConfig(), loadProductLinks()]);
     const afterUiState=JSON.stringify({
       data:normalizeSheetRows(DATA),
       tx:normalizeTxList(TX_DATA),
@@ -15697,14 +15749,12 @@ function startBackgroundSync(){
 }
 
 async function openProductActivity(index){
-  // Đây là màn hình chỉ đọc lịch sử sản phẩm, không phải thao tác chỉnh sửa.
-  // Không dùng requireAdmin() để tránh hiện sai thông báo "chỉ Admin mới được chỉnh sửa".
-  if(!DATA[index]) return;
+  if(!requireAdmin() || !DATA[index]) return;
   const row=DATA[index], code=String(row[1]||""), branch=String(row[13]||"Q2");
   document.getElementById("activitySummary").textContent=`${branch} · ${code} · ${row[2]}`;
   document.getElementById("activityList").innerHTML='<div class="unit-summary">Đang tải lịch sử đầy đủ...</div>';
   document.getElementById("activityOverlay").classList.add("open");
-  try{const json=await fetchSheetJson(sheetUrl({type:"product_activity",branch:branch,code:code,_ts:Date.now()}));renderProductActivity(json.activity||[]);}
+  try{const json=await privateSheet("private_product_activity",{branch,code},35000);renderProductActivity(json.activity||[]);}
   catch(e){
     const fallback=getTransactionsForProduct(row).map(tx=>({time:tx.time,kind:(Number(tx.qty)||0)<0?"RESTOCK":"SALE",title:(Number(tx.qty)||0)<0?"Nhập thêm hàng":"Bán / xuất hàng",detail:`Số lượng ${Math.abs(Number(tx.qty)||0)}${tx.nv?` · ${tx.nv}`:""}`}));
     renderProductActivity(fallback,String(e));
@@ -15724,7 +15774,7 @@ async function openUnitManager(index){
   document.getElementById("unitProductSummary").textContent=`${branch} · ${code} · ${row[2]} · Tồn ${Number(row[5])||0}`;
   document.getElementById("unitList").innerHTML='<div class="unit-summary">Đang tải danh sách từng chiếc...</div>';
   document.getElementById("unitOverlay").classList.add("open");
-  try{ const json=await fetchSheetJson(sheetUrl({type:"units",branch:branch,code:code,_ts:Date.now()})); CURRENT_UNITS=Array.isArray(json.units)?json.units:[]; renderUnitList(); }
+  try{ const json=await privateSheet("private_units",{branch,code},35000); CURRENT_UNITS=Array.isArray(json.units)?json.units:[]; renderUnitList(); }
   catch(e){ CURRENT_UNITS=[]; document.getElementById("unitList").innerHTML=`<div class="form-live-hint warn">⚠️ API hiện tại chưa có chức năng quản lý từng chiếc.<br>${escapeHtml(String(e))}</div>`; }
 }
 function renderUnitList(){
@@ -15744,14 +15794,18 @@ async function saveUnitRow(index){
   try{await postSheet("upsert_unit",unit,30000);showToast(`✓ Đã lưu ${unit.id}`);}catch(e){alert("Không thể lưu ảnh thiết bị: "+String(e));}
 }
 let TRANSFER_UNITS=[];
+let transferUnitsLoaded=false;
+let transferRequestId="";
 async function openTransferModal(index){
   if(!requireAdmin() || !DATA[index]) return;
   const row=DATA[index], from=String(row[13]||"Q2"), to=from==="Q2"?"Q5":"Q2";
   document.getElementById("transferProductIndex").value=String(index); document.getElementById("transferFrom").textContent=from; document.getElementById("transferTo").textContent=to;
   document.getElementById("transferProductSummary").textContent=`${row[1]} · ${row[2]} · Tồn tại ${from}: ${Number(row[5])||0}`;
   const employee=document.getElementById("transferEmployee"); employee.innerHTML='<option value="">-- Chọn nhân viên --</option>'+NV_LIST.map(n=>`<option value="${escapeHtml(typeof n==="object"?n.name:n)}">${escapeHtml(typeof n==="object"?n.name:n)}</option>`).join("");
+  transferRequestId="CK-"+newTransactionId();
+  transferUnitsLoaded=false;
   document.getElementById("transferQty").value="1"; document.getElementById("transferNote").value=""; document.getElementById("transferUnitPicker").innerHTML=""; updateTransferPreview(); document.getElementById("transferOverlay").classList.add("open");
-  try{const json=await fetchSheetJson(sheetUrl({type:"units",branch:from,code:row[1],_ts:Date.now()})); TRANSFER_UNITS=(json.units||[]).filter(u=>u.status==="IN_STOCK"); renderTransferUnitPicker();}catch(_){TRANSFER_UNITS=[];}
+  try{const json=await privateSheet("private_units",{branch:from,code:row[1]},35000); TRANSFER_UNITS=(json.units||[]).filter(u=>u.status==="IN_STOCK"); transferUnitsLoaded=true; renderTransferUnitPicker();}catch(e){TRANSFER_UNITS=[];transferUnitsLoaded=false;document.getElementById("transferUnitPicker").innerHTML='<div class="form-live-hint warn">⚠️ Không tải được danh sách từng chiếc; chưa thể chuyển kho an toàn.</div>';showToast("⚠️ Không tải được mã cá thể: "+String(e),4500);}
 }
 function renderTransferUnitPicker(){
   const box=document.getElementById("transferUnitPicker");
@@ -15817,14 +15871,54 @@ setupCompactHeaderStatus();
 window.addEventListener("online",updateHeaderNetworkStatus);
 window.addEventListener("offline",updateHeaderNetworkStatus);
 
+async function commitInventoryTransfer(payload){
+  try{
+    return await postSheet("transfer_inventory",payload,40000);
+  }catch(firstError){
+    if(!navigator.onLine || !isRetryableSyncError(firstError)) throw firstError;
+    // Gửi lại đúng cùng một ID. API sẽ trả kết quả cũ nếu lần đầu đã ghi xong.
+    return postSheet("transfer_inventory",payload,40000);
+  }
+}
+function applyTransferResultToLocalData(sourceRow,from,to,result){
+  const codeKey=normalizeProductCode(sourceRow[1]);
+  const template=sourceRow.slice();
+  const sourceIndex=DATA.findIndex(r=>normalizeProductCode(r[1])===codeKey && String(r[13]||"Q2")===from);
+  if(sourceIndex>=0){
+    DATA[sourceIndex][5]=Number(result.fromStock)||0;
+    DATA[sourceIndex][6]=getStockStatusValue(DATA[sourceIndex][5],DATA[sourceIndex][12]);
+  }
+  const destinationIndex=DATA.findIndex(r=>normalizeProductCode(r[1])===codeKey && String(r[13]||"Q2")===to);
+  if(destinationIndex>=0){
+    DATA[destinationIndex][5]=Number(result.toStock)||0;
+    DATA[destinationIndex][6]=getStockStatusValue(DATA[destinationIndex][5],DATA[destinationIndex][12]);
+  }else{
+    const destination=normalizeSheetRows([template])[0];
+    const noteParts=splitNoteLocation(destination[7]||"");
+    destination[5]=Number(result.toStock)||0;
+    destination[6]=getStockStatusValue(destination[5],destination[12]);
+    destination[7]=mergeNoteLocation(noteParts.note||"","");
+    destination[13]=to;
+    DATA.push(destination);
+  }
+  if(result.fingerprint) SERVER_DATA_FINGERPRINT=String(result.fingerprint);
+  safeLocalStorageSet("kho_cntt_data",JSON.stringify(normalizeSheetRows(DATA)));
+  markLastSync();
+}
+
 async function submitInventoryTransfer(){
   const index=Number(document.getElementById("transferProductIndex").value), row=DATA[index], qty=Number(document.getElementById("transferQty").value), employee=document.getElementById("transferEmployee").value;
   if(!row||!Number.isInteger(qty)||qty<1||qty>Number(row[5]||0)){alert("Số lượng chuyển không hợp lệ hoặc vượt quá tồn kho");return;} if(!employee){alert("Vui lòng chọn nhân viên thực hiện");return;}
+  if(!transferUnitsLoaded){alert("Chưa tải được danh sách mã từng chiếc. Vui lòng đóng và mở lại cửa sổ chuyển kho khi kết nối ổn định.");return;}
   const unitIds=[...document.querySelectorAll('#transferUnitPicker input:checked')].map(input=>input.value); if(TRANSFER_UNITS.length && unitIds.length!==qty){alert(`Vui lòng chọn đúng ${qty} mã từng chiếc cần chuyển`);return;}
   const from=String(row[13]||"Q2"),to=from==="Q2"?"Q5":"Q2"; if(!confirm(`XÁC NHẬN CUỐI\n\nChuyển ${qty} × ${row[1]}\n${from} → ${to}\nNhân viên: ${employee}`))return;
   const btn=document.getElementById("transferSubmitBtn"); btn.disabled=true; btn.textContent="Đang chuyển trên máy chủ...";
   try{
-    const result=await postSheet("transfer_inventory",{id:"CK-"+Date.now(),from:from,to:to,code:row[1],qty:qty,unitIds:unitIds,employee:employee,note:document.getElementById("transferNote").value.trim()},40000);
+    const payload={id:transferRequestId || ("CK-"+newTransactionId()),from:from,to:to,code:row[1],qty:qty,unitIds:unitIds,employee:employee,note:document.getElementById("transferNote").value.trim()};
+    transferRequestId=payload.id;
+    const result=await commitInventoryTransfer(payload);
+    applyTransferResultToLocalData(row,from,to,result);
+    transferRequestId="";
     closeOverlay("transferOverlay");
     showToast(`✓ Đã chuyển kho · ${result.id}`,5000);
     await Promise.all([loadData(),loadTransfersFromSheet()]);
@@ -15861,6 +15955,7 @@ async function submitInventoryTransfer(){
         loadTXFromSheet(),
         loadTransfersFromSheet(),
         loadNVFromSheet(),
+        loadPublicRecentActivityFromSheet(),
         loadDisplayConfig(),
         loadProductLinks()
       ]);
