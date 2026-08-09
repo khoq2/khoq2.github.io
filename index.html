@@ -2159,6 +2159,21 @@ html::-webkit-scrollbar-corner { background: #EAF2F8; }
   pointer-events:none;
 }
 .admin-bar > * { pointer-events:auto; }
+/* Khi nút đăng nhập/thoát quản trị xuất hiện, dành cho nó một hàng riêng.
+   Không để thanh quản trị và cụm chuông/Q2/Q5 cùng chiếm góc phải tiêu đề. */
+body.admin-mode .sticky:not(.collapsed) .header .admin-bar,
+body.admin-entry-visible .sticky:not(.collapsed) .header .admin-bar {
+  position:relative!important;
+  z-index:2000!important;
+  top:auto!important;
+  right:auto!important;
+  width:100%!important;
+  min-height:38px!important;
+  margin:0 0 6px!important;
+  justify-content:flex-end!important;
+  flex-wrap:nowrap!important;
+  opacity:1!important;
+}
 .title-text {
   display:flex;
   flex-direction:column;
