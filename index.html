@@ -779,14 +779,21 @@ body.employee-mode .card-actions.admin-only.employee-permitted { display:grid!im
 .build-summary-actions button { border:0; border-radius:11px; padding:11px 8px; font-weight:900; cursor:pointer; }
 .build-export-image { background:#2E86C1; color:#fff; }.build-export-print { background:#1E8449; color:#fff; }.build-export-excel { background:#217346; color:#fff; }.build-clear-all { grid-column:1/-1; background:#FDEDEC; color:#922B21; }
 @media(min-width:601px) and (max-width:900px){
-  .build-summary-table-head,.build-summary-row { grid-template-columns:46px 50px minmax(130px,1fr) 52px minmax(300px,1.6fr); gap:6px; padding-left:8px; padding-right:8px; }
-  .build-summary-table-head { font-size:9px; letter-spacing:.015em; }
-  .build-summary-table-controls,.build-summary-controls { grid-template-columns:40px minmax(80px,1fr) minmax(95px,1.08fr) minmax(70px,.85fr); gap:5px; }
-  .build-summary-order { min-height:50px; gap:2px; }
+  .build-summary-table-shell { overflow:visible; }
+  .build-summary-table-head { display:none; }
+  .build-summary-list { gap:8px; overflow:visible; border:0; border-radius:0; background:transparent; }
+  .build-summary-row,.build-summary-row:nth-child(even) { grid-template-columns:46px 50px minmax(0,1fr) 72px; gap:8px; padding:9px; border:1px solid #D5E2EA; border-radius:12px; background:#fff; }
+  .build-summary-order { grid-column:1; grid-row:1/3; min-height:50px; align-self:start; gap:2px; }
   .build-summary-order strong { min-width:15px; font-size:11px; }
   .build-summary-order-buttons { gap:2px; }
   .build-summary-order button { width:20px; height:22px; padding:0; border-radius:6px; font-size:12px; }
+  .build-summary-image-wrap { grid-column:2; grid-row:1/3; }
   .build-summary-image-wrap,.build-summary-img { width:50px; height:50px; }
+  .build-summary-title { grid-column:3; grid-row:1; padding:0; }
+  .build-summary-unit { grid-column:4; grid-row:1; }
+  .build-summary-controls { grid-column:3/5; grid-row:2; grid-template-columns:48px minmax(90px,1fr) minmax(105px,1fr) minmax(86px,1fr); gap:6px; }
+  .build-summary-row .build-item-title-field > span,
+  .build-summary-row .build-summary-field > span:first-child { display:block!important; }
   .build-item-title-input,.build-summary-field input { padding-left:5px; padding-right:5px; font-size:12px; }
   .build-price-wrap em { padding-right:5px; font-size:9px; }
   .build-summary-amount output { padding-left:4px; padding-right:4px; font-size:11px; }
@@ -816,8 +823,30 @@ body.employee-mode .card-actions.admin-only.employee-permitted { display:grid!im
   .build-summary-select-check span { width:22px; height:22px; opacity:.88; transform:scale(1); font-size:17px; }
 }
 @media(min-width:601px){
+  .build-summary-table-shell { overflow:hidden; }
+  .build-summary-table-head,.build-summary-row { grid-template-columns:42px 46px minmax(110px,1fr) 48px minmax(250px,1.45fr); gap:5px; padding-left:8px; padding-right:8px; }
+  .build-summary-table-head { display:grid; min-width:0; padding-top:8px; padding-bottom:8px; font-size:8.5px; letter-spacing:.01em; }
+  .build-summary-table-controls,.build-summary-controls { grid-template-columns:38px minmax(0,.92fr) minmax(0,1.15fr) minmax(0,.9fr); gap:5px; }
+  .build-summary-list { min-width:0; gap:0; overflow:hidden; border:1px solid #CCDCE8; border-radius:0 0 11px 11px; background:#fff; }
+  .build-summary-row,.build-summary-row:nth-child(even) { min-width:0; padding-top:8px; padding-bottom:8px; border:0; border-bottom:1px solid #DCE6EE; border-radius:0; background:#fff; align-items:start; }
+  .build-summary-row:nth-child(even) { background:#F9FBFD; }
+  .build-summary-row:last-child { border-bottom:0; }
+  .build-summary-order { position:static; grid-column:auto; grid-row:auto; min-height:46px; align-self:start; gap:2px; }
+  .build-summary-order strong { min-width:13px; font-size:10px; }
+  .build-summary-order-buttons { gap:2px; }
+  .build-summary-order button { width:20px; height:20px; padding:0; border-radius:6px; font-size:11px; }
+  .build-summary-image-wrap { grid-column:auto; grid-row:auto; }
+  .build-summary-image-wrap,.build-summary-img { width:46px; height:46px; }
+  .build-summary-title { grid-column:auto; grid-row:auto; padding:0; }
+  .build-summary-unit { grid-column:auto; grid-row:auto; width:auto; }
+  .build-summary-controls { grid-column:auto; grid-row:auto; min-width:0; }
   .build-summary-row .build-item-title-field > span,
-  .build-summary-row .build-summary-field > span:first-child { display:none; }
+  .build-summary-row .build-summary-field > span:first-child { display:none!important; }
+  .build-item-title-input,.build-summary-field input { height:32px; padding:4px; font-size:11px; }
+  .build-price-wrap { height:32px; }
+  .build-price-wrap input { height:30px!important; font-size:11px; }
+  .build-price-wrap em { padding-right:3px; font-size:8px; }
+  .build-summary-amount output { min-height:32px; padding:7px 3px; font-size:10px; }
 }
 .fab-wrap { position: fixed; bottom: 20px; right: 16px; display: flex; flex-direction: column; gap: 10px; align-items: flex-end; z-index: 200; }
 .fab { border: none; border-radius: 50px; padding: 12px 18px; font-size: 14px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 14px rgba(0,0,0,.25); display: flex; align-items: center; gap: 8px; transition: transform .1s; }
@@ -8548,6 +8577,8 @@ const buildUnitByIndex = new Map();
 let nextBuildCustomIndex = -1;
 let buildQuoteTitle = "BÁO GIÁ LINH KIỆN";
 let buildQuoteCustomer = "";
+let buildQuoteAddress = "";
+let buildQuoteHotline = "";
 let currentGroupDetailSets = {};
 let ownerTapCount = 0;
 let ownerTapTimer = null;
@@ -11969,7 +12000,7 @@ function render(){
         const groupStock = sumQuickStock(buckets[g]||[]);
         const groupMetric = `${groupCount} mục · ${groupStock.toLocaleString("vi-VN")} tồn`;
         const isEmpty = groupCount === 0;
-        return `<button type="button" class="quick-nav-btn metric-tooltip-host${isEmpty?' quick-nav-empty':''}" style="--c:${GROUP_COLORS[idx%GROUP_COLORS.length]};${isEmpty?'opacity:0.38;pointer-events:none;':''}" aria-label="${escapeHtml(g)} · ${groupMetric}" onclick="jumpToGroup('grp-${idx}')">${g} (${groupCount})<span class="inventory-metric-tooltip" aria-hidden="true">${groupMetric}</span></button>`;
+        return `<button type="button" class="quick-nav-btn${isEmpty?' quick-nav-empty':''}" style="--c:${GROUP_COLORS[idx%GROUP_COLORS.length]};${isEmpty?'opacity:0.38;pointer-events:none;':''}" aria-label="${escapeHtml(g)} · ${groupMetric}" onclick="jumpToGroup('grp-${idx}')">${g} (${groupCount})</button>`;
       }).join("") + `</div><div class="quick-nav-scroll" aria-label="Kéo để xem thêm menu"><div class="quick-nav-scroll-track"><div class="quick-nav-scroll-thumb"></div></div></div></div>`;
     }
     currentGroupDetailSets = {};
@@ -12048,7 +12079,7 @@ function updateBulkControls(){
 function toggleComponentSelectionMode(){
   bulkSelectMode = !bulkSelectMode;
   if(bulkSelectMode) productViewMode = "card";
-  if(!bulkSelectMode){ selectedItems.clear(); buildQtyByIndex.clear(); buildPriceByIndex.clear(); buildTitleByIndex.clear(); buildWarrantyByIndex.clear(); buildCodeByIndex.clear(); buildUnitByIndex.clear(); buildQuoteTitle="BÁO GIÁ LINH KIỆN"; buildQuoteCustomer=""; }
+  if(!bulkSelectMode){ selectedItems.clear(); buildQtyByIndex.clear(); buildPriceByIndex.clear(); buildTitleByIndex.clear(); buildWarrantyByIndex.clear(); buildCodeByIndex.clear(); buildUnitByIndex.clear(); buildQuoteTitle="BÁO GIÁ LINH KIỆN"; buildQuoteCustomer=""; buildQuoteAddress=""; buildQuoteHotline=""; }
   render();
   syncProductViewModeButton();
   updateBulkControls();
@@ -12058,7 +12089,7 @@ function toggleComponentSelectionMode(){
 function toggleBulkSelectMode(){
   if(!requireAdmin()) return;
   bulkSelectMode = !bulkSelectMode;
-  if(!bulkSelectMode){ selectedItems.clear(); buildQtyByIndex.clear(); buildPriceByIndex.clear(); buildTitleByIndex.clear(); buildWarrantyByIndex.clear(); buildCodeByIndex.clear(); buildUnitByIndex.clear(); buildQuoteTitle="BÁO GIÁ LINH KIỆN"; buildQuoteCustomer=""; }
+  if(!bulkSelectMode){ selectedItems.clear(); buildQtyByIndex.clear(); buildPriceByIndex.clear(); buildTitleByIndex.clear(); buildWarrantyByIndex.clear(); buildCodeByIndex.clear(); buildUnitByIndex.clear(); buildQuoteTitle="BÁO GIÁ LINH KIỆN"; buildQuoteCustomer=""; buildQuoteAddress=""; buildQuoteHotline=""; }
   render();
 }
 
@@ -12139,6 +12170,8 @@ function renderBuildSummary(){
     <label><input type="text" maxlength="120" value="${escapeHtml(buildQuoteTitle)}" placeholder="BÁO GIÁ LINH KIỆN" aria-label="Tiêu đề báo giá" oninput="setBuildQuoteText('title',this.value)"></label>
     <label><span>Tên khách</span><input type="text" maxlength="120" value="${escapeHtml(buildQuoteCustomer)}" placeholder="Nhập tên khách hàng" oninput="setBuildQuoteText('customer',this.value)"></label>
     <label><span>Ngày báo giá</span><input type="text" value="${escapeHtml(formatTxTime(new Date()))}" readonly></label>
+    <label><span>Địa chỉ</span><input type="text" maxlength="200" value="${escapeHtml(buildQuoteAddress)}" placeholder="Nhập địa chỉ khách hàng" oninput="setBuildQuoteText('address',this.value)"></label>
+    <label><span>SĐT / Hotline</span><input type="tel" inputmode="tel" maxlength="50" value="${escapeHtml(buildQuoteHotline)}" placeholder="Nhập số điện thoại" oninput="setBuildQuoteText('hotline',this.value)"></label>
   </div><div class="build-summary-table-shell"><div class="build-summary-table-head"><span>STT</span><span>Ảnh</span><span>Tên linh kiện</span><span>ĐVT</span><div class="build-summary-table-controls"><span>SL</span><span>Đơn giá</span><span>Thành tiền</span><span>Bảo hành</span></div></div><div class="build-summary-list">${rows.map(({idx,r,qty,stock,price,title,warranty,unit},rowIndex)=>{
     const img=String(r[9]||"");
     return `<div class="build-summary-row" data-build-index="${idx}">
@@ -12179,9 +12212,11 @@ function setBuildItemPrice(idx,value,input){
   updateBuildSummaryTotals();
 }
 function setBuildQuoteText(field,value){
-  const text=String(value||"").slice(0,120);
-  if(field==="title") buildQuoteTitle=text;
-  if(field==="customer") buildQuoteCustomer=text;
+  const text=String(value||"");
+  if(field==="title") buildQuoteTitle=text.slice(0,120);
+  if(field==="customer") buildQuoteCustomer=text.slice(0,120);
+  if(field==="address") buildQuoteAddress=text.slice(0,200);
+  if(field==="hotline") buildQuoteHotline=text.slice(0,50);
 }
 function setBuildItemText(idx,field,value){
   const text=String(value||"").slice(0,180);
@@ -12223,7 +12258,7 @@ function removeBuildItem(idx){
 }
 function clearBuildSelection(){
   selectedItems.clear(); buildQtyByIndex.clear(); buildPriceByIndex.clear(); buildTitleByIndex.clear(); buildWarrantyByIndex.clear(); buildCodeByIndex.clear(); buildUnitByIndex.clear();
-  buildQuoteTitle="BÁO GIÁ LINH KIỆN"; buildQuoteCustomer="";
+  buildQuoteTitle="BÁO GIÁ LINH KIỆN"; buildQuoteCustomer=""; buildQuoteAddress=""; buildQuoteHotline="";
   closeOverlay("buildSummaryOverlay"); render(); updateBulkControls();
 }
 function loadBuildCanvasImage(url){
@@ -12246,19 +12281,22 @@ async function exportBuildSummaryImage(){
   const rows=getBuildSelectedRows();
   if(!rows.length) return;
   const width=1200,rowH=145,canvas=document.createElement("canvas"),ctx=canvas.getContext("2d");
-  canvas.width=width; canvas.height=190+rows.length*rowH+85;
+  canvas.width=width; canvas.height=210+rows.length*rowH+85;
   const grad=ctx.createLinearGradient(0,0,width,0); grad.addColorStop(0,"#1E3A5F"); grad.addColorStop(1,"#2E86C1");
-  ctx.fillStyle=grad; ctx.fillRect(0,0,width,145);
+  ctx.fillStyle=grad; ctx.fillRect(0,0,width,165);
   const quoteCustomer=String(buildQuoteCustomer||"").trim();
+  const quoteAddress=String(buildQuoteAddress||"").trim();
+  const quoteHotline=String(buildQuoteHotline||"").trim();
   const quoteDate=formatTxTime(new Date());
-  ctx.fillStyle="#fff"; ctx.font="bold 38px Arial"; ctx.textAlign="center"; drawBuildCanvasText(ctx,buildQuoteTitle||"BÁO GIÁ LINH KIỆN",width/2,50,width-90,42,1);
-  ctx.font="bold 18px Arial"; ctx.fillStyle="rgba(255,255,255,.9)";
-  ctx.fillText(`KHÁCH HÀNG: ${quoteCustomer||"................................"}`,width/2,91);
-  ctx.fillText(`NGÀY BÁO GIÁ: ${quoteDate}`,width/2,120);
+  ctx.fillStyle="#fff"; ctx.font="bold 36px Arial"; ctx.textAlign="center"; drawBuildCanvasText(ctx,buildQuoteTitle||"BÁO GIÁ LINH KIỆN",width/2,43,width-90,40,1);
+  ctx.font="bold 17px Arial"; ctx.fillStyle="rgba(255,255,255,.92)";
+  ctx.fillText(`KHÁCH HÀNG: ${quoteCustomer||"................................"}`,width/2,78);
+  ctx.fillText(`NGÀY BÁO GIÁ: ${quoteDate}`,width/2,105);
+  drawBuildCanvasText(ctx,`ĐỊA CHỈ: ${quoteAddress||"................................"}   |   SĐT / HOTLINE: ${quoteHotline||"................................"}`,width/2,136,width-70,22,1);
   ctx.textAlign="left";
   const images=await Promise.all(rows.map(x=>loadBuildCanvasImage(String(x.r[9]||""))));
   rows.forEach((item,i)=>{
-    const y=160+i*rowH; ctx.fillStyle=i%2?"#F4F8FB":"#fff"; ctx.fillRect(28,y,width-56,rowH-8);
+    const y=180+i*rowH; ctx.fillStyle=i%2?"#F4F8FB":"#fff"; ctx.fillRect(28,y,width-56,rowH-8);
     const img=images[i]; if(img){ ctx.save(); ctx.beginPath(); ctx.roundRect(46,y+14,88,88,10); ctx.clip(); ctx.drawImage(img,46,y+14,88,88); ctx.restore(); } else { ctx.fillStyle="#E7EFF5"; ctx.fillRect(46,y+14,88,88); ctx.fillStyle="#789"; ctx.font="30px Arial"; ctx.fillText("PC",69,y+68); }
     ctx.fillStyle="#1E3A5F"; ctx.font="bold 21px Arial"; drawBuildCanvasText(ctx,item.title,155,y+35,960,26,2);
     const priceText=item.price?formatBuildMoney(item.price):"Chưa nhập";
@@ -12266,7 +12304,7 @@ async function exportBuildSummaryImage(){
     ctx.fillStyle="#1A5276"; ctx.font="bold 17px Arial";
     drawBuildCanvasText(ctx,`SL: ${item.qty}   |   GIÁ: ${priceText}   |   BH: ${warrantyText}`,155,y+105,960,20,1);
   });
-  const totals=getBuildTotals(rows),footerY=175+rows.length*rowH;
+  const totals=getBuildTotals(rows),footerY=195+rows.length*rowH;
   ctx.fillStyle="#1E3A5F"; ctx.font="bold 24px Arial"; ctx.fillText(`Tổng: ${rows.length} linh kiện · ${rows.reduce((s,x)=>s+x.qty,0)} sản phẩm`,42,footerY+28);
   ctx.textAlign="right"; ctx.fillStyle="#C0392B"; ctx.font="bold 28px Arial"; ctx.fillText(`TỔNG CỘNG: ${formatBuildMoney(totals.total)}`,1150,footerY+28);
   if(totals.missing){ctx.fillStyle="#A66B00";ctx.font="bold 15px Arial";ctx.fillText(`Còn ${totals.missing} linh kiện chưa nhập giá`,1150,footerY+57);}
@@ -12282,8 +12320,8 @@ function exportBuildSummaryExcelBasic(){
   const title=String(buildQuoteTitle||"BÁO GIÁ LINH KIỆN").trim()||"BÁO GIÁ LINH KIỆN";
   const table=[
     [title],
-    ["Tên khách",String(buildQuoteCustomer||"").trim()],
-    ["Ngày báo giá",createdAt],
+    ["Tên khách",String(buildQuoteCustomer||"").trim(),"","","SĐT / Hotline",String(buildQuoteHotline||"").trim()],
+    ["Ngày báo giá",createdAt,"","","Địa chỉ",String(buildQuoteAddress||"").trim()],
     [],
     ["STT","TÊN LINH KIỆN","ĐVT","SL","ĐƠN GIÁ (VND)","THÀNH TIỀN","BẢO HÀNH"],
     ...rows.map((item,index)=>[index+1,item.title,item.unit,item.qty,item.price||"",item.qty*item.price,item.warranty||""]),
@@ -12296,8 +12334,10 @@ function exportBuildSummaryExcelBasic(){
   const vatRowIndex=table.length-1;
   ws["!merges"]=[
     {s:{r:0,c:0},e:{r:0,c:6}},
-    {s:{r:1,c:1},e:{r:1,c:6}},
-    {s:{r:2,c:1},e:{r:2,c:6}},
+    {s:{r:1,c:1},e:{r:1,c:3}},
+    {s:{r:1,c:5},e:{r:1,c:6}},
+    {s:{r:2,c:1},e:{r:2,c:3}},
+    {s:{r:2,c:5},e:{r:2,c:6}},
     {s:{r:totalRowIndex,c:0},e:{r:totalRowIndex,c:3}},
     {s:{r:vatRowIndex,c:0},e:{r:vatRowIndex,c:3}}
   ];
@@ -12384,6 +12424,8 @@ async function exportBuildSummaryExcel(button){
     const quoteCode=`BG-${now.getFullYear()}${String(now.getMonth()+1).padStart(2,"0")}${String(now.getDate()).padStart(2,"0")}-${String(now.getHours()).padStart(2,"0")}${String(now.getMinutes()).padStart(2,"0")}`;
     const quoteTitle=String(buildQuoteTitle||"BÁO GIÁ LINH KIỆN").trim()||"BÁO GIÁ LINH KIỆN";
     const customer=String(buildQuoteCustomer||"").trim();
+    const customerAddress=String(buildQuoteAddress||"").trim();
+    const customerHotline=String(buildQuoteHotline||"").trim();
     const workbook=new ExcelApi.Workbook();
     workbook.creator="HOÀNG GIA COMPUTER";
     workbook.lastModifiedBy="HOÀNG GIA COMPUTER";
@@ -12415,8 +12457,8 @@ async function exportBuildSummaryExcel(button){
     sheet.getCell("F1").value="BÁO GIÁ";
     sheet.getCell("F3").value=`Ngày ${dateText}\nMã: ${quoteCode}`;
     sheet.getCell("A5").value=quoteTitle.toLocaleUpperCase("vi-VN");
-    sheet.getCell("A6").value=`Khách hàng: ${customer||"........................................"}`;
-    sheet.getCell("D6").value=`Kho lập báo giá: ${currentBranch||"Q2"}`;
+    sheet.getCell("A6").value=`Khách hàng: ${customer||"........................"}\nSĐT / Hotline: ${customerHotline||"........................"}`;
+    sheet.getCell("D6").value=`Địa chỉ: ${customerAddress||"........................................"}\nKho lập báo giá: ${currentBranch||"Q2"}`;
     const logoData=getBuildExcelLogoData();
     if(logoData){
       const extension=/image\/png/i.test(logoData)?"png":"jpeg";
@@ -12425,7 +12467,7 @@ async function exportBuildSummaryExcel(button){
     }else{
       sheet.getCell("A1").value="MÁY TÍNH\nHOÀNG GIA.VN";
     }
-    [27,20,20,24,28,23,26].forEach((height,index)=>{sheet.getRow(index+1).height=height;});
+    [27,20,20,24,28,34,26].forEach((height,index)=>{sheet.getRow(index+1).height=height;});
     const green="FF0B6B3A", green2="FF158447", yellow="FFF5C84C", pale="FFF4F8F6", white="FFFFFFFF", ink="FF23313D", red="FFD92828", line="FFB7C5BE";
     const solid=color=>({type:"pattern",pattern:"solid",fgColor:{argb:color}});
     const thinBorder={top:{style:"thin",color:{argb:line}},left:{style:"thin",color:{argb:line}},bottom:{style:"thin",color:{argb:line}},right:{style:"thin",color:{argb:line}}};
@@ -12508,7 +12550,7 @@ function printBuildSummary(){
     ? `<div class="missing">⚠ Còn ${totals.missing} linh kiện chưa nhập giá; tổng cộng hiện chỉ tính các món đã có giá.</div>`
     : `<div class="complete">Nếu thêm 8% VAT = ${formatBuildMoney(totals.totalWithVat)}</div>`;
   const bodyRows=rows.map((item,index)=>`<tr><td>${index+1}</td><td><b>${escapeHtml(item.title)}</b>${item.warranty?`<small>Bảo hành: ${escapeHtml(item.warranty)}</small>`:""}</td><td class="num">${item.qty}</td><td class="num strong">${item.price?formatBuildMoney(item.price):"Chưa nhập"}</td></tr>`).join("");
-  win.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>${escapeHtml(buildQuoteTitle||"Báo giá linh kiện")}</title><style>body{font-family:Arial,sans-serif;color:#1E3A5F;padding:28px}h1{margin:0}.sub{color:#667;margin:7px 0 22px}table{width:100%;border-collapse:collapse}th,td{padding:11px 9px;border-bottom:1px solid #DDE6ED;text-align:left}th{background:#EAF2F8;font-size:12px}td{font-size:13px}td small{display:block;margin-top:4px;color:#6B7F8D;line-height:1.55}.num{text-align:right}.strong{color:#1E8449;font-weight:bold}.total{margin-top:20px;padding:14px;background:#EAF2F8;border-radius:10px;text-align:right}.total span{display:block;font-size:12px}.total b{display:block;margin-top:3px;color:#C0392B;font-size:24px}.missing,.complete{margin-top:9px;text-align:right;font-size:12px;font-weight:bold}.missing{color:#A66B00}.complete{color:#1E8449}@media print{body{padding:0}}</style></head><body><h1>${escapeHtml(buildQuoteTitle||"BÁO GIÁ LINH KIỆN")}</h1><div class="sub">${buildQuoteCustomer?`Khách: <b>${escapeHtml(buildQuoteCustomer)}</b> · `:""}${escapeHtml(formatTxTime(new Date()))}</div><table><thead><tr><th>#</th><th>Tên linh kiện</th><th class="num">SL</th><th class="num">Đơn giá</th></tr></thead><tbody>${bodyRows}</tbody></table><div class="total"><span>${rows.length} linh kiện · ${totals.totalQty} sản phẩm</span><b>TỔNG CỘNG: ${formatBuildMoney(totals.total)}</b></div>${missingNotice}<script>window.onload=()=>setTimeout(()=>window.print(),250)<\/script></body></html>`);
+  win.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>${escapeHtml(buildQuoteTitle||"Báo giá linh kiện")}</title><style>body{font-family:Arial,sans-serif;color:#1E3A5F;padding:28px}h1{margin:0}.sub{color:#667;margin:7px 0 22px;line-height:1.7}.sub div{display:flex;gap:20px;flex-wrap:wrap}table{width:100%;border-collapse:collapse}th,td{padding:11px 9px;border-bottom:1px solid #DDE6ED;text-align:left}th{background:#EAF2F8;font-size:12px}td{font-size:13px}td small{display:block;margin-top:4px;color:#6B7F8D;line-height:1.55}.num{text-align:right}.strong{color:#1E8449;font-weight:bold}.total{margin-top:20px;padding:14px;background:#EAF2F8;border-radius:10px;text-align:right}.total span{display:block;font-size:12px}.total b{display:block;margin-top:3px;color:#C0392B;font-size:24px}.missing,.complete{margin-top:9px;text-align:right;font-size:12px;font-weight:bold}.missing{color:#A66B00}.complete{color:#1E8449}@media print{body{padding:0}}</style></head><body><h1>${escapeHtml(buildQuoteTitle||"BÁO GIÁ LINH KIỆN")}</h1><div class="sub"><div><span>Khách hàng: <b>${escapeHtml(buildQuoteCustomer||"................................")}</b></span><span>Ngày báo giá: <b>${escapeHtml(formatTxTime(new Date()))}</b></span></div><div><span>Địa chỉ: <b>${escapeHtml(buildQuoteAddress||"................................")}</b></span><span>SĐT / Hotline: <b>${escapeHtml(buildQuoteHotline||"................................")}</b></span></div></div><table><thead><tr><th>#</th><th>Tên linh kiện</th><th class="num">SL</th><th class="num">Đơn giá</th></tr></thead><tbody>${bodyRows}</tbody></table><div class="total"><span>${rows.length} linh kiện · ${totals.totalQty} sản phẩm</span><b>TỔNG CỘNG: ${formatBuildMoney(totals.total)}</b></div>${missingNotice}<script>window.onload=()=>setTimeout(()=>window.print(),250)<\/script></body></html>`);
   const printHeading=win.document.querySelector("h1");
   if(printHeading) printHeading.style.textAlign="center";
   win.document.close();
