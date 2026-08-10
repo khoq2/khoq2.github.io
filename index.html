@@ -8771,8 +8771,12 @@ function hasEmployeePrivateAreaSession(area){ return !!employeeAccessProfile?.na
 function employeePermissions(){
   return Array.isArray(employeeAccessProfile?.permissions) ? employeeAccessProfile.permissions.map(value=>String(value).toUpperCase()) : [];
 }
+function employeeSessionHasPermission(permission,profile=employeeAccessProfile,token=employeeAccessToken){
+  const permissions=Array.isArray(profile?.permissions) ? profile.permissions.map(value=>String(value).toUpperCase()) : [];
+  return !!token && permissions.includes(String(permission||"").toUpperCase());
+}
 function hasEmployeePermission(permission){
-  return isAdminMode() || (!!employeeAccessToken && employeePermissions().includes(String(permission||"").toUpperCase()));
+  return isAdminMode() || employeeSessionHasPermission(permission);
 }
 function hasAnyEmployeePermission(permissions){
   return isAdminMode() || (Array.isArray(permissions) && permissions.some(hasEmployeePermission));
@@ -9032,7 +9036,7 @@ function checkAdminSession(){
 
 // Dòng URL duy nhất
 const SHEET_API_URL = "https://script.google.com/macros/s/AKfycby6YH69F7sfO1ZoUJsDm4BeX6Luj2GrhUfYWWJWNvqjraAEhkBck16EphrPBBm1BT3YqA/exec";
-const REQUIRED_API_VERSION = "2026.08.10-private-area-scope-05";
+const REQUIRED_API_VERSION = "2026.08.10-private-permission-strict-06";
 // Apps Script có thể phải chờ khóa ghi khi nhiều thao tác diễn ra gần nhau.
 // 45 giây dài hơn thời gian chờ khóa phía máy chủ, tránh báo lỗi giả trong khi Sheet vẫn đang ghi.
 const SHEET_TIMEOUT_MS = 45000;
@@ -15667,7 +15671,7 @@ function requestPrivateAccess(target){
   if(privateAccessTarget==="partner" && hasPrivateFeatureAccess("partner")){ void openPartnerPanel(); return; }
   if(employeeAccessToken&&employeeAccessProfile){
     const needed=privateAccessTarget==="partner"?"PARTNER_VIEW":privateAccessTarget==="customer"?"CUSTOMER_VIEW":"";
-    if(needed&&!hasEmployeePermission(needed)){ showToast(`Tài khoản ${employeeAccessProfile.name} chưa được cấp quyền ${EMPLOYEE_PERMISSION_LABELS[needed]}.`,4200); return; }
+    if(needed&&!employeeSessionHasPermission(needed)){ showToast(`Tài khoản ${employeeAccessProfile.name} chưa được cấp quyền ${EMPLOYEE_PERMISSION_LABELS[needed]}.`,4200); return; }
   }
   const overlay=document.getElementById("privateAccessOverlay");
   if(overlay) overlay.dataset.accessTarget=privateAccessTarget;
@@ -15726,9 +15730,10 @@ async function submitPrivateAccess(){
     },20000);
     if(!verified.token) throw new Error("API không cấp phiên đăng nhập nhân viên");
     if(!verified.employee) throw new Error("API chưa trả lại hồ sơ quyền của nhân viên");
-    setEmployeeSession(verified.token,verified.employee);
     const needed=target==="customer"?"CUSTOMER_VIEW":target==="partner"?"PARTNER_VIEW":"";
-    if(needed && !hasEmployeePermission(needed)) throw new Error(`EMPLOYEE_PERMISSION_REQUIRED: Tài khoản ${verified.employee.name} chưa được cấp quyền ${EMPLOYEE_PERMISSION_LABELS[needed]}`);
+    const granted=Array.isArray(verified.employee.permissions) ? verified.employee.permissions.map(permission=>String(permission).toUpperCase()) : [];
+    if(needed && !granted.includes(needed)) throw new Error(`EMPLOYEE_PERMISSION_REQUIRED: Tài khoản ${verified.employee.name} chưa được cấp quyền ${EMPLOYEE_PERMISSION_LABELS[needed]}`);
+    setEmployeeSession(verified.token,verified.employee);
     if(target==="customer"||target==="partner") activateEmployeePrivateArea(target,verified.token);
     closePrivateAccess();
     showToast(`✅ Đã đăng nhập: ${verified.employee.name} · ${employeeRoleLabel(verified.employee)}`,4500);
@@ -15754,9 +15759,12 @@ function clearPrivateSession(){
   PARTNER_DATA=[];
 }
 function hasPrivateFeatureAccess(target=privateAccessTarget){
-  if(privateAccessToken || (isAdminMode() && !!sessionStorage.getItem("kho_admin_session_token"))) return true;
+  if(privateAccessToken) return true;
   const area=target==="partner"?"partner":"customer";
-  return hasEmployeePrivateAreaSession(area) && hasEmployeePermission(area==="partner"?"PARTNER_VIEW":"CUSTOMER_VIEW");
+  if(employeeAccessToken&&employeeAccessProfile){
+    return hasEmployeePrivateAreaSession(area) && employeeSessionHasPermission(area==="partner"?"PARTNER_VIEW":"CUSTOMER_VIEW");
+  }
+  return isAdminMode() && !!sessionStorage.getItem("kho_admin_session_token");
 }
 function requirePrivateFeatureAccess(target=privateAccessTarget){
   if(hasPrivateFeatureAccess(target)) return true;
@@ -15767,21 +15775,24 @@ function requirePrivateFeatureAccess(target=privateAccessTarget){
 function requirePrivateEditAccess(permission,label){
   if(canPrivateEdit(permission)) return true;
   const area=permission.startsWith("PARTNER")?"partner":"customer";
-  if(employeeAccessToken&&employeeAccessProfile&&!hasEmployeePermission(permission)) showToast(`Tài khoản ${employeeAccessProfile.name} chưa được cấp quyền ${label}.`,4200);
+  if(employeeAccessToken&&employeeAccessProfile&&!employeeSessionHasPermission(permission)) showToast(`Tài khoản ${employeeAccessProfile.name} chưa được cấp quyền ${label}.`,4200);
   else requestPrivateAccess(area);
   return false;
 }
 function canPrivateEdit(permission){
-  if(privateAccessToken || (isAdminMode() && !!sessionStorage.getItem("kho_admin_session_token"))) return true;
+  if(privateAccessToken) return true;
   const area=String(permission||"").startsWith("PARTNER")?"partner":"customer";
-  return hasEmployeePrivateAreaSession(area) && hasEmployeePermission(permission);
+  if(employeeAccessToken&&employeeAccessProfile){
+    return hasEmployeePrivateAreaSession(area) && employeeSessionHasPermission(permission);
+  }
+  return isAdminMode() && !!sessionStorage.getItem("kho_admin_session_token");
 }
 function renderPrivateAreaSessionStatus(area){
   const normalized=area==="partner"?"partner":"customer";
   const box=document.getElementById(normalized==="partner"?"partnerSessionStatus":"customerSessionStatus");
   if(!box) return;
-  const adminActive=isAdminMode() && !!sessionStorage.getItem("kho_admin_session_token");
   const employeeActive=!!employeeAccessToken && !!employeeAccessProfile?.name && hasEmployeePrivateAreaSession(normalized);
+  const adminActive=!employeeActive && isAdminMode() && !!sessionStorage.getItem("kho_admin_session_token");
   box.classList.toggle("admin-session",adminActive);
   box.hidden=!adminActive && !employeeActive;
   if(adminActive){
@@ -15795,7 +15806,7 @@ function renderPrivateAreaSessionStatus(area){
 function renderPrivateAreaSessionStatuses(){ renderPrivateAreaSessionStatus("customer"); renderPrivateAreaSessionStatus("partner"); }
 function refreshPrivateEditUI(){
   document.querySelectorAll("[data-private-edit]").forEach(element=>{ element.hidden=!canPrivateEdit(element.dataset.privateEdit); });
-  const viewer=isAdminMode()?"ADMIN":employeeAccessProfile?.name||"ĐÃ XÁC THỰC";
+  const viewer=employeeAccessToken&&employeeAccessProfile?.name ? employeeAccessProfile.name : isAdminMode()?"ADMIN":"ĐÃ XÁC THỰC";
   document.querySelectorAll("#partnerOverlay .modern-live-badge").forEach(element=>{ element.innerHTML=`<i></i> ${escapeHtml(viewer)}`; });
   renderPrivateAreaSessionStatuses();
 }
@@ -15808,10 +15819,11 @@ function isPrivateAuthFailure(error){
 async function privateSheet(action,data={},timeoutMs=SHEET_TIMEOUT_MS){
   const adminToken=sessionStorage.getItem("kho_admin_session_token") || "";
   const areaToken=getEmployeePrivateAreaToken(privateAccessTarget);
+  const actingAsEmployee=!!employeeAccessToken && !!employeeAccessProfile?.name;
   try{
     return await fetchSheetJson(SHEET_API_URL,{
       method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},
-      body:JSON.stringify({action,data,privateAuth:privateAccessToken,auth:adminToken,employeeAuth:areaToken||employeeAccessToken})
+      body:JSON.stringify({action,data,privateAuth:actingAsEmployee?"":privateAccessToken,auth:actingAsEmployee?"":adminToken,employeeAuth:actingAsEmployee?(areaToken||employeeAccessToken):""})
     },timeoutMs);
   }catch(e){
     const rawMessage=privateErrorText(e);
