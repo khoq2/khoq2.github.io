@@ -6135,6 +6135,18 @@ body.private-panel-open{overflow:hidden}
 .private-access-error{min-height:18px;margin:8px 0 0;color:#B03A2E;font-size:11px;font-weight:800}
 .private-access-actions{display:grid;grid-template-columns:1fr 1.35fr;gap:9px;margin-top:13px}
 .private-access-actions button{min-height:44px;border-radius:12px}
+#employeeLogoutOverlay{z-index:780;align-items:center!important;justify-content:center!important;padding:16px!important;background:rgba(7,23,38,.62)!important;backdrop-filter:blur(10px) saturate(115%)}
+.employee-logout-modal{width:min(390px,calc(100vw - 32px))!important;max-height:none!important;margin:auto;padding:25px 23px 21px!important;overflow:visible!important;border:1px solid rgba(255,255,255,.82)!important;border-radius:22px!important;background:linear-gradient(145deg,#FFFFFF,#F5F9FC)!important;text-align:center;box-shadow:0 28px 70px rgba(4,22,38,.36),inset 0 1px 0 #fff!important}
+.employee-logout-icon{display:grid;width:58px;height:58px;margin:0 auto 14px;place-items:center;border-radius:18px;background:linear-gradient(135deg,#E74C3C,#A93226);color:#fff;box-shadow:0 12px 25px rgba(169,50,38,.27)}
+.employee-logout-icon svg{width:29px;height:29px;fill:none;stroke:currentColor;stroke-width:2.15;stroke-linecap:round;stroke-linejoin:round}
+.employee-logout-modal h2{margin:0;color:#183850;font-size:19px;font-weight:950;letter-spacing:.15px}
+.employee-logout-modal p{margin:9px 0 0;color:#62798B;font-size:12px;font-weight:720;line-height:1.5}
+.employee-logout-actions{display:grid;grid-template-columns:1fr 1.2fr;gap:9px;margin-top:20px}
+.employee-logout-actions button{min-height:44px;margin:0;border-radius:11px;font-size:13px;font-weight:900;cursor:pointer}
+.employee-logout-cancel{border:1px solid #C8D5DF;background:#fff;color:#344B5C}
+.employee-logout-confirm{border:1px solid #A93226;background:linear-gradient(135deg,#E74C3C,#A93226);color:#fff;box-shadow:0 6px 15px rgba(169,50,38,.23)}
+.employee-logout-cancel:hover{background:#F3F7F9}.employee-logout-confirm:hover{filter:brightness(1.04)}
+@media(max-width:420px){.employee-logout-modal{width:calc(100vw - 24px)!important;padding:22px 17px 17px!important}.employee-logout-actions{grid-template-columns:1fr 1.15fr}.employee-logout-actions button{min-height:46px}}
 #partnerOverlay{align-items:center;justify-content:center;padding:18px;background:rgba(8,22,38,.64);backdrop-filter:blur(10px)}
 .partner-modal{width:min(860px,calc(100vw - 28px));max-height:calc(100dvh - 30px);padding:15px;border:1px solid #D7E3EC;border-radius:20px;background:#F4F8FB;color:#21384A;box-shadow:0 22px 60px rgba(8,28,45,.34);overflow:auto}
 .partner-head{display:flex;align-items:center;gap:10px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid #D8E3EB}
@@ -6698,6 +6710,7 @@ body.fab-menu-open .side-control-rail{
   color:#fff!important;
   box-shadow:0 6px 16px rgba(15,95,159,.24)!important;
 }
+.side-control-rail #customerDockButton[hidden],.side-control-rail #partnerDockButton[hidden]{display:none!important}
 .side-control-rail #partnerDockButton,
 .side-control-rail #partnerDockButton:hover,
 .side-control-rail #partnerDockButton:focus-visible{
@@ -8059,6 +8072,18 @@ body .warehouse-switch.warehouse-switch-changing .warehouse-pin{
   </div>
 </div>
 
+<div class="overlay" id="employeeLogoutOverlay" onclick="if(event.target===this)closeEmployeeLogoutConfirm()">
+  <div class="modal employee-logout-modal" role="dialog" aria-modal="true" aria-labelledby="employeeLogoutTitle" aria-describedby="employeeLogoutText" onclick="event.stopPropagation()">
+    <div class="employee-logout-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 2.8v8.4"></path><path d="M7.05 5.55a8 8 0 1 0 9.9 0"></path></svg></div>
+    <h2 id="employeeLogoutTitle">Xác nhận đăng xuất</h2>
+    <p id="employeeLogoutText">Bạn có muốn kết thúc phiên đăng nhập?</p>
+    <div class="employee-logout-actions">
+      <button class="employee-logout-cancel" id="employeeLogoutCancel" type="button" onclick="closeEmployeeLogoutConfirm()">Ở lại</button>
+      <button class="employee-logout-confirm" type="button" onclick="confirmEmployeeLogout()">Đăng xuất</button>
+    </div>
+  </div>
+</div>
+
 <div class="overlay" id="privateAccessOverlay" onclick="if(event.target===this)closePrivateAccess()">
   <div class="modal private-access-modal" role="dialog" aria-modal="true" aria-labelledby="privateAccessTitle" onclick="event.stopPropagation()">
     <div class="private-access-heading">
@@ -8770,7 +8795,7 @@ function rememberEmployeePrivateArea(area){
 }
 function reopenEmployeePrivateArea(){ requestPrivateAccess(getEmployeeLastPrivateArea()); }
 function updateEmployeeDock(){
-  const button=document.getElementById("employeeDockButton"), shortcut=document.getElementById("employeeProfileShortcut"), label=document.getElementById("employeeDockLabel"), tooltip=document.getElementById("employeeDockTooltip"), profileTooltip=document.getElementById("employeeProfileTooltip");
+  const button=document.getElementById("employeeDockButton"), shortcut=document.getElementById("employeeProfileShortcut"), label=document.getElementById("employeeDockLabel"), tooltip=document.getElementById("employeeDockTooltip"), profileTooltip=document.getElementById("employeeProfileTooltip"), customerButton=document.getElementById("customerDockButton"), partnerButton=document.getElementById("partnerDockButton");
   const active=!!employeeAccessToken && !!employeeAccessProfile?.name;
   const name=active ? String(employeeAccessProfile.name).trim() : "";
   const sessionEmployee=active ? (findNVByName(name) || normalizeNVItem(employeeAccessProfile)) : null;
@@ -8778,6 +8803,8 @@ function updateEmployeeDock(){
   const roleFriendly=active ? employeeRoleFriendly(sessionEmployee || employeeAccessProfile) : "";
   const reopenArea=getEmployeeLastPrivateArea();
   const reopenText=reopenArea==="partner" ? "Click để mở lại mục Đối tác" : "Click để mở lại hồ sơ";
+  const hideCustomerIcon=active && reopenArea==="customer" && hasEmployeePrivateAreaSession("customer");
+  const hidePartnerIcon=active && reopenArea==="partner" && hasEmployeePrivateAreaSession("partner");
   if(label) label.innerHTML=active ? `<span class="employee-dock-name">${escapeHtml(name)}</span>${renderNVRoleBadge(name,sessionEmployee || employeeAccessProfile)}` : "";
   if(tooltip) tooltip.textContent=active ? `Đăng xuất khỏi ${name} ${roleFriendly}` : "";
   if(profileTooltip) profileTooltip.textContent=active ? reopenText : "";
@@ -8798,6 +8825,8 @@ function updateEmployeeDock(){
     button.setAttribute("aria-label",active?`Đăng xuất khỏi ${name} ${roleFriendly}`:"Chưa có phiên đăng nhập");
     button.removeAttribute("title");
   }
+  if(customerButton) customerButton.hidden=hideCustomerIcon;
+  if(partnerButton) partnerButton.hidden=hidePartnerIcon;
 }
 function refreshEmployeePermissionUI(){
   const active=!!employeeAccessToken && !!employeeAccessProfile?.name;
@@ -8852,11 +8881,26 @@ function requireActionPermission(permission,label="thao tác này"){
   return false;
 }
 function toggleEmployeeAccess(){
-  if(employeeAccessToken&&employeeAccessProfile){
-    if(confirm(`Đăng xuất khỏi ${employeeAccessProfile.name} ${employeeRoleFriendly(employeeAccessProfile)}?`)){ clearEmployeeSession(true); render(); }
-    return;
-  }
+  if(employeeAccessToken&&employeeAccessProfile) openEmployeeLogoutConfirm();
 }
+function openEmployeeLogoutConfirm(){
+  if(!employeeAccessToken||!employeeAccessProfile) return;
+  const overlay=document.getElementById("employeeLogoutOverlay");
+  const text=document.getElementById("employeeLogoutText");
+  if(text) text.textContent=`Đăng xuất khỏi ${employeeAccessProfile.name} ${employeeRoleFriendly(employeeAccessProfile)}?`;
+  overlay?.classList.add("open");
+  setTimeout(()=>document.getElementById("employeeLogoutCancel")?.focus({preventScroll:true}),60);
+}
+function closeEmployeeLogoutConfirm(){
+  document.getElementById("employeeLogoutOverlay")?.classList.remove("open");
+}
+function confirmEmployeeLogout(){
+  if(!employeeAccessToken||!employeeAccessProfile){ closeEmployeeLogoutConfirm(); return; }
+  closeEmployeeLogoutConfirm();
+  clearEmployeeSession(true);
+  render();
+}
+document.addEventListener("keydown",event=>{ if(event.key==="Escape"&&document.getElementById("employeeLogoutOverlay")?.classList.contains("open")) closeEmployeeLogoutConfirm(); });
 
 function isAdminMode(){
   return document.body.classList.contains("admin-mode");
