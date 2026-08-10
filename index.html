@@ -12280,35 +12280,92 @@ function drawBuildCanvasText(ctx,text,x,y,maxWidth,lineHeight,maxLines=2){
 async function exportBuildSummaryImage(){
   const rows=getBuildSelectedRows();
   if(!rows.length) return;
-  const width=1200,rowH=145,canvas=document.createElement("canvas"),ctx=canvas.getContext("2d");
-  canvas.width=width; canvas.height=210+rows.length*rowH+85;
-  const grad=ctx.createLinearGradient(0,0,width,0); grad.addColorStop(0,"#1E3A5F"); grad.addColorStop(1,"#2E86C1");
-  ctx.fillStyle=grad; ctx.fillRect(0,0,width,165);
+  const width=1400,margin=40,tableY=266,tableHeadH=44,rowH=116,footerH=165;
+  const canvas=document.createElement("canvas"),ctx=canvas.getContext("2d");
+  canvas.width=width;
+  canvas.height=tableY+tableHeadH+rows.length*rowH+footerH;
+  ctx.fillStyle="#FFFFFF";
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+  const grad=ctx.createLinearGradient(0,0,width,0);
+  grad.addColorStop(0,"#173B63");
+  grad.addColorStop(1,"#178FC4");
+  ctx.fillStyle=grad;
+  ctx.fillRect(0,0,width,126);
+  ctx.textAlign="center";
+  ctx.save();
+  ctx.shadowColor="rgba(0,0,0,.24)";
+  ctx.shadowBlur=8;
+  ctx.fillStyle="#FFFFFF";
+  ctx.font="bold 24px Arial";
+  ctx.fillText("HOÀNG GIA COMPUTER",width/2,33);
+  ctx.restore();
+  ctx.fillStyle="#F5C84C";
+  ctx.beginPath();ctx.roundRect(width/2-78,44,156,3,2);ctx.fill();
+  ctx.fillStyle="#FFFFFF";
+  ctx.font="bold 36px Arial";
+  drawBuildCanvasText(ctx,buildQuoteTitle||"BÁO GIÁ LINH KIỆN",width/2,82,width-300,40,1);
+  ctx.fillStyle="rgba(255,255,255,.86)";
+  ctx.font="italic 14px Arial";
+  ctx.fillText("Rất hân hạnh được đồng hành và phục vụ Quý Khách.",width/2,109);
   const quoteCustomer=String(buildQuoteCustomer||"").trim();
   const quoteAddress=String(buildQuoteAddress||"").trim();
   const quoteHotline=String(buildQuoteHotline||"").trim();
   const quoteDate=formatTxTime(new Date());
-  ctx.fillStyle="#fff"; ctx.font="bold 36px Arial"; ctx.textAlign="center"; drawBuildCanvasText(ctx,buildQuoteTitle||"BÁO GIÁ LINH KIỆN",width/2,43,width-90,40,1);
-  ctx.font="bold 17px Arial"; ctx.fillStyle="rgba(255,255,255,.92)";
-  ctx.fillText(`KHÁCH HÀNG: ${quoteCustomer||"................................"}`,width/2,78);
-  ctx.fillText(`NGÀY BÁO GIÁ: ${quoteDate}`,width/2,105);
-  drawBuildCanvasText(ctx,`ĐỊA CHỈ: ${quoteAddress||"................................"}   |   SĐT / HOTLINE: ${quoteHotline||"................................"}`,width/2,136,width-70,22,1);
-  ctx.textAlign="left";
-  const images=await Promise.all(rows.map(x=>loadBuildCanvasImage(String(x.r[9]||""))));
+  ctx.fillStyle="#F7FAFC";
+  ctx.beginPath();ctx.roundRect(margin,140,width-margin*2,108,14);ctx.fill();
+  ctx.strokeStyle="#D5E2EA";ctx.lineWidth=1;ctx.stroke();
+  ctx.beginPath();ctx.moveTo(width/2,140);ctx.lineTo(width/2,248);ctx.moveTo(margin,194);ctx.lineTo(width-margin,194);ctx.stroke();
+  const drawInfoCell=(label,value,x,y,w)=>{
+    ctx.textAlign="center";
+    ctx.fillStyle="#6B7F8D";ctx.font="bold 11px Arial";ctx.fillText(label,x+w/2,y+17);
+    ctx.fillStyle="#173B63";ctx.font="bold 16px Arial";
+    drawBuildCanvasText(ctx,value||"—",x+w/2,y+41,w-28,19,1);
+  };
+  const infoW=(width-margin*2)/2;
+  drawInfoCell("KHÁCH HÀNG",quoteCustomer,margin,140,infoW);
+  drawInfoCell("NGÀY BÁO GIÁ",quoteDate,margin+infoW,140,infoW);
+  drawInfoCell("ĐỊA CHỈ",quoteAddress,margin,194,infoW);
+  drawInfoCell("SĐT / HOTLINE",quoteHotline,margin+infoW,194,infoW);
+  const cols=[margin,100,210,780,850,1040,1180,width-margin];
+  const headers=["STT","ẢNH","TÊN SẢN PHẨM","SL","GIÁ","BH","THÀNH TIỀN"];
+  ctx.fillStyle="#173B63";ctx.fillRect(margin,tableY,width-margin*2,tableHeadH);
+  ctx.fillStyle="#FFFFFF";ctx.font="bold 13px Arial";ctx.textAlign="center";
+  headers.forEach((label,index)=>ctx.fillText(label,(cols[index]+cols[index+1])/2,tableY+28));
+  const images=await Promise.all(rows.map(item=>loadBuildCanvasImage(String(item.r[9]||""))));
   rows.forEach((item,i)=>{
-    const y=180+i*rowH; ctx.fillStyle=i%2?"#F4F8FB":"#fff"; ctx.fillRect(28,y,width-56,rowH-8);
-    const img=images[i]; if(img){ ctx.save(); ctx.beginPath(); ctx.roundRect(46,y+14,88,88,10); ctx.clip(); ctx.drawImage(img,46,y+14,88,88); ctx.restore(); } else { ctx.fillStyle="#E7EFF5"; ctx.fillRect(46,y+14,88,88); ctx.fillStyle="#789"; ctx.font="30px Arial"; ctx.fillText("PC",69,y+68); }
-    ctx.fillStyle="#1E3A5F"; ctx.font="bold 21px Arial"; drawBuildCanvasText(ctx,item.title,155,y+35,960,26,2);
-    const priceText=item.price?formatBuildMoney(item.price):"Chưa nhập";
-    const warrantyText=item.warranty||"—";
-    ctx.fillStyle="#1A5276"; ctx.font="bold 17px Arial";
-    drawBuildCanvasText(ctx,`SL: ${item.qty}   |   GIÁ: ${priceText}   |   BH: ${warrantyText}`,155,y+105,960,20,1);
+    const y=tableY+tableHeadH+i*rowH;
+    ctx.fillStyle=i%2?"#F7FAFC":"#FFFFFF";ctx.fillRect(margin,y,width-margin*2,rowH);
+    ctx.strokeStyle="#DCE6ED";ctx.lineWidth=1;ctx.strokeRect(margin,y,width-margin*2,rowH);
+    ctx.beginPath();cols.slice(1,-1).forEach(x=>{ctx.moveTo(x,y);ctx.lineTo(x,y+rowH);});ctx.stroke();
+    ctx.textAlign="center";ctx.fillStyle="#173B63";ctx.font="bold 15px Arial";ctx.fillText(String(i+1),(cols[0]+cols[1])/2,y+64);
+    const img=images[i],imgX=cols[1]+13,imgY=y+16,imgSize=84;
+    ctx.save();ctx.beginPath();ctx.roundRect(imgX,imgY,imgSize,imgSize,11);ctx.clip();
+    if(img){ctx.fillStyle="#EEF4F7";ctx.fillRect(imgX,imgY,imgSize,imgSize);ctx.drawImage(img,imgX,imgY,imgSize,imgSize);}
+    else{ctx.fillStyle="#EAF1F5";ctx.fillRect(imgX,imgY,imgSize,imgSize);ctx.fillStyle="#7892A3";ctx.font="bold 21px Arial";ctx.fillText("SP",imgX+imgSize/2,imgY+51);}
+    ctx.restore();
+    ctx.textAlign="left";ctx.fillStyle="#173B63";ctx.font="bold 19px Arial";
+    drawBuildCanvasText(ctx,item.title,cols[2]+16,y+36,cols[3]-cols[2]-32,25,2);
+    ctx.fillStyle="#718596";ctx.font="bold 12px Arial";ctx.fillText(`ĐVT: ${item.unit||"Cái"}`,cols[2]+16,y+96);
+    ctx.textAlign="center";ctx.fillStyle="#173B63";ctx.font="bold 18px Arial";ctx.fillText(String(item.qty),(cols[3]+cols[4])/2,y+65);
+    ctx.textAlign="right";ctx.fillStyle="#176E9D";ctx.font="bold 16px Arial";
+    ctx.fillText(item.price?formatBuildMoney(item.price):"Liên hệ",cols[5]-14,y+65);
+    ctx.textAlign="center";ctx.fillStyle="#455D70";ctx.font="bold 14px Arial";
+    drawBuildCanvasText(ctx,item.warranty||"—",(cols[5]+cols[6])/2,y+59,cols[6]-cols[5]-18,19,2);
+    ctx.textAlign="right";ctx.fillStyle=item.price?"#158447":"#9AA9B5";ctx.font="bold 17px Arial";
+    ctx.fillText(item.price?formatBuildMoney(item.price*item.qty):"—",cols[7]-15,y+65);
   });
-  const totals=getBuildTotals(rows),footerY=195+rows.length*rowH;
-  ctx.fillStyle="#1E3A5F"; ctx.font="bold 24px Arial"; ctx.fillText(`Tổng: ${rows.length} linh kiện · ${rows.reduce((s,x)=>s+x.qty,0)} sản phẩm`,42,footerY+28);
-  ctx.textAlign="right"; ctx.fillStyle="#C0392B"; ctx.font="bold 28px Arial"; ctx.fillText(`TỔNG CỘNG: ${formatBuildMoney(totals.total)}`,1150,footerY+28);
-  if(totals.missing){ctx.fillStyle="#A66B00";ctx.font="bold 15px Arial";ctx.fillText(`Còn ${totals.missing} linh kiện chưa nhập giá`,1150,footerY+57);}
-  else{ctx.fillStyle="#1E8449";ctx.font="bold 16px Arial";ctx.fillText(`Nếu thêm 8% VAT = ${formatBuildMoney(totals.totalWithVat)}`,1150,footerY+57);} ctx.textAlign="left";
+  const totals=getBuildTotals(rows),footerY=tableY+tableHeadH+rows.length*rowH;
+  ctx.fillStyle="#F7FAFC";ctx.fillRect(margin,footerY+18,width-margin*2,108);
+  ctx.strokeStyle="#D5E2EA";ctx.strokeRect(margin,footerY+18,width-margin*2,108);
+  ctx.textAlign="left";ctx.fillStyle="#173B63";ctx.font="bold 17px Arial";
+  ctx.fillText(`${rows.length} mặt hàng · ${totals.totalQty} sản phẩm`,margin+18,footerY+55);
+  ctx.textAlign="right";ctx.fillStyle="#6B7F8D";ctx.font="bold 12px Arial";ctx.fillText("TỔNG CỘNG",width-margin-18,footerY+43);
+  ctx.fillStyle="#C0392B";ctx.font="bold 28px Arial";ctx.fillText(formatBuildMoney(totals.total),width-margin-18,footerY+75);
+  ctx.font="bold 13px Arial";
+  if(totals.missing){ctx.fillStyle="#A66B00";ctx.fillText(`Còn ${totals.missing} mặt hàng chưa nhập giá`,width-margin-18,footerY+101);}
+  else{ctx.fillStyle="#158447";ctx.fillText(`Nếu thêm VAT 8%: ${formatBuildMoney(totals.totalWithVat)}`,width-margin-18,footerY+101);}
+  ctx.textAlign="center";ctx.fillStyle="#8A9AA7";ctx.font="11px Arial";
+  ctx.fillText("Báo giá được tạo tự động từ hệ thống quản lý kho Hoàng Gia Computer",width/2,canvas.height-17);
   const a=document.createElement("a"); a.download=`Bao-gia-linh-kien-${quickInventoryFileStamp()}.png`; a.href=canvas.toDataURL("image/png"); a.click(); showToast("✅ Đã xuất ảnh báo giá");
 }
 function exportBuildSummaryExcelBasic(){
@@ -12390,7 +12447,22 @@ function ensureBuildExcelJs(){
   }).catch(error=>{buildExcelJsPromise=null;throw error;});
   return buildExcelJsPromise;
 }
-function getBuildExcelLogoData(){
+async function getBuildExcelLogoData(){
+  const driveLogoUrl="https://lh3.googleusercontent.com/d/1m31teW-YSLlh8IbKLxqDS2TnJja8hheC";
+  try{
+    const response=await fetch(driveLogoUrl,{cache:"force-cache"});
+    if(!response.ok) throw new Error(`HTTP ${response.status}`);
+    const blob=await response.blob();
+    if(!/^image\/(?:png|jpe?g)$/i.test(blob.type)) throw new Error("Logo không đúng định dạng ảnh");
+    return await new Promise((resolve,reject)=>{
+      const reader=new FileReader();
+      reader.onload=()=>resolve(String(reader.result||""));
+      reader.onerror=()=>reject(reader.error||new Error("Không đọc được logo"));
+      reader.readAsDataURL(blob);
+    });
+  }catch(error){
+    console.warn("Không tải được logo Excel từ Google Drive; dùng logo dự phòng.",error);
+  }
   const direct=String(document.getElementById("headerBrandLogo")?.src||"");
   if(/^data:image\/(?:png|jpe?g);base64,/i.test(direct)) return direct;
   try{
@@ -12459,11 +12531,11 @@ async function exportBuildSummaryExcel(button){
     sheet.getCell("A5").value=quoteTitle.toLocaleUpperCase("vi-VN");
     sheet.getCell("A6").value=`Khách hàng: ${customer||"........................"}\nSĐT / Hotline: ${customerHotline||"........................"}`;
     sheet.getCell("D6").value=`Địa chỉ: ${customerAddress||"........................................"}\nKho lập báo giá: ${currentBranch||"Q2"}`;
-    const logoData=getBuildExcelLogoData();
+    const logoData=await getBuildExcelLogoData();
     if(logoData){
       const extension=/image\/png/i.test(logoData)?"png":"jpeg";
       const logoId=workbook.addImage({base64:logoData,extension});
-      sheet.addImage(logoId,{tl:{col:.32,row:.25},ext:{width:118,height:78},editAs:"oneCell"});
+      sheet.addImage(logoId,{tl:{col:.38,row:.42},ext:{width:250,height:76},editAs:"oneCell"});
     }else{
       sheet.getCell("A1").value="MÁY TÍNH\nHOÀNG GIA.VN";
     }
@@ -12508,10 +12580,10 @@ async function exportBuildSummaryExcel(button){
     applyBuildExcelStyle(sheet,grandRow,1,grandRow,7,{fill:solid(yellow),border:thinBorder,alignment:{horizontal:"right",vertical:"middle"},font:{name:"Arial",bold:true,size:13,color:{argb:ink}},numFmt:'#,##0 "đ"'});
     sheet.mergeCells(thanksRow,1,thanksRow,7);
     sheet.getCell(thanksRow,1).value="Rất hân hạnh được đồng hành và phục vụ Quý Khách.";
-    applyBuildExcelStyle(sheet,thanksRow,1,thanksRow,7,{fill:solid(white),border:thinBorder,alignment:{horizontal:"left",vertical:"middle"},font:{name:"Arial",bold:true,italic:true,size:10,color:{argb:red}}});
+    applyBuildExcelStyle(sheet,thanksRow,1,thanksRow,7,{fill:solid(white),border:thinBorder,alignment:{horizontal:"center",vertical:"middle"},font:{name:"Arial",bold:true,italic:true,size:10,color:{argb:red}}});
     sheet.mergeCells(noteRow,1,noteRow,7);
-    sheet.getCell(noteRow,1).value="Giá và thời hạn bảo hành có thể được chỉnh trực tiếp trong file. Thành tiền và tổng cộng sẽ tự tính lại khi mở bằng Excel.";
-    applyBuildExcelStyle(sheet,noteRow,1,noteRow,7,{fill:solid(pale),border:thinBorder,alignment:{horizontal:"left",vertical:"middle",wrapText:true},font:{name:"Arial",italic:true,size:9,color:{argb:ink}}});
+    sheet.getCell(noteRow,1).value="Báo giá được tạo tự động từ hệ thống quản lý kho Hoàng Gia Computer";
+    applyBuildExcelStyle(sheet,noteRow,1,noteRow,7,{fill:solid(pale),border:thinBorder,alignment:{horizontal:"center",vertical:"middle",wrapText:true},font:{name:"Arial",italic:true,size:9,color:{argb:ink}}});
     sheet.getRow(thanksRow).height=23; sheet.getRow(noteRow).height=29;
     sheet.views=[{state:"frozen",xSplit:0,ySplit:7,topLeftCell:"A8",activeCell:"B8"}];
     sheet.autoFilter={from:{row:7,column:1},to:{row:lastDataRow,column:7}};
@@ -12550,7 +12622,7 @@ function printBuildSummary(){
     ? `<div class="missing">⚠ Còn ${totals.missing} linh kiện chưa nhập giá; tổng cộng hiện chỉ tính các món đã có giá.</div>`
     : `<div class="complete">Nếu thêm 8% VAT = ${formatBuildMoney(totals.totalWithVat)}</div>`;
   const bodyRows=rows.map((item,index)=>`<tr><td>${index+1}</td><td><b>${escapeHtml(item.title)}</b>${item.warranty?`<small>Bảo hành: ${escapeHtml(item.warranty)}</small>`:""}</td><td class="num">${item.qty}</td><td class="num strong">${item.price?formatBuildMoney(item.price):"Chưa nhập"}</td></tr>`).join("");
-  win.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>${escapeHtml(buildQuoteTitle||"Báo giá linh kiện")}</title><style>body{font-family:Arial,sans-serif;color:#1E3A5F;padding:28px}h1{margin:0}.sub{color:#667;margin:7px 0 22px;line-height:1.7}.sub div{display:flex;gap:20px;flex-wrap:wrap}table{width:100%;border-collapse:collapse}th,td{padding:11px 9px;border-bottom:1px solid #DDE6ED;text-align:left}th{background:#EAF2F8;font-size:12px}td{font-size:13px}td small{display:block;margin-top:4px;color:#6B7F8D;line-height:1.55}.num{text-align:right}.strong{color:#1E8449;font-weight:bold}.total{margin-top:20px;padding:14px;background:#EAF2F8;border-radius:10px;text-align:right}.total span{display:block;font-size:12px}.total b{display:block;margin-top:3px;color:#C0392B;font-size:24px}.missing,.complete{margin-top:9px;text-align:right;font-size:12px;font-weight:bold}.missing{color:#A66B00}.complete{color:#1E8449}@media print{body{padding:0}}</style></head><body><h1>${escapeHtml(buildQuoteTitle||"BÁO GIÁ LINH KIỆN")}</h1><div class="sub"><div><span>Khách hàng: <b>${escapeHtml(buildQuoteCustomer||"................................")}</b></span><span>Ngày báo giá: <b>${escapeHtml(formatTxTime(new Date()))}</b></span></div><div><span>Địa chỉ: <b>${escapeHtml(buildQuoteAddress||"................................")}</b></span><span>SĐT / Hotline: <b>${escapeHtml(buildQuoteHotline||"................................")}</b></span></div></div><table><thead><tr><th>#</th><th>Tên linh kiện</th><th class="num">SL</th><th class="num">Đơn giá</th></tr></thead><tbody>${bodyRows}</tbody></table><div class="total"><span>${rows.length} linh kiện · ${totals.totalQty} sản phẩm</span><b>TỔNG CỘNG: ${formatBuildMoney(totals.total)}</b></div>${missingNotice}<script>window.onload=()=>setTimeout(()=>window.print(),250)<\/script></body></html>`);
+  win.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>${escapeHtml(buildQuoteTitle||"Báo giá linh kiện")}</title><style>body{font-family:Arial,sans-serif;color:#1E3A5F;padding:28px}h1{margin:0}.sub{color:#667;margin:7px 0 22px;line-height:1.7}.sub div{display:flex;gap:20px;flex-wrap:wrap}table{width:100%;border-collapse:collapse}th,td{padding:11px 9px;border-bottom:1px solid #DDE6ED;text-align:left}th{background:#EAF2F8;font-size:12px}td{font-size:13px}td small{display:block;margin-top:4px;color:#6B7F8D;line-height:1.55}.num{text-align:right}.strong{color:#1E8449;font-weight:bold}.total{margin-top:20px;padding:14px;background:#EAF2F8;border-radius:10px;text-align:right}.total span{display:block;font-size:12px}.total b{display:block;margin-top:3px;color:#C0392B;font-size:24px}.missing,.complete{margin-top:9px;text-align:right;font-size:12px;font-weight:bold}.missing{color:#A66B00}.complete{color:#1E8449}.system-note{margin-top:24px;padding-top:10px;border-top:1px solid #DDE6ED;color:#718096;font-size:10px;font-style:italic;text-align:center}@media print{body{padding:0}}</style></head><body><h1>${escapeHtml(buildQuoteTitle||"BÁO GIÁ LINH KIỆN")}</h1><div class="sub"><div><span>Khách hàng: <b>${escapeHtml(buildQuoteCustomer||"................................")}</b></span><span>Ngày báo giá: <b>${escapeHtml(formatTxTime(new Date()))}</b></span></div><div><span>Địa chỉ: <b>${escapeHtml(buildQuoteAddress||"................................")}</b></span><span>SĐT / Hotline: <b>${escapeHtml(buildQuoteHotline||"................................")}</b></span></div></div><table><thead><tr><th>#</th><th>Tên linh kiện</th><th class="num">SL</th><th class="num">Đơn giá</th></tr></thead><tbody>${bodyRows}</tbody></table><div class="total"><span>${rows.length} linh kiện · ${totals.totalQty} sản phẩm</span><b>TỔNG CỘNG: ${formatBuildMoney(totals.total)}</b></div>${missingNotice}<div class="system-note">Báo giá được tạo tự động từ hệ thống quản lý kho Hoàng Gia Computer</div><script>window.onload=()=>setTimeout(()=>window.print(),250)<\/script></body></html>`);
   const printHeading=win.document.querySelector("h1");
   if(printHeading) printHeading.style.textAlign="center";
   win.document.close();
