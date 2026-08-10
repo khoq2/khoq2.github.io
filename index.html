@@ -1198,6 +1198,9 @@ body.employee-mode .admin-only.employee-permitted { display:flex!important; }
 .nv-access-save{background:#1E8449}.nv-access-clear{background:#A93226}
 .employee-login-name{width:100%;margin-bottom:9px;padding:12px 13px;border:1.5px solid #CBDCE8;border-radius:12px;background:#fff;color:#173A5A;font-size:13px;font-weight:750;outline:none}
 .employee-login-name:focus{border-color:#2E86C1;box-shadow:0 0 0 3px rgba(46,134,193,.12)}
+.employee-login-name.name-matched{border-color:#20A66A!important;background:#F4FFF9!important;box-shadow:0 0 0 3px rgba(32,166,106,.12)!important}
+@keyframes privatePasswordScan{0%{background-position:140% 0}100%{background-position:-45% 0}}
+#privateAccessPassword.password-scanning{border-color:#20A66A!important;background-color:#F5FFF9!important;background-image:linear-gradient(105deg,transparent 28%,rgba(51,230,153,.1) 39%,rgba(255,255,255,.98) 48%,rgba(51,230,153,.24) 56%,transparent 68%)!important;background-repeat:no-repeat!important;background-size:240% 100%!important;box-shadow:0 0 0 3px rgba(32,166,106,.12),0 0 15px rgba(32,166,106,.18)!important;animation:privatePasswordScan .85s linear infinite!important}
 @media(max-width:520px){.nv-permission-grid{grid-template-columns:1fr}.nv-password-row{grid-template-columns:1fr 1fr}.nv-password-row input{grid-column:1/-1}}
 .admin-bar { display: flex; justify-content: flex-end; align-items: center; gap: 6px; margin-bottom: 6px; }
 .sync-badge { font-size: 10px; color: rgba(255,255,255,.75); margin-right: auto; display: flex; align-items: center; gap: 5px; cursor:pointer; user-select:none; border-radius:7px; padding:3px 5px; white-space:nowrap; }
@@ -2052,6 +2055,8 @@ html::-webkit-scrollbar-corner { background: #EAF2F8; }
 .customer-editor-subheading { display:flex; align-items:flex-end; justify-content:space-between; gap:10px; margin:14px 0 9px; padding:9px 10px; border-radius:10px; background:#EDF7FC; color:#1A5276; }
 .customer-editor-subheading b { font-size:11px; font-weight:950; letter-spacing:.03em; }
 .customer-editor-subheading small { color:#6D8494; font-size:9px; font-weight:700; text-align:right; }
+.customer-history-link { min-height:30px; padding:5px 9px; border:1px solid #BFD7E6; border-radius:999px; background:#F5FAFD; color:#1B6F99; font-size:9.5px; font-weight:900; cursor:pointer; }
+.customer-history-link:hover,.customer-history-link:focus-visible { border-color:#4CA8D0; background:#EAF7FC; outline:0; }
 .customer-editor-grid { display:grid; grid-template-columns:1fr 1fr; gap:9px; }
 .customer-editor label { display:grid; gap:4px; color:#52606D; font-size:11px; font-weight:850; }
 .customer-editor label small { color:#8A6D3B; font-size:9px; font-weight:750; line-height:1.35; }
@@ -5808,8 +5813,7 @@ body{
   transform:translateX(-50%) rotate(45deg);
 }
 .macos-dock-app:hover .macos-dock-tooltip,
-.macos-dock-app:focus-visible .macos-dock-tooltip,
-.macos-dock-app.dock-active .macos-dock-tooltip{
+.macos-dock-app:focus-visible .macos-dock-tooltip{
   opacity:1;
   transform:translate(-50%,-1px) scale(1);
 }
@@ -6279,6 +6283,28 @@ body.private-panel-open{overflow:hidden}
   letter-spacing:.65px;
 }
 .modern-live-badge i{width:7px;height:7px;border-radius:50%;background:#65f3b2;box-shadow:0 0 0 4px rgba(101,243,178,.14),0 0 14px #65f3b2}
+#customerOverlay .modern-hub-title{justify-content:center}
+#customerOverlay .modern-hub-copy{flex:1;align-items:center;text-align:center}
+#customerOverlay .modern-hub-copy b,#customerOverlay .modern-hub-copy small{width:100%;text-align:center}
+#customerOverlay .modern-hub-copy small{white-space:normal}
+#customerOverlay .customer-back{display:grid;visibility:hidden;pointer-events:none}
+#customerOverlay .customer-back.show{visibility:visible;pointer-events:auto}
+#customerOverlay.customer-editing .customer-back{display:grid!important;visibility:hidden!important;pointer-events:none!important}
+.customer-session-status{display:flex;align-items:center;justify-content:center;gap:8px;min-height:43px;margin:-2px 0 11px;padding:7px 11px;border:1px solid #BFE5D2;border-radius:13px;background:linear-gradient(135deg,#F2FFF8,#E9FAF3);color:#17623F;box-shadow:0 5px 14px rgba(24,126,78,.08)}
+.customer-session-status[hidden]{display:none!important}
+.customer-session-status.admin-session{border-color:#C5DBEB;background:linear-gradient(135deg,#F4FAFE,#EAF4FB);color:#195A81}
+.customer-session-online{width:8px;height:8px;flex:0 0 8px;border-radius:50%;background:#24B66F;box-shadow:0 0 0 4px rgba(36,182,111,.12),0 0 12px rgba(36,182,111,.42);animation:customerSessionPulse 1.5s ease-in-out infinite alternate}
+.customer-session-status .nv-avatar{width:30px;height:30px;flex:0 0 30px;font-size:11px}
+.customer-session-copy{display:grid;gap:1px;min-width:0;text-align:left}
+.customer-session-name-row{display:flex;align-items:center;justify-content:flex-start;gap:4px;min-width:0}
+.customer-session-copy b{max-width:220px;overflow:hidden;color:inherit;font-size:11.5px;font-weight:950;text-overflow:ellipsis;white-space:nowrap}
+.customer-session-copy small{color:#668274;font-size:8.5px;font-weight:750}
+.customer-session-name-row .nv-role-badge{flex:0 0 auto;max-width:105px;margin:0}
+#employeeProfileShortcut .nv-role-badge,.customer-session-status .nv-role-badge{animation:nvRoleNeon 1.7s ease-in-out infinite alternate!important;will-change:box-shadow!important}
+#employeeProfileShortcut .nv-role-badge::after,.customer-session-status .nv-role-badge::after{animation:nvRoleShine 2.35s ease-in-out infinite!important;will-change:left,opacity!important}
+#employeeProfileShortcut .nv-role-badge::before,.customer-session-status .nv-role-badge::before{animation:nvRoleSparkle 1.45s linear infinite!important;will-change:left,top,opacity,transform!important}
+#employeeProfileShortcut .nv-role-badge>span:first-child,#employeeProfileShortcut .nv-role-badge .nv-role-icon,.customer-session-status .nv-role-badge>span:first-child,.customer-session-status .nv-role-badge .nv-role-icon{animation:nvRoleIconTwinkle 1.05s ease-in-out infinite alternate!important;will-change:filter,transform!important}
+@keyframes customerSessionPulse{from{opacity:.72;transform:scale(.9)}to{opacity:1;transform:scale(1.08)}}
 #customerOverlay .customer-close,#partnerOverlay .partner-close{
   align-self:stretch;
   width:54px;
@@ -6297,6 +6323,9 @@ body.private-panel-open{overflow:hidden}
 #customerOverlay .customer-back.show{display:grid}
 #customerOverlay .customer-back:hover,#customerOverlay .customer-back:focus-visible{transform:translateX(-2px);background:#edf8fd;color:#0b79ad;outline:0}
 #customerOverlay.customer-editing .customer-back{display:none!important}
+#customerOverlay .customer-back{display:grid;visibility:hidden;pointer-events:none}
+#customerOverlay .customer-back.show{display:grid;visibility:visible;pointer-events:auto}
+#customerOverlay.customer-editing .customer-back{display:grid!important;visibility:hidden!important;pointer-events:none!important}
 .modern-hub-metrics{
   display:grid;
   grid-template-columns:repeat(3,minmax(0,1fr));
@@ -6690,12 +6719,28 @@ body.fab-menu-open .side-control-rail{
 .side-control-rail #employeeDockButton:hover,
 .side-control-rail #employeeDockButton:focus-visible{
   border:0!important;
-  background:linear-gradient(135deg,#1E8449,#117A65)!important;
+  background:linear-gradient(135deg,#E74C3C,#A93226)!important;
   color:#fff!important;
-  box-shadow:0 6px 16px rgba(17,122,75,.24)!important;
+  box-shadow:0 6px 16px rgba(169,50,38,.27)!important;
 }
-.side-control-rail #employeeDockButton:active{background:linear-gradient(135deg,#176B3B,#0E6251)!important}
+.side-control-rail #employeeDockButton:active{background:linear-gradient(135deg,#C0392B,#7B241C)!important}
 .side-control-rail #employeeDockButton[hidden]{display:none!important}
+.side-control-rail #employeeDockButton .employee-power-icon svg{width:calc(var(--side-control-icon-size) - 4px)!important;height:calc(var(--side-control-icon-size) - 4px)!important;fill:none!important;stroke:currentColor!important;stroke-width:2.25!important;stroke-linecap:round!important;stroke-linejoin:round!important}
+.side-control-rail .employee-profile-shortcut{position:absolute;z-index:6;top:4px;right:calc(100% + 7px);display:flex;width:max-content;max-width:220px;min-height:var(--side-control-size);margin:0;padding:5px 7px 5px 9px;overflow:visible;align-items:center;justify-content:center;gap:5px;border:1px solid rgba(255,255,255,.4);border-radius:999px;background:linear-gradient(135deg,#1E8449,#117A65);color:#fff;font:950 9px/1 system-ui,-apple-system,"Segoe UI",sans-serif;white-space:nowrap;text-shadow:none;box-shadow:0 5px 13px rgba(17,122,75,.22);cursor:pointer;transition:transform .16s ease,box-shadow .16s ease,filter .16s ease}
+.side-control-rail .employee-profile-shortcut:hover,.side-control-rail .employee-profile-shortcut:focus-visible{outline:0;filter:brightness(1.06);box-shadow:0 7px 18px rgba(17,122,75,.3);transform:translateY(-1px)}
+.side-control-rail .employee-profile-shortcut:active{transform:scale(.97)}
+.side-control-rail .employee-profile-shortcut[hidden]{display:none!important}
+.side-control-rail .employee-profile-shortcut .employee-dock-name-role{display:flex;align-items:center;gap:5px;min-width:0}
+.side-control-rail .employee-profile-shortcut .employee-dock-name{display:block;max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.side-control-rail .employee-profile-shortcut .nv-role-badge{flex:0 0 auto;max-width:92px;padding:2px 5px;font-size:7px}
+@media(max-width:640px){
+  .side-control-rail .employee-profile-shortcut{display:flex!important;top:4px;right:calc(100% + 5px);min-height:calc(var(--side-control-size) - 2px);max-width:126px;padding:4px 5px 4px 7px;gap:3px;font-size:7.5px;box-shadow:0 4px 10px rgba(17,122,75,.2)}
+  .side-control-rail .employee-profile-shortcut[hidden]{display:none!important}
+  .side-control-rail .employee-profile-shortcut .employee-dock-name-role{gap:3px}
+  .side-control-rail .employee-profile-shortcut .employee-dock-name{max-width:54px}
+  .side-control-rail .employee-profile-shortcut .nv-role-badge{max-width:64px;padding:1px 3px;font-size:5.8px}
+  .side-control-rail .employee-profile-shortcut .nv-role-icon{width:9px;height:9px}
+}
 .side-control-rail .macos-dock-app-icon,
 .side-control-rail .macos-dock-customer,
 .side-control-rail .macos-dock-partner,
@@ -6753,6 +6798,14 @@ body .side-control-rail .scroll-btn>svg{
 .side-control-rail .scroll-btn:focus-visible .macos-dock-tooltip{
   opacity:1;
   transform:translate(-1px,-50%) scale(1);
+}
+@media(min-width:641px){
+  .side-control-rail #employeeDockButton .macos-dock-tooltip{top:auto;right:0;bottom:calc(100% + 9px);left:auto;transform:translateY(4px) scale(.96)}
+  .side-control-rail #employeeDockButton .macos-dock-tooltip::after{top:auto;right:12px;bottom:-5px;left:auto;transform:rotate(45deg)}
+  .side-control-rail #employeeDockButton:hover .macos-dock-tooltip,.side-control-rail #employeeDockButton:focus-visible .macos-dock-tooltip{opacity:1;transform:translateY(0) scale(1)}
+  .side-control-rail .employee-profile-shortcut .macos-dock-tooltip{top:auto;right:0;bottom:calc(100% + 9px);left:auto;transform:translateY(4px) scale(.96)}
+  .side-control-rail .employee-profile-shortcut .macos-dock-tooltip::after{top:auto;right:12px;bottom:-5px;left:auto;transform:rotate(45deg)}
+  .side-control-rail .employee-profile-shortcut:hover .macos-dock-tooltip,.side-control-rail .employee-profile-shortcut:focus-visible .macos-dock-tooltip{opacity:1;transform:translateY(0) scale(1)}
 }
 @keyframes sideControlBlueGlow{
   from{box-shadow:0 0 0 2px rgba(56,189,248,.18),0 0 10px rgba(14,165,233,.38),0 6px 16px rgba(15,95,159,.28)}
@@ -7485,12 +7538,15 @@ body .warehouse-switch.warehouse-switch-changing .warehouse-pin{
   </div>
 
   <nav class="macos-dock" id="customerQrDock" aria-label="Khách hàng, đối tác và QR Code">
-    <button class="macos-dock-app" id="employeeDockButton" data-dock-index="0" type="button" aria-label="Tài khoản nhân viên đang đăng nhập" title="Tài khoản nhân viên đang đăng nhập" onclick="toggleEmployeeAccess()" hidden>
-      <span class="macos-dock-app-icon macos-dock-employee" aria-hidden="true">
-        <svg viewBox="0 0 24 24"><circle cx="12" cy="7" r="4"></circle><path d="M4 21c.25-5.2 2.9-7.8 8-7.8s7.75 2.6 8 7.8H4Z"></path><path d="M17.5 3.5 20 6l-2.5 2.5" opacity=".75"></path></svg>
+    <button class="employee-profile-shortcut" id="employeeProfileShortcut" type="button" aria-label="Mở lại khu vực vừa sử dụng" aria-haspopup="dialog" onclick="reopenEmployeePrivateArea()" hidden>
+      <span class="employee-dock-name-role" id="employeeDockLabel"></span>
+      <span class="macos-dock-tooltip" id="employeeProfileTooltip" aria-hidden="true">Click để mở lại hồ sơ</span>
+    </button>
+    <button class="macos-dock-app" id="employeeDockButton" data-dock-index="0" type="button" aria-label="Đăng xuất" onclick="toggleEmployeeAccess()" hidden>
+      <span class="macos-dock-app-icon macos-dock-employee employee-power-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M12 2.8v8.4"></path><path d="M7.05 5.55a8 8 0 1 0 9.9 0"></path></svg>
       </span>
-      <span class="macos-dock-mobile-label" id="employeeDockLabel"></span>
-      <span class="macos-dock-tooltip" id="employeeDockTooltip" aria-hidden="true"></span>
+      <span class="macos-dock-tooltip" id="employeeDockTooltip" aria-hidden="true">Đăng xuất</span>
     </button>
 
     <button class="macos-dock-app" id="customerDockButton" data-dock-index="1" type="button" aria-label="KHÁCH HÀNG" aria-haspopup="dialog" aria-controls="privateAccessOverlay" title="Mở hồ sơ khách hàng" onclick="requestPrivateAccess('customer')">
@@ -8010,9 +8066,9 @@ body .warehouse-switch.warehouse-switch-changing .warehouse-pin{
       <div class="private-access-heading-copy"><h2 class="private-access-title" id="privateAccessTitle">ĐĂNG NHẬP HỆ THỐNG</h2><p class="private-access-subtitle" id="privateAccessSubtitle">Sử dụng tài khoản nhân viên do quản trị viên cấp.</p></div>
     </div>
     <div class="private-access-fields">
-      <label class="private-access-field" for="privateAccessEmployee"><span>Tên đăng nhập</span><input id="privateAccessEmployee" class="employee-login-name" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="Nhập tên đăng nhập" onkeydown="if(event.key==='Enter')document.getElementById('privateAccessPassword')?.focus()"></label>
+      <label class="private-access-field" for="privateAccessEmployee"><span>Tên đăng nhập</span><input id="privateAccessEmployee" class="employee-login-name" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="Nhập tên đăng nhập" oninput="handlePrivateEmployeeNameInput()" onkeydown="if(event.key==='Enter')document.getElementById('privateAccessPassword')?.focus()"></label>
       <label class="private-access-field" for="privateAccessPassword"><span>Mật khẩu</span><div class="admin-password-wrap">
-        <input id="privateAccessPassword" type="password" autocomplete="current-password" placeholder="Nhập mật khẩu" onkeydown="if(event.key==='Enter')submitPrivateAccess()">
+        <input id="privateAccessPassword" type="password" autocomplete="current-password" placeholder="Nhập mật khẩu" oninput="schedulePrivateAccessAutoSubmit()" onkeydown="if(event.key==='Enter')submitPrivateAccess()">
         <button type="button" class="admin-password-toggle" aria-label="Hiện hoặc ẩn mật khẩu" title="Hiện hoặc ẩn mật khẩu" onclick="const input=document.getElementById('privateAccessPassword');input.type=input.type==='password'?'text':'password';this.classList.toggle('password-visible',input.type==='text')"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"></path><circle cx="12" cy="12" r="2.7"></circle></svg></button>
       </div></label>
     </div>
@@ -8024,6 +8080,7 @@ body .warehouse-switch.warehouse-switch-changing .warehouse-pin{
 <div class="overlay" id="partnerOverlay" onclick="if(event.target===this)closePartnerPanel()">
   <section class="partner-modal" role="dialog" aria-modal="true" aria-labelledby="partnerTitle" onclick="event.stopPropagation()">
     <header class="partner-head"><div class="partner-title modern-hub-title" id="partnerTitle"><span class="modern-hub-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm8.5 1a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z"></path><path d="M1.8 21c.2-5 2.3-7.5 6.2-7.5s6 2.5 6.2 7.5H1.8Zm12.1-6.8c.8-.45 1.7-.7 2.7-.7 3.45 0 5.3 2.5 5.6 7.5h-5.7"></path></svg></span><span class="modern-hub-copy"><b>MẠNG LƯỚI ĐỐI TÁC</b><small>Điều phối kỹ thuật theo khu vực và chuyên môn</small></span><span class="modern-live-badge"><i></i> ADMIN</span></div><button type="button" class="partner-close" aria-label="Đóng" onclick="closePartnerPanel()">×</button></header>
+    <div class="customer-session-status partner-session-status" id="partnerSessionStatus" aria-live="polite" hidden></div>
     <div class="modern-hub-metrics partner-hub-metrics"><div><span class="modern-metric-icon violet">01</span><p><b id="modernPartnerTotal">0</b><small>Đối tác đang hoạt động</small></p></div><div><span class="modern-metric-icon coral">04</span><p><b>4 nhóm</b><small>Máy tính · In · Camera · Internet</small></p></div><div><span class="modern-metric-icon emerald">24/7</span><p><b>Liên hệ nhanh</b><small>Gọi điện và mở định vị tức thì</small></p></div></div>
     <div class="partner-filters">
       <select id="partnerDistrict" aria-label="Chọn quận huyện" onchange="renderPartners()"><option value="">Tất cả quận / huyện</option></select>
@@ -8055,9 +8112,10 @@ body .warehouse-switch.warehouse-switch-changing .warehouse-pin{
   <div class="modal customer-modal" role="dialog" aria-modal="true" aria-labelledby="customerPanelTitle" onclick="event.stopPropagation()">
     <div class="customer-head">
       <button type="button" class="customer-back" id="customerBackBtn" aria-label="Quay lại danh sách khách hàng" title="Quay lại danh sách" onclick="backToCustomerList()">←</button>
-      <div class="customer-title modern-hub-title" id="customerPanelTitle"><span class="modern-hub-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="9" cy="7" r="4"></circle><path d="M2 21c.25-5.2 2.6-7.8 7-7.8s6.75 2.6 7 7.8H2Zm16-13v7m-3.5-3.5h7"></path></svg></span><span class="modern-hub-copy"><b>TRUNG TÂM KHÁCH HÀNG</b><small>Tra cứu hồ sơ, lịch sử sửa chữa và bảo hành</small></span><span class="modern-live-badge"><i></i> ADMIN</span></div>
+      <div class="customer-title modern-hub-title" id="customerPanelTitle"><span class="modern-hub-copy"><b>TRUNG TÂM KHÁCH HÀNG</b><small>Tra cứu hồ sơ, lịch sử sửa chữa và bảo hành</small></span></div>
       <button type="button" class="customer-close" aria-label="Đóng" onclick="closeCustomerPanel()">×</button>
     </div>
+    <div class="customer-session-status" id="customerSessionStatus" aria-live="polite" hidden></div>
     <div class="customer-list-bar"><div class="customer-list-heading"><b>KHÁCH HÀNG</b><button type="button" class="customer-profile-count" aria-label="Xem toàn bộ hồ sơ khách hàng đã lưu" onclick="showAllCustomerProfiles()"><span id="modernCustomerTotal">0</span> hồ sơ</button></div><button type="button" class="customer-primary" data-private-edit="CUSTOMER_EDIT" onclick="openCustomerEditor()">＋ Thêm khách hàng</button></div>
     <div class="customer-search-wrap">
       <input id="customerSearch" class="customer-search" type="search" inputmode="search" autocomplete="off" placeholder="Tìm theo tên hoặc số điện thoại..." oninput="scheduleCustomerSearch()">
@@ -8075,29 +8133,43 @@ body .warehouse-switch.warehouse-switch-changing .warehouse-pin{
       </div>
       <div class="customer-editor-subheading"><b>THÔNG TIN MÁY ĐANG SỬ DỤNG</b><small>Tùy chọn · có thể bổ sung cho hồ sơ cũ</small></div>
       <div class="customer-editor-grid">
-        <label>Model máy<input id="customerEditModel" type="text" autocomplete="off" placeholder="VD: Dell Inspiron 15 3511"></label>
-        <label>Serial / Service Tag<input id="customerEditSerialTag" type="text" autocomplete="off" placeholder="Mã máy nếu có"></label>
+        <label>MODEL<input id="customerEditModel" type="text" autocomplete="off" placeholder="VD: Dell Inspiron 15 3511"></label>
+        <label>SERIAL / SERVICE TAG<input id="customerEditSerialTag" type="text" autocomplete="off" placeholder="Mã máy nếu có"></label>
         <label>PSU<input id="customerEditPsu" type="text" autocomplete="off" placeholder="VD: Corsair 650W"></label>
-        <label>Mainboard<input id="customerEditMainboard" type="text" autocomplete="off" placeholder="VD: ASUS B660M-K D4"></label>
+        <label>MAINBOARD<input id="customerEditMainboard" type="text" autocomplete="off" placeholder="VD: ASUS B660M-K D4"></label>
         <label>CPU<input id="customerEditCpu" type="text" autocomplete="off" placeholder="VD: Intel Core i5-1135G7"></label>
         <label>RAM<input id="customerEditRam" type="text" autocomplete="off" placeholder="VD: 16GB DDR4"></label>
         <label>SSD<input id="customerEditSsd" type="text" autocomplete="off" placeholder="VD: NVMe 512GB"></label>
         <label>HDD<input id="customerEditHdd" type="text" autocomplete="off" placeholder="VD: HDD 1TB"></label>
-        <label>VGA / Card<input id="customerEditVga" type="text" autocomplete="off" placeholder="VD: RTX 3060 12GB"></label>
-        <label class="wide">Phụ kiện kèm<textarea id="customerEditAccessories" placeholder="VD: Sạc, túi chống sốc, chuột, dây nguồn..."></textarea></label>
+        <label>VGA / CARD<input id="customerEditVga" type="text" autocomplete="off" placeholder="VD: RTX 3060 12GB"></label>
+        <label class="wide">PHỤ KIỆN KÈM<textarea id="customerEditAccessories" placeholder="VD: Sạc, túi chống sốc, chuột, dây nguồn..."></textarea></label>
       </div>
       <div class="customer-toolbar" id="customerProfileToolbar"><button type="button" class="customer-secondary btn-cancel-danger" onclick="closeCustomerEditors()">Hủy</button><button type="button" class="customer-primary" id="customerProfileSaveBtn" onclick="saveCustomerProfile()">💾 Lưu khách hàng</button></div>
     </div>
     <div id="customerEditRecordList" class="customer-edit-record-list"></div>
     <div id="customerRecordEditor" class="customer-editor">
-      <div class="customer-editor-heading">THÔNG TIN LẦN SỬA</div>
+      <div class="customer-editor-heading" id="customerRecordEditorTitle">TẠO PHIẾU SỬA CHỮA</div>
       <input type="hidden" id="customerRecordId">
+      <input type="hidden" id="customerRecordDevice">
       <div class="customer-editor-grid">
         <label class="customer-record-identity">Tên khách hàng<input id="customerRecordCustomerName" type="text" readonly></label>
         <label class="customer-record-identity">Số điện thoại<input id="customerRecordPhone" type="tel" readonly></label>
-        <label>Thiết bị<input id="customerRecordDevice" type="text" placeholder="VD: Laptop Dell Inspiron"></label>
-        <label>Model<input id="customerRecordModel" type="text" placeholder="VD: Inspiron 15 3511"></label>
-        <label>Serial / Service Tag<input id="customerRecordSerialTag" type="text" placeholder="Serial hoặc Service Tag"></label>
+      </div>
+      <div class="customer-editor-subheading"><b>THÔNG TIN MÁY ĐANG SỬ DỤNG</b><small>Cùng cấu trúc với thông tin khách hàng</small></div>
+      <div class="customer-editor-grid">
+        <label>MODEL<input id="customerRecordModel" type="text" placeholder="VD: Dell Inspiron 15 3511"></label>
+        <label>SERIAL / SERVICE TAG<input id="customerRecordSerialTag" type="text" placeholder="Mã máy nếu có"></label>
+        <label>PSU<input id="customerRecordPsu" type="text" placeholder="VD: Corsair 650W"></label>
+        <label>MAINBOARD<input id="customerRecordMainboard" type="text" placeholder="VD: ASUS B660M-K D4"></label>
+        <label>CPU<input id="customerRecordCpu" type="text" placeholder="VD: Intel Core i5-1135G7"></label>
+        <label>RAM<input id="customerRecordRam" type="text" placeholder="VD: 16GB DDR4"></label>
+        <label>SSD<input id="customerRecordSsd" type="text" placeholder="VD: NVMe 512GB"></label>
+        <label>HDD<input id="customerRecordHdd" type="text" placeholder="VD: HDD 1TB"></label>
+        <label>VGA / CARD<input id="customerRecordVga" type="text" placeholder="VD: RTX 3060 12GB"></label>
+        <label class="wide">PHỤ KIỆN KÈM<textarea id="customerRecordAccessories" placeholder="VD: Sạc, túi chống sốc, chuột, dây nguồn..."></textarea></label>
+      </div>
+      <div class="customer-editor-subheading"><b>THÔNG TIN SỬA CHỮA</b><small>Nội dung riêng của lần sửa này</small></div>
+      <div class="customer-editor-grid">
         <label>Giá tiền<input id="customerRecordAmount" type="text" inputmode="numeric" placeholder="VD: 1.500.000"></label>
         <label>Chi nhánh<select id="customerRecordBranch"><option value="Q2">Q2</option><option value="Q5">Q5</option></select></label>
         <label class="wide">Ngày giờ khách đến / thực hiện *<input id="customerRecordTime" type="datetime-local"></label>
@@ -8638,6 +8710,38 @@ const EMPLOYEE_PERMISSION_LABELS = {
 let employeeAccessToken = sessionStorage.getItem("kho_employee_session_token") || "";
 let employeeAccessProfile = null;
 try{ employeeAccessProfile=JSON.parse(sessionStorage.getItem("kho_employee_profile")||"null"); }catch(_){ employeeAccessProfile=null; }
+let employeePrivateAreaSessions = {employeeKey:"",customer:"",partner:""};
+try{
+  const savedAreas=JSON.parse(sessionStorage.getItem("kho_employee_private_area_sessions")||"null");
+  if(savedAreas&&typeof savedAreas==="object") employeePrivateAreaSessions={employeeKey:String(savedAreas.employeeKey||""),customer:String(savedAreas.customer||""),partner:String(savedAreas.partner||"")};
+}catch(_){ employeePrivateAreaSessions={employeeKey:"",customer:"",partner:""}; }
+
+function currentEmployeeSessionKey(profile=employeeAccessProfile){ return removeAccents(String(profile?.name||"")).trim().toLowerCase(); }
+function saveEmployeePrivateAreaSessions(){
+  if(employeePrivateAreaSessions.customer||employeePrivateAreaSessions.partner) sessionStorage.setItem("kho_employee_private_area_sessions",JSON.stringify(employeePrivateAreaSessions));
+  else sessionStorage.removeItem("kho_employee_private_area_sessions");
+}
+function clearEmployeePrivateAreaSessions(area=""){
+  if(area==="customer"||area==="partner") employeePrivateAreaSessions[area]="";
+  else employeePrivateAreaSessions={employeeKey:"",customer:"",partner:""};
+  if(!employeePrivateAreaSessions.customer&&!employeePrivateAreaSessions.partner) employeePrivateAreaSessions.employeeKey="";
+  saveEmployeePrivateAreaSessions();
+}
+function activateEmployeePrivateArea(area,token){
+  const normalized=area==="partner"?"partner":"customer";
+  const employeeKey=currentEmployeeSessionKey();
+  if(!employeeKey||!token) return false;
+  if(employeePrivateAreaSessions.employeeKey!==employeeKey) employeePrivateAreaSessions={employeeKey:employeeKey,customer:"",partner:""};
+  employeePrivateAreaSessions[normalized]=String(token);
+  saveEmployeePrivateAreaSessions();
+  rememberEmployeePrivateArea(normalized);
+  return true;
+}
+function getEmployeePrivateAreaToken(area){
+  const normalized=area==="partner"?"partner":"customer";
+  return employeePrivateAreaSessions.employeeKey===currentEmployeeSessionKey()?String(employeePrivateAreaSessions[normalized]||""):"";
+}
+function hasEmployeePrivateAreaSession(area){ return !!employeeAccessProfile?.name && !!getEmployeePrivateAreaToken(area); }
 
 function employeePermissions(){
   return Array.isArray(employeeAccessProfile?.permissions) ? employeeAccessProfile.permissions.map(value=>String(value).toUpperCase()) : [];
@@ -8648,19 +8752,51 @@ function hasEmployeePermission(permission){
 function hasAnyEmployeePermission(permissions){
   return isAdminMode() || (Array.isArray(permissions) && permissions.some(hasEmployeePermission));
 }
+function employeeRoleLabel(profile=employeeAccessProfile){
+  const role=normalizeNVRole(profile?.role);
+  return ({CEO:"CEO",ADMIN:"ADMIN",MOD:"MOD",ACCOUNTANT:"KẾ TOÁN",TECHNICIAN:"KỸ THUẬT",STAFF:"NHÂN VIÊN"})[role] || "NHÂN VIÊN";
+}
+function employeeRoleFriendly(profile=employeeAccessProfile){
+  const role=normalizeNVRole(profile?.role);
+  return ({CEO:"CEO",ADMIN:"Admin",MOD:"Mod",ACCOUNTANT:"Kế Toán",TECHNICIAN:"Kỹ Thuật",STAFF:"Nhân Viên"})[role] || "Nhân Viên";
+}
+function getEmployeeLastPrivateArea(){
+  return sessionStorage.getItem("kho_employee_last_private_area")==="partner" ? "partner" : "customer";
+}
+function rememberEmployeePrivateArea(area){
+  const normalized=area==="partner" ? "partner" : "customer";
+  sessionStorage.setItem("kho_employee_last_private_area",normalized);
+  updateEmployeeDock();
+}
+function reopenEmployeePrivateArea(){ requestPrivateAccess(getEmployeeLastPrivateArea()); }
 function updateEmployeeDock(){
-  const button=document.getElementById("employeeDockButton"), label=document.getElementById("employeeDockLabel"), tooltip=document.getElementById("employeeDockTooltip");
+  const button=document.getElementById("employeeDockButton"), shortcut=document.getElementById("employeeProfileShortcut"), label=document.getElementById("employeeDockLabel"), tooltip=document.getElementById("employeeDockTooltip"), profileTooltip=document.getElementById("employeeProfileTooltip");
   const active=!!employeeAccessToken && !!employeeAccessProfile?.name;
   const name=active ? String(employeeAccessProfile.name).trim() : "";
-  if(label) label.textContent=name;
-  if(tooltip) tooltip.textContent=active ? `${name} · ĐÃ ĐĂNG NHẬP · BẤM ĐỂ ĐĂNG XUẤT` : "";
+  const sessionEmployee=active ? (findNVByName(name) || normalizeNVItem(employeeAccessProfile)) : null;
+  const roleLabel=active ? employeeRoleLabel(sessionEmployee || employeeAccessProfile) : "";
+  const roleFriendly=active ? employeeRoleFriendly(sessionEmployee || employeeAccessProfile) : "";
+  const reopenArea=getEmployeeLastPrivateArea();
+  const reopenText=reopenArea==="partner" ? "Click để mở lại mục Đối tác" : "Click để mở lại hồ sơ";
+  if(label) label.innerHTML=active ? `<span class="employee-dock-name">${escapeHtml(name)}</span>${renderNVRoleBadge(name,sessionEmployee || employeeAccessProfile)}` : "";
+  if(tooltip) tooltip.textContent=active ? `Đăng xuất khỏi ${name} ${roleFriendly}` : "";
+  if(profileTooltip) profileTooltip.textContent=active ? reopenText : "";
+  if(shortcut){
+    shortcut.hidden=!active;
+    shortcut.tabIndex=active?0:-1;
+    shortcut.setAttribute("aria-hidden",active?"false":"true");
+    shortcut.setAttribute("aria-label",active?`${reopenText} · ${name}, vai trò ${roleLabel}`:"Chưa có phiên đăng nhập");
+    if(active) shortcut.setAttribute("aria-controls",reopenArea==="partner"?"partnerOverlay":"customerOverlay");
+    else shortcut.removeAttribute("aria-controls");
+    shortcut.removeAttribute("title");
+  }
   if(button){
     button.hidden=!active;
     button.tabIndex=active?0:-1;
     button.classList.toggle("dock-active",active);
     button.setAttribute("aria-hidden",active?"false":"true");
-    button.setAttribute("aria-label",active?`Tài khoản ${name} đang đăng nhập. Bấm để đăng xuất`:"Tài khoản nhân viên chưa đăng nhập");
-    button.title=active?`${name} đang đăng nhập · bấm để đăng xuất`:"";
+    button.setAttribute("aria-label",active?`Đăng xuất khỏi ${name} ${roleFriendly}`:"Chưa có phiên đăng nhập");
+    button.removeAttribute("title");
   }
 }
 function refreshEmployeePermissionUI(){
@@ -8673,14 +8809,27 @@ function refreshEmployeePermissionUI(){
   const fabButton=document.getElementById("fabToggleBtn");
   if(fabButton && !document.body.classList.contains("fab-menu-open")) fabButton.textContent=isAdminMode()?"⚙️ Phạm Văn Chương":"⚙️ Thao tác";
   updateEmployeeDock();
+  if(document.getElementById("customerOverlay")?.classList.contains("open") || document.getElementById("partnerOverlay")?.classList.contains("open")) refreshPrivateEditUI();
 }
 function setEmployeeSession(token,profile){
+  const previousEmployeeKey=currentEmployeeSessionKey();
   employeeAccessToken=String(token||"");
   employeeAccessProfile=profile&&typeof profile==="object"?profile:null;
   if(employeeAccessToken&&employeeAccessProfile){
+    const normalizedProfile=normalizeNVItem(employeeAccessProfile);
+    if(normalizedProfile){
+      const profileKey=removeAccents(normalizedProfile.name).toLowerCase();
+      const existingIndex=NV_LIST.findIndex(item=>removeAccents(getNVName(item)).toLowerCase()===profileKey);
+      if(existingIndex>=0) NV_LIST[existingIndex]={...normalizeNVItem(NV_LIST[existingIndex]),...normalizedProfile};
+      else NV_LIST.push(normalizedProfile);
+      employeeAccessProfile={...employeeAccessProfile,...normalizedProfile};
+    }
+    const nextEmployeeKey=currentEmployeeSessionKey();
+    if(previousEmployeeKey&&nextEmployeeKey&&previousEmployeeKey!==nextEmployeeKey) clearEmployeePrivateAreaSessions();
     sessionStorage.setItem("kho_employee_session_token",employeeAccessToken);
     sessionStorage.setItem("kho_employee_profile",JSON.stringify(employeeAccessProfile));
   }else{
+    clearEmployeePrivateAreaSessions();
     sessionStorage.removeItem("kho_employee_session_token");
     sessionStorage.removeItem("kho_employee_profile");
   }
@@ -8688,8 +8837,9 @@ function setEmployeeSession(token,profile){
 }
 function clearEmployeeSession(notify=false){
   const oldName=employeeAccessProfile?.name||"Nhân viên";
+  const oldRole=employeeRoleFriendly(employeeAccessProfile);
   setEmployeeSession("",null);
-  if(notify) showToast(`Đã đăng xuất tài khoản ${oldName}`);
+  if(notify) showToast(`Đã đăng xuất khỏi ${oldName} ${oldRole}`);
 }
 function requireActionPermission(permission,label="thao tác này"){
   if(hasEmployeePermission(permission)) return true;
@@ -8703,7 +8853,7 @@ function requireActionPermission(permission,label="thao tác này"){
 }
 function toggleEmployeeAccess(){
   if(employeeAccessToken&&employeeAccessProfile){
-    if(confirm(`Đăng xuất tài khoản nhân viên ${employeeAccessProfile.name}?`)){ clearEmployeeSession(true); render(); }
+    if(confirm(`Đăng xuất khỏi ${employeeAccessProfile.name} ${employeeRoleFriendly(employeeAccessProfile)}?`)){ clearEmployeeSession(true); render(); }
     return;
   }
 }
@@ -8714,7 +8864,7 @@ function isAdminMode(){
 
 function requireAdmin(){
   if(isAdminMode()) return true;
-  showToast("Chi Admin moi duoc chinh sua");
+  showToast("Chức năng này chỉ dành cho vai trò Admin.");
   return false;
 }
 
@@ -8838,7 +8988,7 @@ function checkAdminSession(){
 
 // Dòng URL duy nhất
 const SHEET_API_URL = "https://script.google.com/macros/s/AKfycby6YH69F7sfO1ZoUJsDm4BeX6Luj2GrhUfYWWJWNvqjraAEhkBck16EphrPBBm1BT3YqA/exec";
-const REQUIRED_API_VERSION = "2026.08.10-customer-machine-profile-03";
+const REQUIRED_API_VERSION = "2026.08.10-private-area-scope-05";
 // Apps Script có thể phải chờ khóa ghi khi nhiều thao tác diễn ra gần nhau.
 // 45 giây dài hơn thời gian chờ khóa phía máy chủ, tránh báo lỗi giả trong khi Sheet vẫn đang ghi.
 const SHEET_TIMEOUT_MS = 45000;
@@ -12857,16 +13007,16 @@ function findNVByName(name){
   const key = removeAccents(String(name || "")).trim().toLowerCase();
   return normalizeNVList(NV_LIST).find(nv=>removeAccents(nv.name).toLowerCase() === key) || null;
 }
-function renderNVAvatar(name, extraClass=""){
-  const nv = findNVByName(name);
+function renderNVAvatar(name, extraClass="", fallbackProfile=null){
+  const nv = findNVByName(name) || normalizeNVItem(fallbackProfile);
   const avatar = nv && nv.avatar ? nv.avatar : "";
   const label = String(name || "").trim();
   const initial = label ? escapeHtml(label.charAt(0).toUpperCase()) : "👤";
   if(avatar) return `<span class="nv-avatar has-preview ${extraClass}" title="Bấm để phóng to avatar" onclick="event.stopPropagation();openImageViewer(this.querySelector('img').src,this.querySelector('img').alt)"><img src="${escapeHtml(avatar)}" alt="Avatar ${escapeHtml(label)}" loading="lazy" decoding="async" referrerpolicy="no-referrer" onerror="this.parentElement.outerHTML='<span class=\\'nv-avatar ${extraClass}\\' title=\\'${escapeHtml(label)}\\'>${initial}</span>';"></span>`;
   return `<span class="nv-avatar ${extraClass}" title="${escapeHtml(label)}">${initial}</span>`;
 }
-function renderNVRoleBadge(name){
-  const nv=findNVByName(name);
+function renderNVRoleBadge(name,fallbackProfile=null){
+  const nv=findNVByName(name) || normalizeNVItem(fallbackProfile);
   if(!nv) return "";
   const role=normalizeNVRole(nv.role);
   const cfg={CEO:{label:"CEO",icon:"👑",cls:"ceo"},ADMIN:{label:"ADMIN",icon:"🔑",cls:"admin"},MOD:{label:"MOD",icon:"🛡️",cls:"mod"},ACCOUNTANT:{label:"KẾ TOÁN",icon:"🧾",cls:"accountant"},TECHNICIAN:{label:"KỸ THUẬT",icon:"🔧",cls:"technician"},STAFF:{label:"NHÂN VIÊN",icon:"👤",cls:"staff"}}[role];
@@ -15418,17 +15568,57 @@ function filterByBrand(brand){
 let privateAccessTarget = "customer";
 let privateAccessToken = "";
 let privateAccessBusy = false;
+let privateEmployeeNameFocusTimer = 0;
+let privatePasswordAutoSubmitTimer = 0;
+let privatePasswordLastAttempt = "";
 const PRIVATE_DISTRICTS = ["TP Thủ Đức","Quận 1","Quận 3","Quận 4","Quận 5","Quận 6","Quận 7","Quận 8","Quận 10","Quận 11","Quận 12","Bình Thạnh","Gò Vấp","Phú Nhuận","Tân Bình","Tân Phú","Bình Tân","Bình Chánh","Hóc Môn","Củ Chi","Nhà Bè","Cần Giờ"];
 const PARTNER_SERVICES = ["Máy tính","Máy in","Camera","Internet"];
 try{ localStorage.removeItem("kho_cntt_customers_cache"); }catch(_){ }
 
+function handlePrivateEmployeeNameInput(){
+  const input=document.getElementById("privateAccessEmployee");
+  const password=document.getElementById("privateAccessPassword");
+  clearTimeout(privateEmployeeNameFocusTimer);
+  if(!input || !document.getElementById("privateAccessOverlay")?.classList.contains("open")) return;
+  const employee=findNVByName(input.value);
+  input.classList.toggle("name-matched",!!employee);
+  privatePasswordLastAttempt="";
+  if(!employee) return;
+  input.value=employee.name;
+  privateEmployeeNameFocusTimer=setTimeout(()=>{
+    if(document.activeElement===input && !privateAccessBusy) password?.focus({preventScroll:true});
+  },120);
+}
+function schedulePrivateAccessAutoSubmit(){
+  const overlay=document.getElementById("privateAccessOverlay");
+  const employeeInput=document.getElementById("privateAccessEmployee");
+  const password=document.getElementById("privateAccessPassword");
+  const errorBox=document.getElementById("privateAccessError");
+  clearTimeout(privatePasswordAutoSubmitTimer);
+  const employee=findNVByName(employeeInput?.value||"");
+  const value=String(password?.value||"");
+  if(!overlay?.classList.contains("open") || privateAccessBusy || !employee || !value){
+    password?.classList.remove("password-scanning");
+    return;
+  }
+  if(errorBox) errorBox.textContent="";
+  password.classList.add("password-scanning");
+  const attemptKey=`${removeAccents(employee.name).toLowerCase()}\n${value}`;
+  if(attemptKey===privatePasswordLastAttempt){ password.classList.remove("password-scanning"); return; }
+  privatePasswordAutoSubmitTimer=setTimeout(()=>{
+    const currentEmployee=findNVByName(employeeInput?.value||"");
+    const currentValue=String(password?.value||"");
+    const currentKey=currentEmployee?`${removeAccents(currentEmployee.name).toLowerCase()}\n${currentValue}`:"";
+    if(!privateAccessBusy && overlay.classList.contains("open") && currentKey===attemptKey && attemptKey!==privatePasswordLastAttempt) submitPrivateAccess();
+  },800);
+}
 function requestPrivateAccess(target){
   privateAccessTarget = target === "partner" ? "partner" : target === "workspace" ? "workspace" : "customer";
   if(privateAccessTarget==="customer" && hasPrivateFeatureAccess("customer")){ void openCustomerPanel(); return; }
   if(privateAccessTarget==="partner" && hasPrivateFeatureAccess("partner")){ void openPartnerPanel(); return; }
   if(employeeAccessToken&&employeeAccessProfile){
     const needed=privateAccessTarget==="partner"?"PARTNER_VIEW":privateAccessTarget==="customer"?"CUSTOMER_VIEW":"";
-    if(needed){ showToast(`Tài khoản ${employeeAccessProfile.name} chưa được cấp quyền ${EMPLOYEE_PERMISSION_LABELS[needed]}.`,4200); return; }
+    if(needed&&!hasEmployeePermission(needed)){ showToast(`Tài khoản ${employeeAccessProfile.name} chưa được cấp quyền ${EMPLOYEE_PERMISSION_LABELS[needed]}.`,4200); return; }
   }
   const overlay=document.getElementById("privateAccessOverlay");
   const password=document.getElementById("privateAccessPassword");
@@ -15438,24 +15628,30 @@ function requestPrivateAccess(target){
     ? "Sử dụng tài khoản nhân viên do quản trị viên cấp."
     : `Đăng nhập để truy cập ${privateAccessTarget==="partner"?"danh sách đối tác":"hồ sơ khách hàng"} theo quyền được cấp.`;
   document.getElementById("privateAccessError").textContent="";
-  if(employeeInput){ employeeInput.value=employeeAccessProfile?.name||""; employeeInput.disabled=false; }
-  if(password){ password.value=""; password.type="password"; password.disabled=false; }
+  clearTimeout(privatePasswordAutoSubmitTimer);
+  privatePasswordLastAttempt="";
+  const prefilledEmployee=employeeAccessProfile?.name ? findNVByName(employeeAccessProfile.name) : null;
+  if(employeeInput){ employeeInput.value=prefilledEmployee?.name||employeeAccessProfile?.name||""; employeeInput.disabled=false; employeeInput.classList.toggle("name-matched",!!prefilledEmployee); }
+  if(password){ password.value=""; password.type="password"; password.disabled=false; password.classList.remove("password-scanning"); }
   document.querySelector("#privateAccessOverlay .admin-password-toggle")?.classList.remove("password-visible");
   overlay?.classList.add("open");
   document.body.classList.add("private-panel-open");
-  setTimeout(()=>employeeInput?.focus({preventScroll:true}),90);
+  setTimeout(()=>prefilledEmployee?password?.focus({preventScroll:true}):employeeInput?.focus({preventScroll:true}),90);
 }
 function closePrivateAccess(){
+  clearTimeout(privateEmployeeNameFocusTimer);
+  clearTimeout(privatePasswordAutoSubmitTimer);
   document.getElementById("privateAccessOverlay")?.classList.remove("open");
   if(!document.getElementById("customerOverlay")?.classList.contains("open") && !document.getElementById("partnerOverlay")?.classList.contains("open")) document.body.classList.remove("private-panel-open");
   const password=document.getElementById("privateAccessPassword");
-  if(password){password.value="";password.disabled=false;}
+  if(password){password.value="";password.disabled=false;password.classList.remove("password-scanning");}
   const employeeInput=document.getElementById("privateAccessEmployee");
-  if(employeeInput) employeeInput.disabled=false;
+  if(employeeInput){employeeInput.disabled=false;employeeInput.classList.remove("name-matched");}
   privateAccessBusy=false;
 }
 async function submitPrivateAccess(){
   if(privateAccessBusy) return;
+  clearTimeout(privatePasswordAutoSubmitTimer);
   const password=document.getElementById("privateAccessPassword");
   const submit=document.getElementById("privateAccessSubmit");
   const errorBox=document.getElementById("privateAccessError");
@@ -15464,7 +15660,9 @@ async function submitPrivateAccess(){
   const value=password?.value || "";
   if(!employeeName){ errorBox.textContent="Vui lòng chọn hoặc nhập đúng tên đăng nhập."; employeeInput?.focus(); return; }
   if(!value){ errorBox.textContent="Vui lòng nhập mật khẩu."; password?.focus(); return; }
+  privatePasswordLastAttempt=`${removeAccents(employeeName).toLowerCase()}\n${value}`;
   privateAccessBusy=true;
+  password?.classList.add("password-scanning");
   if(password) password.disabled=true;
   if(employeeInput) employeeInput.disabled=true;
   if(submit){submit.disabled=true;submit.textContent="Đang xác thực...";}
@@ -15472,7 +15670,7 @@ async function submitPrivateAccess(){
   try{
     const verified=await fetchSheetJson(SHEET_API_URL,{
       method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},
-      body:JSON.stringify({action:"verify_employee_access",employee:employeeName,password:value})
+      body:JSON.stringify({action:"verify_employee_access",employee:employeeName,password:value,scope:privateAccessTarget})
     },20000);
     if(!verified.token) throw new Error("API không cấp phiên đăng nhập nhân viên");
     const target=privateAccessTarget;
@@ -15480,10 +15678,11 @@ async function submitPrivateAccess(){
     setEmployeeSession(verified.token,verified.employee);
     const needed=target==="customer"?"CUSTOMER_VIEW":target==="partner"?"PARTNER_VIEW":"";
     if(needed && !hasEmployeePermission(needed)) throw new Error(`EMPLOYEE_PERMISSION_REQUIRED: Tài khoản ${verified.employee.name} chưa được cấp quyền ${EMPLOYEE_PERMISSION_LABELS[needed]}`);
+    if(target==="customer"||target==="partner") activateEmployeePrivateArea(target,verified.token);
     closePrivateAccess();
+    showToast(`✅ Đã đăng nhập: ${verified.employee.name} · ${employeeRoleLabel(verified.employee)}`,4500);
     if(target==="workspace"){
       render();
-      showToast(`✅ ${verified.employee.name} đã đăng nhập · ${employeePermissions().length} quyền được cấp`,4500);
     }else if(target==="partner") await openPartnerPanel();
     else await openCustomerPanel();
   }catch(e){
@@ -15492,7 +15691,7 @@ async function submitPrivateAccess(){
     password?.select();
   }finally{
     privateAccessBusy=false;
-    if(password) password.disabled=false;
+    if(password){ password.disabled=false; password.classList.remove("password-scanning"); }
     if(employeeInput) employeeInput.disabled=false;
     if(submit){submit.disabled=false;submit.textContent="Đăng nhập";}
   }
@@ -15505,7 +15704,8 @@ function clearPrivateSession(){
 }
 function hasPrivateFeatureAccess(target=privateAccessTarget){
   if(privateAccessToken || (isAdminMode() && !!sessionStorage.getItem("kho_admin_session_token"))) return true;
-  return hasEmployeePermission(target==="partner"?"PARTNER_VIEW":"CUSTOMER_VIEW");
+  const area=target==="partner"?"partner":"customer";
+  return hasEmployeePrivateAreaSession(area) && hasEmployeePermission(area==="partner"?"PARTNER_VIEW":"CUSTOMER_VIEW");
 }
 function requirePrivateFeatureAccess(target=privateAccessTarget){
   if(hasPrivateFeatureAccess(target)) return true;
@@ -15515,17 +15715,38 @@ function requirePrivateFeatureAccess(target=privateAccessTarget){
 }
 function requirePrivateEditAccess(permission,label){
   if(canPrivateEdit(permission)) return true;
-  if(employeeAccessToken&&employeeAccessProfile) showToast(`Tài khoản ${employeeAccessProfile.name} chưa được cấp quyền ${label}.`,4200);
-  else requestPrivateAccess(permission.startsWith("PARTNER")?"partner":"customer");
+  const area=permission.startsWith("PARTNER")?"partner":"customer";
+  if(employeeAccessToken&&employeeAccessProfile&&!hasEmployeePermission(permission)) showToast(`Tài khoản ${employeeAccessProfile.name} chưa được cấp quyền ${label}.`,4200);
+  else requestPrivateAccess(area);
   return false;
 }
 function canPrivateEdit(permission){
-  return !!privateAccessToken || (isAdminMode() && !!sessionStorage.getItem("kho_admin_session_token")) || hasEmployeePermission(permission);
+  if(privateAccessToken || (isAdminMode() && !!sessionStorage.getItem("kho_admin_session_token"))) return true;
+  const area=String(permission||"").startsWith("PARTNER")?"partner":"customer";
+  return hasEmployeePrivateAreaSession(area) && hasEmployeePermission(permission);
 }
+function renderPrivateAreaSessionStatus(area){
+  const normalized=area==="partner"?"partner":"customer";
+  const box=document.getElementById(normalized==="partner"?"partnerSessionStatus":"customerSessionStatus");
+  if(!box) return;
+  const adminActive=isAdminMode() && !!sessionStorage.getItem("kho_admin_session_token");
+  const employeeActive=!!employeeAccessToken && !!employeeAccessProfile?.name && hasEmployeePrivateAreaSession(normalized);
+  box.classList.toggle("admin-session",adminActive);
+  box.hidden=!adminActive && !employeeActive;
+  if(adminActive){
+    box.innerHTML=`<span class="customer-session-online" aria-hidden="true"></span><span class="customer-session-copy"><b>ADMIN</b><small>Phiên quản trị đang hoạt động</small></span>`;
+    return;
+  }
+  if(!employeeActive){ box.innerHTML=""; return; }
+  const name=String(employeeAccessProfile.name).trim();
+  box.innerHTML=`<span class="customer-session-online" aria-hidden="true"></span>${renderNVAvatar(name,"private-session-avatar",employeeAccessProfile)}<span class="customer-session-copy"><span class="customer-session-name-row"><b>${escapeHtml(name)}</b>${renderNVRoleBadge(name,employeeAccessProfile)}</span><small>Phiên đăng nhập đang hoạt động</small></span>`;
+}
+function renderPrivateAreaSessionStatuses(){ renderPrivateAreaSessionStatus("customer"); renderPrivateAreaSessionStatus("partner"); }
 function refreshPrivateEditUI(){
   document.querySelectorAll("[data-private-edit]").forEach(element=>{ element.hidden=!canPrivateEdit(element.dataset.privateEdit); });
   const viewer=isAdminMode()?"ADMIN":employeeAccessProfile?.name||"ĐÃ XÁC THỰC";
-  document.querySelectorAll("#customerOverlay .modern-live-badge,#partnerOverlay .modern-live-badge").forEach(element=>{ element.innerHTML=`<i></i> ${escapeHtml(viewer)}`; });
+  document.querySelectorAll("#partnerOverlay .modern-live-badge").forEach(element=>{ element.innerHTML=`<i></i> ${escapeHtml(viewer)}`; });
+  renderPrivateAreaSessionStatuses();
 }
 function privateErrorText(error){
   return String(error?.message || error || "Lỗi không xác định");
@@ -15535,15 +15756,16 @@ function isPrivateAuthFailure(error){
 }
 async function privateSheet(action,data={},timeoutMs=SHEET_TIMEOUT_MS){
   const adminToken=sessionStorage.getItem("kho_admin_session_token") || "";
+  const areaToken=getEmployeePrivateAreaToken(privateAccessTarget);
   try{
     return await fetchSheetJson(SHEET_API_URL,{
       method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},
-      body:JSON.stringify({action,data,privateAuth:privateAccessToken,auth:adminToken,employeeAuth:employeeAccessToken})
+      body:JSON.stringify({action,data,privateAuth:privateAccessToken,auth:adminToken,employeeAuth:areaToken||employeeAccessToken})
     },timeoutMs);
   }catch(e){
     const rawMessage=privateErrorText(e);
     if(rawMessage.includes("EMPLOYEE_PERMISSION_REQUIRED")) throw e;
-    if(rawMessage.includes("EMPLOYEE_AUTH_REQUIRED")){
+    if(rawMessage.includes("EMPLOYEE_AUTH_REQUIRED")||rawMessage.includes("EMPLOYEE_SCOPE_REQUIRED")){
       clearEmployeeSession(false);
       const expiredError=new Error("Phiên nhân viên đã hết hạn. Vui lòng đăng nhập lại để tiếp tục.");
       expiredError.code="PRIVATE_AUTH_REQUIRED";
@@ -15574,6 +15796,9 @@ let selectedCustomer = null;
 let customerSearchTimer = null;
 let customerSaving = false;
 let customerCreatingCombined = false;
+let customerHistoryVisible = false;
+let customerRecordsLoading = false;
+let customerHistoryLoadError = "";
 
 function normalizeCustomerPhone(value){
   let phone = String(value || "").replace(/\D/g, "");
@@ -15612,6 +15837,36 @@ function customerMachineEditorPayload(){
     accessories:document.getElementById("customerEditAccessories")?.value.trim() || ""
   };
 }
+function customerRecordMachinePayload(){
+  return {
+    model:document.getElementById("customerRecordModel")?.value.trim() || "",
+    serialTag:document.getElementById("customerRecordSerialTag")?.value.trim() || "",
+    psu:document.getElementById("customerRecordPsu")?.value.trim() || "",
+    mainboard:document.getElementById("customerRecordMainboard")?.value.trim() || "",
+    cpu:document.getElementById("customerRecordCpu")?.value.trim() || "",
+    ram:document.getElementById("customerRecordRam")?.value.trim() || "",
+    ssd:document.getElementById("customerRecordSsd")?.value.trim() || "",
+    hdd:document.getElementById("customerRecordHdd")?.value.trim() || "",
+    vga:document.getElementById("customerRecordVga")?.value.trim() || "",
+    accessories:document.getElementById("customerRecordAccessories")?.value.trim() || ""
+  };
+}
+function setupCustomerMachineFieldMirror(){
+  const pairs=[
+    ["customerEditModel","customerRecordModel"],["customerEditSerialTag","customerRecordSerialTag"],
+    ["customerEditPsu","customerRecordPsu"],["customerEditMainboard","customerRecordMainboard"],
+    ["customerEditCpu","customerRecordCpu"],["customerEditRam","customerRecordRam"],
+    ["customerEditSsd","customerRecordSsd"],["customerEditHdd","customerRecordHdd"],
+    ["customerEditVga","customerRecordVga"],["customerEditAccessories","customerRecordAccessories"]
+  ];
+  pairs.forEach(([profileId,recordId])=>{
+    const profileField=document.getElementById(profileId),recordField=document.getElementById(recordId);
+    if(!profileField||!recordField) return;
+    profileField.addEventListener("input",()=>{ if(customerCreatingCombined) recordField.value=profileField.value; });
+    recordField.addEventListener("input",()=>{ if(customerCreatingCombined) profileField.value=recordField.value; });
+  });
+}
+setupCustomerMachineFieldMirror();
 function customerMatchesProfilePayload(customer,payload){
   if(!customer) return false;
   const fields=["device","model","cpu","ram","storage","serialTag","psu","mainboard","ssd","hdd","vga","accessories"];
@@ -15661,6 +15916,10 @@ async function upsertCustomerRecordSafely(payload){
     return await privateSheet("upsert_customer_record",data,70000);
   }catch(originalError){
     if(isPrivateAuthFailure(originalError)) throw originalError;
+    if(data.createOnly===true&&!canViewCustomerHistory()){
+      try{ return await privateSheet("upsert_customer_record",data,70000); }
+      catch(_){ throw originalError; }
+    }
     try{
       const json=await privateSheet("private_customer_records",{phone:data.phone},45000);
       const found=(Array.isArray(json.records)?json.records:[]).find(item=>String(item.id)===String(data.id));
@@ -15680,6 +15939,7 @@ async function loadCustomers(force=false){
 async function openCustomerPanel(){
   privateAccessTarget="customer";
   if(!requirePrivateFeatureAccess("customer")) return;
+  rememberEmployeePrivateArea("customer");
   const overlay = document.getElementById("customerOverlay");
   overlay.classList.add("open");
   refreshPrivateEditUI();
@@ -15698,6 +15958,9 @@ function closeCustomerPanel(){
   document.body.style.overflow = "";
   selectedCustomer = null;
   CUSTOMER_RECORDS = [];
+  customerHistoryVisible=false;
+  customerRecordsLoading=false;
+  customerHistoryLoadError="";
   setCustomerBackVisible(false);
   closeCustomerEditors();
   clearPrivateSession();
@@ -15731,6 +15994,9 @@ function backToCustomerList(){
   closeCustomerEditors();
   selectedCustomer=null;
   CUSTOMER_RECORDS=[];
+  customerHistoryVisible=false;
+  customerRecordsLoading=false;
+  customerHistoryLoadError="";
   document.getElementById("customerDetail").innerHTML="";
   setCustomerBackVisible(false);
   const raw=String(document.getElementById("customerSearch")?.value||"").trim();
@@ -15764,16 +16030,35 @@ async function openCustomerDetail(phone){
   selectedCustomer = CUSTOMER_DATA.find(item=>item.phone===normalizeCustomerPhone(phone)) || null;
   if(!selectedCustomer) return;
   CUSTOMER_RECORDS=[];
+  customerHistoryVisible=false;
+  customerRecordsLoading=false;
+  customerHistoryLoadError="";
   setCustomerBackVisible(true);
   document.getElementById("customerResults").innerHTML="";
+  renderCustomerDetail(false);
+  if(!isAdminMode()) return;
+  customerRecordsLoading=true;
   renderCustomerDetail(true);
   try{
     const json = await privateSheet("private_customer_records",{phone:selectedCustomer.phone},35000);
     CUSTOMER_RECORDS = Array.isArray(json.records) ? json.records : [];
-    renderCustomerDetail(false);
+    customerRecordsLoading=false;
   }catch(e){
-    document.getElementById("customerDetail").insertAdjacentHTML("beforeend",`<div class="customer-empty">⚠️ Không tải được lịch sử: ${escapeHtml(privateErrorText(e))}</div>`);
+    customerRecordsLoading=false;
+    customerHistoryLoadError=privateErrorText(e);
   }
+  renderCustomerDetail(false);
+}
+function canViewCustomerHistory(){
+  return isAdminMode() && !!sessionStorage.getItem("kho_admin_session_token");
+}
+function requestCustomerHistory(){
+  if(!canViewCustomerHistory()){
+    showToast("Chức năng này chỉ dành cho vai trò Admin.",3600);
+    return;
+  }
+  customerHistoryVisible=!customerHistoryVisible;
+  renderCustomerDetail(customerRecordsLoading);
 }
 function splitCustomerImages(value){
   return String(value || "").split(/\r?\n/).map(v=>v.trim()).filter(Boolean).slice(0,10);
@@ -15825,11 +16110,16 @@ function renderCustomerDetail(loading=false){
     c.accessories?`PHỤ KIỆN KÈM: ${c.accessories}`:""
   ].filter(Boolean);
   const machineHtml=machineSpecs.length?`<div class="customer-profile-machine"><div class="customer-profile-machine-title">MÁY ĐANG SỬ DỤNG</div>${machineSpecs.map(spec=>`<span class="customer-profile-machine-spec">${escapeHtml(spec)}</span>`).join("")}</div>`:"";
-  const recordsHtml = loading ? '<div class="customer-empty">⏳ Đang tải lịch sử bill...</div>' : (CUSTOMER_RECORDS.length ? CUSTOMER_RECORDS.map(record=>{
+  const recordsHtml = (loading||customerRecordsLoading) ? '<div class="customer-empty">⏳ Đang tải lịch sử sửa chữa...</div>' : (customerHistoryLoadError ? `<div class="customer-empty">⚠️ Không tải được lịch sử: ${escapeHtml(customerHistoryLoadError)}</div>` : (CUSTOMER_RECORDS.length ? CUSTOMER_RECORDS.map(record=>{
     const images=splitCustomerImages(record.images);
-    return `<article class="customer-record ${record.status==="CANCELLED"?"cancelled":""}"><div class="customer-record-head"><span>🕒 ${escapeHtml(formatCustomerRecordTime(record.time))} · ${escapeHtml(record.branch || "Q2")}</span><span>${escapeHtml(record.employee || "")}${record.status==="CANCELLED"?" · ĐÃ HỦY":""}</span></div><div class="customer-record-device">${escapeHtml(record.device || "Thiết bị chưa ghi tên")}</div><div class="customer-record-specs">${record.model?`<span class="customer-record-spec">Model: ${escapeHtml(record.model)}</span>`:""}${record.serialTag?`<span class="customer-record-spec">Serial: ${escapeHtml(record.serialTag)}</span>`:""}${Number(record.amount)>0?`<span class="customer-record-spec amount">💰 ${formatVndNumber(record.amount)} VND</span>`:""}</div><div class="customer-record-work">${escapeHtml(record.work || "Chưa ghi nội dung đã làm")}</div>${record.note?`<div class="customer-record-note">📝 ${escapeHtml(record.note)}</div>`:""}${images.length?`<div class="customer-bill-grid">${images.map(url=>`<img class="customer-bill-img" src="${escapeHtml(resolveImageUrl(url))}" data-full="${escapeHtml(resolveImageUrl(url))}" alt="Ảnh bill" loading="lazy" referrerpolicy="no-referrer" onclick="openCustomerBillImage(this)">`).join("")}</div>`:""}${canPrivateEdit("CUSTOMER_EDIT")?`<div class="customer-toolbar"><button type="button" class="customer-secondary" data-record-id="${escapeHtml(record.id)}" onclick="openCustomerRecordEditor(this.dataset.recordId)">✏️ Sửa hồ sơ</button><button type="button" class="btn-delete admin-only" data-record-id="${escapeHtml(record.id)}" onclick="deleteCustomerRecord(this.dataset.recordId)">🗑️ Xóa</button></div>`:""}</article>`;
-  }).join("") : '<div class="customer-empty">Khách này chưa có bill hoặc lịch sử sửa chữa.</div>');
-  document.getElementById("customerDetail").innerHTML=`<div class="customer-profile"><div class="customer-profile-name">${escapeHtml(c.name || "KHÁCH CHƯA GHI TÊN")}</div><div class="customer-profile-phone">☎ ${escapeHtml(formatCustomerPhone(c.phone))}</div>${c.note?`<div class="customer-profile-note">${escapeHtml(c.note)}</div>`:""}${machineHtml}</div>${canPrivateEdit("CUSTOMER_EDIT")?`<div class="customer-toolbar"><button type="button" class="customer-secondary" onclick="openCustomerEditor('${c.phone}')">✏️ Sửa thông tin khách</button><button type="button" class="customer-primary" onclick="openCustomerRecordEditor()">＋ Tạo phiếu sửa chữa</button><button type="button" class="btn-delete admin-only" onclick="deleteSelectedCustomer()">🗑️ Xóa khách</button></div>`:""}<div class="customer-records">${recordsHtml}</div>`;
+    const savedRecordSsd=record.ssd || "";
+    const recordSpecs=[record.model?`MODEL: ${record.model}`:"",record.serialTag?`SERIAL: ${record.serialTag}`:"",record.psu?`PSU: ${record.psu}`:"",record.mainboard?`MAINBOARD: ${record.mainboard}`:"",record.cpu?`CPU: ${record.cpu}`:"",record.ram?`RAM: ${record.ram}`:"",savedRecordSsd?`SSD: ${savedRecordSsd}`:"",record.hdd?`HDD: ${record.hdd}`:"",record.vga?`VGA / CARD: ${record.vga}`:"",record.accessories?`PHỤ KIỆN: ${record.accessories}`:""].filter(Boolean);
+    return `<article class="customer-record ${record.status==="CANCELLED"?"cancelled":""}"><div class="customer-record-head"><span>🕒 ${escapeHtml(formatCustomerRecordTime(record.time))} · ${escapeHtml(record.branch || "Q2")}</span><span>${escapeHtml(record.employee || "")}${record.status==="CANCELLED"?" · ĐÃ HỦY":""}</span></div><div class="customer-record-device">${escapeHtml(record.model || record.device || "Thiết bị chưa ghi tên")}</div><div class="customer-record-specs">${recordSpecs.map(spec=>`<span class="customer-record-spec">${escapeHtml(spec)}</span>`).join("")}${Number(record.amount)>0?`<span class="customer-record-spec amount">💰 ${formatVndNumber(record.amount)} VND</span>`:""}</div><div class="customer-record-work">${escapeHtml(record.work || "Chưa ghi nội dung đã làm")}</div>${record.note?`<div class="customer-record-note">📝 ${escapeHtml(record.note)}</div>`:""}${images.length?`<div class="customer-bill-grid">${images.map(url=>`<img class="customer-bill-img" src="${escapeHtml(resolveImageUrl(url))}" data-full="${escapeHtml(resolveImageUrl(url))}" alt="Ảnh bill" loading="lazy" referrerpolicy="no-referrer" onclick="openCustomerBillImage(this)">`).join("")}</div>`:""}${canPrivateEdit("CUSTOMER_EDIT")?`<div class="customer-toolbar"><button type="button" class="customer-secondary" data-record-id="${escapeHtml(record.id)}" onclick="openCustomerRecordEditor(this.dataset.recordId)">✏️ Sửa hồ sơ</button><button type="button" class="btn-delete admin-only" data-record-id="${escapeHtml(record.id)}" onclick="deleteCustomerRecord(this.dataset.recordId)">🗑️ Xóa</button></div>`:""}</article>`;
+  }).join("") : '<div class="customer-empty">Khách này chưa có lịch sử sửa chữa.</div>'));
+  const editActions=canPrivateEdit("CUSTOMER_EDIT")?`<button type="button" class="customer-secondary" onclick="openCustomerEditor('${c.phone}')">✏️ Sửa thông tin khách</button><button type="button" class="customer-primary" onclick="openCustomerRecordEditor()">＋ Tạo phiếu sửa chữa</button><button type="button" class="btn-delete admin-only" onclick="deleteSelectedCustomer()">🗑️ Xóa khách</button>`:"";
+  const historyLabel=customerHistoryVisible&&canViewCustomerHistory()?"Ẩn lịch sử":"Xem lịch sử";
+  const historySection=customerHistoryVisible&&canViewCustomerHistory()?`<div class="customer-records">${recordsHtml}</div>`:"";
+  document.getElementById("customerDetail").innerHTML=`<div class="customer-profile"><div class="customer-profile-name">${escapeHtml(c.name || "KHÁCH CHƯA GHI TÊN")}</div><div class="customer-profile-phone">☎ ${escapeHtml(formatCustomerPhone(c.phone))}</div>${c.note?`<div class="customer-profile-note">${escapeHtml(c.note)}</div>`:""}${machineHtml}</div><div class="customer-toolbar">${editActions}<button type="button" class="customer-history-link" aria-expanded="${customerHistoryVisible&&canViewCustomerHistory()}" onclick="requestCustomerHistory()">🕘 ${historyLabel}</button></div>${historySection}`;
 }
 function openCustomerBillImage(img){
   const record=img?.closest?.(".customer-record");
@@ -15841,6 +16131,11 @@ function openCustomerBillImage(img){
 function renderCustomerEditRecordList(){
   const box=document.getElementById("customerEditRecordList");
   if(!box||!selectedCustomer){ if(box) box.classList.remove("open"); return; }
+  if(!canViewCustomerHistory()){
+    box.classList.add("open");
+    box.innerHTML='<div class="customer-edit-record-list-head"><b>LỊCH SỬ SỬA CHỮA</b><small>Lịch sử chi tiết dành cho vai trò Admin.</small></div><button type="button" class="customer-history-link" onclick="requestCustomerHistory()">🕘 Xem lịch sử</button>';
+    return;
+  }
   const records=CUSTOMER_RECORDS.filter(record=>record.status!=="CANCELLED");
   box.classList.add("open");
   if(!records.length){
@@ -15918,12 +16213,21 @@ async function saveCustomerProfile(){
   finally{ customerSaving=false; if(saveBtn){ saveBtn.disabled=false; saveBtn.textContent="💾 Lưu khách hàng"; } }
 }
 function fillCustomerRecordEditor(record=null){
+  document.getElementById("customerRecordEditorTitle").textContent=record?"CHỈNH SỬA PHIẾU SỬA CHỮA":"TẠO PHIẾU SỬA CHỮA";
   document.getElementById("customerRecordId").value=record?.id || "";
   document.getElementById("customerRecordCustomerName").value=record?.customerName || selectedCustomer.name || "";
   document.getElementById("customerRecordPhone").value=formatCustomerPhone(selectedCustomer.phone);
-  document.getElementById("customerRecordDevice").value=record ? (record.device || "") : (selectedCustomer.device || "");
+  document.getElementById("customerRecordDevice").value=record ? (record.device || "") : (selectedCustomer.device || selectedCustomer.model || "");
   document.getElementById("customerRecordModel").value=record ? (record.model || "") : (selectedCustomer.model || "");
   document.getElementById("customerRecordSerialTag").value=record ? (record.serialTag || "") : (selectedCustomer.serialTag || "");
+  document.getElementById("customerRecordPsu").value=record ? (record.psu || "") : (selectedCustomer.psu || "");
+  document.getElementById("customerRecordMainboard").value=record ? (record.mainboard || "") : (selectedCustomer.mainboard || "");
+  document.getElementById("customerRecordCpu").value=record ? (record.cpu || "") : (selectedCustomer.cpu || "");
+  document.getElementById("customerRecordRam").value=record ? (record.ram || "") : (selectedCustomer.ram || "");
+  document.getElementById("customerRecordSsd").value=record ? (record.ssd || "") : (selectedCustomer.ssd || selectedCustomer.storage || "");
+  document.getElementById("customerRecordHdd").value=record ? (record.hdd || "") : (selectedCustomer.hdd || "");
+  document.getElementById("customerRecordVga").value=record ? (record.vga || "") : (selectedCustomer.vga || "");
+  document.getElementById("customerRecordAccessories").value=record ? (record.accessories || "") : (selectedCustomer.accessories || "");
   document.getElementById("customerRecordAmount").value=Number(record?.amount)>0 ? formatVndNumber(record.amount) : "";
   document.getElementById("customerRecordWork").value=record?.work || "";
   document.getElementById("customerRecordImages").value=record?.images || "";
@@ -15935,6 +16239,10 @@ function fillCustomerRecordEditor(record=null){
 }
 function openCustomerRecordEditor(recordId=""){
   if(!requirePrivateEditAccess("CUSTOMER_EDIT","thêm hoặc sửa hồ sơ khách hàng") || !selectedCustomer) return;
+  if(recordId&&!canViewCustomerHistory()){
+    showToast("Chức năng này chỉ dành cho vai trò Admin.",3800);
+    return;
+  }
   const record=CUSTOMER_RECORDS.find(item=>String(item.id)===String(recordId));
   closeCustomerEditors();
   fillCustomerRecordEditor(record);
@@ -15971,8 +16279,11 @@ async function saveCustomerRecord(){
       selectedCustomer=cacheSavedCustomer(profile.customer) || profile.customer;
     }
     const recordIdField=document.getElementById("customerRecordId");
+    const creatingNewRecord=!recordIdField.value;
     if(!recordIdField.value) recordIdField.value=makeCustomerRequestId("HS");
-    await upsertCustomerRecordSafely({id:recordIdField.value,phone:recordPhone,customerName:recordCustomerName,device:document.getElementById("customerRecordDevice").value.trim(),model:document.getElementById("customerRecordModel").value.trim(),serialTag:document.getElementById("customerRecordSerialTag").value.trim(),amount:parseVndInput(document.getElementById("customerRecordAmount").value),work,images:imageLinks.join("\n"),note:document.getElementById("customerRecordNote").value.trim(),employee:document.getElementById("customerRecordEmployee").value.trim(),branch:document.getElementById("customerRecordBranch").value,time:recordTime.replace("T"," ")});
+    const recordMachine=customerRecordMachinePayload();
+    const recordDevice=document.getElementById("customerRecordDevice").value.trim() || recordMachine.model || "Thiết bị khách hàng";
+    await upsertCustomerRecordSafely({id:recordIdField.value,createOnly:creatingNewRecord,phone:recordPhone,customerName:recordCustomerName,device:recordDevice,...recordMachine,amount:parseVndInput(document.getElementById("customerRecordAmount").value),work,images:imageLinks.join("\n"),note:document.getElementById("customerRecordNote").value.trim(),employee:document.getElementById("customerRecordEmployee").value.trim(),branch:document.getElementById("customerRecordBranch").value,time:recordTime.replace("T"," ")});
     closeCustomerEditors();
     document.getElementById("customerSearch").value=recordPhone;
     await openCustomerDetail(recordPhone);
@@ -16090,6 +16401,7 @@ function renderPartners(){
 async function openPartnerPanel(){
   privateAccessTarget="partner";
   if(!requirePrivateFeatureAccess("partner")) return;
+  rememberEmployeePrivateArea("partner");
   const overlay=document.getElementById("partnerOverlay");
   overlay?.classList.add("open");
   refreshPrivateEditUI();
