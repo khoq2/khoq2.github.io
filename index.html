@@ -12236,16 +12236,22 @@ async function exportBuildSummaryImage(){
   canvas.width=width; canvas.height=190+rows.length*rowH+85;
   const grad=ctx.createLinearGradient(0,0,width,0); grad.addColorStop(0,"#1E3A5F"); grad.addColorStop(1,"#2E86C1");
   ctx.fillStyle=grad; ctx.fillRect(0,0,width,145);
-  ctx.fillStyle="#fff"; ctx.font="bold 38px Arial"; ctx.textAlign="center"; drawBuildCanvasText(ctx,buildQuoteTitle||"BÁO GIÁ LINH KIỆN",width/2,58,width-90,42,1); ctx.textAlign="left";
-  ctx.font="20px Arial"; ctx.fillStyle="rgba(255,255,255,.82)"; ctx.fillText(`${buildQuoteCustomer?`Khách: ${buildQuoteCustomer} · `:""}${formatTxTime(new Date())}`,47,101);
+  const quoteCustomer=String(buildQuoteCustomer||"").trim();
+  const quoteDate=formatTxTime(new Date());
+  ctx.fillStyle="#fff"; ctx.font="bold 38px Arial"; ctx.textAlign="center"; drawBuildCanvasText(ctx,buildQuoteTitle||"BÁO GIÁ LINH KIỆN",width/2,50,width-90,42,1);
+  ctx.font="bold 18px Arial"; ctx.fillStyle="rgba(255,255,255,.9)";
+  ctx.fillText(`KHÁCH HÀNG: ${quoteCustomer||"................................"}`,width/2,91);
+  ctx.fillText(`NGÀY BÁO GIÁ: ${quoteDate}`,width/2,120);
+  ctx.textAlign="left";
   const images=await Promise.all(rows.map(x=>loadBuildCanvasImage(String(x.r[9]||""))));
   rows.forEach((item,i)=>{
     const y=160+i*rowH; ctx.fillStyle=i%2?"#F4F8FB":"#fff"; ctx.fillRect(28,y,width-56,rowH-8);
     const img=images[i]; if(img){ ctx.save(); ctx.beginPath(); ctx.roundRect(46,y+14,88,88,10); ctx.clip(); ctx.drawImage(img,46,y+14,88,88); ctx.restore(); } else { ctx.fillStyle="#E7EFF5"; ctx.fillRect(46,y+14,88,88); ctx.fillStyle="#789"; ctx.font="30px Arial"; ctx.fillText("PC",69,y+68); }
-    ctx.fillStyle="#1E3A5F"; ctx.font="bold 21px Arial"; drawBuildCanvasText(ctx,item.title,155,y+35,650,26,2);
-    if(item.warranty){ctx.fillStyle="#1A5276";ctx.font="bold 16px Arial";drawBuildCanvasText(ctx,`Bảo hành: ${item.warranty}`,155,y+105,650,20,1);}
-    ctx.textAlign="right"; ctx.fillStyle="#536B7D"; ctx.font="bold 17px Arial"; ctx.fillText(`SL: ${item.qty}`,1130,y+48);
-    ctx.fillStyle="#1E8449"; ctx.font="bold 19px Arial"; ctx.fillText(`Đơn giá: ${item.price?formatBuildMoney(item.price):"Chưa nhập"}`,1130,y+91); ctx.textAlign="left";
+    ctx.fillStyle="#1E3A5F"; ctx.font="bold 21px Arial"; drawBuildCanvasText(ctx,item.title,155,y+35,960,26,2);
+    const priceText=item.price?formatBuildMoney(item.price):"Chưa nhập";
+    const warrantyText=item.warranty||"—";
+    ctx.fillStyle="#1A5276"; ctx.font="bold 17px Arial";
+    drawBuildCanvasText(ctx,`SL: ${item.qty}   |   GIÁ: ${priceText}   |   BH: ${warrantyText}`,155,y+105,960,20,1);
   });
   const totals=getBuildTotals(rows),footerY=175+rows.length*rowH;
   ctx.fillStyle="#1E3A5F"; ctx.font="bold 24px Arial"; ctx.fillText(`Tổng: ${rows.length} linh kiện · ${rows.reduce((s,x)=>s+x.qty,0)} sản phẩm`,42,footerY+28);
