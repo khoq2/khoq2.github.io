@@ -283,15 +283,16 @@ button:disabled,input:disabled,select:disabled,[aria-disabled="true"] { cursor:n
 .search-landing-icon svg { width:29px; height:29px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; }
 .search-landing-icon::after { content:""; position:absolute; width:7px; height:7px; border-radius:50%; background:#F5B041; box-shadow:0 0 9px rgba(245,176,65,.78); animation:searchOrbit 2.6s linear infinite; }
 .search-landing .empty-title { font-size:18px; color:#1E3A5F; margin-bottom:8px; }
-.search-examples { width:min(100%,470px); margin:18px auto 0; display:flex; flex-direction:column; align-items:center; gap:6px; }
-.search-example { width:auto; max-width:100%; display:flex; align-items:center; gap:5px; padding:6px 11px 6px 7px; border:1px solid rgba(46,134,193,.26); border-radius:9px; background:#fff; color:#1A5276; font:inherit; font-size:11px; font-weight:800; line-height:1.3; box-shadow:0 3px 8px rgba(30,58,95,.07); cursor:pointer; text-align:left; }
-.search-example:hover { border-color:#2E86C1; color:#1E3A5F; transform:translateY(-1px); box-shadow:0 5px 12px rgba(30,58,95,.12); }
-.search-example:active { transform:scale(.96); }
+.search-examples { width:min(100%,500px); margin:18px auto 0; display:flex; flex-direction:column; align-items:stretch; gap:0; border-top:1px dotted #B9C7D2; }
+.search-example { width:100%; max-width:100%; display:flex; align-items:center; gap:6px; padding:5px 3px; border:0; border-bottom:1px dotted #B9C7D2; border-radius:0; background:transparent; color:#0969B6; font:inherit; font-size:11px; font-weight:850; line-height:1.3; box-shadow:none; cursor:pointer; text-align:left; transition:background .14s ease,color .14s ease,padding-left .14s ease; }
+.search-example:hover,.search-example:focus-visible { border-color:#9DB4C5; background:#F3F9FD; color:#064F91; padding-left:6px; transform:none; box-shadow:none; outline:none; }
+.search-example:active { background:#E8F3FA; transform:none; }
+.search-example::after { display:none!important; }
 .search-example-rank { position:relative; isolation:isolate; flex:0 0 15px; width:15px; height:13px; display:grid; place-items:center; overflow:visible; border:1px solid rgba(255,255,255,.82); border-radius:3px; background:var(--rank-color); color:#fff; font-size:7px; font-weight:950; line-height:1; text-shadow:0 1px 1px rgba(0,0,0,.2); box-shadow:0 0 0 1px rgba(34,57,77,.16),0 1px 2px rgba(30,58,95,.15); }
 .search-example-rank::before { content:""; position:absolute; z-index:2; top:-1px; right:-1px; width:5px; height:5px; border-left:1px solid rgba(255,255,255,.9); border-bottom:1px solid rgba(255,255,255,.9); border-radius:0 2px 0 1px; background:#fff; clip-path:polygon(0 0,100% 100%,0 100%); }
 .search-example-rank::after { content:""; position:absolute; z-index:-1; left:-3px; top:3px; width:3px; height:1.5px; border-radius:2px 0 0 2px; background:var(--rank-color); box-shadow:0 3px 0 var(--rank-color),0 6px 0 var(--rank-color); opacity:.96; }
 .search-example-rank-number { position:relative; z-index:3; transform:translate(-1px,.5px); }
-.search-example-label { min-width:0; flex:1 1 auto; overflow-wrap:anywhere; }
+.search-example-label { min-width:0; flex:1 1 auto; overflow-wrap:anywhere; text-decoration:underline; text-decoration-thickness:1px; text-underline-offset:1.5px; text-decoration-color:rgba(9,105,182,.6); }
 @keyframes searchBreathe { 0%,100%{transform:translateY(0);box-shadow:0 0 0 7px rgba(46,134,193,.08),0 10px 24px rgba(30,58,95,.22)} 50%{transform:translateY(-3px);box-shadow:0 0 0 10px rgba(46,134,193,.05),0 14px 28px rgba(30,58,95,.26)} }
 @keyframes searchOrbit { from{transform:rotate(0deg) translateX(40px) rotate(0deg)} to{transform:rotate(360deg) translateX(40px) rotate(-360deg)} }
 .card { position:relative; background: #fff; border-radius: 12px; margin-bottom: 8px; overflow: hidden; border: 1.5px solid #E8E8E8; box-shadow: 0 1px 4px rgba(0,0,0,.06); transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease,background-color .18s ease; }
@@ -1297,7 +1298,7 @@ body.fab-menu-open .category-view-bar .view-mode-switch { pointer-events:none; }
 .home-landing-mode .latest-items-ticker { position:relative; left:auto; right:auto; bottom:auto; width:fit-content; max-width:calc(100vw - 28px); margin:16px 14px 0; transform:translateY(7px); }
 .home-landing-mode .latest-items-line { justify-content:flex-start; }
 .loading-layout-mode .sticky { position:relative; top:auto; }
-.home-landing-mode .search-examples::after { content:""; flex:0 0 72%; height:1px; margin-top:5px; border-radius:999px; background:linear-gradient(90deg,transparent,rgba(46,134,193,.22) 18%,rgba(46,134,193,.72) 50%,rgba(46,134,193,.22) 82%,transparent); box-shadow:0 0 4px rgba(46,134,193,.18); pointer-events:none; }
+.home-landing-mode .search-examples::after { display:none; }
 .home-landing-mode .latest-items-ticker.show,.home-landing-mode .latest-items-ticker.is-rising { transform:translateY(0); }
 .home-landing-mode .latest-items-ticker.is-leaving { transform:translateY(7px); }
 .home-landing-mode #results { padding-bottom:0; }
@@ -7609,6 +7610,8 @@ body .warehouse-switch.warehouse-switch-changing .warehouse-pin{
     grid-row:1!important;
     display:flex!important;
     align-items:center!important;
+    justify-content:flex-start!important;
+    flex-wrap:nowrap!important;
     align-self:center!important;
     min-height:26px!important;
     line-height:1.1!important;
@@ -7673,6 +7676,7 @@ body .warehouse-switch.warehouse-switch-changing .warehouse-pin{
   body .header .title-status-line .sync-badge,
   body .header .title-status-line #lastSyncText{
     flex:0 0 auto!important;
+    margin-right:0!important;
     color:#657A8C!important;
     font-size:7.2px!important;
     line-height:1!important;
@@ -9000,7 +9004,12 @@ let searchQ = "";
 const SEARCH_KEYWORD_POOL = ["SSD","RAM","Nguồn","Mainboard","CPU","HP","Canon","Camera wifi","Laptop","Màn hình","Chuột","Bàn phím","Router","Switch","HDMI","Máy in"];
 let SEARCH_KEYWORDS_THIS_VISIT = [];
 const SEARCH_EXAMPLE_RANK_COLORS = (()=>{
-  const colors=["#F2A126","#2EAF66","#5B86E5","#A45BD4","#EB6672","#19AFC1","#E4832B","#6BBD45"];
+  const colorSets=[
+    ["#F2A126","#31B66B","#5B82E6"],
+    ["#EC6575","#20AEC2","#A45FD2"],
+    ["#E98926","#45B85C","#6676DB"]
+  ];
+  const colors=[...colorSets[Math.floor(Math.random()*colorSets.length)]];
   for(let i=colors.length-1;i>0;i--){
     const j=Math.floor(Math.random()*(i+1));
     [colors[i],colors[j]]=[colors[j],colors[i]];
