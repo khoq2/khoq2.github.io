@@ -944,6 +944,28 @@ body.employee-mode .card-actions.admin-only.employee-permitted { display:grid!im
   .build-summary-order-buttons { display:flex; }
   .build-summary-order button { width:27px; height:27px; }
   .build-summary-image-wrap,.build-summary-img { width:50px;height:50px }
+  .build-summary-image-wrap { position:relative; overflow:visible; isolation:isolate; }
+  .build-summary-select-check {
+    inset:auto!important;
+    top:3px!important;
+    right:3px!important;
+    bottom:auto!important;
+    left:auto!important;
+    z-index:4;
+    width:25px!important;
+    height:25px!important;
+    border-radius:50%;
+    touch-action:manipulation;
+  }
+  .build-summary-select-check span {
+    width:25px;
+    height:25px;
+    border-width:1.5px;
+    font-size:18px;
+    opacity:1;
+    transform:none;
+    pointer-events:none;
+  }
   .build-summary-title { grid-column:2/4; padding-right:87px; }
   .build-summary-unit { grid-column:1/-1; width:90px; }
   .build-summary-controls { grid-column:1/-1; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:6px; }
@@ -14151,6 +14173,37 @@ async function loadPublicRecentActivityFromSheet(){
     safeLocalStorageSet(PUBLIC_RECENT_ACTIVITY_CACHE_KEY,JSON.stringify(snapshot));
   }catch(error){console.warn("Chưa tải được giao dịch gần đây dùng chung:",error);}
 }
+let recentActivityRefreshRunning=false;
+let recentActivityRefreshTimer=null;
+async function refreshRecentActivityLive(markSeenIfPanelOpen=false){
+  if(recentActivityRefreshRunning || !SHEET_API_URL || document.hidden || !navigator.onLine) return false;
+  if(hasAuxPendingSync(PENDING_TX_SYNC_KEY)) return false;
+  recentActivityRefreshRunning=true;
+  try{
+    if(isAdminMode()){
+      await Promise.allSettled([loadTXFromSheet(),loadTransfersFromSheet(),loadNVFromSheet()]);
+    }else{
+      await loadPublicRecentActivityFromSheet();
+    }
+    const panel=document.getElementById("recentActivityPanel");
+    if(markSeenIfPanelOpen && panel?.classList.contains("open")) markRecentActivitySeen(recentTxSorted());
+    refreshRecentActivityNotification();
+    return true;
+  }catch(error){
+    console.warn("Chưa cập nhật được chuông giao dịch:",error);
+    return false;
+  }finally{
+    recentActivityRefreshRunning=false;
+  }
+}
+function startRecentActivityAutoRefresh(){
+  clearInterval(recentActivityRefreshTimer);
+  recentActivityRefreshTimer=setInterval(()=>{ void refreshRecentActivityLive(false); },30000);
+  window.addEventListener("focus",()=>{ void refreshRecentActivityLive(false); });
+  document.addEventListener("visibilitychange",()=>{
+    if(!document.hidden) void refreshRecentActivityLive(false);
+  });
+}
 function normalizeTxItem(tx){
   if(typeof tx === "string"){
     const raw = tx.trim();
@@ -14489,6 +14542,9 @@ function toggleRecentActivity(event){
       const list=document.getElementById("recentActivityList");
       if(list) list.innerHTML='<div class="recent-activity-empty">Không thể đọc danh sách giao dịch. Vui lòng tải lại trang.</div>';
     }
+    // Hiển thị cache ngay cho nhanh, đồng thời kiểm tra máy chủ để bổ sung
+    // giao dịch vừa phát sinh từ thiết bị khác mà không cần tải lại trang.
+    void refreshRecentActivityLive(true);
   }
 }
 function toggleAllRecentActivity(event){
@@ -18896,6 +18952,7 @@ async function submitInventoryTransfer(){
   refreshLatestItemsTicker();
   syncStatusButtons(totalStockView ? currentStatus : "");
   render();
+  startRecentActivityAutoRefresh();
 
   // Đồng bộ Google Sheet hoàn toàn ở nền. loadData() vẫn kiểm tra cờ pending:
   // nếu thiết bị có thay đổi chưa gửi thì giữ nguyên bản cục bộ, tuyệt đối không
