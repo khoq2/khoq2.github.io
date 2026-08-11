@@ -7548,6 +7548,151 @@ body .warehouse-switch.warehouse-switch-changing .warehouse-pin{
     transform:translateY(0)!important;
   }
 }
+
+/* Bố cục điện thoại hoàn chỉnh: không cắt chữ, không để nút nổi che nội dung. */
+@media(max-width:430px){
+  /* Hàng 1: logo + tên cửa hàng + chuông + kho. Hàng 2: trạng thái đồng bộ dùng toàn bộ phần còn lại. */
+  body .header .title{
+    grid-template-columns:32px minmax(0,1fr) 23px auto!important;
+    grid-template-rows:auto auto!important;
+    column-gap:6px!important;
+    row-gap:3px!important;
+  }
+  body .header .title-heading-line{
+    grid-column:2!important;
+    grid-row:1!important;
+    align-self:center!important;
+  }
+  body .header .recent-activity-wrap{
+    grid-column:3!important;
+    grid-row:1!important;
+    align-self:center!important;
+    justify-self:center!important;
+  }
+  body .header .warehouse-switcher{
+    grid-column:4!important;
+    grid-row:1!important;
+    align-self:center!important;
+    justify-self:end!important;
+  }
+  body .header .title-status-line{
+    grid-column:2 / -1!important;
+    grid-row:2!important;
+    width:100%!important;
+    max-width:100%!important;
+    overflow:visible!important;
+    gap:3px!important;
+    padding-right:1px!important;
+    font-size:7px!important;
+  }
+  body .header .title-status-line .sync-badge,
+  body .header .title-status-line #lastSyncText,
+  body .header .network-status{flex:0 0 auto!important}
+  body .header .recent-activity-count{top:-4px!important;right:-3px!important}
+
+  /* Ghim kho vẫn có hiệu ứng nhưng ngọn lửa không tràn lên chuông và tiêu đề. */
+  body .warehouse-switch.active .warehouse-pin::after{
+    width:7px!important;
+    height:9px!important;
+    bottom:25%!important;
+    opacity:.6!important;
+    animation:none!important;
+  }
+
+  /* Mỗi danh mục là một nút đầy đủ; người dùng cuộn cả nút thay vì nhìn chữ chạy bị cắt. */
+  body > .sticky .tabs{
+    justify-content:flex-start!important;
+    gap:6px!important;
+    padding:7px calc(42px + env(safe-area-inset-right)) 7px 8px!important;
+    overflow-x:auto!important;
+    overflow-y:hidden!important;
+    scroll-padding-inline:8px 42px;
+  }
+  body > .sticky .tab-btn{
+    flex:0 0 auto!important;
+    width:auto!important;
+    min-width:max-content!important;
+    min-height:40px!important;
+    gap:5px!important;
+    padding:8px 11px!important;
+    overflow:visible!important;
+    font-size:11px!important;
+  }
+  body > .sticky .tab-label-viewport{
+    display:inline-block!important;
+    flex:0 0 auto!important;
+    width:auto!important;
+    max-width:none!important;
+    overflow:visible!important;
+    -webkit-mask-image:none!important;
+    mask-image:none!important;
+  }
+  body > .sticky .tab-label-track{
+    display:inline-flex!important;
+    width:auto!important;
+    transform:none!important;
+    animation:none!important;
+  }
+  body > .sticky .tab-label-copy{
+    display:inline-block!important;
+    padding-right:0!important;
+  }
+  body > .sticky .tab-label-copy[aria-hidden="true"]{display:none!important}
+
+  /* Thanh nút dọc nhỏ hơn và luôn nằm trong rãnh riêng bên phải. */
+  body .side-control-rail{
+    --side-control-size:24px;
+    --side-control-icon-size:11px;
+    --side-control-shell-pad:2px;
+    right:max(2px,env(safe-area-inset-right))!important;
+    gap:4px!important;
+  }
+  body .side-control-rail .category-view-bar .view-mode-switch,
+  body .side-control-rail .macos-dock,
+  body .side-control-rail .scroll-btns{
+    gap:1px!important;
+    padding:2px!important;
+    border-radius:9px!important;
+  }
+  body .tabs,
+  body .filters,
+  body #homeInventoryBar,
+  body #results{
+    padding-right:calc(42px + env(safe-area-inset-right))!important;
+  }
+
+  /* Tiêu đề nhóm hàng và số tồn luôn chung một hàng, cân đối hơn. */
+  body #results .group-header{
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr) auto!important;
+    align-items:center!important;
+    min-height:44px!important;
+    gap:6px!important;
+    padding:6px!important;
+  }
+  body #results .group-header-main{min-width:0!important}
+  body #results .group-header-label{
+    min-width:0!important;
+    padding:8px 9px!important;
+    overflow:hidden!important;
+    font-size:13px!important;
+    line-height:1.15!important;
+    overflow-wrap:normal!important;
+    word-break:normal!important;
+    text-overflow:ellipsis!important;
+    white-space:nowrap!important;
+  }
+  body #results .group-header-count{
+    width:auto!important;
+    min-width:0!important;
+    min-height:30px!important;
+    max-width:none!important;
+    padding:5px 7px!important;
+    font-size:9.5px!important;
+    line-height:1!important;
+    white-space:nowrap!important;
+  }
+}
 </style>
 </head>
 <body>
@@ -18264,36 +18409,13 @@ const uiColorIconObserver=new MutationObserver(list=>{
 });
 uiColorIconObserver.observe(document.body,{childList:true,subtree:true});
 
-// Chạy nhãn menu trên điện thoại theo đúng phần chữ thực tế bị cắt. Dùng
-// Web Animations thay cho CSS marquee để hoạt động ổn định cả trong iframe
-// review của Codex, Safari iPhone và Chrome Android.
+// Nhãn menu luôn đứng yên và hiện đủ. Trên điện thoại cuộn ngang theo cả nút,
+// tránh ảnh chụp hoặc lúc người dùng đọc bị mất đầu/cuối chữ do marquee.
 let mobileTabMarqueeResizeTimer=0;
 function startMobileTabLabelMarquee(){
   document.querySelectorAll(".tabs .tab-label-track").forEach(track=>{
     track.getAnimations().forEach(animation=>animation.cancel());
     track.style.transform="translateX(0)";
-  });
-  if(!window.matchMedia("(max-width:600px)").matches) return;
-  document.querySelectorAll(".tabs .tab-label-viewport").forEach((viewport,index)=>{
-    const track=viewport.querySelector(".tab-label-track");
-    const label=track?.querySelector(".tab-label-copy:not([aria-hidden='true'])");
-    if(!track||!label) return;
-    const paddingRight=parseFloat(getComputedStyle(label).paddingRight)||0;
-    const textWidth=Math.max(0,label.getBoundingClientRect().width-paddingRight);
-    const distance=Math.ceil(textWidth-viewport.clientWidth+5);
-    if(distance<=1) return;
-    track.animate([
-      {transform:"translateX(0)",offset:0},
-      {transform:"translateX(0)",offset:.18},
-      {transform:`translateX(-${distance}px)`,offset:.82},
-      {transform:`translateX(-${distance}px)`,offset:1}
-    ],{
-      duration:4200,
-      iterations:Infinity,
-      direction:"alternate",
-      easing:"ease-in-out",
-      delay:index*180
-    });
   });
 }
 requestAnimationFrame(startMobileTabLabelMarquee);
