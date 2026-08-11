@@ -2324,6 +2324,26 @@ body.admin-entry-visible .sticky:not(.collapsed) .header .admin-bar {
   line-height:1.2;
   white-space:nowrap;
 }
+@keyframes headerTitleOverflowMarquee {
+  0%,18% { transform:translateX(0); }
+  42%,58% { transform:translateX(calc(-1 * var(--title-overflow-distance,0px))); }
+  82%,100% { transform:translateX(0); }
+}
+@media(max-width:600px){
+  .title-heading-line.title-overflowing {
+    -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 6px,#000 calc(100% - 6px),transparent 100%);
+    mask-image:linear-gradient(90deg,transparent 0,#000 6px,#000 calc(100% - 6px),transparent 100%);
+  }
+  .title-heading-line.title-overflowing .title-base {
+    flex:0 0 auto!important;
+    width:max-content!important;
+    max-width:none!important;
+    overflow:visible!important;
+    text-overflow:clip!important;
+    will-change:transform;
+    animation:headerTitleOverflowMarquee var(--title-marquee-duration,8s) ease-in-out infinite!important;
+  }
+}
 .title-heading-line .title-shine {
   top:50%!important;
   width:28%!important;
@@ -12630,7 +12650,7 @@ function render(){
     return;
   }
   if(!bulkSelectMode && !kw && currentTab==="ALL" && currentStatus==="ALL" && !restockOnly){
-    el.innerHTML = `<div class="empty search-landing"><div class="search-landing-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"></circle><path d="M15.5 15.5L21 21"></path></svg></div><div class="empty-title">Bạn muốn tìm thiết bị nào?</div><div class="empty-sub">Chọn gợi ý hoặc nhập tên, mã hàng hay thương hiệu vào ô phía trên</div><div class="search-examples">${getSearchKeywordsForVisit().map((keyword,index)=>renderSearchExampleButton(keyword,index)).join("")}</div></div>`;
+    el.innerHTML = `<div class="empty search-landing"><div class="search-landing-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"></circle><path d="M15.5 15.5L21 21"></path></svg></div><div class="empty-title">Bạn muốn tìm thiết bị nào?</div><div class="empty-sub">Chọn gợi ý bên dưới hoặc nhập tên cần tìm vào ô phía trên.</div><div class="search-examples">${getSearchKeywordsForVisit().map((keyword,index)=>renderSearchExampleButton(keyword,index)).join("")}</div></div>`;
     return;
   }
   el.innerHTML = results.map(({r,i},idx)=>renderCard(r,i,idx+1)).join("");
@@ -18326,6 +18346,40 @@ function setupCompactHeaderStatus(){
   updateHeaderNetworkStatus();
 }
 setupCompactHeaderStatus();
+let headerTitleOverflowResizeTimer=0;
+function updateHeaderTitleOverflowMotion(){
+  const heading=document.querySelector(".title-heading-line");
+  const titleBase=heading?.querySelector(".title-base");
+  if(!heading||!titleBase) return;
+  heading.classList.remove("title-overflowing");
+  heading.style.removeProperty("--title-overflow-distance");
+  heading.style.removeProperty("--title-marquee-duration");
+  titleBase.style.removeProperty("transform");
+  if(!window.matchMedia("(max-width:600px)").matches) return;
+  requestAnimationFrame(()=>{
+    const viewportWidth=Math.floor(heading.clientWidth);
+    const contentWidth=Math.ceil(titleBase.scrollWidth);
+    const overflow=Math.max(0,contentWidth-viewportWidth);
+    if(overflow<=2) return;
+    heading.style.setProperty("--title-overflow-distance",`${overflow+8}px`);
+    heading.style.setProperty("--title-marquee-duration",`${Math.max(7,Math.min(12,7+(overflow/18))).toFixed(1)}s`);
+    heading.classList.add("title-overflowing");
+    heading.title=titleBase.textContent.trim();
+  });
+}
+function scheduleHeaderTitleOverflowMotion(){
+  clearTimeout(headerTitleOverflowResizeTimer);
+  headerTitleOverflowResizeTimer=setTimeout(updateHeaderTitleOverflowMotion,90);
+}
+requestAnimationFrame(()=>requestAnimationFrame(updateHeaderTitleOverflowMotion));
+window.addEventListener("resize",scheduleHeaderTitleOverflowMotion,{passive:true});
+window.addEventListener("orientationchange",scheduleHeaderTitleOverflowMotion,{passive:true});
+if(document.fonts?.ready) document.fonts.ready.then(updateHeaderTitleOverflowMotion).catch(()=>{});
+if(typeof ResizeObserver==="function"){
+  const headerTitleOverflowObserver=new ResizeObserver(scheduleHeaderTitleOverflowMotion);
+  const headerTitleOverflowTarget=document.querySelector(".header .title");
+  if(headerTitleOverflowTarget) headerTitleOverflowObserver.observe(headerTitleOverflowTarget);
+}
 window.addEventListener("online",()=>updateHeaderNetworkStatus("checking"));
 window.addEventListener("offline",()=>updateHeaderNetworkStatus("network-offline"));
 
