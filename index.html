@@ -606,6 +606,36 @@ mark.kw-hit { background: #FFEB3B; color: #1A1A1A; padding: 0 1px; border-radius
 .product-related-list { display:flex; flex-wrap:wrap; gap:5px; }
 .product-related-link { border:1px solid #AED6F1; border-radius:999px; background:#fff; color:#1A5276; padding:5px 8px; font-size:10px; font-weight:850; cursor:pointer; }
 .product-related-link:active { transform:scale(.97); background:#EAF4FB; }
+.product-related-link:hover,.product-related-link:focus-visible { border-color:#4EA3D5; background:#F4FAFE; color:#0E5F91; box-shadow:0 4px 12px rgba(26,82,118,.12); outline:none; }
+.related-product-tooltip {
+  position:fixed;
+  z-index:2147483000;
+  width:min(370px,calc(100vw - 20px));
+  overflow:hidden;
+  border:1px solid #B9CDDC;
+  border-radius:12px;
+  background:#fff;
+  color:#263A4A;
+  box-shadow:0 18px 45px rgba(13,43,68,.28),0 2px 8px rgba(13,43,68,.1);
+  opacity:0;
+  visibility:hidden;
+  pointer-events:none;
+  transform:translateY(-5px) scale(.985);
+  transform-origin:top left;
+  transition:opacity .14s ease,transform .16s ease,visibility 0s linear .16s;
+}
+.related-product-tooltip.show { opacity:1; visibility:visible; transform:translateY(0) scale(1); transition:opacity .14s ease,transform .16s ease,visibility 0s; }
+.related-product-tooltip.above { transform-origin:bottom left; }
+.related-product-tooltip-head { display:flex; align-items:center; justify-content:space-between; gap:10px; min-height:34px; padding:8px 11px; background:linear-gradient(135deg,#102F55,#1D5685); color:#fff; }
+.related-product-tooltip-head strong { font-size:11px; font-weight:950; letter-spacing:.035em; }
+.related-product-tooltip-head span { padding:3px 7px; border:1px solid rgba(255,255,255,.25); border-radius:999px; background:rgba(255,255,255,.12); color:#D7EEFC; font-size:8px; font-weight:850; white-space:nowrap; }
+.related-product-tooltip-body { display:grid; gap:0; padding:8px 11px 10px; }
+.related-product-tooltip-row { display:grid; grid-template-columns:76px minmax(0,1fr); gap:8px; align-items:start; padding:4px 0; border-bottom:1px dashed #E2EAF0; font-size:10px; line-height:1.35; }
+.related-product-tooltip-row:last-child { border-bottom:0; }
+.related-product-tooltip-label { color:#D14336; font-weight:850; white-space:nowrap; }
+.related-product-tooltip-value { min-width:0; color:#344B5E; font-weight:720; overflow-wrap:anywhere; }
+.related-product-tooltip-row.is-title .related-product-tooltip-value { color:#C0392B; font-size:10.5px; font-weight:900; }
+.related-product-tooltip-value.is-stock { color:#14834B; font-weight:900; }
 .related-edit-preview { margin-top:6px; color:#607D8B; font-size:10px; line-height:1.4; }
 .related-smart-picker { position:relative; }
 .related-smart-search { width:100%; min-height:44px; padding-right:38px!important; }
@@ -7884,6 +7914,7 @@ body .warehouse-switch.warehouse-switch-changing .warehouse-pin{
 <div class="latest-items-ticker" id="latestItemsTicker" aria-live="polite" aria-label="Thiết bị mới thêm, bấm để mở" role="button" tabindex="0" onclick="openLatestItemFromTicker()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openLatestItemFromTicker();}">
   <span class="latest-items-line"><span class="latest-items-label">Cập nhật mới:</span><span class="latest-items-title" id="latestItemsTitle"></span></span>
 </div>
+<div class="related-product-tooltip" id="relatedProductTooltip" role="tooltip" hidden></div>
 <div class="footer-credit"><span class="footer-credit-text">· Design by : Pham Van Chuong · © 2026</span></div>
 
 <div class="qr-showcase-overlay" id="qrShowcaseOverlay" hidden aria-hidden="true" onclick="if(event.target===this)closeQrShowcase()">
@@ -14312,7 +14343,49 @@ function getRelatedProductItems(row){
 function renderRelatedProducts(row){
   const items=getRelatedProductItems(row);
   if(!items.length) return "";
-  return `<div class="product-related"><span class="product-related-title">🔗 Bài viết / thiết bị liên quan (${items.length})</span><div class="product-related-list">${items.map(item=>`<button type="button" class="product-related-link" onclick="event.stopPropagation();openRelatedProduct(${item.index})">${escapeHtml(item.row[1])} · ${escapeHtml(stripProductConditionFromTitle(item.row[2]))}</button>`).join("")}</div></div>`;
+  return `<div class="product-related"><span class="product-related-title">🔗 Bài viết / thiết bị liên quan (${items.length})</span><div class="product-related-list">${items.map(item=>`<button type="button" class="product-related-link" aria-describedby="relatedProductTooltip" onmouseenter="showRelatedProductTooltip(event,${item.index})" onmouseleave="hideRelatedProductTooltip()" onfocus="showRelatedProductTooltip(event,${item.index})" onblur="hideRelatedProductTooltip()" onclick="event.stopPropagation();hideRelatedProductTooltip(true);openRelatedProduct(${item.index})">${escapeHtml(item.row[1])} · ${escapeHtml(stripProductConditionFromTitle(item.row[2]))}</button>`).join("")}</div></div>`;
+}
+let relatedProductTooltipHideTimer=0;
+function relatedProductTooltipRow(label,value,extraClass=""){
+  return `<div class="related-product-tooltip-row ${extraClass}"><span class="related-product-tooltip-label">${escapeHtml(label)}:</span><span class="related-product-tooltip-value ${extraClass==="is-stock"?"is-stock":""}">${escapeHtml(value||"—")}</span></div>`;
+}
+function positionRelatedProductTooltip(anchor){
+  const tooltip=document.getElementById("relatedProductTooltip");
+  if(!tooltip||!anchor) return;
+  const rect=anchor.getBoundingClientRect(),gap=8,edge=10;
+  const width=tooltip.offsetWidth,height=tooltip.offsetHeight;
+  let left=Math.max(edge,Math.min(rect.left,window.innerWidth-width-edge));
+  let top=rect.bottom+gap;
+  let above=false;
+  if(top+height>window.innerHeight-edge){
+    top=Math.max(edge,rect.top-height-gap);
+    above=true;
+  }
+  tooltip.style.left=`${Math.round(left)}px`;
+  tooltip.style.top=`${Math.round(top)}px`;
+  tooltip.classList.toggle("above",above);
+}
+function showRelatedProductTooltip(event,index){
+  const row=DATA[index],tooltip=document.getElementById("relatedProductTooltip");
+  if(!row||!tooltip) return;
+  clearTimeout(relatedProductTooltipHideTimer);
+  const stock=Math.max(0,Number(row[5])||0);
+  const condition=getProductConditionFromTitle(row[2]||"");
+  const status=String(row[6]||"").trim()||(stock>0?"Còn hàng":"Hết hàng");
+  const branch=String(row[13]||"Q2").trim().toUpperCase();
+  tooltip.innerHTML=`<div class="related-product-tooltip-head"><strong>THÔNG TIN BÀI VIẾT</strong><span>Bấm để mở</span></div><div class="related-product-tooltip-body">${relatedProductTooltipRow("Tiêu đề",stripProductConditionFromTitle(row[2]||"Chưa có tên"),"is-title")}${relatedProductTooltipRow("Mã hàng",String(row[1]||"Chưa có mã"))}${relatedProductTooltipRow("Chuyên mục",relatedCategoryLabel(row[0]))}${relatedProductTooltipRow("Kho hàng",branch)}${relatedProductTooltipRow("Tồn kho",`${stock.toLocaleString("vi-VN")} sản phẩm`,"is-stock")}${relatedProductTooltipRow("Trạng thái",[condition,status].filter(Boolean).join(" · "))}</div>`;
+  tooltip.hidden=false;
+  tooltip.classList.remove("show");
+  positionRelatedProductTooltip(event.currentTarget);
+  requestAnimationFrame(()=>tooltip.classList.add("show"));
+}
+function hideRelatedProductTooltip(immediate=false){
+  const tooltip=document.getElementById("relatedProductTooltip");
+  if(!tooltip) return;
+  clearTimeout(relatedProductTooltipHideTimer);
+  tooltip.classList.remove("show");
+  if(immediate){ tooltip.hidden=true; return; }
+  relatedProductTooltipHideTimer=setTimeout(()=>{ if(!tooltip.classList.contains("show")) tooltip.hidden=true; },180);
 }
 function openRelatedProduct(index){
   if(!DATA[index]) return;
