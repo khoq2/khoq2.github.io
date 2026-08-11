@@ -3573,6 +3573,39 @@ html, body, button, input, select, textarea {
   border-radius: 16px;
   box-shadow: 0 8px 24px rgba(19,59,99,.08);
 }
+.overview-eyebrow { display:inline-flex; align-items:center; gap:6px; margin-bottom:7px; padding:4px 8px; border:1px solid #D7E5F0; border-radius:999px; background:rgba(255,255,255,.82); color:#547089; font-size:9px; font-weight:900; letter-spacing:.45px; text-transform:uppercase; }
+.overview-eyebrow::before { content:""; width:6px; height:6px; border-radius:50%; background:#20B486; box-shadow:0 0 0 4px rgba(32,180,134,.12); }
+.total-stock-head .restock-summary,.audit-head .restock-summary,.restock-head .restock-summary { align-items:stretch; }
+.total-stock-head .metric-card,.audit-head .metric-card,.restock-head .metric-card { position:relative; overflow:hidden; transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease; }
+.total-stock-head .metric-card::after,.audit-head .metric-card::after,.restock-head .metric-card::after { content:""; position:absolute; right:-18px; bottom:-24px; width:62px; height:62px; border-radius:50%; background:#DDEAF4; opacity:.45; pointer-events:none; }
+.total-stock-head .metric-card:hover,.audit-head .metric-card:hover,.restock-head .metric-card:hover { border-color:#AFCBDE; transform:translateY(-2px); box-shadow:0 10px 24px rgba(19,59,99,.11); }
+.metric-note { display:block; margin-top:auto; padding-top:6px; color:#8190A0; font-size:9px; font-weight:750; line-height:1.3; }
+.overview-alert { display:flex; align-items:flex-start; gap:9px; margin-top:12px; padding:10px 11px; border:1px solid #F0D59A; border-radius:12px; background:#FFF9EA; color:#775500; font-size:10px; font-weight:750; line-height:1.45; }
+.overview-alert.is-ok { border-color:#BFE2CC; background:#F0FAF4; color:#17643B; }
+.overview-alert-icon { flex:0 0 auto; width:22px; height:22px; display:inline-flex; align-items:center; justify-content:center; border-radius:7px; background:rgba(255,255,255,.8); font-size:11px; box-shadow:0 2px 7px rgba(25,55,82,.08); }
+.management-table-wrap { width:100%; margin-top:14px; overflow-x:auto; overscroll-behavior-inline:contain; border:1px solid #DFE8F1; border-radius:13px; background:#fff; scrollbar-width:thin; }
+.management-table-wrap .management-table { min-width:620px; margin-top:0; border:0; border-radius:0; }
+.overview-priority { margin:0 0 14px; overflow:hidden; border:1px solid #DCE7F1; border-radius:16px; background:#fff; box-shadow:0 8px 24px rgba(19,59,99,.08); }
+.overview-priority-head { display:flex; align-items:flex-start; justify-content:space-between; gap:10px; padding:12px 13px; border-bottom:1px solid #E4ECF3; background:linear-gradient(110deg,#F3F8FC,#fff); }
+.overview-priority-title { display:block; color:#173B63; font-size:12px; font-weight:950; }
+.overview-priority-sub { display:block; margin-top:2px; color:#718396; font-size:9px; line-height:1.35; }
+.overview-priority-badge { flex:0 0 auto; padding:4px 8px; border-radius:999px; background:#173B63; color:#fff; font-size:9px; font-weight:900; }
+.overview-priority-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:7px; padding:8px; }
+.overview-priority-item { display:grid; grid-template-columns:28px minmax(0,1fr); gap:3px 8px; align-items:center; padding:9px; border:1px solid #E0E9F1; border-radius:11px; background:linear-gradient(145deg,#fff,#F8FBFD); color:#263F58; text-align:left; cursor:pointer; transition:transform .15s ease,border-color .15s ease,box-shadow .15s ease; }
+.overview-priority-item:hover,.overview-priority-item:focus-visible { border-color:#8FC0DD; outline:none; transform:translateY(-1px); box-shadow:0 7px 16px rgba(19,59,99,.09); }
+.overview-priority-rank { grid-row:1 / span 2; width:28px; height:28px; display:inline-flex; align-items:center; justify-content:center; border-radius:9px; background:#EAF3FA; color:#1A5276; font-size:10px; font-weight:950; }
+.overview-priority-item.is-out .overview-priority-rank { background:#FDEDEC; color:#B03A2E; }
+.overview-priority-name { min-width:0; overflow:hidden; color:#173B63; font-size:10.5px; font-weight:900; text-overflow:ellipsis; white-space:nowrap; }
+.overview-priority-meta { color:#728395; font-size:9px; line-height:1.35; }
+.summary-product-link { position:relative; overflow:hidden; transition:transform .15s ease,border-color .15s ease,box-shadow .15s ease; }
+.summary-product-link:hover,.summary-product-link:focus-visible { outline:none; transform:translateY(-1px); box-shadow:0 6px 15px rgba(19,59,99,.08); }
+.summary-product-badges { display:flex; flex-wrap:wrap; gap:4px; margin-top:2px; }
+.summary-mini-badge { display:inline-flex; align-items:center; padding:3px 6px; border:1px solid #DDE6EE; border-radius:999px; background:#fff; color:#617487; font-size:8px; font-weight:850; line-height:1.2; }
+.summary-mini-badge.is-money { border-color:#BFE2CC; background:#EFF9F3; color:#1E8449; }
+.summary-mini-badge.is-alert { border-color:#F0C5C0; background:#FEF1EF; color:#B03A2E; }
+.summary-mini-badge.is-warn { border-color:#F2D795; background:#FFF9E8; color:#8A6800; }
+.summary-mini-badge.is-info { border-color:#BFD8EA; background:#EFF6FB; color:#1A5276; }
+.audit-score-ring { color:#168B62 !important; }
 @media (max-width: 699px) {
   #homeInventoryBar .home-stock-actions {
     gap: 5px;
@@ -3633,6 +3666,12 @@ html, body, button, input, select, textarea {
   .management-issues {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+  .management-table-wrap { margin-top:11px; }
+  .management-table-wrap .management-table { min-width:560px; table-layout:auto; }
+  .overview-priority-grid { grid-template-columns:1fr; padding:7px; }
+  .overview-priority-head { padding:10px; }
+  .overview-priority-name { white-space:normal; display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:2; }
+  .overview-alert { padding:9px; }
 }
 
 /* Điều khiển nổi 2026: List/Grid và cuộn nhanh. */
@@ -12456,17 +12495,22 @@ function getSummaryProductItems(key){
     if(key==="total-all") return ton>0;
     if(key==="total-q2") return ton>0 && branch==="Q2";
     if(key==="total-q5") return ton>0 && branch==="Q5";
+    if(key==="total-idle") return ton>0;
     if(key==="restock-all") return state==="HET" || state==="SAP";
     if(key==="restock-out") return state==="HET";
     if(key==="restock-low") return state==="SAP";
     if(key==="audit-all") return reasons.length>0;
-    if(key==="audit-low") return reasons.some(reason=>reason.startsWith("Tồn thấp:"));
+    if(key==="audit-critical") return reasons.some(reason=>reason==="Thiếu mã hàng" || reason==="Trùng mã trong chi nhánh" || reason==="Thiếu tên sản phẩm");
+    if(key==="audit-pricing") return reasons.includes("Chưa có giá nhập") || reasons.includes("Chưa có giá bán");
     if(key==="audit-location") return reasons.includes("Chưa có vị trí kho");
     if(key==="audit-price") return reasons.includes("Chưa có giá bán");
+    if(key==="audit-cost") return reasons.includes("Chưa có giá nhập");
     if(key==="audit-group") return reasons.includes("Chưa phân nhóm");
     if(key==="audit-brand") return reasons.includes("Thiếu thương hiệu");
     if(key==="audit-code") return reasons.includes("Thiếu mã hàng") || reasons.includes("Trùng mã trong chi nhánh");
     if(key==="audit-name") return reasons.includes("Thiếu tên sản phẩm");
+    if(key==="audit-threshold") return reasons.includes("Chưa đặt ngưỡng nhập");
+    if(key==="audit-image") return reasons.includes("Chưa có hình sản phẩm");
     return false;
   }).sort((a,b)=>(Number(a.r[5])||0)-(Number(b.r[5])||0) || String(a.r[2]||"").localeCompare(String(b.r[2]||""),"vi"));
 }
@@ -12483,6 +12527,54 @@ function getSummaryHierarchyGroup(row){
     return "🗄️ HDD chưa rõ PC/Laptop";
   }
   return baseGroup;
+}
+function getRestockMinimumSuggestion(item){
+  const stock=Number(item?.stock ?? item?.r?.[5])||0;
+  const threshold=Math.max(1,Number(item?.threshold ?? item?.r?.[12])||2);
+  return Math.max(0,(threshold+1)-stock);
+}
+function sortRestockPriority(entries){
+  return [...entries].sort((a,b)=>{
+    const stateRank={HET:0,SAP:1};
+    return (stateRank[a.state]??9)-(stateRank[b.state]??9)
+      || b.sales30-a.sales30
+      || (a.stock/Math.max(1,a.threshold))-(b.stock/Math.max(1,b.threshold))
+      || b.activity.latestAt-a.activity.latestAt
+      || String(a.r[2]||"").localeCompare(String(b.r[2]||""),"vi",{sensitivity:"base"});
+  });
+}
+function getSummaryGroupTotal(key,items){
+  if(String(key).startsWith("audit-")) return `${items.length} mặt hàng cần bổ sung`;
+  if(String(key).startsWith("restock-")){
+    const out=items.filter(item=>(item.state||getStockState(item.r[5],item.r[12]))==="HET").length;
+    return `${out} hết · ${items.length-out} sắp hết`;
+  }
+  const qty=items.reduce((sum,item)=>sum+(Number(item.stock ?? item.r[5])||0),0);
+  return `${items.length} mặt hàng · Tồn ${qty.toLocaleString("vi-VN")}`;
+}
+function renderSummaryItemBadges(item,key){
+  const r=item.r||[];
+  const stock=Number(item.stock ?? r[5])||0;
+  const badges=[];
+  if(String(key).startsWith("total-")){
+    const cost=stock*(Number(r[4])||0), sale=stock*(Number(r[10])||0);
+    badges.push(`<span class="summary-mini-badge is-info">Tồn ${stock}</span>`);
+    badges.push(`<span class="summary-mini-badge is-money">Vốn ${formatVndNumber(cost)}đ</span>`);
+    badges.push(`<span class="summary-mini-badge is-money">Bán ${formatVndNumber(sale)}đ</span>`);
+    if(item.sales30>0) badges.push(`<span class="summary-mini-badge">Đã bán ${item.sales30}/30 ngày</span>`);
+  }else if(String(key).startsWith("restock-")){
+    const state=item.state||getStockState(stock,r[12]);
+    const threshold=Math.max(1,Number(item.threshold ?? r[12])||2);
+    badges.push(`<span class="summary-mini-badge ${state==="HET"?"is-alert":"is-warn"}">${state==="HET"?"Hết hàng":`Còn ${stock} / ngưỡng ${threshold}`}</span>`);
+    badges.push(`<span class="summary-mini-badge is-info">Nhập tối thiểu +${getRestockMinimumSuggestion(item)}</span>`);
+    if(item.sales30>0) badges.push(`<span class="summary-mini-badge">Đã bán ${item.sales30}/30 ngày</span>`);
+    if(item.activity?.latestAt) badges.push(`<span class="summary-mini-badge">Cập nhật ${escapeHtml(kpiRelativeTime(item.activity.latestAt))}</span>`);
+  }else{
+    const reasons=Array.isArray(item.auditReasons)?item.auditReasons:getInventoryAuditReasons(r);
+    reasons.slice(0,4).forEach(reason=>badges.push(`<span class="summary-mini-badge is-alert">${escapeHtml(reason)}</span>`));
+    if(reasons.length>4) badges.push(`<span class="summary-mini-badge">+${reasons.length-4} mục khác</span>`);
+  }
+  return `<span class="summary-product-badges">${badges.join("")}</span>`;
 }
 function scrollSummaryResultIntoView(box){
   requestAnimationFrame(()=>{
@@ -12509,7 +12601,6 @@ function toggleSummaryProductList(key,title,shouldScroll=true){
   const orderedCategories = [...categoryMap.entries()].sort((a,b)=>(categoryOrder.indexOf(a[0])<0?99:categoryOrder.indexOf(a[0]))-(categoryOrder.indexOf(b[0])<0?99:categoryOrder.indexOf(b[0])));
   const hierarchyHtml = orderedCategories.map(([sh,categoryItems])=>{
     const cfg = SHEET_CFG[sh] || {label:sh==="OTHER"?"📦 KHÁC":sh,c:"#566573"};
-    const categoryQty = categoryItems.reduce((sum,item)=>sum+(Number(item.r[5])||0),0);
     const groupMap = new Map();
     categoryItems.forEach(item=>{
       const group = getSummaryHierarchyGroup(item.r);
@@ -12517,159 +12608,135 @@ function toggleSummaryProductList(key,title,shouldScroll=true){
       groupMap.get(group).push(item);
     });
     const groupsHtml = [...groupMap.entries()].sort((a,b)=>cleanKpiPathLabel(a[0]).localeCompare(cleanKpiPathLabel(b[0]),"vi")).map(([group,groupItems],groupIndex)=>{
-      const groupQty = groupItems.reduce((sum,item)=>sum+(Number(item.r[5])||0),0);
-      return `<details class="summary-group"${groupIndex===0?' open':''}><summary><span class="summary-group-name">${escapeHtml(cleanKpiPathLabel(group) || "Khác")}</span><span class="summary-group-total">${groupItems.length} mặt hàng · Tồn ${groupQty.toLocaleString("vi-VN")}</span></summary><div class="summary-group-products">${groupItems.map(item=>`<button type="button" class="summary-product-link" onclick="openSummaryInventoryItem(${item.i})"><span class="summary-product-info"><b>${escapeHtml(item.r[1]||"Chưa có mã")}</b> · ${renderProductTitleWithCondition(item.r[2]||"Chưa có tên")}</span><span class="summary-product-path">Tồn ${Number(item.r[5])||0} · ${escapeHtml(item.r[13]||"Q2")}</span></button>`).join("")}</div></details>`;
+      return `<details class="summary-group"${groupIndex===0?' open':''}><summary><span class="summary-group-name">${escapeHtml(cleanKpiPathLabel(group) || "Khác")}</span><span class="summary-group-total">${getSummaryGroupTotal(key,groupItems)}</span></summary><div class="summary-group-products">${groupItems.map(item=>`<button type="button" class="summary-product-link" onclick="openSummaryInventoryItem(${item.i})"><span class="summary-product-info"><b>${escapeHtml(item.r[1]||"Chưa có mã")}</b> · ${renderProductTitleWithCondition(item.r[2]||"Chưa có tên")}</span><span class="summary-product-path">${escapeHtml(item.r[13]||"Q2")} · ${escapeHtml(getKpiProductPath(item.r))}</span>${renderSummaryItemBadges(item,key)}</button>`).join("")}</div></details>`;
     }).join("");
-    return `<section class="summary-category"><div class="summary-category-head" style="background:${cfg.c}"><span>${escapeHtml(cfg.label)}</span><small>${categoryItems.length} mặt hàng · Tổng tồn ${categoryQty.toLocaleString("vi-VN")}</small></div>${groupsHtml}</section>`;
+    return `<section class="summary-category"><div class="summary-category-head" style="background:${cfg.c}"><span>${escapeHtml(cfg.label)}</span><small>${getSummaryGroupTotal(key,categoryItems)}</small></div>${groupsHtml}</section>`;
   }).join("");
   box.innerHTML = `<div class="summary-product-list"><div class="summary-product-list-title">${escapeHtml(title)} · ${safeItems.length} mặt hàng · Bấm nhóm để xem sản phẩm</div>${hierarchyHtml || '<div class="empty-sub">Không có dữ liệu phù hợp</div>'}</div>`;
   if(shouldScroll) scrollSummaryResultIntoView(box);
 }
 function renderTotalStockOverview(el){
-  const scopedEntries=getKpiScopedEntries();
+  const scopedEntries=getKpiEnrichedEntries();
   const scopeLabel=currentBranch==="ALL" ? "TOÀN HỆ THỐNG" : `KHO ${currentBranch}`;
-  const inStock = scopedEntries.filter(({r})=>Number(r[5]) > 0);
-  inStock.sort((a,b)=>(Number(a.r[5])||0)-(Number(b.r[5])||0) || String(a.r[2]||"").localeCompare(String(b.r[2]||""),"vi"));
+  const inStock=scopedEntries.filter(item=>item.stock>0).sort((a,b)=>b.stockValue-a.stockValue || b.stock-a.stock || String(a.r[2]||"").localeCompare(String(b.r[2]||""),"vi"));
   document.getElementById("count").textContent = inStock.length + " mặt hàng đang có tồn";
   if(!inStock.length){
     el.innerHTML = `<div class="empty"><div class="empty-icon">📦</div><div class="empty-title">${scopeLabel} hiện không có hàng tồn</div><div class="empty-sub">Các mặt hàng tồn 0 nằm trong mục Cần nhập cùng phạm vi</div></div>`;
     return;
   }
-  const branchCfg = {Q2:{label:"📍 CHI NHÁNH Q2",color:"#1A5276"},Q5:{label:"📍 CHI NHÁNH Q5",color:"#7D3C98"}};
   const q2Items = inStock.filter(({r})=>(r[13]||"Q2")==="Q2");
   const q5Items = inStock.filter(({r})=>(r[13]||"Q2")==="Q5");
-  summaryProductSets = {"total-all":inStock,"total-q2":q2Items,"total-q5":q5Items};
-  const totalQty = inStock.reduce((sum,{r})=>sum+(Number(r[5])||0),0);
-  const totalCost = inStock.reduce((sum,{r})=>sum+(Number(r[5])||0)*(Number(r[4])||0),0);
-  const totalSaleValue = inStock.reduce((sum,{r})=>sum+(Number(r[5])||0)*(Number(r[10])||0),0);
+  const hasActivityData=Array.isArray(TX_DATA)&&TX_DATA.length>0;
+  const idleItems=hasActivityData?inStock.filter(item=>item.sales30===0):[];
+  summaryProductSets = {"total-all":inStock,"total-q2":q2Items,"total-q5":q5Items,"total-idle":idleItems};
+  const totalQty = inStock.reduce((sum,item)=>sum+item.stock,0);
+  const totalCost = inStock.reduce((sum,item)=>sum+item.stock*(Number(item.r[4])||0),0);
+  const totalSaleValue = inStock.reduce((sum,item)=>sum+item.stockValue,0);
+  const projectedGross=totalSaleValue-totalCost;
+  const projectedMargin=totalSaleValue ? (projectedGross*100/totalSaleValue) : 0;
+  const missingCost=inStock.filter(item=>!(Number(item.r[4])>0)).length;
+  const missingSale=inStock.filter(item=>!(Number(item.r[10])>0)).length;
+  const completePrices=inStock.filter(item=>Number(item.r[4])>0&&Number(item.r[10])>0).length;
+  const priceCoverage=inStock.length ? Math.round(completePrices*100/inStock.length) : 0;
+  const signedMoney=value=>`${Number(value)<0?"−":""}${formatVndNumber(Math.abs(Number(value)||0))}`;
   const reportBranches=currentBranch==="ALL" ? ["Q2","Q5"] : [currentBranch];
-  const branchReport = reportBranches.map(code=>{ const items=code==="Q5"?q5Items:q2Items; return {code,items:items.length,qty:items.reduce((s,{r})=>s+(Number(r[5])||0),0),cost:items.reduce((s,{r})=>s+(Number(r[5])||0)*(Number(r[4])||0),0),sale:items.reduce((s,{r})=>s+(Number(r[5])||0)*(Number(r[10])||0),0)}; });
-  let html = `<div class="total-stock-head"><div class="total-stock-title">📦 BÁO CÁO TỒN KHO · ${scopeLabel}</div><div class="total-stock-sub">Tổng quan số lượng và giá trị hàng đang còn trong ${currentBranch==="ALL"?"toàn hệ thống":currentBranch}</div><div class="restock-summary"><button class="metric-card metric-green summary-click" onclick="toggleSummaryProductList('total-all','Hàng đang có · ${scopeLabel}')"><span class="metric-number">${inStock.length}</span><span class="metric-label">Mã hàng đang có tồn</span></button><button class="metric-card metric-blue summary-click" onclick="toggleSummaryProductList('total-all','Số lượng đang tồn · ${scopeLabel}')"><span class="metric-number">${totalQty.toLocaleString("vi-VN")}</span><span class="metric-label">Tổng sản phẩm trong kho</span></button><div class="metric-card metric-purple"><span class="metric-number">${formatVndNumber(totalCost)}</span><span class="metric-label">Giá trị vốn · VND</span></div><div class="metric-card metric-green"><span class="metric-number">${formatVndNumber(totalSaleValue)}</span><span class="metric-label">Giá trị bán dự kiến · VND</span></div></div><table class="management-table"><thead><tr><th>Chi nhánh</th><th>Mã hàng</th><th>Số lượng</th><th>Giá vốn</th><th>Giá bán</th></tr></thead><tbody>${branchReport.map(x=>`<tr><td>📍 ${x.code}</td><td>${x.items}</td><td>${x.qty.toLocaleString("vi-VN")}</td><td>${formatVndNumber(x.cost)}</td><td>${formatVndNumber(x.sale)}</td></tr>`).join("")}</tbody></table></div><div class="summary-product-list-host"></div>`;
-  el.innerHTML = html;
+  const branchReport = reportBranches.map(code=>{ const items=code==="Q5"?q5Items:q2Items; const qty=items.reduce((s,item)=>s+item.stock,0), cost=items.reduce((s,item)=>s+item.stock*(Number(item.r[4])||0),0), sale=items.reduce((s,item)=>s+item.stockValue,0); return {code,items:items.length,qty,cost,sale,gross:sale-cost}; });
+  const highestValue=inStock.filter(item=>item.stockValue>0).slice(0,6);
+  const priceNotice=(missingCost||missingSale)
+    ? `<div class="overview-alert"><span class="overview-alert-icon">!</span><span>Còn <b>${missingCost}</b> mã chưa có giá nhập và <b>${missingSale}</b> mã chưa có giá bán. Các tổng tiền phía trên đang tạm tính phần thiếu bằng 0.</span></div>`
+    : `<div class="overview-alert is-ok"><span class="overview-alert-icon">✓</span><span>Giá nhập và giá bán đã được khai báo đầy đủ cho toàn bộ mã hàng đang có tồn.</span></div>`;
+  const priorityHtml=highestValue.length?`<section class="overview-priority"><div class="overview-priority-head"><span><strong class="overview-priority-title">Giá trị tồn nổi bật</strong><span class="overview-priority-sub">Các mã có giá trị bán dự kiến cao để kế toán và quản lý kiểm tra nhanh</span></span><span class="overview-priority-badge">TOP ${highestValue.length}</span></div><div class="overview-priority-grid">${highestValue.map((item,index)=>`<button type="button" class="overview-priority-item" onclick="openSummaryInventoryItem(${item.i})"><span class="overview-priority-rank">${index+1}</span><span class="overview-priority-name">${renderProductTitleWithCondition(item.r[2]||"Chưa có tên")}</span><span class="overview-priority-meta">${escapeHtml(item.r[1]||"Chưa có mã")} · Tồn ${item.stock} · ${formatVndNumber(item.stockValue)}đ</span></button>`).join("")}</div></section>`:"";
+  const html = `<div class="total-stock-head"><span class="overview-eyebrow">Tổng quan vận hành</span><div class="total-stock-title">📦 BÁO CÁO TỒN KHO · ${scopeLabel}</div><div class="total-stock-sub">Số lượng, giá trị hàng hóa và độ đầy đủ dữ liệu giá trong ${currentBranch==="ALL"?"toàn hệ thống":currentBranch}</div><div class="restock-summary"><button class="metric-card metric-green summary-click" onclick="toggleSummaryProductList('total-all','Hàng đang có · ${scopeLabel}')"><span class="metric-number">${inStock.length}</span><span class="metric-label">Mã hàng đang có tồn</span><span class="metric-note">Bấm để xem danh sách</span></button><div class="metric-card metric-blue"><span class="metric-number">${totalQty.toLocaleString("vi-VN")}</span><span class="metric-label">Tổng sản phẩm trong kho</span><span class="metric-note">Bình quân ${inStock.length?(totalQty/inStock.length).toLocaleString("vi-VN",{maximumFractionDigits:1}):0} / mã</span></div><div class="metric-card metric-purple"><span class="metric-number">${formatVndNumber(totalCost)}</span><span class="metric-label">Giá trị vốn · VND</span><span class="metric-note">Theo giá nhập đang lưu</span></div><div class="metric-card metric-green"><span class="metric-number">${formatVndNumber(totalSaleValue)}</span><span class="metric-label">Giá bán dự kiến · VND</span><span class="metric-note">Nếu bán hết tồn hiện tại</span></div><div class="metric-card metric-green"><span class="metric-number">${signedMoney(projectedGross)}</span><span class="metric-label">Lãi gộp dự kiến · VND</span><span class="metric-note">Biên ${projectedMargin.toLocaleString("vi-VN",{maximumFractionDigits:1})}%</span></div><button class="metric-card metric-yellow summary-click" onclick="toggleSummaryProductList('total-idle','Chưa ghi nhận bán trong 30 ngày · ${scopeLabel}')"><span class="metric-number">${hasActivityData?idleItems.length:"—"}</span><span class="metric-label">Chưa ghi nhận bán 30 ngày</span><span class="metric-note">${hasActivityData?`Độ phủ dữ liệu giá ${priceCoverage}%`:"Chưa tải lịch sử giao dịch"}</span></button></div>${priceNotice}<div class="management-table-wrap"><table class="management-table"><thead><tr><th>Chi nhánh</th><th>Mã hàng</th><th>Số lượng</th><th>Giá vốn</th><th>Giá bán</th><th>Lãi gộp</th></tr></thead><tbody>${branchReport.map(x=>`<tr><td>📍 ${x.code}</td><td>${x.items}</td><td>${x.qty.toLocaleString("vi-VN")}</td><td>${formatVndNumber(x.cost)}</td><td>${formatVndNumber(x.sale)}</td><td>${signedMoney(x.gross)}</td></tr>`).join("")}</tbody></table></div></div>${priorityHtml}<div class="summary-product-list-host"></div>`;
+  el.innerHTML=html;
   toggleSummaryProductList('total-all',`Hàng đang có · ${scopeLabel}`,false);
-  return;
-  ["Q2","Q5"].forEach((branch,branchIndex)=>{
-    const items = inStock.filter(({r})=>(r[13]||"Q2")===branch);
-    if(!items.length) return;
-    const totalQty = items.reduce((sum,{r})=>sum+(Number(r[5])||0),0);
-    const cfg = branchCfg[branch];
-    html += `<div class="total-stock-branch" style="background:${cfg.color}"><span>${cfg.label}</span><small>${items.length} mặt hàng · ${totalQty.toLocaleString("vi-VN")} sản phẩm tồn</small></div>`;
-    const buckets = new Map();
-    items.forEach(item=>{
-      const group = getPrimaryRowGroup(item.r[8]) || NO_GROUP;
-      if(!buckets.has(group)) buckets.set(group,[]);
-      buckets.get(group).push(item);
-    });
-    [...buckets.entries()].sort((a,b)=>groupOrderKey(a[0]).localeCompare(groupOrderKey(b[0]),"vi")).forEach(([group,groupItems],groupIndex)=>{
-      const groupQty = groupItems.reduce((sum,{r})=>sum+(Number(r[5])||0),0);
-      const colorIndex = (branchIndex*7+groupIndex)%GROUP_COLORS.length;
-      html += `<section class="group-section total-stock-category" style="--group-strong:${GROUP_STRONG_COLORS[colorIndex]}">
-        <div class="group-header" style="--group-bg:${GROUP_COLORS[colorIndex]};--group-strong:${GROUP_STRONG_COLORS[colorIndex]};background:${GROUP_COLORS[colorIndex]}">
-          <div class="group-header-main"><span class="group-header-label">${escapeHtml(group)}</span></div>
-          <span class="group-header-count">${groupItems.length} mục · ${groupQty.toLocaleString("vi-VN")} tồn</span>
-        </div>
-        ${groupItems.map((item,itemIdx)=>renderCard(item.r,item.i,itemIdx+1)).join("")}
-      </section>`;
-    });
-  });
-  el.innerHTML = html;
 }
-function getInventoryAuditReasons(r){
+function buildInventoryAuditContext(rows=DATA){
+  const codeCounts=new Map();
+  rows.forEach(row=>{
+    const code=normalizeProductCode(row?.[1]);
+    if(!code) return;
+    const key=`${String(row?.[13]||"Q2").toUpperCase()}|${code}`;
+    codeCounts.set(key,(codeCounts.get(key)||0)+1);
+  });
+  return {codeCounts};
+}
+function getInventoryAuditReasons(r,context=buildInventoryAuditContext()){
+  if(!context?.codeCounts) context=buildInventoryAuditContext();
   const reasons = [];
-  const ton = Number(r[5]) || 0;
-  const lowLimit = Math.max(1,Number(r[12]) || 2);
   const location = splitNoteLocation(r[7] || "").location;
-  if(ton > 0 && ton <= lowLimit) reasons.push(`Tồn thấp: ${ton}/${lowLimit}`);
   if(!location) reasons.push("Chưa có vị trí kho");
+  if(!(Number(r[4]) > 0)) reasons.push("Chưa có giá nhập");
   if(!(Number(r[10]) > 0)) reasons.push("Chưa có giá bán");
   if(!getPrimaryRowGroup(r[8])) reasons.push("Chưa phân nhóm");
   if(!String(r[3] || "").trim()) reasons.push("Thiếu thương hiệu");
   const code = String(r[1] || "").trim();
   const branch = r[13] || "Q2";
   if(!code) reasons.push("Thiếu mã hàng");
-  else if(DATA.filter(row=>normalizeProductCode(row[1])===normalizeProductCode(code) && (row[13]||"Q2")===branch).length > 1) reasons.push("Trùng mã trong chi nhánh");
+  else if((context.codeCounts.get(`${String(branch).toUpperCase()}|${normalizeProductCode(code)}`)||0)>1) reasons.push("Trùng mã trong chi nhánh");
   if(!String(r[2] || "").trim()) reasons.push("Thiếu tên sản phẩm");
+  if(!String(r[12] ?? "").trim() || Number(r[12])<1) reasons.push("Chưa đặt ngưỡng nhập");
+  if(![r[9],r[14],r[15],r[18],r[19]].some(value=>String(value||"").trim())) reasons.push("Chưa có hình sản phẩm");
   return reasons;
 }
-function renderInventoryAudit(el, results){
-  results.sort((a,b)=>getInventoryAuditReasons(b.r).length-getInventoryAuditReasons(a.r).length || (Number(a.r[5])||0)-(Number(b.r[5])||0) || String(a.r[2]||"").localeCompare(String(b.r[2]||""),"vi"));
-  const lowItems = results.filter(({r})=>getInventoryAuditReasons(r).some(reason=>reason.startsWith("Tồn thấp:")));
-  const locationItems = results.filter(({r})=>getInventoryAuditReasons(r).includes("Chưa có vị trí kho"));
-  const priceItems = results.filter(({r})=>getInventoryAuditReasons(r).includes("Chưa có giá bán"));
-  const groupItems = results.filter(({r})=>getInventoryAuditReasons(r).includes("Chưa phân nhóm"));
-  const brandItems = results.filter(({r})=>getInventoryAuditReasons(r).includes("Thiếu thương hiệu"));
-  const codeItems = results.filter(({r})=>getInventoryAuditReasons(r).some(reason=>reason==="Thiếu mã hàng" || reason==="Trùng mã trong chi nhánh"));
-  const nameItems = results.filter(({r})=>getInventoryAuditReasons(r).includes("Thiếu tên sản phẩm"));
-  summaryProductSets = {"audit-all":results,"audit-low":lowItems,"audit-location":locationItems,"audit-price":priceItems,"audit-group":groupItems,"audit-brand":brandItems,"audit-code":codeItems,"audit-name":nameItems};
-  document.getElementById("count").textContent = results.length + " mặt hàng cần kiểm tra";
-  if(!results.length){
+function renderInventoryAudit(el,results,auditContext=buildInventoryAuditContext()){
+  const audited=results.map(item=>({...item,auditReasons:getInventoryAuditReasons(item.r,auditContext)}));
+  const isCritical=item=>item.auditReasons.some(reason=>reason==="Thiếu mã hàng"||reason==="Trùng mã trong chi nhánh"||reason==="Thiếu tên sản phẩm");
+  audited.sort((a,b)=>Number(isCritical(b))-Number(isCritical(a)) || b.auditReasons.length-a.auditReasons.length || String(a.r[2]||"").localeCompare(String(b.r[2]||""),"vi"));
+  const byReason=reason=>audited.filter(item=>item.auditReasons.includes(reason));
+  const locationItems=byReason("Chưa có vị trí kho");
+  const costItems=byReason("Chưa có giá nhập");
+  const priceItems=byReason("Chưa có giá bán");
+  const groupItems=byReason("Chưa phân nhóm");
+  const brandItems=byReason("Thiếu thương hiệu");
+  const codeItems=audited.filter(item=>item.auditReasons.some(reason=>reason==="Thiếu mã hàng"||reason==="Trùng mã trong chi nhánh"));
+  const nameItems=byReason("Thiếu tên sản phẩm");
+  const thresholdItems=byReason("Chưa đặt ngưỡng nhập");
+  const imageItems=byReason("Chưa có hình sản phẩm");
+  const pricingItems=audited.filter(item=>item.auditReasons.includes("Chưa có giá nhập")||item.auditReasons.includes("Chưa có giá bán"));
+  const criticalItems=audited.filter(isCritical);
+  const scopedTotal=getKpiScopedEntries().length;
+  const completeCount=Math.max(0,scopedTotal-audited.length);
+  const qualityScore=scopedTotal?Math.round(completeCount*100/scopedTotal):100;
+  summaryProductSets={"audit-all":audited,"audit-critical":criticalItems,"audit-pricing":pricingItems,"audit-location":locationItems,"audit-cost":costItems,"audit-price":priceItems,"audit-group":groupItems,"audit-brand":brandItems,"audit-code":codeItems,"audit-name":nameItems,"audit-threshold":thresholdItems,"audit-image":imageItems};
+  document.getElementById("count").textContent=audited.length+" mặt hàng cần bổ sung";
+  if(!audited.length){
     el.innerHTML = `<div class="empty"><div class="empty-icon">✅</div><div class="empty-title">Không có mặt hàng cần kiểm tra</div><div class="empty-sub">Dữ liệu sản phẩm trong phạm vi này đã đầy đủ</div></div>`;
     return;
   }
-  el.innerHTML = `<div class="audit-head"><div class="audit-title">⚠️ KIỂM TRA DỮ LIỆU KHO</div><div class="audit-sub">Chỉ hiện tổng quan · Bấm từng loại lỗi để mở đúng danh sách cần xử lý</div><div class="restock-summary"><button class="metric-card metric-yellow summary-click" onclick="toggleSummaryProductList('audit-all','Toàn bộ mặt hàng cần kiểm tra')"><span class="metric-number">${results.length}</span><span class="metric-label">Mặt hàng có ít nhất một lỗi</span></button><button class="metric-card metric-red summary-click" onclick="toggleSummaryProductList('audit-low','Mặt hàng tồn thấp')"><span class="metric-number">${lowItems.length}</span><span class="metric-label">Tồn thấp</span></button><button class="metric-card metric-blue summary-click" onclick="toggleSummaryProductList('audit-location','Mặt hàng chưa có vị trí')"><span class="metric-number">${locationItems.length}</span><span class="metric-label">Thiếu vị trí kho</span></button><button class="metric-card metric-purple summary-click" onclick="toggleSummaryProductList('audit-price','Mặt hàng chưa có giá bán')"><span class="metric-number">${priceItems.length}</span><span class="metric-label">Thiếu giá bán</span></button></div><div class="management-issues"><button class="management-issue summary-click" onclick="toggleSummaryProductList('audit-group','Mặt hàng chưa phân nhóm')"><span>Chưa phân nhóm</span><b>${groupItems.length}</b></button><button class="management-issue summary-click" onclick="toggleSummaryProductList('audit-brand','Mặt hàng thiếu thương hiệu')"><span>Thiếu thương hiệu</span><b>${brandItems.length}</b></button><button class="management-issue summary-click" onclick="toggleSummaryProductList('audit-code','Mặt hàng lỗi mã')"><span>Thiếu / trùng mã</span><b>${codeItems.length}</b></button><button class="management-issue summary-click" onclick="toggleSummaryProductList('audit-name','Mặt hàng thiếu tên')"><span>Thiếu tên sản phẩm</span><b>${nameItems.length}</b></button></div></div><div class="summary-product-list-host"></div>` + [].map(({r,i},idx)=>{
-    const reasons = getInventoryAuditReasons(r);
-    return `<div class="audit-item"><div class="audit-reasons">${reasons.map(reason=>`<span class="audit-reason">${escapeHtml(reason)}</span>`).join("")}</div>${renderCard(r,i,idx+1)}</div>`;
-  }).join("");
-  toggleSummaryProductList('audit-all','Toàn bộ mặt hàng cần kiểm tra',false);
+  const scopeLabel=currentBranch==="ALL"?"TOÀN HỆ THỐNG":`KHO ${currentBranch}`;
+  el.innerHTML=`<div class="audit-head"><span class="overview-eyebrow">Chất lượng dữ liệu</span><div class="audit-title">✓ CHUẨN HÓA DỮ LIỆU KHO · ${scopeLabel}</div><div class="audit-sub">Tách riêng lỗi thông tin sản phẩm; tồn thấp và hết hàng được xử lý tại mục Cần nhập</div><div class="restock-summary"><div class="metric-card metric-green"><span class="metric-number audit-score-ring">${qualityScore}%</span><span class="metric-label">Mã hàng hoàn chỉnh</span><span class="metric-note">${completeCount}/${scopedTotal} mã không thiếu dữ liệu</span></div><button class="metric-card metric-yellow summary-click" onclick="toggleSummaryProductList('audit-all','Toàn bộ mặt hàng cần bổ sung')"><span class="metric-number">${audited.length}</span><span class="metric-label">Cần bổ sung thông tin</span><span class="metric-note">Bấm để xem toàn bộ</span></button><button class="metric-card metric-red summary-click" onclick="toggleSummaryProductList('audit-critical','Mã hàng cần xử lý trước')"><span class="metric-number">${criticalItems.length}</span><span class="metric-label">Lỗi quan trọng</span><span class="metric-note">Thiếu/trùng mã hoặc thiếu tên</span></button><button class="metric-card metric-blue summary-click" onclick="toggleSummaryProductList('audit-location','Mặt hàng chưa có vị trí')"><span class="metric-number">${locationItems.length}</span><span class="metric-label">Thiếu vị trí kho</span><span class="metric-note">Ảnh hưởng việc tìm hàng</span></button><button class="metric-card metric-purple summary-click" onclick="toggleSummaryProductList('audit-pricing','Mặt hàng thiếu dữ liệu giá')"><span class="metric-number">${pricingItems.length}</span><span class="metric-label">Thiếu dữ liệu giá</span><span class="metric-note">Giá nhập hoặc giá bán</span></button></div><div class="management-issues"><button class="management-issue summary-click" onclick="toggleSummaryProductList('audit-cost','Mặt hàng chưa có giá nhập')"><span>Chưa có giá nhập</span><b>${costItems.length}</b></button><button class="management-issue summary-click" onclick="toggleSummaryProductList('audit-price','Mặt hàng chưa có giá bán')"><span>Chưa có giá bán</span><b>${priceItems.length}</b></button><button class="management-issue summary-click" onclick="toggleSummaryProductList('audit-group','Mặt hàng chưa phân nhóm')"><span>Chưa phân nhóm</span><b>${groupItems.length}</b></button><button class="management-issue summary-click" onclick="toggleSummaryProductList('audit-brand','Mặt hàng thiếu thương hiệu')"><span>Thiếu thương hiệu</span><b>${brandItems.length}</b></button><button class="management-issue summary-click" onclick="toggleSummaryProductList('audit-code','Mặt hàng lỗi mã')"><span>Thiếu / trùng mã</span><b>${codeItems.length}</b></button><button class="management-issue summary-click" onclick="toggleSummaryProductList('audit-name','Mặt hàng thiếu tên')"><span>Thiếu tên sản phẩm</span><b>${nameItems.length}</b></button><button class="management-issue summary-click" onclick="toggleSummaryProductList('audit-threshold','Mặt hàng chưa đặt ngưỡng nhập')"><span>Thiếu ngưỡng nhập</span><b>${thresholdItems.length}</b></button><button class="management-issue summary-click" onclick="toggleSummaryProductList('audit-image','Mặt hàng chưa có hình')"><span>Thiếu hình sản phẩm</span><b>${imageItems.length}</b></button></div><div class="overview-alert is-ok"><span class="overview-alert-icon">i</span><span>Mục này chỉ đánh giá độ đầy đủ của dữ liệu. Mỗi thẻ sản phẩm hiển thị đúng các trường cần bổ sung để mọi người xử lý nhanh.</span></div></div><div class="summary-product-list-host"></div>`;
+  toggleSummaryProductList('audit-all','Toàn bộ mặt hàng cần bổ sung',false);
 }
 function renderRestockOverview(el){
   const kw = removeAccents(searchQ.trim());
   const kwTokens = kw ? kw.split(/\s+/).filter(Boolean) : [];
   const scopeLabel=currentBranch==="ALL" ? "TOÀN HỆ THỐNG" : `KHO ${currentBranch}`;
-  const rows = getKpiScopedEntries().map(({r,i})=>({r,i,state:getStockState(r[5],r[12])})).filter(item=>{
+  const rows = sortRestockPriority(getKpiEnrichedEntries().filter(item=>{
     if(item.state!=="HET" && item.state!=="SAP") return false;
     if(!kwTokens.length) return true;
     const hay = removeAccents([item.r[1],item.r[2],item.r[3],item.r[7],item.r[8],item.r[13]||"Q2"].join(" "));
     return kwTokens.every(token=>hay.includes(token));
-  });
+  }));
   const outCount = rows.filter(item=>item.state==="HET").length;
   const lowCount = rows.filter(item=>item.state==="SAP").length;
   const outItems = rows.filter(item=>item.state==="HET");
   const lowItems = rows.filter(item=>item.state==="SAP");
+  const sellingItems=rows.filter(item=>item.sales30>0);
+  const salesQty30=sellingItems.reduce((sum,item)=>sum+item.sales30,0);
+  const minimumSuggestion=rows.reduce((sum,item)=>sum+getRestockMinimumSuggestion(item),0);
   summaryProductSets = {"restock-all":rows,"restock-out":outItems,"restock-low":lowItems};
   document.getElementById("count").textContent = rows.length + " mặt hàng cần nhập";
   if(!rows.length){
     el.innerHTML = `<div class="empty"><div class="empty-icon">✅</div><div class="empty-title">${scopeLabel} chưa có mặt hàng cần nhập</div><div class="empty-sub">Không có hàng hết hoặc thấp hơn ngưỡng cảnh báo trong phạm vi này</div></div>`;
     return;
   }
-  const branchCfg = {Q2:{label:"📍 CHI NHÁNH Q2",color:"#1A5276"},Q5:{label:"📍 CHI NHÁNH Q5",color:"#7D3C98"}};
   const reportBranches=currentBranch==="ALL" ? ["Q2","Q5"] : [currentBranch];
-  const restockBranches = reportBranches.map(code=>{ const items=rows.filter(item=>(item.r[13]||"Q2")===code); return {code,total:items.length,out:items.filter(item=>item.state==="HET").length,low:items.filter(item=>item.state==="SAP").length}; });
-  let html = `<div class="restock-head"><div class="restock-title">📥 KẾ HOẠCH NHẬP HÀNG · ${scopeLabel}</div><div class="restock-sub">Phạm vi ${currentBranch==="ALL"?"toàn hệ thống":currentBranch} · đỏ cần xử lý trước · vàng cần chuẩn bị nhập</div><div class="restock-summary"><button class="metric-card metric-red summary-click" onclick="toggleSummaryProductList('restock-out','Mặt hàng đã hết · ${scopeLabel}')"><span class="metric-number">${outCount}</span><span class="metric-label">Hết hàng · ưu tiên ngay</span></button><button class="metric-card metric-yellow summary-click" onclick="toggleSummaryProductList('restock-low','Mặt hàng sắp hết · ${scopeLabel}')"><span class="metric-number">${lowCount}</span><span class="metric-label">Sắp hết · cần chuẩn bị</span></button><button class="metric-card metric-blue summary-click" onclick="toggleSummaryProductList('restock-all','Mặt hàng cần xử lý · ${scopeLabel}')"><span class="metric-number">${rows.length}</span><span class="metric-label">Tổng mặt hàng cần xử lý</span></button></div><table class="management-table"><thead><tr><th>Chi nhánh</th><th>Hết hàng</th><th>Sắp hết</th><th>Cần xử lý</th></tr></thead><tbody>${restockBranches.map(x=>`<tr><td>📍 ${x.code}</td><td style="color:#C0392B;font-weight:900">${x.out}</td><td style="color:#9A6700;font-weight:900">${x.low}</td><td><b>${x.total}</b></td></tr>`).join("")}</tbody></table></div><div class="summary-product-list-host"></div>`;
-  el.innerHTML = html;
+  const restockBranches = reportBranches.map(code=>{ const items=rows.filter(item=>(item.r[13]||"Q2")===code); return {code,total:items.length,out:items.filter(item=>item.state==="HET").length,low:items.filter(item=>item.state==="SAP").length,suggested:items.reduce((sum,item)=>sum+getRestockMinimumSuggestion(item),0)}; });
+  const priorityItems=rows.slice(0,8);
+  const priorityHtml=`<section class="overview-priority"><div class="overview-priority-head"><span><strong class="overview-priority-title">Cần xử lý trước</strong><span class="overview-priority-sub">Hết hàng được ưu tiên, sau đó xét sức bán 30 ngày, mức tồn/ngưỡng và hoạt động gần nhất</span></span><span class="overview-priority-badge">TOP ${priorityItems.length}</span></div><div class="overview-priority-grid">${priorityItems.map((item,index)=>`<button type="button" class="overview-priority-item${item.state==="HET"?" is-out":""}" onclick="openSummaryInventoryItem(${item.i})"><span class="overview-priority-rank">${index+1}</span><span class="overview-priority-name">${renderProductTitleWithCondition(item.r[2]||"Chưa có tên")}</span><span class="overview-priority-meta">${item.state==="HET"?"Hết hàng":`Còn ${item.stock}/${item.threshold}`} · Nhập tối thiểu +${getRestockMinimumSuggestion(item)}${item.sales30?` · Đã bán ${item.sales30}/30 ngày`:""}</span></button>`).join("")}</div></section>`;
+  const html = `<div class="restock-head"><span class="overview-eyebrow">Kế hoạch hành động</span><div class="restock-title">📥 KẾ HOẠCH NHẬP HÀNG · ${scopeLabel}</div><div class="restock-sub">${rows.length} mã cần xử lý · danh sách được xếp theo mức ưu tiên thực tế, không theo thứ tự dữ liệu gốc</div><div class="restock-summary"><button class="metric-card metric-red summary-click" onclick="toggleSummaryProductList('restock-out','Mặt hàng đã hết · ${scopeLabel}')"><span class="metric-number">${outCount}</span><span class="metric-label">Hết hàng · ưu tiên ngay</span><span class="metric-note">Được đưa lên đầu danh sách</span></button><button class="metric-card metric-yellow summary-click" onclick="toggleSummaryProductList('restock-low','Mặt hàng sắp hết · ${scopeLabel}')"><span class="metric-number">${lowCount}</span><span class="metric-label">Sắp hết · cần chuẩn bị</span><span class="metric-note">Theo ngưỡng từng mã hàng</span></button><div class="metric-card metric-blue"><span class="metric-number">${sellingItems.length}</span><span class="metric-label">Có phát sinh bán 30 ngày</span><span class="metric-note">Tổng ${salesQty30} sản phẩm đã bán</span></div><button class="metric-card metric-purple summary-click" onclick="toggleSummaryProductList('restock-all','Mặt hàng cần xử lý · ${scopeLabel}')"><span class="metric-number">+${minimumSuggestion}</span><span class="metric-label">Gợi ý nhập tối thiểu</span><span class="metric-note">Để tồn vượt ngưỡng cảnh báo</span></button></div><div class="overview-alert"><span class="overview-alert-icon">i</span><span>Số lượng gợi ý là mức tối thiểu để đưa tồn lên cao hơn ngưỡng cảnh báo. Đây là chỉ báo vận hành, không thay thế quyết định mua hàng của quản lý.</span></div><div class="management-table-wrap"><table class="management-table"><thead><tr><th>Chi nhánh</th><th>Hết hàng</th><th>Sắp hết</th><th>Cần xử lý</th><th>Gợi ý nhập</th></tr></thead><tbody>${restockBranches.map(x=>`<tr><td>📍 ${x.code}</td><td style="color:#C0392B;font-weight:900">${x.out}</td><td style="color:#9A6700;font-weight:900">${x.low}</td><td><b>${x.total}</b></td><td style="color:#7D3C98;font-weight:900">+${x.suggested}</td></tr>`).join("")}</tbody></table></div></div>${priorityHtml}<div class="summary-product-list-host"></div>`;
+  el.innerHTML=html;
   toggleSummaryProductList('restock-all',`Mặt hàng cần xử lý · ${scopeLabel}`,false);
-  return;
-  ["Q2","Q5"].forEach((branch,branchIndex)=>{
-    const branchItems = rows.filter(item=>(item.r[13]||"Q2")===branch);
-    if(!branchItems.length) return;
-    const branchOut = branchItems.filter(item=>item.state==="HET").length;
-    const branchLow = branchItems.filter(item=>item.state==="SAP").length;
-    const cfg = branchCfg[branch];
-    html += `<div class="total-stock-branch" style="background:${cfg.color}"><span>${cfg.label}</span><small>${branchOut} hết · ${branchLow} sắp hết</small></div>`;
-    [{state:"HET",label:"🔴 HẾT HÀNG — ƯU TIÊN NHẬP",cls:"het"},{state:"SAP",label:"🟡 SẮP HẾT",cls:"sap"}].forEach((level,levelIndex)=>{
-      const levelItems = branchItems.filter(item=>item.state===level.state);
-      if(!levelItems.length) return;
-      html += `<div class="restock-level ${level.cls}"><span>${level.label}</span><small>${levelItems.length} mặt hàng</small></div>`;
-      const buckets = new Map();
-      levelItems.forEach(item=>{
-        const group = getPrimaryRowGroup(item.r[8]) || NO_GROUP;
-        if(!buckets.has(group)) buckets.set(group,[]);
-        buckets.get(group).push(item);
-      });
-      [...buckets.entries()].sort((a,b)=>groupOrderKey(a[0]).localeCompare(groupOrderKey(b[0]),"vi")).forEach(([group,groupItems],groupIndex)=>{
-        groupItems.sort((a,b)=>(Number(a.r[5])||0)-(Number(b.r[5])||0) || String(a.r[2]||"").localeCompare(String(b.r[2]||""),"vi"));
-        const colorIndex = (branchIndex*7+levelIndex*3+groupIndex)%GROUP_COLORS.length;
-        html += `<section class="group-section total-stock-category" style="--group-strong:${GROUP_STRONG_COLORS[colorIndex]}">
-          <div class="group-header" style="--group-bg:${GROUP_COLORS[colorIndex]};--group-strong:${GROUP_STRONG_COLORS[colorIndex]};background:${GROUP_COLORS[colorIndex]}">
-            <div class="group-header-main"><span class="group-header-label">${escapeHtml(group)}</span></div>
-            <span class="group-header-count">${groupItems.length} mặt hàng</span>
-          </div>
-          ${groupItems.map((item,itemIdx)=>`<div class="audit-reasons"><span class="audit-reason">Ngưỡng cảnh báo: ≤ ${Math.max(1,Number(item.r[12])||2)}</span></div>${renderCard(item.r,item.i,itemIdx+1)}`).join("")}
-        </section>`;
-      });
-    });
-  });
-  el.innerHTML = html;
 }
 function render(){
   document.body.classList.remove("loading-layout-mode");
@@ -12683,6 +12750,7 @@ function render(){
   updateBulkControls();
   const kw = removeAccents(searchQ.trim());
   const kwTokens = kw ? kw.split(/\s+/).filter(Boolean) : [];
+  const auditContext=currentStatus==="AUDIT"&&!kwTokens.length ? buildInventoryAuditContext() : null;
   const homeLandingMode = !bulkSelectMode && !kw && currentTab==="ALL" && currentStatus==="ALL" && !restockOnly && !totalStockView;
   document.body.classList.toggle("home-landing-mode", homeLandingMode);
   const results = DATA.map((r,i)=>({r,i})).filter(({r})=>{
@@ -12695,7 +12763,7 @@ function render(){
     if(!kwTokens.length && currentStatus==="CON" && stockState!=="CON") return false;
     if(!kwTokens.length && currentStatus==="SAP" && stockState!=="SAP") return false;
     if(!kwTokens.length && currentStatus==="HET" && stockState!=="HET") return false;
-    if(!kwTokens.length && currentStatus==="AUDIT" && !getInventoryAuditReasons(r).length) return false;
+    if(!kwTokens.length && currentStatus==="AUDIT" && !getInventoryAuditReasons(r,auditContext).length) return false;
     if(!kwTokens.length && restockOnly && stockState!=="SAP" && stockState!=="HET") return false;
     const resolvedGroupLabel = resolveQuickGroupLabelFromRow(r, r[8] || "");
     if(!kwTokens.length && !matchesQuickGroupFilter(r, resolvedGroupLabel)) return false;
@@ -12740,7 +12808,7 @@ function render(){
   }
 
   if(currentStatus==="AUDIT"){
-    renderInventoryAudit(el, results);
+    renderInventoryAudit(el,results,auditContext);
     return;
   }
 
@@ -16264,7 +16332,7 @@ function setStatus(btn){
   currentStatus = btn.dataset.status;
   restockOnly = false;
   totalStockView = currentStatus === "ALL";
-  if(totalStockView){
+  if(totalStockView || currentStatus==="AUDIT"){
     currentTab = "ALL";
     syncHomeStockFilters();
     currentBranch = getStoredWarehouseBranch();
