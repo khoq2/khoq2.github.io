@@ -883,7 +883,7 @@ body.employee-mode .card-actions.admin-only.employee-permitted { display:grid!im
 .build-summary-name { color:#1E3A5F; font-size:13px; font-weight:900; line-height:1.3; }
 .build-summary-title { min-width:0; }
 .build-item-title-field { min-width:0; display:grid; gap:4px; color:#64748B; font-size:9px; font-weight:900; }
-.build-item-title-input { width:100%; height:34px; margin:0; padding:5px 7px; border:1px solid #CCD9E3; border-radius:7px; background:#fff; color:#1E3A5F; font-size:13px; font-weight:900; line-height:1.3; box-sizing:border-box; }
+.build-item-title-input { width:100%; height:34px; margin:0; padding:5px 7px; overflow-x:auto; border:1px solid #CCD9E3; border-radius:7px; background:#fff; color:#1E3A5F; font-size:13px; font-weight:900; line-height:1.3; text-overflow:clip; white-space:nowrap; box-sizing:border-box; }
 .build-item-title-input:focus { border-color:#2E86C1; background:#fff; outline:0; box-shadow:0 0 0 3px rgba(46,134,193,.1); }
 .build-summary-meta { margin-top:4px; color:#657786; font-size:11px; line-height:1.45; }
 .build-summary-stock { color:#1E8449; font-weight:900; }
@@ -996,7 +996,19 @@ body.employee-mode .card-actions.admin-only.employee-permitted { display:grid!im
     padding-right:87px;
     box-sizing:border-box;
   }
-  .build-item-title-input { width:100%; height:40px; font-size:14px; }
+  .build-item-title-input {
+    width:100%;
+    height:40px;
+    overflow-x:scroll;
+    overscroll-behavior-x:contain;
+    font-size:14px;
+    text-overflow:clip;
+    white-space:nowrap;
+    touch-action:pan-x;
+    -webkit-overflow-scrolling:touch;
+    -webkit-user-select:text;
+    user-select:text;
+  }
   .build-summary-unit { grid-column:1/-1; width:90px; }
   .build-summary-controls { grid-column:1/-1; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:6px; }
   .build-summary-field input { padding-left:6px; padding-right:6px; font-size:14px; }
@@ -13152,6 +13164,35 @@ function updateBuildSummaryTotals(){
     if(amount) amount.textContent=formatBuildMoney(item.qty*item.price);
   });
 }
+function bindBuildTitleTouchSwipe(root){
+  root?.querySelectorAll(".build-item-title-input").forEach(input=>{
+    if(input.dataset.touchSwipeBound==="1") return;
+    input.dataset.touchSwipeBound="1";
+    let startX=0,startY=0,startScrollLeft=0,horizontal=false;
+    input.addEventListener("touchstart",event=>{
+      const touch=event.touches?.[0];
+      if(!touch) return;
+      startX=touch.clientX;
+      startY=touch.clientY;
+      startScrollLeft=input.scrollLeft;
+      horizontal=false;
+      event.stopPropagation();
+    },{passive:true});
+    input.addEventListener("touchmove",event=>{
+      const touch=event.touches?.[0];
+      if(!touch) return;
+      const dx=touch.clientX-startX,dy=touch.clientY-startY;
+      if(!horizontal && Math.abs(dx)>Math.abs(dy)+3) horizontal=true;
+      if(!horizontal) return;
+      input.scrollLeft=startScrollLeft-dx;
+      event.stopPropagation();
+    },{passive:true});
+    input.addEventListener("touchend",event=>{
+      horizontal=false;
+      event.stopPropagation();
+    },{passive:true});
+  });
+}
 function renderBuildSummary(){
   const body=document.getElementById("buildSummaryBody");
   if(!body) return;
@@ -13186,6 +13227,7 @@ function renderBuildSummary(){
   }).join("")}</div></div><button type="button" class="build-add-row" onclick="addBuildCustomItem()"><strong aria-hidden="true">＋</strong> THÊM HÀNG</button>
   <div class="build-summary-total"><span class="build-summary-total-copy" id="buildSummaryCount">${rows.length} linh kiện · ${totals.totalQty} sản phẩm</span><span class="build-summary-grand ${totals.missing?"":"complete"}" id="buildSummaryGrand"><small>TỔNG CỘNG</small><strong id="buildSummaryGrandTotal">${formatBuildMoney(totals.total)}</strong><em id="buildSummaryPriceNote">${totals.missing?`Còn ${totals.missing} linh kiện chưa nhập giá`:`Nếu thêm 8% VAT = ${formatBuildMoney(totals.totalWithVat)}`}</em></span></div>
   <div class="build-summary-actions"><button type="button" class="build-export-image" onclick="exportBuildSummaryImage()">📷 Xuất ảnh</button><button type="button" class="build-export-print" onclick="printBuildSummary()">📄 In / Lưu PDF</button><button type="button" class="build-export-excel" onclick="exportBuildSummaryExcel(this)">📊 Xuất Excel</button><button type="button" class="build-clear-all" onclick="clearBuildSelection()">🗑️ Bỏ chọn tất cả</button></div>`;
+  bindBuildTitleTouchSwipe(body);
 }
 function openBuildSummary(){
   if(!selectedItems.size){ showToast("Chưa chọn linh kiện nào"); return; }
