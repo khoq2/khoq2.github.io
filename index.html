@@ -8021,6 +8021,101 @@ body .warehouse-switch.warehouse-switch-changing .warehouse-pin{
   }
 }
 </style>
+<style id="admin-stability-ui-2026">
+:root{
+  --ui-focus:#2E86C1;
+  --ui-surface:#FFFFFF;
+  --ui-border:#D7E3EC;
+  --ui-shadow:0 16px 38px rgba(20,48,72,.16);
+}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{
+  outline:3px solid color-mix(in srgb,var(--ui-focus) 34%,transparent)!important;
+  outline-offset:2px;
+}
+.overlay.open{overscroll-behavior:contain}
+.overlay .modal{border-color:var(--ui-border);box-shadow:var(--ui-shadow)}
+.kpi-row{position:relative;z-index:32;overflow:visible}
+.kpi-hover-menu{z-index:4600}
+.search-box{z-index:30}
+.admin-bar,.recent-activity-wrap,.warehouse-switcher{isolation:isolate}
+@media(max-width:600px){
+  .build-summary-modal{
+    width:calc(100vw - 12px)!important;
+    max-height:calc(100dvh - 12px)!important;
+    padding:14px 11px calc(16px + env(safe-area-inset-bottom))!important;
+    border-radius:20px!important;
+    overscroll-behavior:contain;
+  }
+  .build-summary-head{align-items:center}
+  .build-summary-head .modal-title{font-size:15px}
+  .build-summary-sub{font-size:11px;line-height:1.4}
+  .build-summary-close{min-height:38px;padding:7px 10px}
+  .build-summary-row,.build-summary-row:nth-child(even){
+    grid-template-columns:56px minmax(0,1fr)!important;
+    column-gap:9px!important;
+    padding:12px 10px!important;
+    overflow:visible!important;
+    border-radius:16px!important;
+    box-shadow:0 7px 18px rgba(24,58,84,.07);
+  }
+  .build-summary-image-wrap{
+    grid-column:1!important;
+    grid-row:1!important;
+    width:56px!important;
+    height:56px!important;
+    overflow:visible!important;
+    border-radius:11px!important;
+  }
+  .build-summary-img{width:56px!important;height:56px!important;border-radius:11px!important}
+  .build-summary-select-check{
+    position:absolute!important;
+    inset:-7px -7px auto auto!important;
+    width:29px!important;
+    height:29px!important;
+    display:grid!important;
+    place-items:center!important;
+    padding:0!important;
+    border-radius:50%!important;
+    background:transparent!important;
+    z-index:6!important;
+  }
+  .build-summary-select-check span{
+    width:27px!important;
+    height:27px!important;
+    opacity:1!important;
+    transform:none!important;
+    border:2px solid #fff!important;
+    background:#334155!important;
+    color:#fff!important;
+    font-size:18px!important;
+    box-shadow:0 4px 11px rgba(15,23,42,.32)!important;
+  }
+  .build-summary-title{grid-column:2!important;grid-row:1!important;min-width:0!important}
+  .build-summary-row .build-item-title-field>span{padding-right:88px!important}
+  .build-item-title-input{
+    width:100%!important;
+    min-width:0!important;
+    height:44px!important;
+    overflow-x:auto!important;
+    white-space:nowrap!important;
+    touch-action:pan-x!important;
+    -webkit-overflow-scrolling:touch;
+    font-size:15px!important;
+  }
+  .build-summary-unit{grid-column:1!important;grid-row:2!important;width:100%!important}
+  .build-summary-controls{grid-column:1/-1!important;grid-row:3!important}
+  .build-summary-order{top:10px!important;right:10px!important}
+  .build-summary-actions{gap:7px}
+  .build-summary-actions button{min-height:52px;padding:9px 5px;line-height:1.25}
+  .overlay,.recent-activity-panel,.side-control-shell{
+    -webkit-backdrop-filter:blur(7px) saturate(108%)!important;
+    backdrop-filter:blur(7px) saturate(108%)!important;
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  .build-summary-row,.build-summary-select-check span{transition:none!important}
+}
+</style>
 </head>
 <body>
 <div class="sticky">
@@ -9308,6 +9403,7 @@ const EMPLOYEE_PERMISSION_LABELS = {
 };
 let employeeAccessToken = sessionStorage.getItem("kho_employee_session_token") || "";
 let employeeAccessProfile = null;
+let employeeSessionValidated = false;
 try{ employeeAccessProfile=JSON.parse(sessionStorage.getItem("kho_employee_profile")||"null"); }catch(_){ employeeAccessProfile=null; }
 let employeePrivateAreaSessions = {employeeKey:"",customer:"",partner:""};
 try{
@@ -9347,7 +9443,7 @@ function employeePermissions(){
 }
 function employeeSessionHasPermission(permission,profile=employeeAccessProfile,token=employeeAccessToken){
   const permissions=Array.isArray(profile?.permissions) ? profile.permissions.map(value=>String(value).toUpperCase()) : [];
-  return !!token && permissions.includes(String(permission||"").toUpperCase());
+  return employeeSessionValidated && !!token && permissions.includes(String(permission||"").toUpperCase());
 }
 function hasEmployeePermission(permission){
   return isAdminMode() || employeeSessionHasPermission(permission);
@@ -9374,7 +9470,7 @@ function rememberEmployeePrivateArea(area){
 function reopenEmployeePrivateArea(){ requestPrivateAccess(getEmployeeLastPrivateArea()); }
 function updateEmployeeDock(){
   const button=document.getElementById("employeeDockButton"), shortcut=document.getElementById("employeeProfileShortcut"), label=document.getElementById("employeeDockLabel"), tooltip=document.getElementById("employeeDockTooltip"), profileTooltip=document.getElementById("employeeProfileTooltip"), customerButton=document.getElementById("customerDockButton"), partnerButton=document.getElementById("partnerDockButton");
-  const active=!!employeeAccessToken && !!employeeAccessProfile?.name;
+  const active=employeeSessionValidated && !!employeeAccessToken && !!employeeAccessProfile?.name;
   const name=active ? String(employeeAccessProfile.name).trim() : "";
   const sessionEmployee=active ? (findNVByName(name) || normalizeNVItem(employeeAccessProfile)) : null;
   const roleLabel=active ? employeeRoleLabel(sessionEmployee || employeeAccessProfile) : "";
@@ -9407,7 +9503,7 @@ function updateEmployeeDock(){
   if(partnerButton) partnerButton.hidden=hidePartnerIcon;
 }
 function refreshEmployeePermissionUI(){
-  const active=!!employeeAccessToken && !!employeeAccessProfile?.name;
+  const active=employeeSessionValidated && !!employeeAccessToken && !!employeeAccessProfile?.name;
   document.body.classList.toggle("employee-mode",active);
   document.querySelectorAll("[data-permission]").forEach(element=>{
     const permissions=String(element.dataset.permission||"").split(/[\s,|]+/).filter(Boolean);
@@ -9418,10 +9514,11 @@ function refreshEmployeePermissionUI(){
   updateEmployeeDock();
   if(document.getElementById("customerOverlay")?.classList.contains("open") || document.getElementById("partnerOverlay")?.classList.contains("open")) refreshPrivateEditUI();
 }
-function setEmployeeSession(token,profile){
+function setEmployeeSession(token,profile,validated=true){
   const previousEmployeeKey=currentEmployeeSessionKey();
   employeeAccessToken=String(token||"");
   employeeAccessProfile=profile&&typeof profile==="object"?profile:null;
+  employeeSessionValidated=!!employeeAccessToken&&!!employeeAccessProfile&&validated;
   if(employeeAccessToken&&employeeAccessProfile){
     const normalizedProfile=normalizeNVItem(employeeAccessProfile);
     if(normalizedProfile){
@@ -9442,11 +9539,28 @@ function setEmployeeSession(token,profile){
   }
   refreshEmployeePermissionUI();
 }
-function clearEmployeeSession(notify=false){
+function clearEmployeeSession(notify=false,revoke=true){
+  const oldToken=employeeAccessToken||"";
   const oldName=employeeAccessProfile?.name||"Nhân viên";
   const oldRole=employeeRoleFriendly(employeeAccessProfile);
+  if(revoke&&oldToken) void revokeServerSession("logout_employee",{employeeAuth:oldToken});
   setEmployeeSession("",null);
+  stripPrivateProductFieldsFromLocalData();
+  if(!isAdminMode()) setTimeout(async()=>{ await loadData(); render(); },0);
   if(notify) showToast(`Đã đăng xuất khỏi ${oldName} ${oldRole}`);
+}
+async function validateRestoredEmployeeSession(){
+  if(!employeeAccessToken) return false;
+  try{
+    const result=await fetchSheetJson(SHEET_API_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({action:"validate_employee_session",employeeAuth:employeeAccessToken})},16000);
+    if(!result.valid||!result.employee) throw new Error("Phiên nhân viên đã hết hạn");
+    setEmployeeSession(employeeAccessToken,result.employee);
+    if(hasPrivateProductDataAccess()) await loadData();
+    return true;
+  }catch(_){
+    clearEmployeeSession(false,false);
+    return false;
+  }
 }
 function requireActionPermission(permission,label="thao tác này"){
   if(hasEmployeePermission(permission)) return true;
@@ -9521,6 +9635,8 @@ function setAdminMode(on){
     updateAdminProfileButton(true);
     setTimeout(refreshPrivateOperationalData,0);
   } else {
+    const closingAdminToken=sessionStorage.getItem("kho_admin_session_token")||"";
+    if(closingAdminToken) void revokeServerSession("logout_admin",{auth:closingAdminToken});
     sessionStorage.removeItem("kho_cntt_admin");
     sessionStorage.removeItem("kho_admin_session_token");
     document.body.classList.remove("admin-mode");
@@ -9534,7 +9650,8 @@ function setAdminMode(on){
     }
     updateAdminProfileButton(false);
     clearAdminOperationalView();
-    setTimeout(loadPublicRecentActivityFromSheet,0);
+    stripPrivateProductFieldsFromLocalData();
+    setTimeout(async()=>{ await Promise.allSettled([loadData(),loadPublicRecentActivityFromSheet()]); render(); },0);
     bulkSelectMode = false;
     selectedItems.clear();
     buildQtyByIndex.clear(); buildPriceByIndex.clear(); buildTitleByIndex.clear(); buildWarrantyByIndex.clear(); buildCodeByIndex.clear(); buildUnitByIndex.clear();
@@ -9576,7 +9693,7 @@ async function submitAdminPass(){
     const result = await fetchSheetJson(SHEET_API_URL, {
       method:"POST",
       headers:{"Content-Type":"text/plain;charset=utf-8"},
-      body:JSON.stringify({action:"verify_admin",password:val})
+      body:JSON.stringify({action:"verify_admin",password:val,clientId:LOGIN_CLIENT_ID})
     }, 20000);
     if(!result.token) throw new Error("Backend không cấp phiên Admin");
     sessionStorage.setItem("kho_admin_session_token", result.token);
@@ -9599,18 +9716,31 @@ async function submitAdminPass(){
     }
   }
 }
-function checkAdminSession(){
-  if(sessionStorage.getItem("kho_cntt_admin")==="1" && sessionStorage.getItem("kho_admin_session_token")){
-    setAdminMode(true);
-  }else{
+async function checkAdminSession(){
+  const token=sessionStorage.getItem("kho_admin_session_token")||"";
+  if(sessionStorage.getItem("kho_cntt_admin")!=="1" || !token){
     sessionStorage.removeItem("kho_cntt_admin");
     sessionStorage.removeItem("kho_admin_session_token");
+    return false;
+  }
+  try{
+    const result=await fetchSheetJson(SHEET_API_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({action:"validate_admin_session",auth:token})},16000);
+    if(!result.valid) throw new Error("Phiên Admin đã hết hạn");
+    setAdminMode(true);
+    return true;
+  }catch(_){
+    sessionStorage.removeItem("kho_cntt_admin");
+    sessionStorage.removeItem("kho_admin_session_token");
+    document.body.classList.remove("admin-mode");
+    updateAdminProfileButton(false);
+    stripPrivateProductFieldsFromLocalData();
+    return false;
   }
 }
 
 // Dòng URL duy nhất
 const SHEET_API_URL = "https://script.google.com/macros/s/AKfycby6YH69F7sfO1ZoUJsDm4BeX6Luj2GrhUfYWWJWNvqjraAEhkBck16EphrPBBm1BT3YqA/exec";
-const REQUIRED_API_VERSION = "2026.08.11-recent-activity-safe-07";
+const REQUIRED_API_VERSION = "2026.08.11-admin-stable-08";
 // Apps Script có thể phải chờ khóa ghi khi nhiều thao tác diễn ra gần nhau.
 // 45 giây dài hơn thời gian chờ khóa phía máy chủ, tránh báo lỗi giả trong khi Sheet vẫn đang ghi.
 const SHEET_TIMEOUT_MS = 45000;
@@ -9620,6 +9750,22 @@ const PENDING_TX_SYNC_KEY = "kho_cntt_pending_tx_sync";
 const PENDING_NV_SYNC_KEY = "kho_cntt_pending_nv_sync";
 const PENDING_CONFIG_SYNC_KEY = "kho_cntt_pending_config_sync";
 const LAST_SYNC_ERROR_KEY = "kho_cntt_last_sync_error";
+const LOGIN_CLIENT_ID_KEY = "kho_cntt_login_client_id";
+function getLoginClientId(){
+  try{
+    let value=localStorage.getItem(LOGIN_CLIENT_ID_KEY)||"";
+    if(!value){
+      value=crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+      localStorage.setItem(LOGIN_CLIENT_ID_KEY,value);
+    }
+    return value;
+  }catch(_){ return `session-${Date.now()}-${Math.random().toString(36).slice(2)}`; }
+}
+const LOGIN_CLIENT_ID = getLoginClientId();
+function revokeServerSession(action,payload={}){
+  if(!SHEET_API_URL || !navigator.onLine) return Promise.resolve();
+  return fetch(SHEET_API_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({action,...payload}),keepalive:true}).catch(()=>{});
+}
 let dataSaveChain = Promise.resolve();
 let dataSaveSeq = 0;
 let txSaveChain = Promise.resolve();
@@ -10020,7 +10166,9 @@ async function replaceAllInventoryRows(snapshot){
     if(!String(e).includes("SYNC_CONFLICT")) throw e;
     // Chỉ tự xử lý khi dữ liệu hai bên THỰC SỰ giống nhau. Không tự ghi đè
     // nếu Sheet có thay đổi nội dung từ một thiết bị khác.
-    const latest = await fetchSheetJson(sheetUrl({type:"data",_ts:Date.now()}),{},35000);
+    const latest = hasPrivateProductDataAccess()
+      ? await privateSheet("private_products",{},35000)
+      : await fetchSheetJson(sheetUrl({type:"data",_ts:Date.now()}),{},35000);
     if(!Array.isArray(latest.data)) throw e;
     SERVER_DATA_FINGERPRINT = String(latest.fingerprint || "");
     if(canonicalInventoryJson(snapshot) === canonicalInventoryJson(latest.data)){
@@ -10052,9 +10200,9 @@ function isSafeSheetGetRetry(error){
 }
 async function fetchSheetJson(url, options={}, timeoutMs=SHEET_TIMEOUT_MS){
   const context=sheetRequestContext(url,options);
-  // Ba action riêng tư dưới đây dùng POST để kèm phiên đăng nhập nhưng hoàn toàn chỉ đọc.
-  // Cho phép thử lại các action này khi mạng chập chờn; mọi POST có ghi dữ liệu vẫn chỉ gửi đúng một lần.
-  const safeReadPost=new Set(["private_customers","private_customer_records","private_partners"]).has(context.action);
+  // Các action đọc dùng POST để kèm phiên đăng nhập nhưng không thay đổi dữ liệu.
+  // Cho phép thử lại khi mạng chập chờn; mọi POST có ghi dữ liệu vẫn chỉ gửi đúng một lần.
+  const safeReadPost=new Set(["private_products","private_customers","private_customer_records","private_partners","validate_admin_session","validate_employee_session"]).has(context.action);
   const maxAttempts=context.method==="GET" ? 3 : safeReadPost ? 2 : 1;
   let lastError;
   for(let attempt=1;attempt<=maxAttempts;attempt++){
@@ -10143,7 +10291,7 @@ async function postSheet(action, data, timeoutMs=SHEET_TIMEOUT_MS){
   const send = auth=>fetchSheetJson(SHEET_API_URL, {
     method:"POST",
     headers:{"Content-Type":"text/plain;charset=utf-8"},
-    body:JSON.stringify({action,data,auth:auth||"",employeeAuth:employeeAccessToken||""})
+    body:JSON.stringify({action,data,auth:auth||"",employeeAuth:employeeSessionValidated?(employeeAccessToken||""):""})
   },timeoutMs);
   const sessionToken = sessionStorage.getItem("kho_admin_session_token") || "";
   try{
@@ -10194,7 +10342,7 @@ async function commitInventoryTransaction(mode,row,tx,options={}){
     if(result.fingerprint) SERVER_DATA_FINGERPRINT=result.fingerprint;
     return result;
   }catch(firstError){
-    if(!navigator.onLine) throw firstError;
+    if(!navigator.onLine || !isRetryableSyncError(firstError)) throw firstError;
     const result=await postSheet("commit_inventory_transaction",payload,35000);
     if(result.fingerprint) SERVER_DATA_FINGERPRINT=result.fingerprint;
     return result;
@@ -10227,7 +10375,9 @@ async function saveProductRow(row, oldCode="", oldBranch="Q2"){
     if(isRetryableSyncError(e)){
       try{
         await new Promise(resolve=>setTimeout(resolve,1800));
-        const latest=await fetchSheetJson(sheetUrl({type:"data",_ts:Date.now()}),{},45000);
+        const latest=hasPrivateProductDataAccess()
+          ? await privateSheet("private_products",{},45000)
+          : await fetchSheetJson(sheetUrl({type:"data",_ts:Date.now()}),{},45000);
         const safeRow=normalizeSheetRows([row])[0];
         const serverRow=normalizeSheetRows(latest.data||[]).find(r=>
           normalizeProductCode(r[1])===normalizeProductCode(safeRow[1]) &&
@@ -10258,6 +10408,23 @@ async function deleteProductRow(code, branch){
   catch(e){ setPendingSync(hadPendingBefore,hadPendingBefore?"Vẫn còn thay đổi khác đang chờ đồng bộ":""); setSyncBadge("error", String(e)); return false; }
 }
 
+function hasPrivateProductDataAccess(){
+  return isAdminMode() || employeeSessionHasPermission("PRODUCT_ADD") || employeeSessionHasPermission("PRODUCT_EDIT") || employeeSessionHasPermission("PRODUCT_DELETE");
+}
+function sanitizePublicProductRows(rows){
+  return normalizeSheetRows(rows).map(row=>{
+    const safe=row.slice();
+    safe[4]=0;
+    const firstLine=String(safe[7]||"").split(/\r?\n/)[0].trim();
+    safe[7]=/^Vị trí (?:trong kho|kho)\s*:/i.test(firstLine)?firstLine:"";
+    for(let index=14;index<22;index++) safe[index]="";
+    return safe;
+  });
+}
+function stripPrivateProductFieldsFromLocalData(){
+  DATA=sanitizePublicProductRows(DATA);
+  try{ safeLocalStorageSet("kho_cntt_data",JSON.stringify(DATA)); }catch(_){}
+}
 async function loadData(){
   loadLocal();
   const localSnapshot = JSON.parse(JSON.stringify(DATA));
@@ -10266,11 +10433,14 @@ async function loadData(){
   if(SHEET_API_URL){
     setSyncBadge(localHasPending ? "pending" : "loading");
     try{
-      const json = await fetchSheetJson(sheetUrl({type:"data", _ts: Date.now()}));
+      const privateData=hasPrivateProductDataAccess();
+      const json = privateData
+        ? await privateSheet("private_products",{},35000)
+        : await fetchSheetJson(sheetUrl({type:"data", _ts: Date.now()}));
       if(!Array.isArray(json.data)) throw new Error("Máy chủ không có dữ liệu sản phẩm hợp lệ");
       const validationIssues = validateInventoryRows(json.data);
       if(validationIssues.length) throw new Error(inventoryValidationMessage(validationIssues,"máy chủ"));
-      const sheetRows = normalizeSheetRows(json.data);
+      const sheetRows = privateData ? normalizeSheetRows(json.data) : sanitizePublicProductRows(json.data);
       const latestServerFingerprint = String(json.fingerprint || "");
       // Trong lúc GET đang chờ, người dùng có thể vừa sửa dữ liệu hoặc bắt đầu lưu.
       // Không áp dụng phản hồi được tạo trước thao tác đó vì có thể là bản máy chủ cũ.
@@ -10306,9 +10476,11 @@ async function loadData(){
 function loadLocal(){
   try {
     const saved = localStorage.getItem("kho_cntt_data");
-    DATA = saved ? JSON.parse(saved) : (SHEET_API_URL ? [] : JSON.parse(JSON.stringify(DEFAULT_DATA)));
+    const storedRows=saved ? JSON.parse(saved) : (SHEET_API_URL ? [] : JSON.parse(JSON.stringify(DEFAULT_DATA)));
+    DATA = hasPrivateProductDataAccess() ? normalizeSheetRows(storedRows) : sanitizePublicProductRows(storedRows);
+    try{ safeLocalStorageSet("kho_cntt_data",JSON.stringify(DATA)); }catch(_){}
   } catch(e){
-    DATA = SHEET_API_URL ? [] : JSON.parse(JSON.stringify(DEFAULT_DATA));
+    DATA = SHEET_API_URL ? [] : sanitizePublicProductRows(JSON.parse(JSON.stringify(DEFAULT_DATA)));
   }
 }
 
@@ -12651,7 +12823,7 @@ function renderSummaryItemBadges(item,key){
   if(String(key).startsWith("total-")){
     const cost=stock*(Number(r[4])||0), sale=stock*(Number(r[10])||0);
     badges.push(`<span class="summary-mini-badge is-info">Tồn ${stock}</span>`);
-    badges.push(`<span class="summary-mini-badge is-money">Vốn ${formatVndNumber(cost)}đ</span>`);
+    if(hasPrivateProductDataAccess()) badges.push(`<span class="summary-mini-badge is-money">Vốn ${formatVndNumber(cost)}đ</span>`);
     badges.push(`<span class="summary-mini-badge is-money">Bán ${formatVndNumber(sale)}đ</span>`);
     if(item.sales30>0) badges.push(`<span class="summary-mini-badge">Đã bán ${item.sales30}/30 ngày</span>`);
   }else if(String(key).startsWith("restock-")){
@@ -12722,23 +12894,34 @@ function renderTotalStockOverview(el){
   const idleItems=hasActivityData?inStock.filter(item=>item.sales30===0):[];
   summaryProductSets = {"total-all":inStock,"total-q2":q2Items,"total-q5":q5Items,"total-idle":idleItems};
   const totalQty = inStock.reduce((sum,item)=>sum+item.stock,0);
+  const canSeeCost=hasPrivateProductDataAccess();
   const totalCost = inStock.reduce((sum,item)=>sum+item.stock*(Number(item.r[4])||0),0);
   const totalSaleValue = inStock.reduce((sum,item)=>sum+item.stockValue,0);
   const projectedGross=totalSaleValue-totalCost;
   const projectedMargin=totalSaleValue ? (projectedGross*100/totalSaleValue) : 0;
-  const missingCost=inStock.filter(item=>!(Number(item.r[4])>0)).length;
+  const missingCost=canSeeCost?inStock.filter(item=>!(Number(item.r[4])>0)).length:0;
   const missingSale=inStock.filter(item=>!(Number(item.r[10])>0)).length;
-  const completePrices=inStock.filter(item=>Number(item.r[4])>0&&Number(item.r[10])>0).length;
+  const completePrices=inStock.filter(item=>Number(item.r[10])>0&&(!canSeeCost||Number(item.r[4])>0)).length;
   const priceCoverage=inStock.length ? Math.round(completePrices*100/inStock.length) : 0;
   const signedMoney=value=>`${Number(value)<0?"−":""}${formatVndNumber(Math.abs(Number(value)||0))}`;
   const reportBranches=currentBranch==="ALL" ? ["Q2","Q5"] : [currentBranch];
   const branchReport = reportBranches.map(code=>{ const items=code==="Q5"?q5Items:q2Items; const qty=items.reduce((s,item)=>s+item.stock,0), cost=items.reduce((s,item)=>s+item.stock*(Number(item.r[4])||0),0), sale=items.reduce((s,item)=>s+item.stockValue,0); return {code,items:items.length,qty,cost,sale,gross:sale-cost}; });
   const highestValue=inStock.filter(item=>item.stockValue>0).slice(0,6);
-  const priceNotice=(missingCost||missingSale)
-    ? `<div class="overview-alert"><span class="overview-alert-icon">!</span><span>Còn <b>${missingCost}</b> mã chưa có giá nhập và <b>${missingSale}</b> mã chưa có giá bán. Các tổng tiền phía trên đang tạm tính phần thiếu bằng 0.</span></div>`
-    : `<div class="overview-alert is-ok"><span class="overview-alert-icon">✓</span><span>Giá nhập và giá bán đã được khai báo đầy đủ cho toàn bộ mã hàng đang có tồn.</span></div>`;
+  const priceNotice=canSeeCost
+    ? ((missingCost||missingSale)
+      ? `<div class="overview-alert"><span class="overview-alert-icon">!</span><span>Còn <b>${missingCost}</b> mã chưa có giá nhập và <b>${missingSale}</b> mã chưa có giá bán. Các tổng tiền phía trên đang tạm tính phần thiếu bằng 0.</span></div>`
+      : `<div class="overview-alert is-ok"><span class="overview-alert-icon">✓</span><span>Giá nhập và giá bán đã được khai báo đầy đủ cho toàn bộ mã hàng đang có tồn.</span></div>`)
+    : (missingSale
+      ? `<div class="overview-alert"><span class="overview-alert-icon">!</span><span>Còn <b>${missingSale}</b> mã chưa có giá bán. Kỹ thuật vẫn có thể kiểm tồn và vị trí; giá nhập được bảo vệ theo quyền.</span></div>`
+      : `<div class="overview-alert is-ok"><span class="overview-alert-icon">✓</span><span>Giá bán đã đầy đủ. Giá nhập và lợi nhuận chỉ hiển thị trong phiên quản lý được cấp quyền.</span></div>`);
+  const financeCards=canSeeCost
+    ? `<div class="metric-card metric-purple"><span class="metric-number">${formatVndNumber(totalCost)}</span><span class="metric-label">Giá trị vốn · VND</span><span class="metric-note">Theo giá nhập đang lưu</span></div><div class="metric-card metric-green"><span class="metric-number">${formatVndNumber(totalSaleValue)}</span><span class="metric-label">Giá bán dự kiến · VND</span><span class="metric-note">Nếu bán hết tồn hiện tại</span></div><div class="metric-card metric-green"><span class="metric-number">${signedMoney(projectedGross)}</span><span class="metric-label">Lãi gộp dự kiến · VND</span><span class="metric-note">Biên ${projectedMargin.toLocaleString("vi-VN",{maximumFractionDigits:1})}%</span></div>`
+    : `<div class="metric-card metric-green"><span class="metric-number">${formatVndNumber(totalSaleValue)}</span><span class="metric-label">Giá bán dự kiến · VND</span><span class="metric-note">Theo giá bán công khai hiện tại</span></div>`;
+  const reportTable=canSeeCost
+    ? `<div class="management-table-wrap"><table class="management-table"><thead><tr><th>Chi nhánh</th><th>Mã hàng</th><th>Số lượng</th><th>Giá vốn</th><th>Giá bán</th><th>Lãi gộp</th></tr></thead><tbody>${branchReport.map(x=>`<tr><td>📍 ${x.code}</td><td>${x.items}</td><td>${x.qty.toLocaleString("vi-VN")}</td><td>${formatVndNumber(x.cost)}</td><td>${formatVndNumber(x.sale)}</td><td>${signedMoney(x.gross)}</td></tr>`).join("")}</tbody></table></div>`
+    : `<div class="management-table-wrap"><table class="management-table"><thead><tr><th>Chi nhánh</th><th>Mã hàng</th><th>Số lượng</th><th>Giá bán dự kiến</th></tr></thead><tbody>${branchReport.map(x=>`<tr><td>📍 ${x.code}</td><td>${x.items}</td><td>${x.qty.toLocaleString("vi-VN")}</td><td>${formatVndNumber(x.sale)}</td></tr>`).join("")}</tbody></table></div>`;
   const priorityHtml=highestValue.length?`<section class="overview-priority"><div class="overview-priority-head"><span><strong class="overview-priority-title">Giá trị tồn nổi bật</strong><span class="overview-priority-sub">Các mã có giá trị bán dự kiến cao để kế toán và quản lý kiểm tra nhanh</span></span><span class="overview-priority-badge">TOP ${highestValue.length}</span></div><div class="overview-priority-grid">${highestValue.map((item,index)=>`<button type="button" class="overview-priority-item" onclick="openSummaryInventoryItem(${item.i})"><span class="overview-priority-rank">${index+1}</span><span class="overview-priority-name">${renderProductTitleWithCondition(item.r[2]||"Chưa có tên")}</span><span class="overview-priority-meta">${escapeHtml(item.r[1]||"Chưa có mã")} · Tồn ${item.stock} · ${formatVndNumber(item.stockValue)}đ</span></button>`).join("")}</div></section>`:"";
-  const html = `<div class="total-stock-head"><span class="overview-eyebrow">Tổng quan vận hành</span><div class="total-stock-title">📦 BÁO CÁO TỒN KHO · ${scopeLabel}</div><div class="total-stock-sub">Số lượng, giá trị hàng hóa và độ đầy đủ dữ liệu giá trong ${currentBranch==="ALL"?"toàn hệ thống":currentBranch}</div><div class="restock-summary"><button class="metric-card metric-green summary-click" onclick="toggleSummaryProductList('total-all','Hàng đang có · ${scopeLabel}')"><span class="metric-number">${inStock.length}</span><span class="metric-label">Mã hàng đang có tồn</span><span class="metric-note">Bấm để xem danh sách</span></button><div class="metric-card metric-blue"><span class="metric-number">${totalQty.toLocaleString("vi-VN")}</span><span class="metric-label">Tổng sản phẩm trong kho</span><span class="metric-note">Bình quân ${inStock.length?(totalQty/inStock.length).toLocaleString("vi-VN",{maximumFractionDigits:1}):0} / mã</span></div><div class="metric-card metric-purple"><span class="metric-number">${formatVndNumber(totalCost)}</span><span class="metric-label">Giá trị vốn · VND</span><span class="metric-note">Theo giá nhập đang lưu</span></div><div class="metric-card metric-green"><span class="metric-number">${formatVndNumber(totalSaleValue)}</span><span class="metric-label">Giá bán dự kiến · VND</span><span class="metric-note">Nếu bán hết tồn hiện tại</span></div><div class="metric-card metric-green"><span class="metric-number">${signedMoney(projectedGross)}</span><span class="metric-label">Lãi gộp dự kiến · VND</span><span class="metric-note">Biên ${projectedMargin.toLocaleString("vi-VN",{maximumFractionDigits:1})}%</span></div><button class="metric-card metric-yellow summary-click" onclick="toggleSummaryProductList('total-idle','Chưa ghi nhận bán trong 30 ngày · ${scopeLabel}')"><span class="metric-number">${hasActivityData?idleItems.length:"—"}</span><span class="metric-label">Chưa ghi nhận bán 30 ngày</span><span class="metric-note">${hasActivityData?`Độ phủ dữ liệu giá ${priceCoverage}%`:"Chưa tải lịch sử giao dịch"}</span></button></div>${priceNotice}<div class="management-table-wrap"><table class="management-table"><thead><tr><th>Chi nhánh</th><th>Mã hàng</th><th>Số lượng</th><th>Giá vốn</th><th>Giá bán</th><th>Lãi gộp</th></tr></thead><tbody>${branchReport.map(x=>`<tr><td>📍 ${x.code}</td><td>${x.items}</td><td>${x.qty.toLocaleString("vi-VN")}</td><td>${formatVndNumber(x.cost)}</td><td>${formatVndNumber(x.sale)}</td><td>${signedMoney(x.gross)}</td></tr>`).join("")}</tbody></table></div></div>${priorityHtml}<div class="summary-product-list-host"></div>`;
+  const html = `<div class="total-stock-head"><span class="overview-eyebrow">Tổng quan vận hành</span><div class="total-stock-title">📦 BÁO CÁO TỒN KHO · ${scopeLabel}</div><div class="total-stock-sub">${canSeeCost?"Số lượng, giá trị hàng hóa và độ đầy đủ dữ liệu giá":"Số lượng, giá bán và tình trạng hàng hóa"} trong ${currentBranch==="ALL"?"toàn hệ thống":currentBranch}</div><div class="restock-summary"><button class="metric-card metric-green summary-click" onclick="toggleSummaryProductList('total-all','Hàng đang có · ${scopeLabel}')"><span class="metric-number">${inStock.length}</span><span class="metric-label">Mã hàng đang có tồn</span><span class="metric-note">Bấm để xem danh sách</span></button><div class="metric-card metric-blue"><span class="metric-number">${totalQty.toLocaleString("vi-VN")}</span><span class="metric-label">Tổng sản phẩm trong kho</span><span class="metric-note">Bình quân ${inStock.length?(totalQty/inStock.length).toLocaleString("vi-VN",{maximumFractionDigits:1}):0} / mã</span></div>${financeCards}<button class="metric-card metric-yellow summary-click" onclick="toggleSummaryProductList('total-idle','Chưa ghi nhận bán trong 30 ngày · ${scopeLabel}')"><span class="metric-number">${hasActivityData?idleItems.length:"—"}</span><span class="metric-label">Chưa ghi nhận bán 30 ngày</span><span class="metric-note">${hasActivityData?`Độ phủ giá bán ${priceCoverage}%`:"Chưa tải lịch sử giao dịch"}</span></button></div>${priceNotice}${reportTable}</div>${priorityHtml}<div class="summary-product-list-host"></div>`;
   el.innerHTML=html;
   toggleSummaryProductList('total-all',`Hàng đang có · ${scopeLabel}`,false);
 }
@@ -12757,7 +12940,7 @@ function getInventoryAuditReasons(r,context=buildInventoryAuditContext()){
   const reasons = [];
   const location = splitNoteLocation(r[7] || "").location;
   if(!location) reasons.push("Chưa có vị trí kho");
-  if(!(Number(r[4]) > 0)) reasons.push("Chưa có giá nhập");
+  if(hasPrivateProductDataAccess() && !(Number(r[4]) > 0)) reasons.push("Chưa có giá nhập");
   if(!(Number(r[10]) > 0)) reasons.push("Chưa có giá bán");
   if(!getPrimaryRowGroup(r[8])) reasons.push("Chưa phân nhóm");
   if(!String(r[3] || "").trim()) reasons.push("Thiếu thương hiệu");
@@ -12796,7 +12979,9 @@ function renderInventoryAudit(el,results,auditContext=buildInventoryAuditContext
     return;
   }
   const scopeLabel=currentBranch==="ALL"?"TOÀN HỆ THỐNG":`KHO ${currentBranch}`;
-  el.innerHTML=`<div class="audit-head"><span class="overview-eyebrow">Chất lượng dữ liệu</span><div class="audit-title">✓ CHUẨN HÓA DỮ LIỆU KHO · ${scopeLabel}</div><div class="audit-sub">Tách riêng lỗi thông tin sản phẩm; tồn thấp và hết hàng được xử lý tại mục Cần nhập</div><div class="restock-summary"><div class="metric-card metric-green"><span class="metric-number audit-score-ring">${qualityScore}%</span><span class="metric-label">Mã hàng hoàn chỉnh</span><span class="metric-note">${completeCount}/${scopedTotal} mã không thiếu dữ liệu</span></div><button class="metric-card metric-yellow summary-click" onclick="toggleSummaryProductList('audit-all','Toàn bộ mặt hàng cần bổ sung')"><span class="metric-number">${audited.length}</span><span class="metric-label">Cần bổ sung thông tin</span><span class="metric-note">Bấm để xem toàn bộ</span></button><button class="metric-card metric-red summary-click" onclick="toggleSummaryProductList('audit-critical','Mã hàng cần xử lý trước')"><span class="metric-number">${criticalItems.length}</span><span class="metric-label">Lỗi quan trọng</span><span class="metric-note">Thiếu/trùng mã hoặc thiếu tên</span></button><button class="metric-card metric-blue summary-click" onclick="toggleSummaryProductList('audit-location','Mặt hàng chưa có vị trí')"><span class="metric-number">${locationItems.length}</span><span class="metric-label">Thiếu vị trí kho</span><span class="metric-note">Ảnh hưởng việc tìm hàng</span></button><button class="metric-card metric-purple summary-click" onclick="toggleSummaryProductList('audit-pricing','Mặt hàng thiếu dữ liệu giá')"><span class="metric-number">${pricingItems.length}</span><span class="metric-label">Thiếu dữ liệu giá</span><span class="metric-note">Giá nhập hoặc giá bán</span></button></div><div class="management-issues"><button class="management-issue summary-click" onclick="toggleSummaryProductList('audit-cost','Mặt hàng chưa có giá nhập')"><span>Chưa có giá nhập</span><b>${costItems.length}</b></button><button class="management-issue summary-click" onclick="toggleSummaryProductList('audit-price','Mặt hàng chưa có giá bán')"><span>Chưa có giá bán</span><b>${priceItems.length}</b></button><button class="management-issue summary-click" onclick="toggleSummaryProductList('audit-group','Mặt hàng chưa phân nhóm')"><span>Chưa phân nhóm</span><b>${groupItems.length}</b></button><button class="management-issue summary-click" onclick="toggleSummaryProductList('audit-brand','Mặt hàng thiếu thương hiệu')"><span>Thiếu thương hiệu</span><b>${brandItems.length}</b></button><button class="management-issue summary-click" onclick="toggleSummaryProductList('audit-code','Mặt hàng lỗi mã')"><span>Thiếu / trùng mã</span><b>${codeItems.length}</b></button><button class="management-issue summary-click" onclick="toggleSummaryProductList('audit-name','Mặt hàng thiếu tên')"><span>Thiếu tên sản phẩm</span><b>${nameItems.length}</b></button><button class="management-issue summary-click" onclick="toggleSummaryProductList('audit-threshold','Mặt hàng chưa đặt ngưỡng nhập')"><span>Thiếu ngưỡng nhập</span><b>${thresholdItems.length}</b></button><button class="management-issue summary-click" onclick="toggleSummaryProductList('audit-image','Mặt hàng chưa có hình')"><span>Thiếu hình sản phẩm</span><b>${imageItems.length}</b></button></div><div class="overview-alert is-ok"><span class="overview-alert-icon">i</span><span>Mục này chỉ đánh giá độ đầy đủ của dữ liệu. Mỗi thẻ sản phẩm hiển thị đúng các trường cần bổ sung để mọi người xử lý nhanh.</span></div></div><div class="summary-product-list-host"></div>`;
+  const canSeeCost=hasPrivateProductDataAccess();
+  const costIssueButton=canSeeCost?`<button class="management-issue summary-click" onclick="toggleSummaryProductList('audit-cost','Mặt hàng chưa có giá nhập')"><span>Chưa có giá nhập</span><b>${costItems.length}</b></button>`:"";
+  el.innerHTML=`<div class="audit-head"><span class="overview-eyebrow">Chất lượng dữ liệu</span><div class="audit-title">✓ CHUẨN HÓA DỮ LIỆU KHO · ${scopeLabel}</div><div class="audit-sub">Tách riêng lỗi thông tin sản phẩm; tồn thấp và hết hàng được xử lý tại mục Cần nhập</div><div class="restock-summary"><div class="metric-card metric-green"><span class="metric-number audit-score-ring">${qualityScore}%</span><span class="metric-label">Mã hàng hoàn chỉnh</span><span class="metric-note">${completeCount}/${scopedTotal} mã không thiếu dữ liệu</span></div><button class="metric-card metric-yellow summary-click" onclick="toggleSummaryProductList('audit-all','Toàn bộ mặt hàng cần bổ sung')"><span class="metric-number">${audited.length}</span><span class="metric-label">Cần bổ sung thông tin</span><span class="metric-note">Bấm để xem toàn bộ</span></button><button class="metric-card metric-red summary-click" onclick="toggleSummaryProductList('audit-critical','Mã hàng cần xử lý trước')"><span class="metric-number">${criticalItems.length}</span><span class="metric-label">Lỗi quan trọng</span><span class="metric-note">Thiếu/trùng mã hoặc thiếu tên</span></button><button class="metric-card metric-blue summary-click" onclick="toggleSummaryProductList('audit-location','Mặt hàng chưa có vị trí')"><span class="metric-number">${locationItems.length}</span><span class="metric-label">Thiếu vị trí kho</span><span class="metric-note">Ảnh hưởng việc tìm hàng</span></button><button class="metric-card metric-purple summary-click" onclick="toggleSummaryProductList('audit-pricing','Mặt hàng thiếu dữ liệu giá')"><span class="metric-number">${pricingItems.length}</span><span class="metric-label">Thiếu dữ liệu giá</span><span class="metric-note">${canSeeCost?"Giá nhập hoặc giá bán":"Giá bán công khai"}</span></button></div><div class="management-issues">${costIssueButton}<button class="management-issue summary-click" onclick="toggleSummaryProductList('audit-price','Mặt hàng chưa có giá bán')"><span>Chưa có giá bán</span><b>${priceItems.length}</b></button><button class="management-issue summary-click" onclick="toggleSummaryProductList('audit-group','Mặt hàng chưa phân nhóm')"><span>Chưa phân nhóm</span><b>${groupItems.length}</b></button><button class="management-issue summary-click" onclick="toggleSummaryProductList('audit-brand','Mặt hàng thiếu thương hiệu')"><span>Thiếu thương hiệu</span><b>${brandItems.length}</b></button><button class="management-issue summary-click" onclick="toggleSummaryProductList('audit-code','Mặt hàng lỗi mã')"><span>Thiếu / trùng mã</span><b>${codeItems.length}</b></button><button class="management-issue summary-click" onclick="toggleSummaryProductList('audit-name','Mặt hàng thiếu tên')"><span>Thiếu tên sản phẩm</span><b>${nameItems.length}</b></button><button class="management-issue summary-click" onclick="toggleSummaryProductList('audit-threshold','Mặt hàng chưa đặt ngưỡng nhập')"><span>Thiếu ngưỡng nhập</span><b>${thresholdItems.length}</b></button><button class="management-issue summary-click" onclick="toggleSummaryProductList('audit-image','Mặt hàng chưa có hình')"><span>Thiếu hình sản phẩm</span><b>${imageItems.length}</b></button></div><div class="overview-alert is-ok"><span class="overview-alert-icon">i</span><span>Mục này chỉ đánh giá độ đầy đủ của dữ liệu. Mỗi thẻ sản phẩm hiển thị đúng các trường cần bổ sung để mọi người xử lý nhanh.</span></div></div><div class="summary-product-list-host"></div>`;
   toggleSummaryProductList('audit-all','Toàn bộ mặt hàng cần bổ sung',false);
 }
 function renderRestockOverview(el){
@@ -14684,7 +14869,7 @@ function loadTXFromSheet(){
 
 async function refreshPrivateOperationalData(){
   if(!SHEET_API_URL || !isAdminMode()) return;
-  await Promise.allSettled([loadTXFromSheet(),loadTransfersFromSheet(),loadNVFromSheet()]);
+  await Promise.allSettled([loadData(),loadTXFromSheet(),loadTransfersFromSheet(),loadNVFromSheet()]);
   refreshRecentActivityNotification();
   render();
 }
@@ -16793,7 +16978,7 @@ async function submitPrivateAccess(){
   try{
     const verified=await fetchSheetJson(SHEET_API_URL,{
       method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},
-      body:JSON.stringify({action:"verify_employee_access",employee:employeeName,password:value,scope:target})
+      body:JSON.stringify({action:"verify_employee_access",employee:employeeName,password:value,scope:target,clientId:LOGIN_CLIENT_ID})
     },20000);
     if(!verified.token) throw new Error("API không cấp phiên đăng nhập nhân viên");
     if(!verified.employee) throw new Error("API chưa trả lại hồ sơ quyền của nhân viên");
@@ -16801,6 +16986,7 @@ async function submitPrivateAccess(){
     const granted=Array.isArray(verified.employee.permissions) ? verified.employee.permissions.map(permission=>String(permission).toUpperCase()) : [];
     if(needed && !granted.includes(needed)) throw new Error(`EMPLOYEE_PERMISSION_REQUIRED: Tài khoản ${verified.employee.name} chưa được cấp quyền ${EMPLOYEE_PERMISSION_LABELS[needed]}`);
     setEmployeeSession(verified.token,verified.employee);
+    if(granted.includes("PRODUCT_ADD")||granted.includes("PRODUCT_EDIT")||granted.includes("PRODUCT_DELETE")) await loadData();
     if(target==="customer"||target==="partner") activateEmployeePrivateArea(target,verified.token);
     closePrivateAccess();
     showToast(`✅ Đã đăng nhập: ${verified.employee.name} · ${employeeRoleLabel(verified.employee)}`,4500);
@@ -16820,6 +17006,7 @@ async function submitPrivateAccess(){
   }
 }
 function clearPrivateSession(){
+  if(privateAccessToken) void revokeServerSession("logout_private",{privateAuth:privateAccessToken});
   privateAccessToken="";
   CUSTOMER_DATA=[];
   CUSTOMER_RECORDS=[];
@@ -16886,7 +17073,7 @@ function isPrivateAuthFailure(error){
 async function privateSheet(action,data={},timeoutMs=SHEET_TIMEOUT_MS){
   const adminToken=sessionStorage.getItem("kho_admin_session_token") || "";
   const areaToken=getEmployeePrivateAreaToken(privateAccessTarget);
-  const actingAsEmployee=!!employeeAccessToken && !!employeeAccessProfile?.name;
+  const actingAsEmployee=employeeSessionValidated && !!employeeAccessToken && !!employeeAccessProfile?.name;
   try{
     return await fetchSheetJson(SHEET_API_URL,{
       method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},
@@ -18162,7 +18349,6 @@ document.getElementById("adminPass").addEventListener("keydown", function(e){ if
 document.querySelector(".title").addEventListener("click", handleOwnerTap);
 setupVndInputs();
 setupAdminEntry();
-checkAdminSession();
 startSearchPlaceholderTyping();
 startLatestItemsTicker();
 document.getElementById("headerToggleBtn").addEventListener("click", ()=>setTimeout(updateSearchFixedState, 0));
@@ -18710,7 +18896,7 @@ function restoreViewportProductAnchor(anchor){
   }));
 }
 async function syncFromServerIfIdle(forceRetry=false){
-  if(!forceRetry && syncRetryAttempts >= 1) return;
+  if(!forceRetry && syncRetryRunning) return;
   if(backgroundSyncRunning || !SHEET_API_URL || document.hidden || !navigator.onLine) return;
   if(document.querySelector(".overlay.open") || document.body.classList.contains("fab-menu-open")) return;
   backgroundSyncRunning = true;
@@ -18752,6 +18938,7 @@ async function syncFromServerIfIdle(forceRetry=false){
       render();
       restoreViewportProductAnchor(viewportAnchor);
     }
+    clearSyncRetry(true);
   }catch(e){
     console.warn("Lỗi đồng bộ nền:", e);
   }finally{
@@ -19008,6 +19195,8 @@ async function submitInventoryTransfer(){
 }
 
 (async function init(){
+  const sessionValidationPromise=Promise.allSettled([checkAdminSession(),validateRestoredEmployeeSession()]);
+  void sessionValidationPromise.then(()=>{ refreshEmployeePermissionUI(); render(); });
   refreshEmployeePermissionUI();
   syncWarehouseBranchUI();
   showLastSync();
@@ -19030,6 +19219,7 @@ async function submitInventoryTransfer(){
   // nếu thiết bị có thay đổi chưa gửi thì giữ nguyên bản cục bộ, tuyệt đối không
   // lấy dữ liệu máy chủ về ghi đè.
   void (async()=>{
+    await sessionValidationPromise;
     try{
       await Promise.allSettled([
         loadData(),
