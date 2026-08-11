@@ -78,8 +78,23 @@ button:disabled,input:disabled,select:disabled,[aria-disabled="true"] { cursor:n
 .recent-activity-all { padding:5px 8px; border:0; border-radius:8px; background:#EBF5FB; color:#1676B8; font-size:10px; font-weight:900; cursor:pointer; }
 .recent-activity-close { display:grid; place-items:center; width:27px; height:27px; padding:0; border:1px solid rgba(255,255,255,.25); border-radius:8px; background:rgba(255,255,255,.12); color:#fff; font-size:17px; line-height:1; cursor:pointer; }
 .recent-activity-close:hover { background:rgba(255,255,255,.24); }
+.recent-activity-overview { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:6px; padding:9px 10px 8px; border-bottom:1px solid #E2EBF2; background:linear-gradient(180deg,#F8FBFE,#F2F7FB); }
+.recent-activity-overview-item { min-width:0; padding:7px 5px; border:1px solid #DFEAF2; border-radius:10px; background:#fff; box-shadow:0 2px 7px rgba(21,64,94,.045); text-align:center; }
+.recent-activity-overview-value { display:block; color:#143D63; font-size:13px; font-weight:950; line-height:1.1; }
+.recent-activity-overview-label { display:block; margin-top:3px; overflow:hidden; color:#728698; font-size:8px; font-weight:850; line-height:1.15; text-overflow:ellipsis; white-space:nowrap; }
+.recent-activity-filters { display:flex; gap:5px; padding:7px 10px; overflow-x:auto; border-bottom:1px solid #E1EAF1; background:#fff; scrollbar-width:none; }
+.recent-activity-filters::-webkit-scrollbar { display:none; }
+.recent-activity-filter { display:inline-flex; flex:0 0 auto; align-items:center; gap:4px; min-height:27px; padding:5px 8px; border:1px solid #D9E6F0; border-radius:999px; background:#F7FAFC; color:#526B7E; font-size:9px; font-weight:900; white-space:nowrap; cursor:pointer; transition:.16s ease; }
+.recent-activity-filter span { display:grid; place-items:center; min-width:16px; height:16px; padding:0 4px; border-radius:999px; background:#E5EEF5; color:#486276; font-size:8px; }
+.recent-activity-filter:hover { border-color:#78B8E0; background:#F1F8FD; color:#176DA8; }
+.recent-activity-filter.active { border-color:#167DBD; background:#167DBD; color:#fff; box-shadow:0 4px 10px rgba(22,125,189,.2); }
+.recent-activity-filter.active span { background:rgba(255,255,255,.2); color:#fff; }
 .recent-activity-list { max-height:min(62vh,470px); overflow:auto; overscroll-behavior:contain; padding:7px 10px 10px; background:#F7FAFD; scrollbar-width:thin; }
 .recent-activity-row { width:100%; display:grid; grid-template-columns:38px minmax(0,1fr) auto; gap:10px; align-items:center; margin:5px 0; padding:10px; border:1px solid #E4EDF4; border-radius:12px; background:#fff; color:inherit; box-shadow:0 2px 7px rgba(22,62,92,.05); text-align:left; cursor:pointer; transition:border-color .16s ease,box-shadow .16s ease,background .16s ease; }
+.recent-activity-row.kind-import { border-left:3px solid #20A957; }
+.recent-activity-row.kind-sale { border-left:3px solid #ED4A54; }
+.recent-activity-row.kind-adjust { border-left:3px solid #F28C28; }
+.recent-activity-row.kind-transfer { border-left:3px solid #7C62D8; }
 .recent-activity-row:hover,.recent-activity-row:focus-visible { border-color:#69B5E7; background:#F4FAFF; box-shadow:0 5px 15px rgba(31,111,166,.13); outline:none; }
 .recent-activity-row.transfer { border-color:#F0D49B; background:linear-gradient(135deg,#FFFDF7,#FFF7E7); }
 .recent-activity-row.transfer:hover,.recent-activity-row.transfer:focus-visible { border-color:#D9A441; background:#FFF7E6; box-shadow:0 5px 15px rgba(185,119,14,.15); }
@@ -89,7 +104,13 @@ button:disabled,input:disabled,select:disabled,[aria-disabled="true"] { cursor:n
 .recent-activity-kind-icon.sale { background:#FDEDEC; color:#D63D35; }
 .recent-activity-kind-icon.adjust { background:#FEF5E7; color:#CA7611; }
 .recent-activity-copy { display:block; min-width:0; overflow:hidden; }
-.recent-activity-action { display:block; max-width:100%; overflow:hidden; color:#25394B; font-size:11px; font-weight:850; text-overflow:ellipsis; white-space:nowrap; }
+.recent-activity-action-line { display:flex; align-items:center; gap:5px; min-width:0; }
+.recent-activity-action { display:block; min-width:0; max-width:100%; overflow:hidden; color:#25394B; font-size:11px; font-weight:850; text-overflow:ellipsis; white-space:nowrap; }
+.recent-activity-kind-chip { display:inline-flex; flex:0 0 auto; align-items:center; min-height:17px; padding:2px 5px; border-radius:999px; font-size:7.5px; font-weight:950; letter-spacing:.025em; line-height:1; }
+.recent-activity-kind-chip.import { background:#E7F7EE; color:#138247; }
+.recent-activity-kind-chip.sale { background:#FDEBEC; color:#C9343D; }
+.recent-activity-kind-chip.adjust { background:#FFF1DD; color:#B96508; }
+.recent-activity-kind-chip.transfer { background:#F0EDFF; color:#694FC5; }
 .recent-activity-product { display:block; max-width:100%; margin-top:2px; overflow:hidden; color:#6B7D8C; font-size:10px; text-overflow:ellipsis; white-space:nowrap; }
 .recent-activity-progress { --activity-progress-color:#22A559; display:block; width:100%; height:4px; margin-top:6px; overflow:hidden; border-radius:999px; background:#E8EEF3; box-shadow:inset 0 1px 2px rgba(30,58,95,.08); }
 .recent-activity-progress > i { display:block; width:var(--activity-progress,0%); height:100%; border-radius:inherit; background:var(--activity-progress-color); box-shadow:0 0 6px color-mix(in srgb,var(--activity-progress-color) 42%,transparent); transform-origin:left center; animation:recentActivityProgressIn .48s cubic-bezier(.22,.72,.25,1) var(--activity-progress-delay,0ms) both; }
@@ -102,7 +123,8 @@ button:disabled,input:disabled,select:disabled,[aria-disabled="true"] { cursor:n
 .recent-activity-route { display:inline-flex; align-items:center; margin-left:4px; padding:2px 6px; border:1px solid #E5BD71; border-radius:999px; background:#FFF0CE; color:#865505; font-size:9px; font-weight:950; white-space:nowrap; vertical-align:1px; }
 .recent-activity-daily { display:block; max-width:100%; margin-top:5px; padding:5px 7px; border-radius:7px; background:#FFF0CE; color:#78500E; font-size:9px; font-weight:750; line-height:1.35; white-space:normal; }
 .recent-activity-daily b { font-weight:950; }
-.recent-activity-time { color:#738494; font-size:9px; font-weight:750; white-space:nowrap; }
+.recent-activity-time { display:flex; flex-direction:column; align-items:flex-end; gap:2px; color:#536D80; font-size:9px; font-weight:850; white-space:nowrap; }
+.recent-activity-time small { color:#8A9AA7; font-size:7.5px; font-weight:700; }
 .recent-activity-row > .recent-activity-avatar { width:32px; height:32px; min-width:32px; font-size:12px; border:2px solid #fff; box-shadow:0 3px 9px rgba(19,75,111,.18); }
 .recent-activity-row > .recent-activity-avatar.has-preview { position:relative; z-index:2; cursor:zoom-in!important; }
 .recent-activity-empty { padding:25px 14px; color:#718291; font-size:11px; text-align:center; }
@@ -111,13 +133,19 @@ button:disabled,input:disabled,select:disabled,[aria-disabled="true"] { cursor:n
   .recent-activity-bell svg{width:18px;height:18px}
   .recent-activity-count{top:1px;right:1px}
   .recent-activity-panel{position:fixed;top:58px;right:8px;left:8px;width:auto;max-height:calc(100dvh - 70px);border-radius:14px}
-  .recent-activity-list{max-height:calc(100dvh - 132px);padding:6px}
+  .recent-activity-overview{gap:4px;padding:7px 6px 6px}
+  .recent-activity-overview-item{padding:6px 3px}
+  .recent-activity-overview-value{font-size:11px}
+  .recent-activity-overview-label{font-size:7px}
+  .recent-activity-filters{padding:6px}
+  .recent-activity-list{max-height:calc(100dvh - 220px);padding:6px}
   .recent-activity-row{grid-template-columns:34px minmax(0,1fr);grid-template-rows:auto auto;gap:3px 8px;align-items:start;padding:9px 8px}
   .recent-activity-kind-icon,.recent-activity-row > .recent-activity-avatar{grid-column:1;grid-row:1 / span 2;width:30px;height:30px;min-width:30px;margin-top:1px}
   .recent-activity-copy{grid-column:2;grid-row:1;width:100%}
   .recent-activity-action{font-size:10.5px;line-height:1.3}
   .recent-activity-product{font-size:9.5px;line-height:1.3}
-  .recent-activity-time{grid-column:2;grid-row:2;justify-self:start;margin-top:1px;padding:2px 5px;border-radius:999px;background:#EDF4F9;color:#587083;font-size:8px;line-height:1.2}
+  .recent-activity-time{grid-column:2;grid-row:2;justify-self:start;align-items:flex-start;margin-top:1px;padding:2px 5px;border-radius:999px;background:#EDF4F9;color:#587083;font-size:8px;line-height:1.2}
+  .recent-activity-time small{display:none}
 }
 .warehouse-switch.active .warehouse-pin { animation:warehousePinFire .72s ease-in-out infinite alternate; filter:drop-shadow(0 0 3px #FF3B1F) drop-shadow(0 -2px 5px #FFB000); }
 .warehouse-switch.active .warehouse-pin::after { content:""; position:absolute; z-index:-1; left:50%; bottom:45%; width:13px; height:17px; border-radius:52% 48% 55% 45%; background:radial-gradient(circle at 50% 72%,#FFF59D 0 18%,#FFB000 24% 48%,#F44336 55% 76%,transparent 80%); opacity:.82; transform:translateX(-50%) rotate(4deg); animation:warehouseFlame .48s ease-in-out infinite alternate; pointer-events:none; }
@@ -7940,7 +7968,7 @@ body .warehouse-switch.warehouse-switch-changing .warehouse-pin{
       <button class="admin-btn admin-only" id="syncBtn" type="button" title="Đồng bộ thủ công lên máy chủ" aria-label="Đồng bộ thủ công lên máy chủ" onclick="manualSync()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7h-5V2"></path><path d="M4 17h5v5"></path><path d="M5.2 9A8 8 0 0 1 18.5 5.5L20 7"></path><path d="M18.8 15A8 8 0 0 1 5.5 18.5L4 17"></path></svg></button>
       <button class="admin-btn admin-profile-btn" id="adminBtn" type="button" aria-label="Mở quản trị" onclick="onAdminBtnClick()"><span class="admin-profile-avatar">A</span><span class="admin-profile-copy"><span class="admin-profile-name">Quản trị</span><span class="admin-profile-role">Đăng nhập</span></span><svg class="admin-profile-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m7 9 5 5 5-5"></path></svg></button>
     </div>
-    <div class="title"><span class="title-logo-slot"><img class="title-icon title-brand-logo" id="headerBrandLogo" src="" alt="Logo cửa hàng" hidden onerror="this.hidden=true;document.getElementById('headerBrandFallback').hidden=false"><span class="title-icon title-brand-fallback" id="headerBrandFallback" aria-hidden="true">🏪</span></span><span class="title-text"><span class="title-base">HOÀNG GIA COMPUTER</span><span class="title-shine" aria-hidden="true"></span></span><div class="recent-activity-wrap" id="recentActivityWrap"><button type="button" class="recent-activity-bell" id="recentActivityBell" aria-label="Mở thông báo giao dịch mới" aria-expanded="false" onclick="toggleRecentActivity(event)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"></path><path d="M10 21h4"></path></svg><span class="recent-activity-count" id="recentActivityCount"></span><span class="header-control-tooltip" aria-hidden="true"><span class="header-tooltip-title">GIAO DỊCH GẦN ĐÂY</span><span class="header-tooltip-status" id="recentActivityTooltipStatus">Không có giao dịch mới</span></span></button><div class="recent-activity-panel" id="recentActivityPanel"><div class="recent-activity-head"><span class="recent-activity-title">HOẠT ĐỘNG GẦN ĐÂY</span><span class="recent-activity-head-actions"><button type="button" class="recent-activity-all" id="recentActivityAll" onclick="toggleAllRecentActivity(event)">Xem tất cả</button><button type="button" class="recent-activity-close" aria-label="Đóng hoạt động gần đây" onclick="closeRecentActivity();event.stopPropagation()">×</button></span></div><div class="recent-activity-list" id="recentActivityList"></div></div></div><span class="warehouse-switcher" role="group" aria-label="Chọn kho đang xem"><button type="button" class="warehouse-switch" data-warehouse="Q2" aria-label="KHO Q2" onclick="selectWarehouseBranch('Q2')"><span class="warehouse-pin">📍</span> Q2<span class="header-control-tooltip" aria-hidden="true"><span class="header-tooltip-title">KHO Q2</span></span></button><button type="button" class="warehouse-switch" data-warehouse="Q5" aria-label="KHO Q5" onclick="selectWarehouseBranch('Q5')"><span class="warehouse-pin">📍</span> Q5<span class="header-control-tooltip" aria-hidden="true"><span class="header-tooltip-title">KHO Q5</span></span></button></span></div>
+    <div class="title"><span class="title-logo-slot"><img class="title-icon title-brand-logo" id="headerBrandLogo" src="" alt="Logo cửa hàng" hidden onerror="this.hidden=true;document.getElementById('headerBrandFallback').hidden=false"><span class="title-icon title-brand-fallback" id="headerBrandFallback" aria-hidden="true">🏪</span></span><span class="title-text"><span class="title-base">HOÀNG GIA COMPUTER</span><span class="title-shine" aria-hidden="true"></span></span><div class="recent-activity-wrap" id="recentActivityWrap"><button type="button" class="recent-activity-bell" id="recentActivityBell" aria-label="Mở thông báo giao dịch mới" aria-expanded="false" onclick="toggleRecentActivity(event)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"></path><path d="M10 21h4"></path></svg><span class="recent-activity-count" id="recentActivityCount"></span><span class="header-control-tooltip" aria-hidden="true"><span class="header-tooltip-title">GIAO DỊCH GẦN ĐÂY</span><span class="header-tooltip-status" id="recentActivityTooltipStatus">Không có giao dịch mới</span></span></button><div class="recent-activity-panel" id="recentActivityPanel"><div class="recent-activity-head"><span class="recent-activity-title">GIAO DỊCH GẦN ĐÂY</span><span class="recent-activity-head-actions"><button type="button" class="recent-activity-all" id="recentActivityAll" onclick="toggleAllRecentActivity(event)">Xem tất cả</button><button type="button" class="recent-activity-close" aria-label="Đóng giao dịch gần đây" onclick="closeRecentActivity();event.stopPropagation()">×</button></span></div><div class="recent-activity-overview" id="recentActivityOverview" aria-label="Tóm tắt hoạt động hôm nay"></div><div class="recent-activity-filters" id="recentActivityFilters" role="group" aria-label="Lọc giao dịch"><button type="button" class="recent-activity-filter active" data-recent-filter="ALL" aria-pressed="true" onclick="setRecentActivityFilter('ALL',event)">Tất cả <span>0</span></button><button type="button" class="recent-activity-filter" data-recent-filter="IMPORT" aria-pressed="false" onclick="setRecentActivityFilter('IMPORT',event)">Nhập <span>0</span></button><button type="button" class="recent-activity-filter" data-recent-filter="SALE" aria-pressed="false" onclick="setRecentActivityFilter('SALE',event)">Xuất <span>0</span></button><button type="button" class="recent-activity-filter" data-recent-filter="TRANSFER" aria-pressed="false" onclick="setRecentActivityFilter('TRANSFER',event)">Chuyển <span>0</span></button><button type="button" class="recent-activity-filter" data-recent-filter="ADJUST" aria-pressed="false" onclick="setRecentActivityFilter('ADJUST',event)">Điều chỉnh <span>0</span></button></div><div class="recent-activity-list" id="recentActivityList"></div></div></div><span class="warehouse-switcher" role="group" aria-label="Chọn kho đang xem"><button type="button" class="warehouse-switch" data-warehouse="Q2" aria-label="KHO Q2" onclick="selectWarehouseBranch('Q2')"><span class="warehouse-pin">📍</span> Q2<span class="header-control-tooltip" aria-hidden="true"><span class="header-tooltip-title">KHO Q2</span></span></button><button type="button" class="warehouse-switch" data-warehouse="Q5" aria-label="KHO Q5" onclick="selectWarehouseBranch('Q5')"><span class="warehouse-pin">📍</span> Q5<span class="header-control-tooltip" aria-hidden="true"><span class="header-tooltip-title">KHO Q5</span></span></button></span></div>
     <div class="kpi-row">
       <div class="kpi" style="background: #2E86C1;" onclick="showKpiDetail('all')" onmouseenter="showKpiHoverMenu('all',this)" onmouseleave="scheduleKpiHoverClose()"><div class="kpi-v"><span class="kpi-icon kpi-icon-box" aria-hidden="true">📦</span><span id="kpi-mh">0</span></div><div class="kpi-l">mặt hàng <span class="kpi-hint">▼</span></div><div class="kpi-insight" id="kpi-insight-all"></div></div>
       <div class="kpi" style="background: #1E8449;" onclick="showKpiDetail('ton')" onmouseenter="showKpiHoverMenu('ton',this)" onmouseleave="scheduleKpiHoverClose()"><div class="kpi-v"><span class="kpi-icon kpi-icon-stock" aria-hidden="true">📊</span><span id="kpi-ton">0</span></div><div class="kpi-l">tổng tồn <span class="kpi-hint">▼</span></div><div class="kpi-insight" id="kpi-insight-ton"></div></div>
@@ -9518,7 +9546,7 @@ function checkAdminSession(){
 
 // Dòng URL duy nhất
 const SHEET_API_URL = "https://script.google.com/macros/s/AKfycby6YH69F7sfO1ZoUJsDm4BeX6Luj2GrhUfYWWJWNvqjraAEhkBck16EphrPBBm1BT3YqA/exec";
-const REQUIRED_API_VERSION = "2026.08.10-private-permission-strict-06";
+const REQUIRED_API_VERSION = "2026.08.11-recent-activity-safe-07";
 // Apps Script có thể phải chờ khóa ghi khi nhiều thao tác diễn ra gần nhau.
 // 45 giây dài hơn thời gian chờ khóa phía máy chủ, tránh báo lỗi giả trong khi Sheet vẫn đang ghi.
 const SHEET_TIMEOUT_MS = 45000;
@@ -14061,21 +14089,64 @@ function clearAdminOperationalView(){
 }
 const TRANSFER_CACHE_KEY = "kho_cntt_transfers";
 const PUBLIC_RECENT_ACTIVITY_CACHE_KEY = "kho_cntt_public_full_activity_v2";
+function toPublicRecentTxItem(item){
+  const tx=normalizeTxItem(item);
+  if(!tx) return null;
+  return {
+    id:tx.id,
+    ma:tx.ma,
+    ten:tx.ten,
+    sh:tx.sh,
+    nv:tx.nv,
+    qty:tx.qty,
+    time:tx.time,
+    branch:tx.branch,
+    kind:getTransactionKind(tx)
+  };
+}
+function toPublicRecentTransferItem(item){
+  const transfer=normalizeTransferItem(item);
+  if(!transfer) return null;
+  return {
+    id:transfer.id,
+    time:transfer.time,
+    from:transfer.from,
+    to:transfer.to,
+    code:transfer.code,
+    name:transfer.name,
+    qty:transfer.qty,
+    employee:transfer.employee,
+    status:transfer.status
+  };
+}
+function toPublicRecentEmployee(item){
+  const employee=normalizeNVItem(item);
+  if(!employee) return null;
+  return {name:employee.name,avatar:employee.avatar,role:employee.role,badgeIcon:employee.badgeIcon};
+}
 function applyPublicRecentActivity(data){
-  TX_DATA=normalizeTxList(Array.isArray(data?.tx)?data.tx:[]);
-  TRANSFER_DATA=normalizeTransferList(Array.isArray(data?.transfers)?data.transfers:[]);
-  NV_LIST=normalizeNVList(Array.isArray(data?.nv)?data.nv:[]);
+  // Dọn cả cache cũ trên máy: bảng công khai chỉ giữ các trường cần hiển thị.
+  TX_DATA=(Array.isArray(data?.tx)?data.tx:[]).map(toPublicRecentTxItem).filter(Boolean);
+  TRANSFER_DATA=(Array.isArray(data?.transfers)?data.transfers:[]).map(toPublicRecentTransferItem).filter(item=>item && item.id && item.status==="COMPLETED");
+  NV_LIST=(Array.isArray(data?.nv)?data.nv:[]).map(toPublicRecentEmployee).filter(Boolean);
   refreshRecentActivityNotification();
 }
 function loadPublicRecentCache(){
-  try{applyPublicRecentActivity(JSON.parse(localStorage.getItem(PUBLIC_RECENT_ACTIVITY_CACHE_KEY)||"{}"));}
+  try{
+    applyPublicRecentActivity(JSON.parse(localStorage.getItem(PUBLIC_RECENT_ACTIVITY_CACHE_KEY)||"{}"));
+    safeLocalStorageSet(PUBLIC_RECENT_ACTIVITY_CACHE_KEY,JSON.stringify({tx:TX_DATA,transfers:TRANSFER_DATA,nv:NV_LIST}));
+  }
   catch(_){TX_DATA=[];TRANSFER_DATA=[];NV_LIST=[];}
 }
 async function loadPublicRecentActivityFromSheet(){
   if(!SHEET_API_URL || isAdminMode()) return;
   try{
     const json=await fetchSheetJson(sheetUrl({type:"recent_activity",_ts:Date.now()}),{},35000);
-    const snapshot={tx:Array.isArray(json.tx)?json.tx:[],transfers:Array.isArray(json.transfers)?json.transfers:[],nv:Array.isArray(json.nv)?json.nv:[]};
+    const snapshot={
+      tx:(Array.isArray(json.tx)?json.tx:[]).map(toPublicRecentTxItem).filter(Boolean),
+      transfers:(Array.isArray(json.transfers)?json.transfers:[]).map(toPublicRecentTransferItem).filter(item=>item && item.id && item.status==="COMPLETED"),
+      nv:(Array.isArray(json.nv)?json.nv:[]).map(toPublicRecentEmployee).filter(Boolean)
+    };
     applyPublicRecentActivity(snapshot);
     safeLocalStorageSet(PUBLIC_RECENT_ACTIVITY_CACHE_KEY,JSON.stringify(snapshot));
   }catch(error){console.warn("Chưa tải được giao dịch gần đây dùng chung:",error);}
@@ -14120,7 +14191,8 @@ function normalizeTxItem(tx){
       time: String(tx.time || tx.createdAt || ""), branch: String(tx.branch || "Q2"),
       vatRate: Number(tx.vatRate || 0) || 0, basePrice: Number(tx.basePrice || tx.gia || tx.price || 0) || 0,
       warranty1: String(tx.warranty1 || ""), warranty2: String(tx.warranty2 || ""), unitIds:Array.isArray(tx.unitIds)?tx.unitIds.map(String):String(tx.unitIds||"").split(/\s*\|\s*/).filter(Boolean),
-      unitDetails:Array.isArray(tx.unitDetails)?tx.unitDetails.map(item=>({id:String(item?.id||""),serial:String(item?.serial||"")})).filter(item=>item.id):[]
+      unitDetails:Array.isArray(tx.unitDetails)?tx.unitDetails.map(item=>({id:String(item?.id||""),serial:String(item?.serial||"")})).filter(item=>item.id):[],
+      kind:String(tx.kind||"").trim().toUpperCase()
     };
   }
   return null;
@@ -14190,7 +14262,9 @@ function getRecentActivityKind(item){
   return item?.recentKind==="TRANSFER" ? "TRANSFER" : getTransactionKind(item);
 }
 const RECENT_TX_SEEN_KEY = "kho_cntt_recent_tx_seen";
+const RECENT_TX_SEEN_READY_KEY = "kho_cntt_recent_tx_seen_ready_v2";
 let recentActivityExpanded = false;
+let recentActivityFilter = "ALL";
 function recentTxSorted(){
   const rows=TX_DATA.slice().concat(TRANSFER_DATA.map(transferToRecentItem));
   return rows.sort((a,b)=>{
@@ -14219,12 +14293,69 @@ function markRecentActivitySeen(rows){
   rows.forEach(tx=>seen.add(recentTxSignature(tx)));
   const keys=Array.from(seen);
   safeLocalStorageSet(RECENT_TX_SEEN_KEY,JSON.stringify(keys.slice(Math.max(0,keys.length-5000))));
+  if(rows.length) safeLocalStorageSet(RECENT_TX_SEEN_READY_KEY,"1");
+}
+function initializeRecentActivitySeenBaseline(rows){
+  let ready=false;
+  try{ ready=localStorage.getItem(RECENT_TX_SEEN_READY_KEY)==="1"; }catch(_){ ready=true; }
+  if(!rows.length || ready) return false;
+  markRecentActivitySeen(rows);
+  return true;
 }
 function recentActivityTimeLabel(value){
   const full=formatTxTime(value);
   const m=full.match(/^(\d{2})\/(\d{2})\/(\d{4})\s+(\d{2}:\d{2}(?::\d{2})?)/);
   if(!m) return full;
   return `${m[1]}/${m[2]}/${m[3]} ${m[4]}`;
+}
+function recentActivityRelativeTime(value){
+  const timestamp=txTimeSortValue({time:value});
+  if(!timestamp) return recentActivityTimeLabel(value);
+  const diff=Math.max(0,Date.now()-timestamp);
+  const minute=60*1000, hour=60*minute, day=24*hour;
+  if(diff<minute) return "Vừa xong";
+  if(diff<hour) return `${Math.max(1,Math.floor(diff/minute))} phút trước`;
+  if(diff<day) return `${Math.max(1,Math.floor(diff/hour))} giờ trước`;
+  if(diff<7*day) return `${Math.max(1,Math.floor(diff/day))} ngày trước`;
+  return recentActivityTimeLabel(value).slice(0,10);
+}
+function recentActivityKindLabel(kind){
+  if(kind==="IMPORT") return "NHẬP";
+  if(kind==="ADJUST") return "ĐIỀU CHỈNH";
+  if(kind==="TRANSFER") return "CHUYỂN";
+  return "XUẤT";
+}
+function recentActivityFilteredRows(rows){
+  return recentActivityFilter==="ALL" ? rows : rows.filter(item=>getRecentActivityKind(item)===recentActivityFilter);
+}
+function setRecentActivityFilter(filter,event){
+  event?.stopPropagation();
+  const allowed=["ALL","IMPORT","SALE","TRANSFER","ADJUST"];
+  recentActivityFilter=allowed.includes(filter) ? filter : "ALL";
+  recentActivityExpanded=false;
+  renderRecentActivity();
+}
+function renderRecentActivityOverview(rows){
+  const todayKey=parseTxDateKey(new Date());
+  const today=rows.filter(item=>parseTxDateKey(item.time)===todayKey);
+  const quantity=kind=>today.filter(item=>getRecentActivityKind(item)===kind).reduce((sum,item)=>sum+Math.abs(Number(item.qty)||0),0);
+  const overview=document.getElementById("recentActivityOverview");
+  if(overview){
+    overview.innerHTML=[
+      [today.length,"Giao dịch hôm nay"],
+      [quantity("IMPORT"),"Sản phẩm nhập"],
+      [quantity("SALE"),"Sản phẩm xuất"],
+      [quantity("TRANSFER"),"Sản phẩm chuyển"]
+    ].map(item=>`<span class="recent-activity-overview-item"><b class="recent-activity-overview-value">${Number(item[0]).toLocaleString("vi-VN")}</b><small class="recent-activity-overview-label">${item[1]}</small></span>`).join("");
+  }
+  document.querySelectorAll(".recent-activity-filter").forEach(button=>{
+    const filter=String(button.dataset.recentFilter||"ALL");
+    const count=filter==="ALL" ? rows.length : rows.filter(item=>getRecentActivityKind(item)===filter).length;
+    button.classList.toggle("active",filter===recentActivityFilter);
+    button.setAttribute("aria-pressed",String(filter===recentActivityFilter));
+    const badge=button.querySelector("span");
+    if(badge) badge.textContent=count>999 ? "999+" : String(count);
+  });
 }
 function getEmployeeTransferDaySummary(tx,rows){
   const dateKey=parseTxDateKey(tx?.time);
@@ -14246,35 +14377,38 @@ function renderRecentActivity(){
   const title=document.querySelector(".recent-activity-title");
   if(title) title.textContent="GIAO DỊCH GẦN ĐÂY";
   const rows=recentTxSorted();
-  const shown=recentActivityExpanded ? rows : rows.slice(0,5);
+  renderRecentActivityOverview(rows);
+  const filteredRows=recentActivityFilteredRows(rows);
+  const shown=recentActivityExpanded ? filteredRows : filteredRows.slice(0,5);
   const allBtn=document.getElementById("recentActivityAll");
   if(allBtn){
-    allBtn.hidden=rows.length<=5;
+    allBtn.hidden=filteredRows.length<=5;
     allBtn.textContent=recentActivityExpanded ? "Thu gọn" : "Xem tất cả";
   }
   if(!shown.length){
-    list.innerHTML='<div class="recent-activity-empty">Chưa có giao dịch nào.</div>';
+    const emptyLabel=recentActivityFilter==="ALL" ? "Chưa có giao dịch nào." : "Chưa có giao dịch thuộc nhóm này.";
+    list.innerHTML=`<div class="recent-activity-empty">${emptyLabel}</div>`;
     return;
   }
   const maxShownQty=Math.max(1,...shown.map(item=>Math.abs(Number(item.qty)||0)));
   const progressTones=["green","blue","violet","orange","red"];
   list.innerHTML=shown.map((tx,index)=>{
     const kind=getRecentActivityKind(tx);
+    const kindClass=kind.toLowerCase();
     const info=getTransactionProductDisplay(tx,null);
     const qty=Math.abs(Number(tx.qty)||0);
     const isTransfer=kind==="TRANSFER";
     const from=String(tx.from||"Q2").toUpperCase()==="Q5" ? "Q5" : "Q2";
     const to=String(tx.to||tx.branch||"Q2").toUpperCase()==="Q5" ? "Q5" : "Q2";
     const action=isTransfer ? "chuyển kho" : kind==="IMPORT" ? "nhập hàng" : kind==="ADJUST" ? "điều chỉnh kho" : "xuất hàng";
-    const route=isTransfer ? `<span class="recent-activity-route">${from} → ${to}</span>` : "";
-    const summary=isTransfer ? getEmployeeTransferDaySummary(tx,rows) : null;
-    const dayLabel=recentActivityTimeLabel(tx.time).slice(0,10);
-    const daily=isTransfer ? `<span class="recent-activity-daily">Trong ngày ${escapeHtml(dayLabel)}: <b>${escapeHtml(tx.nv||"Nhân viên")}</b> đã chuyển <b>${summary.qty} sản phẩm</b> thuộc <b>${summary.products} mặt hàng</b> sang <b>${to}</b>.</span>` : "";
+    const route=`<span class="recent-activity-route">${isTransfer?`${from} → ${to}`:to}</span>`;
     const progressPercent=qty?Math.max(10,Math.min(100,Math.round(qty/maxShownQty*100))):0;
     const progressTone=progressTones[index%progressTones.length];
-    const progress=`<span class="recent-activity-progress tone-${progressTone}" style="--activity-progress:${progressPercent}%;--activity-progress-delay:${Math.min(index,8)*45}ms" aria-hidden="true"><i></i></span>`;
+    const progressTitle=qty ? `Số lượng ${qty}; bằng ${progressPercent}% giao dịch lớn nhất đang hiển thị` : "Chưa có số lượng";
+    const progress=`<span class="recent-activity-progress tone-${progressTone}" style="--activity-progress:${progressPercent}%;--activity-progress-delay:${Math.min(index,8)*45}ms" role="img" aria-label="${escapeHtml(progressTitle)}" title="${escapeHtml(progressTitle)}"><i></i></span>`;
     const employeeAvatar=renderNVAvatar(tx.nv||"Chưa rõ nhân viên","recent-activity-avatar");
-    return `<button type="button" class="recent-activity-row${isTransfer?" transfer":""}" data-code="${escapeHtml(tx.ma||"")}" data-branch="${escapeHtml(tx.branch||"Q2")}" title="Mở sản phẩm này tại ${escapeHtml(tx.branch||"Q2")}" onclick="openRecentActivityProduct(this,event)">${employeeAvatar}<span class="recent-activity-copy"><span class="recent-activity-action">${escapeHtml(tx.nv||"Chưa rõ nhân viên")} ${action}${route}</span><span class="recent-activity-product">${escapeHtml(info.currentName||tx.ma||"Sản phẩm")}${qty?` (${qty} cái)`:""}</span>${progress}${daily}</span><span class="recent-activity-time">${escapeHtml(recentActivityTimeLabel(tx.time))}</span></button>`;
+    const fullTime=recentActivityTimeLabel(tx.time);
+    return `<button type="button" class="recent-activity-row kind-${kindClass}${isTransfer?" transfer":""}" data-code="${escapeHtml(tx.ma||"")}" data-branch="${escapeHtml(tx.branch||"Q2")}" title="Mở sản phẩm này tại ${escapeHtml(tx.branch||"Q2")}" onclick="openRecentActivityProduct(this,event)">${employeeAvatar}<span class="recent-activity-copy"><span class="recent-activity-action-line"><span class="recent-activity-kind-chip ${kindClass}">${recentActivityKindLabel(kind)}</span><span class="recent-activity-action">${escapeHtml(tx.nv||"Chưa rõ nhân viên")} ${action}</span>${route}</span><span class="recent-activity-product">${escapeHtml(info.currentName||tx.ma||"Sản phẩm")}${qty?` · ${qty} cái`:""}</span>${progress}</span><span class="recent-activity-time" title="${escapeHtml(fullTime)}">${escapeHtml(recentActivityRelativeTime(tx.time))}<small>${escapeHtml(fullTime)}</small></span></button>`;
   }).join("");
 }
 function openRecentActivityProduct(button,event){
@@ -14295,7 +14429,8 @@ function openRecentActivityProduct(button,event){
 }
 function refreshRecentActivityNotification(){
   const rows=recentTxSorted();
-  const count=recentTxUnreadCount(rows);
+  const initialized=initializeRecentActivitySeenBaseline(rows);
+  const count=initialized ? 0 : recentTxUnreadCount(rows);
   const badge=document.getElementById("recentActivityCount");
   const bell=document.getElementById("recentActivityBell");
   const tooltipStatus=document.getElementById("recentActivityTooltipStatus");
@@ -14343,6 +14478,7 @@ function toggleRecentActivity(event){
   bell.setAttribute("aria-expanded",String(opening));
   if(opening){
     recentActivityExpanded=false;
+    recentActivityFilter="ALL";
     positionRecentActivityPanel();
     try{
       renderRecentActivity();
@@ -14647,6 +14783,8 @@ function formatTxTimeFromInput(value){
 }
 
 function getTransactionKind(tx){
+  const publicKind=String(tx?.kind || "").trim().toUpperCase();
+  if(["IMPORT","ADJUST","SALE"].includes(publicKind)) return publicKind;
   const note = String(tx?.ghi || "").trim().toUpperCase();
   if(note.startsWith("[NHẬP HÀNG]")) return "IMPORT";
   if(note.startsWith("[ĐIỀU CHỈNH]")) return "ADJUST";
