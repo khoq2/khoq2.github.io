@@ -7473,6 +7473,81 @@ body .warehouse-switch.warehouse-switch-changing .warehouse-pin{
   #txOverlay .tx-kpi-icon.tx-modern-icon{width:30px;height:30px;flex-basis:30px}
   #txOverlay .tx-action-label{display:none}
 }
+
+/* iPhone 12 Pro và các màn hình khoảng 390px:
+   - tách tên cửa hàng khỏi hàng điều khiển để Online/chuông/Q2/Q5 không đè nhau;
+   - chừa một rãnh thật ở mép phải cho thanh nút dọc, thay vì phủ lên nội dung;
+   - bỏ phép dịch -50% còn sót của khay báo giá trên giao diện điện thoại. */
+@media(max-width:430px){
+  body .header .title{
+    display:grid!important;
+    grid-template-columns:32px minmax(0,1fr) 23px auto!important;
+    grid-template-rows:auto auto!important;
+    align-items:center!important;
+    column-gap:4px!important;
+    row-gap:2px!important;
+  }
+  body .header .title-logo-slot{
+    grid-column:1!important;
+    grid-row:1 / 3!important;
+    align-self:center!important;
+  }
+  body .header .title-text.compact-header-ready{
+    display:contents!important;
+  }
+  body .header .title-heading-line{
+    grid-column:2 / -1!important;
+    grid-row:1!important;
+    width:100%!important;
+    min-width:0!important;
+    max-width:100%!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+  }
+  body .header .title-status-line{
+    grid-column:2!important;
+    grid-row:2!important;
+    width:100%!important;
+    min-width:0!important;
+    overflow:hidden!important;
+  }
+  body .header .recent-activity-wrap{
+    grid-column:3!important;
+    grid-row:2!important;
+    margin:0!important;
+    justify-self:center!important;
+  }
+  body .header .warehouse-switcher{
+    grid-column:4!important;
+    grid-row:2!important;
+    margin:0!important;
+    justify-self:end!important;
+  }
+
+  body .side-control-rail{
+    --side-control-size:25px;
+    --side-control-icon-size:12px;
+    --side-control-shell-pad:3px;
+    right:max(2px,env(safe-area-inset-right))!important;
+  }
+  body .tabs,
+  body .filters,
+  body #homeInventoryBar,
+  body #results{
+    padding-right:calc(40px + env(safe-area-inset-right))!important;
+  }
+}
+@media(max-width:800px){
+  body .build-selection-tray{
+    left:8px!important;
+    right:8px!important;
+    width:auto!important;
+    transform:translateY(18px)!important;
+  }
+  body .build-selection-tray.show{
+    transform:translateY(0)!important;
+  }
+}
 </style>
 </head>
 <body>
@@ -12440,6 +12515,8 @@ function openBuildSummary(){
   if(!selectedItems.size){ showToast("Chưa chọn linh kiện nào"); return; }
   renderBuildSummary();
   document.getElementById("buildSummaryOverlay").classList.add("open");
+  ensureBuildExcelJs().catch(()=>{});
+  getBuildExcelLogoData().catch(()=>{});
 }
 function setBuildItemQty(idx,value,input){
   const stock=idx<0?9999:Math.max(0,Number(DATA[idx]?.[5])||0);
@@ -12504,6 +12581,42 @@ function clearBuildSelection(){
   selectedItems.clear(); buildQtyByIndex.clear(); buildPriceByIndex.clear(); buildTitleByIndex.clear(); buildWarrantyByIndex.clear(); buildCodeByIndex.clear(); buildUnitByIndex.clear();
   buildQuoteTitle="BÁO GIÁ LINH KIỆN"; buildQuoteCustomer=""; buildQuoteAddress=""; buildQuoteHotline="";
   closeOverlay("buildSummaryOverlay"); render(); updateBulkControls();
+}
+function isAppleTouchDevice(){
+  const ua=String(navigator.userAgent||"");
+  return /iPad|iPhone|iPod/i.test(ua)||(navigator.platform==="MacIntel"&&Number(navigator.maxTouchPoints)>1);
+}
+function isMobileExportDevice(){
+  return isAppleTouchDevice()||window.matchMedia?.("(max-width:820px), (pointer:coarse)")?.matches===true;
+}
+async function deliverGeneratedFile(blob,filename,{label="tệp",title="",shareHint=""}={}){
+  if(!(blob instanceof Blob)) throw new Error("Dữ liệu xuất file không hợp lệ");
+  const safeName=String(filename||"tep-xuat").replace(/[\\/:*?\"<>|]+/g,"-");
+  if(isMobileExportDevice()&&typeof File==="function"&&typeof navigator.share==="function"){
+    const file=new File([blob],safeName,{type:blob.type||"application/octet-stream",lastModified:Date.now()});
+    const shareData={files:[file],title:title||safeName};
+    let canShare=false;
+    try{ canShare=typeof navigator.canShare==="function"&&navigator.canShare(shareData); }catch(e){ canShare=false; }
+    if(canShare){
+      try{
+        showToast(shareHint||`Chọn nơi lưu hoặc ứng dụng để mở ${label}`,4200);
+        await navigator.share(shareData);
+        showToast(`✅ Đã hoàn tất thao tác chia sẻ / lưu ${label}`,3500);
+        return "shared";
+      }catch(error){
+        if(error?.name==="AbortError"){ showToast(`Đã hủy chia sẻ ${label}`); return "cancelled"; }
+        console.warn(`Không mở được bảng chia sẻ ${label}; chuyển sang tải xuống.`,error);
+      }
+    }
+  }
+  const url=URL.createObjectURL(blob),link=document.createElement("a");
+  link.href=url; link.download=safeName; link.rel="noopener";
+  document.body.appendChild(link); link.click(); link.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),5000);
+  showToast(isAppleTouchDevice()
+    ? `✅ Đã gửi ${label} vào mục Tải về trong ứng dụng Tệp`
+    : `✅ Đã tải ${label} về máy`,4500);
+  return "downloaded";
 }
 function loadBuildCanvasImage(url){
   return new Promise(resolve=>{
@@ -12610,7 +12723,17 @@ async function exportBuildSummaryImage(){
   else{ctx.fillStyle="#158447";ctx.fillText(`Nếu thêm VAT 8%: ${formatBuildMoney(totals.totalWithVat)}`,width-margin-18,footerY+101);}
   ctx.textAlign="center";ctx.fillStyle="#8A9AA7";ctx.font="11px Arial";
   ctx.fillText("Báo giá được tạo tự động từ hệ thống quản lý kho Hoàng Gia Computer",width/2,canvas.height-17);
-  const a=document.createElement("a"); a.download=`Bao-gia-linh-kien-${quickInventoryFileStamp()}.png`; a.href=canvas.toDataURL("image/png"); a.click(); showToast("✅ Đã xuất ảnh báo giá");
+  const filename=`Bao-gia-linh-kien-${quickInventoryFileStamp()}.png`;
+  const previewUrl=canvas.toDataURL("image/png");
+  if(isMobileExportDevice()){
+    openImageViewer(previewUrl,filename.replace(/\.png$/i,""));
+    showImageSaveButton();
+    showToast("✅ Ảnh đã tạo xong — bấm Chia sẻ / Lưu rồi chọn “Lưu hình ảnh” hoặc “Lưu vào Tệp”",6500);
+    return;
+  }
+  const a=document.createElement("a");
+  a.download=filename; a.href=previewUrl; document.body.appendChild(a); a.click(); a.remove();
+  showToast("✅ Đã xuất ảnh báo giá");
 }
 function exportBuildSummaryExcelBasic(){
   const rows=getBuildSelectedRows();
@@ -12681,17 +12804,45 @@ function ensureBuildExcelJs(){
   if(window.ExcelJS) return Promise.resolve(window.ExcelJS);
   if(buildExcelJsPromise) return buildExcelJsPromise;
   buildExcelJsPromise=new Promise((resolve,reject)=>{
-    const script=document.createElement("script");
-    script.src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js";
-    script.async=true;
-    script.dataset.buildExceljs="1";
-    script.onload=()=>window.ExcelJS?resolve(window.ExcelJS):reject(new Error("ExcelJS không khởi tạo"));
-    script.onerror=()=>reject(new Error("Không tải được ExcelJS"));
-    document.head.appendChild(script);
+    const sources=[
+      "https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js",
+      "https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js",
+      "https://unpkg.com/exceljs@4.4.0/dist/exceljs.min.js"
+    ];
+    let sourceIndex=0;
+    const loadNext=()=>{
+      if(window.ExcelJS){ resolve(window.ExcelJS); return; }
+      if(sourceIndex>=sources.length){ reject(new Error("Không tải được công cụ tạo Excel có logo")); return; }
+      const script=document.createElement("script");
+      script.src=sources[sourceIndex++];
+      script.async=true;
+      script.dataset.buildExceljs="1";
+      script.onload=()=>window.ExcelJS?resolve(window.ExcelJS):(script.remove(),loadNext());
+      script.onerror=()=>{ script.remove(); loadNext(); };
+      document.head.appendChild(script);
+    };
+    loadNext();
   }).catch(error=>{buildExcelJsPromise=null;throw error;});
   return buildExcelJsPromise;
 }
+let buildExcelLogoPromise=null;
 async function getBuildExcelLogoData(){
+  if(buildExcelLogoPromise) return buildExcelLogoPromise;
+  buildExcelLogoPromise=(async()=>{
+  const direct=String(document.getElementById("headerBrandLogo")?.src||"");
+  if(/^data:image\/(?:png|jpe?g);base64,/i.test(direct)) return direct;
+  try{
+    const slot=document.querySelector(".title-logo-slot");
+    const bg=slot?getComputedStyle(slot).backgroundImage:"";
+    const match=String(bg).match(/url\(["']?(data:image\/(?:png|jpe?g);base64,[A-Za-z0-9+/=]+)["']?\)/i);
+    if(match?.[1]) return match[1];
+  }catch(e){}
+  try{
+    for(const style of document.querySelectorAll("style")){
+      const match=String(style.textContent||"").match(/\.title-logo-slot\s*\{[^}]*background-image\s*:\s*url\(["']?(data:image\/(?:png|jpe?g);base64,[A-Za-z0-9+/=]+)["']?\)/i);
+      if(match?.[1]) return match[1];
+    }
+  }catch(e){}
   const driveLogoUrl="https://lh3.googleusercontent.com/d/1m31teW-YSLlh8IbKLxqDS2TnJja8hheC";
   try{
     const response=await fetch(driveLogoUrl,{cache:"force-cache"});
@@ -12705,16 +12856,11 @@ async function getBuildExcelLogoData(){
       reader.readAsDataURL(blob);
     });
   }catch(error){
-    console.warn("Không tải được logo Excel từ Google Drive; dùng logo dự phòng.",error);
+    console.warn("Không tải được logo Excel từ Google Drive.",error);
+    return "";
   }
-  const direct=String(document.getElementById("headerBrandLogo")?.src||"");
-  if(/^data:image\/(?:png|jpe?g);base64,/i.test(direct)) return direct;
-  try{
-    const slot=document.querySelector(".title-logo-slot");
-    const bg=slot?getComputedStyle(slot).backgroundImage:"";
-    const match=String(bg).match(/url\(["']?(data:image\/(?:png|jpe?g);base64,[A-Za-z0-9+/=]+)["']?\)/i);
-    return match?.[1]||"";
-  }catch(e){ return ""; }
+  })().catch(error=>{buildExcelLogoPromise=null;throw error;});
+  return buildExcelLogoPromise;
 }
 function applyBuildExcelStyle(sheet,r1,c1,r2,c2,style){
   for(let row=r1;row<=r2;row++){
@@ -12775,13 +12921,12 @@ async function exportBuildSummaryExcel(button){
     sheet.getCell("A5").value=quoteTitle.toLocaleUpperCase("vi-VN");
     sheet.getCell("A6").value=`Khách hàng: ${customer||"........................"}\nSĐT / Hotline: ${customerHotline||"........................"}`;
     sheet.getCell("D6").value=`Địa chỉ: ${customerAddress||"........................................"}\nKho lập báo giá: ${currentBranch||"Q2"}`;
+    sheet.getCell("A1").value="HOÀNG GIA\nCOMPUTER";
     const logoData=await getBuildExcelLogoData();
     if(logoData){
       const extension=/image\/png/i.test(logoData)?"png":"jpeg";
       const logoId=workbook.addImage({base64:logoData,extension});
       sheet.addImage(logoId,{tl:{col:.38,row:.42},ext:{width:250,height:76},editAs:"oneCell"});
-    }else{
-      sheet.getCell("A1").value="MÁY TÍNH\nHOÀNG GIA.VN";
     }
     [27,20,20,24,28,34,26].forEach((height,index)=>{sheet.getRow(index+1).height=height;});
     const green="FF0B6B3A", green2="FF158447", yellow="FFF5C84C", pale="FFF4F8F6", white="FFFFFFFF", ink="FF23313D", red="FFD92828", line="FFB7C5BE";
@@ -12835,14 +12980,19 @@ async function exportBuildSummaryExcel(button){
     sheet.headerFooter.oddFooter="&LHOÀNG GIA COMPUTER&CTrang &P / &N&R0375 111 112";
     const buffer=await workbook.xlsx.writeBuffer();
     const blob=new Blob([buffer],{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});
-    const url=URL.createObjectURL(blob),link=document.createElement("a");
-    link.href=url; link.download=`Bao-gia-Hoang-Gia-${quickInventoryFileStamp()}.xlsx`;
-    document.body.appendChild(link); link.click(); link.remove(); setTimeout(()=>URL.revokeObjectURL(url),1500);
-    showToast("✅ Đã xuất Excel báo giá có khung mẫu và công thức",4200);
+    const filename=`Bao-gia-Hoang-Gia-${quickInventoryFileStamp()}.xlsx`;
+    await deliverGeneratedFile(blob,filename,{
+      label:"file Excel",
+      title:"Báo giá Hoàng Gia Computer",
+      shareHint:"Excel đã tạo xong — chọn Lưu vào Tệp hoặc mở bằng Microsoft Excel / Numbers"
+    });
   }catch(e){
     console.error("Lỗi tạo Excel báo giá nâng cao:",e);
-    showToast("⚠️ Không tạo được mẫu Excel nâng cao; đang xuất bản cơ bản.",4200);
-    exportBuildSummaryExcelBasic();
+    if(isMobileExportDevice()) showToast("⚠️ Chưa tạo được Excel có logo. Hãy kiểm tra mạng rồi bấm Xuất Excel lại.",5200);
+    else{
+      showToast("⚠️ Không tạo được mẫu Excel nâng cao; đang xuất bản cơ bản.",4200);
+      exportBuildSummaryExcelBasic();
+    }
   }finally{
     if(button){ button.disabled=false; button.innerHTML=originalButtonHtml; }
   }
@@ -12865,8 +13015,8 @@ function printBuildSummary(){
   const missingNotice=totals.missing
     ? `<div class="missing">⚠ Còn ${totals.missing} linh kiện chưa nhập giá; tổng cộng hiện chỉ tính các món đã có giá.</div>`
     : `<div class="complete">Nếu thêm 8% VAT = ${formatBuildMoney(totals.totalWithVat)}</div>`;
-  const bodyRows=rows.map((item,index)=>`<tr><td>${index+1}</td><td><b>${escapeHtml(item.title)}</b>${item.warranty?`<small>Bảo hành: ${escapeHtml(item.warranty)}</small>`:""}</td><td class="num">${item.qty}</td><td class="num strong">${item.price?formatBuildMoney(item.price):"Chưa nhập"}</td></tr>`).join("");
-  win.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>${escapeHtml(buildQuoteTitle||"Báo giá linh kiện")}</title><style>body{font-family:Arial,sans-serif;color:#1E3A5F;padding:28px}h1{margin:0}.sub{color:#667;margin:7px 0 22px;line-height:1.7}.sub div{display:flex;gap:20px;flex-wrap:wrap}table{width:100%;border-collapse:collapse}th,td{padding:11px 9px;border-bottom:1px solid #DDE6ED;text-align:left}th{background:#EAF2F8;font-size:12px}td{font-size:13px}td small{display:block;margin-top:4px;color:#6B7F8D;line-height:1.55}.num{text-align:right}.strong{color:#1E8449;font-weight:bold}.total{margin-top:20px;padding:14px;background:#EAF2F8;border-radius:10px;text-align:right}.total span{display:block;font-size:12px}.total b{display:block;margin-top:3px;color:#C0392B;font-size:24px}.missing,.complete{margin-top:9px;text-align:right;font-size:12px;font-weight:bold}.missing{color:#A66B00}.complete{color:#1E8449}.system-note{margin-top:24px;padding-top:10px;border-top:1px solid #DDE6ED;color:#718096;font-size:10px;font-style:italic;text-align:center}@media print{body{padding:0}}</style></head><body><h1>${escapeHtml(buildQuoteTitle||"BÁO GIÁ LINH KIỆN")}</h1><div class="sub"><div><span>Khách hàng: <b>${escapeHtml(buildQuoteCustomer||"................................")}</b></span><span>Ngày báo giá: <b>${escapeHtml(formatTxTime(new Date()))}</b></span></div><div><span>Địa chỉ: <b>${escapeHtml(buildQuoteAddress||"................................")}</b></span><span>SĐT / Hotline: <b>${escapeHtml(buildQuoteHotline||"................................")}</b></span></div></div><table><thead><tr><th>#</th><th>Tên linh kiện</th><th class="num">SL</th><th class="num">Đơn giá</th></tr></thead><tbody>${bodyRows}</tbody></table><div class="total"><span>${rows.length} linh kiện · ${totals.totalQty} sản phẩm</span><b>TỔNG CỘNG: ${formatBuildMoney(totals.total)}</b></div>${missingNotice}<div class="system-note">Báo giá được tạo tự động từ hệ thống quản lý kho Hoàng Gia Computer</div><script>window.onload=()=>setTimeout(()=>window.print(),250)<\/script></body></html>`);
+  const bodyRows=rows.map((item,index)=>`<tr><td>${index+1}</td><td><b>${escapeHtml(item.title)}</b></td><td class="center">${escapeHtml(item.unit||"Cái")}</td><td class="num">${item.qty}</td><td class="num strong">${item.price?formatBuildMoney(item.price):"Chưa nhập"}</td><td class="warranty">${escapeHtml(item.warranty||"—")}</td></tr>`).join("");
+  win.document.write(`<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escapeHtml(buildQuoteTitle||"Báo giá linh kiện")}</title><style>@page{size:A4 landscape;margin:10mm}*{box-sizing:border-box}body{font-family:Arial,sans-serif;color:#1E3A5F;padding:24px;margin:0}h1{margin:0;text-align:center}.sub{color:#667;margin:7px 0 18px;line-height:1.55}.sub div{display:flex;justify-content:center;gap:24px;flex-wrap:wrap}table{width:100%;table-layout:fixed;border-collapse:collapse}col.stt{width:5%}col.name{width:42%}col.unit{width:8%}col.qty{width:7%}col.price{width:20%}col.bh{width:18%}th,td{padding:10px 8px;border-bottom:1px solid #DDE6ED;text-align:left;vertical-align:middle}th{background:#EAF2F8;font-size:11px;white-space:nowrap}td{font-size:12px}.center{text-align:center}.num{text-align:right}.strong{color:#1E8449;font-weight:bold;white-space:nowrap}.warranty{text-align:center;white-space:nowrap;font-size:11px;font-weight:700;color:#52697B;overflow:hidden;text-overflow:ellipsis}.total{margin-top:17px;padding:13px;background:#EAF2F8;border-radius:10px;text-align:right}.total span{display:block;font-size:12px}.total b{display:block;margin-top:3px;color:#C0392B;font-size:23px}.missing,.complete{margin-top:8px;text-align:right;font-size:12px;font-weight:bold}.missing{color:#A66B00}.complete{color:#1E8449}.system-note{margin-top:20px;padding-top:9px;border-top:1px solid #DDE6ED;color:#718096;font-size:10px;font-style:italic;text-align:center}@media print{body{padding:0}tr{break-inside:avoid}}</style></head><body><h1>${escapeHtml(buildQuoteTitle||"BÁO GIÁ LINH KIỆN")}</h1><div class="sub"><div><span>Khách hàng: <b>${escapeHtml(buildQuoteCustomer||"................................")}</b></span><span>Ngày báo giá: <b>${escapeHtml(formatTxTime(new Date()))}</b></span></div><div><span>Địa chỉ: <b>${escapeHtml(buildQuoteAddress||"................................")}</b></span><span>SĐT / Hotline: <b>${escapeHtml(buildQuoteHotline||"................................")}</b></span></div></div><table><colgroup><col class="stt"><col class="name"><col class="unit"><col class="qty"><col class="price"><col class="bh"></colgroup><thead><tr><th>#</th><th>Tên linh kiện</th><th class="center">ĐVT</th><th class="num">SL</th><th class="num">GIÁ</th><th class="center">BH</th></tr></thead><tbody>${bodyRows}</tbody></table><div class="total"><span>${rows.length} linh kiện · ${totals.totalQty} sản phẩm</span><b>TỔNG CỘNG: ${formatBuildMoney(totals.total)}</b></div>${missingNotice}<div class="system-note">Báo giá được tạo tự động từ hệ thống quản lý kho Hoàng Gia Computer</div><script>window.onload=()=>setTimeout(()=>window.print(),250)<\/script></body></html>`);
   const printHeading=win.document.querySelector("h1");
   if(printHeading) printHeading.style.textAlign="center";
   win.document.close();
@@ -14460,6 +14610,12 @@ function openImageViewer(src, alt="Ảnh phóng to", keepGallery=false){
   img.onload = function(){ img.onerror = null; };
   img.src = src;
   img.alt = alt || "Ảnh phóng to";
+  const saveButton=document.getElementById("imageLightboxSave");
+  if(saveButton){
+    const mobile=isMobileExportDevice();
+    saveButton.textContent=mobile?"↗ Chia sẻ / Lưu":"⬇ Tải ảnh";
+    saveButton.setAttribute("aria-label",mobile?"Chia sẻ hoặc lưu ảnh đang xem":"Tải ảnh đang xem");
+  }
   resetImageViewerZoom();
   document.getElementById("imageLightboxActions")?.classList.remove("show");
   box.classList.add("open");
@@ -14490,6 +14646,15 @@ async function saveCurrentViewerImage(){
     const blob=await response.blob();
     const ext=(blob.type.split("/")[1]||"jpg").replace("jpeg","jpg");
     const filename=`${safeBase}.${ext}`;
+    if(isMobileExportDevice()){
+      const result=await deliverGeneratedFile(blob,filename,{
+        label:"ảnh",
+        title:String(img.alt||"Ảnh báo giá"),
+        shareHint:"Chọn “Lưu hình ảnh” để vào ứng dụng Ảnh, hoặc “Lưu vào Tệp” để tự chọn thư mục"
+      });
+      if(result==="downloaded"&&isAppleTouchDevice()) showToast("Nếu chưa thấy ảnh: giữ ảnh đang xem rồi chọn “Lưu vào Ảnh”",5500);
+      return;
+    }
     if(typeof window.showSaveFilePicker==="function"){
       const handle=await window.showSaveFilePicker({
         suggestedName:filename,
@@ -17840,6 +18005,7 @@ function setupCompactHeaderStatus(){
   /* Giữ nút đồng bộ trong thanh quản trị; không đặt sau chữ Online. */
   if(syncBtn && adminBar && syncBtn.parentElement!==adminBar) adminBar.insertBefore(syncBtn,adminBar.firstChild);
   titleText.appendChild(line);
+  titleText.classList.add("compact-header-ready");
   if(adminBar&&!adminBar.children.length) adminBar.hidden=true;
   updateHeaderNetworkStatus();
 }
