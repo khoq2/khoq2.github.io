@@ -8111,6 +8111,50 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     -webkit-backdrop-filter:blur(7px) saturate(108%)!important;
     backdrop-filter:blur(7px) saturate(108%)!important;
   }
+
+  /* Khi header tự thu gọn trên điện thoại, bỏ hẳn các hàng đã ẩn khỏi
+     phép tính chiều cao. Một số phiên bản Safari vẫn giữ min-height/padding
+     của các lớp responsive cũ, tạo ra khoảng trắng lớn phía trên nội dung. */
+  body > .sticky.collapsed{
+    min-height:0!important;
+    height:auto!important;
+  }
+  body > .sticky.collapsed .header-collapsible{
+    min-height:0!important;
+    height:auto!important;
+    max-height:none!important;
+    overflow:visible!important;
+  }
+  body > .sticky.collapsed .header{
+    min-height:0!important;
+    height:auto!important;
+    padding:7px 8px!important;
+  }
+  body > .sticky.collapsed .admin-bar,
+  body > .sticky.collapsed .header .title,
+  body > .sticky.collapsed .kpi-row,
+  body > .sticky.collapsed .tabs,
+  body > .sticky.collapsed .filters{
+    display:none!important;
+    min-height:0!important;
+    height:0!important;
+    max-height:0!important;
+    margin:0!important;
+    padding:0!important;
+    border:0!important;
+    overflow:hidden!important;
+  }
+  body > .sticky.collapsed .search-box{
+    min-height:44px!important;
+    margin:0!important;
+  }
+  body > .sticky.collapsed #searchSpacer{
+    display:none!important;
+    height:0!important;
+    min-height:0!important;
+    margin:0!important;
+    padding:0!important;
+  }
 }
 @media(prefers-reduced-motion:reduce){
   .build-summary-row,.build-summary-select-check span{transition:none!important}
