@@ -2434,6 +2434,14 @@ html::-webkit-scrollbar-corner { background: #EAF2F8; }
 .tx-detail-grid b { color:#1C2733; text-align:right; overflow-wrap:anywhere; }
 .tx-historical-name { display:block; margin-top:4px; color:#78899A; font-size:9px; font-weight:600; line-height:1.35; }
 .tx-detail-grid .tx-total b { color:#16883F; font-size:13px; }
+.tx-detail-grid .tx-vat-breakdown {
+  margin:0 -6px;
+  padding:3px 6px;
+  border-bottom-color:#D7ECE2;
+  border-radius:8px;
+  background:linear-gradient(90deg,#F1FBF6,#F7FCFF);
+}
+.tx-detail-grid .tx-vat-breakdown b { color:#146B43; font-size:11px; font-weight:900; line-height:1.45; }
 @media (min-width:521px) {
   #txOverlay .tx-history-modal {
     width:min(900px,calc(100vw - 40px));
@@ -14569,7 +14577,7 @@ function clearAdminOperationalView(){
   updateAdminProfileButton(false);
 }
 const TRANSFER_CACHE_KEY = "kho_cntt_transfers";
-const PUBLIC_RECENT_ACTIVITY_CACHE_KEY = "kho_cntt_public_full_activity_v4";
+const PUBLIC_RECENT_ACTIVITY_CACHE_KEY = "kho_cntt_public_full_activity_v5";
 function publicInlineTransactionMedia(value){
   const text=String(value||"").trim();
   return text.length<=2048&&/^https?:\/\//i.test(text)?text:"";
@@ -14585,6 +14593,8 @@ function toPublicRecentTxItem(item){
     nv:tx.nv,
     qty:tx.qty,
     gia:tx.gia,
+    vatRate:tx.vatRate,
+    basePrice:tx.basePrice,
     ghi:String(tx.ghi||"").slice(0,2000),
     img:publicInlineTransactionMedia(tx.img),
     warranty1:publicInlineTransactionMedia(tx.warranty1),
@@ -14617,13 +14627,17 @@ function toPublicRecentEmployee(item){
 function applyPublicRecentActivity(data){
   // Dọn cả cache cũ trên máy: bảng công khai chỉ giữ các trường cần hiển thị.
   const publicDetailsById=new Map(TX_DATA.map(tx=>[String(tx?.id||""),{
-    ghi:String(tx?.ghi||""),img:String(tx?.img||""),
-    warranty1:String(tx?.warranty1||""),warranty2:String(tx?.warranty2||""),
+    img:/^data:/i.test(String(tx?.img||""))?String(tx.img):"",
+    warranty1:/^data:/i.test(String(tx?.warranty1||""))?String(tx.warranty1):"",
+    warranty2:/^data:/i.test(String(tx?.warranty2||""))?String(tx.warranty2):"",
     unitDetails:Array.isArray(tx?.unitDetails)?tx.unitDetails.map(item=>({id:String(item?.id||""),serial:String(item?.serial||"")})).filter(item=>item.id):[]
   }]));
   TX_DATA=(Array.isArray(data?.tx)?data.tx:[]).map(toPublicRecentTxItem).filter(Boolean).map(tx=>{
     const details=publicDetailsById.get(String(tx.id||""));
-    return details ? {...tx,...details} : tx;
+    return details ? {...tx,
+      img:details.img||tx.img,warranty1:details.warranty1||tx.warranty1,warranty2:details.warranty2||tx.warranty2,
+      unitDetails:details.unitDetails.length?details.unitDetails:(Array.isArray(tx.unitDetails)?tx.unitDetails:[])
+    } : tx;
   });
   TRANSFER_DATA=(Array.isArray(data?.transfers)?data.transfers:[]).map(toPublicRecentTransferItem).filter(item=>item && item.id && item.status==="COMPLETED");
   NV_LIST=(Array.isArray(data?.nv)?data.nv:[]).map(toPublicRecentEmployee).filter(Boolean);
@@ -14676,7 +14690,9 @@ async function loadPublicTransactionDetailsForProduct(index){
       const detail=detailsById.get(String(tx?.id||""));
       if(!detail) return tx;
       return {...tx,
-        gia:Number(detail.gia)||Number(tx.gia)||0,ghi:String(detail.ghi||""),img:String(detail.img||""),
+        gia:Number(detail.gia)||Number(tx.gia)||0,vatRate:Number(detail.vatRate)||0,
+        basePrice:Number(detail.basePrice)||Number(detail.gia)||Number(tx.basePrice)||Number(tx.gia)||0,
+        ghi:String(detail.ghi||""),img:String(detail.img||""),
         warranty1:String(detail.warranty1||""),warranty2:String(detail.warranty2||""),
         unitDetails:Array.isArray(detail.unitDetails)?detail.unitDetails.map(item=>({id:String(item?.id||""),serial:String(item?.serial||"")})).filter(item=>item.id):[]
       };
@@ -15147,6 +15163,22 @@ function updateSaleVatPreview(){
   const finalPrice = basePrice + vatAmount;
   box.textContent = `${fmt(basePrice)}/cái + 8% VAT: ${fmt(vatAmount)} = ${fmt(finalPrice)}/cái`;
   box.style.display="block";
+}
+function getTransactionVatDetails(tx){
+  const vatRate=Math.max(0,Number(tx?.vatRate)||0);
+  if(!vatRate) return null;
+  let basePrice=Math.max(0,Number(tx?.basePrice)||0);
+  const storedFinal=Math.max(0,Number(tx?.gia)||0);
+  if(storedFinal && (!basePrice || basePrice>=storedFinal)) basePrice=Math.round(storedFinal/(1+vatRate/100));
+  if(!basePrice) return null;
+  const vatAmount=Math.round(basePrice*vatRate/100);
+  const finalPrice=basePrice+vatAmount;
+  return {vatRate,basePrice,vatAmount,finalPrice};
+}
+function formatTransactionVatDetails(tx){
+  const vat=getTransactionVatDetails(tx);
+  if(!vat) return "";
+  return `${fmt(vat.basePrice)}/cái + ${formatVndNumber(vat.vatRate)}% VAT: ${fmt(vat.vatAmount)} = ${fmt(vat.finalPrice)}/cái`;
 }
 function newTransactionId(){ return (crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`); }
 let SALE_UNITS=[];
@@ -15804,6 +15836,7 @@ function renderTxHistory(){
   const rows = filtered.length ? filtered.map(t=>{
         const productDisplay=getTransactionProductDisplay(t,r);
         const unitDetailText=(Array.isArray(t.unitDetails)&&t.unitDetails.length?t.unitDetails.map(item=>item.serial?`${item.id} · Serial ${item.serial}`:item.id):(Array.isArray(t.unitIds)?t.unitIds:[])).join(" | ");
+        const vatDetailText=formatTransactionVatDetails(t);
         const kindView=txHistoryKindView(t);
         return `
         <div class="tx-row">
@@ -15819,6 +15852,7 @@ function renderTxHistory(){
 	            <div><span class="tx-detail-label">${txHistoryIcon("id","purple")}<span>Mã giao dịch</span></span><b>${escapeHtml(String(t.id||""))}</b></div>
 	            <div><span class="tx-detail-label">${txHistoryIcon("quantity","orange")}<span>Số lượng</span></span><b>${Math.abs(Number(t.qty)||0)}</b></div>
 	            <div><span class="tx-detail-label">${txHistoryIcon("price","teal")}<span>Giá bán</span></span><b>${t.gia>0?fmt(t.gia):"Không ghi giá"}</b></div>
+	            ${vatDetailText?`<div class="tx-vat-breakdown"><span class="tx-detail-label">${txHistoryIcon("money","teal")}<span>Chi tiết VAT</span></span><b>${escapeHtml(vatDetailText)}</b></div>`:""}
 	            <div class="tx-total"><span class="tx-detail-label">${txHistoryIcon("total","green")}<span>Thành tiền</span></span><b>${fmt((Number(t.gia)||0)*Math.abs(Number(t.qty)||0))}</b></div>
 	            ${unitDetailText?`<div class="tx-total"><span class="tx-detail-label">${txHistoryIcon("serial","purple")}<span>Serial / mã cá thể</span></span><b>${escapeHtml(unitDetailText)}</b></div>`:""}
 	          </div>
