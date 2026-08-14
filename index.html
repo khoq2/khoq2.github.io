@@ -602,6 +602,104 @@ button:disabled,input:disabled,select:disabled,[aria-disabled="true"] { cursor:n
 .tx-price-pill { background: #EAF7EE; color: #1E8449; }
 .tx-note { display: block; margin-top: 6px; color: #7B7D7D; font-size: 11px; line-height: 1.4; word-break: break-word; }
 .tx-img { display: block; width: 74px; height: 74px; object-fit: cover; border-radius: 8px; border: 1px solid #E5E8E8; margin-top: 8px; background: #fafafa; cursor: zoom-in; }
+.tx-bill-card {
+  position:relative;
+  display:inline-grid;
+  grid-template-columns:62px minmax(0,1fr) 28px;
+  align-items:center;
+  gap:10px;
+  width:min(292px,100%);
+  min-height:78px;
+  margin-top:9px;
+  padding:7px 8px;
+  overflow:hidden;
+  appearance:none;
+  border:1px solid #CFE0ED;
+  border-radius:14px;
+  background:linear-gradient(145deg,#FFFFFF 0%,#F3F9FD 100%);
+  color:#173B5E;
+  font:inherit;
+  text-align:left;
+  box-shadow:0 5px 14px rgba(26,82,118,.08),inset 0 1px 0 rgba(255,255,255,.9);
+  cursor:pointer;
+  transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease;
+}
+.tx-bill-card::before {
+  content:"";
+  position:absolute;
+  inset:0 auto 0 0;
+  width:3px;
+  background:linear-gradient(180deg,#19A7CE,#145DA0);
+}
+.tx-bill-card:hover {
+  transform:translateY(-1px);
+  border-color:#7FC4E2;
+  box-shadow:0 9px 20px rgba(26,82,118,.14),inset 0 1px 0 rgba(255,255,255,.95);
+}
+.tx-bill-card:active { transform:translateY(0) scale(.985); }
+.tx-bill-card:focus-visible { outline:3px solid rgba(25,167,206,.24); outline-offset:2px; }
+.tx-bill-thumb {
+  position:relative;
+  display:block;
+  width:62px;
+  height:62px;
+  overflow:hidden;
+  border:1px solid #D7E5EF;
+  border-radius:10px;
+  background:linear-gradient(110deg,#E9F1F7 20%,#F8FBFD 40%,#E9F1F7 60%);
+  background-size:220% 100%;
+}
+.tx-bill-thumb:not(.loaded):not(.is-error) { animation:txBillLoading 1.15s linear infinite; }
+@keyframes txBillLoading { to { background-position:-220% 0; } }
+.tx-bill-image { display:block; width:100%; height:100%; object-fit:cover; background:#fff; }
+.tx-bill-zoom {
+  position:absolute;
+  right:4px;
+  bottom:4px;
+  display:grid;
+  place-items:center;
+  width:23px;
+  height:23px;
+  border:1px solid rgba(255,255,255,.78);
+  border-radius:50%;
+  background:rgba(14,67,105,.88);
+  color:#fff;
+  box-shadow:0 2px 7px rgba(9,50,79,.28);
+  backdrop-filter:blur(4px);
+}
+.tx-bill-zoom svg { width:13px; height:13px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+.tx-bill-thumb.is-error::after {
+  content:"Không tải được";
+  position:absolute;
+  inset:0;
+  display:grid;
+  place-items:center;
+  padding:5px;
+  background:#F7F9FB;
+  color:#7B8794;
+  font-size:8px;
+  font-weight:800;
+  text-align:center;
+}
+.tx-bill-thumb.is-error .tx-bill-zoom { display:none; }
+.tx-bill-copy { min-width:0; display:flex; flex-direction:column; gap:2px; }
+.tx-bill-copy small { color:#2584B5; font-size:8px; font-weight:900; letter-spacing:.1em; line-height:1.15; }
+.tx-bill-copy b { overflow:hidden; color:#173B5E; font-size:11px; font-weight:900; line-height:1.25; text-overflow:ellipsis; white-space:nowrap; }
+.tx-bill-copy em { color:#6B7F90; font-size:9px; font-style:normal; font-weight:600; line-height:1.25; }
+.tx-bill-open {
+  display:grid;
+  place-items:center;
+  width:26px;
+  height:26px;
+  border-radius:9px;
+  background:#E4F3FA;
+  color:#147EA8;
+  font-size:20px;
+  font-weight:800;
+  line-height:1;
+  transition:transform .18s ease,background .18s ease;
+}
+.tx-bill-card:hover .tx-bill-open { transform:translateX(2px); background:#D5EDF8; }
 .tx-related { margin-top: 7px; padding: 7px 8px; border-radius: 8px; background: #F8FAFC; border: 1px solid #E5EAF0; }
 .tx-related-label { display: block; margin-bottom: 5px; color: #607D8B; font-size: 10px; font-weight: 800; }
 .tx-related-links { display:grid; grid-template-columns:minmax(0,1fr); gap:5px; counter-reset:related-item; }
@@ -2390,12 +2488,15 @@ html::-webkit-scrollbar-corner { background: #EAF2F8; }
   #txOverlay .tx-detail-grid b { text-align:left; }
   #txOverlay .tx-note { grid-column:1; }
   #txOverlay .tx-related,
-  #txOverlay .tx-img,
+  #txOverlay .tx-bill-card,
   #txOverlay .prod-media { grid-column:1 / -1; }
+  #txOverlay .tx-bill-card { justify-self:start; }
 }
 @media (max-width:520px) {
   #txOverlay { padding:7px; align-items:flex-start; }
   #txOverlay .tx-history-modal { width:100%; max-height:96dvh; border-radius:18px; padding:12px; background:linear-gradient(145deg,#F4F9FF,#EEF5FC); }
+  #txOverlay .tx-bill-card { width:100%; grid-template-columns:58px minmax(0,1fr) 28px; min-height:74px; }
+  #txOverlay .tx-bill-thumb { width:58px; height:58px; }
   #txOverlay .modal-title {
     width:100%;
     min-height:38px;
@@ -14468,7 +14569,11 @@ function clearAdminOperationalView(){
   updateAdminProfileButton(false);
 }
 const TRANSFER_CACHE_KEY = "kho_cntt_transfers";
-const PUBLIC_RECENT_ACTIVITY_CACHE_KEY = "kho_cntt_public_full_activity_v3";
+const PUBLIC_RECENT_ACTIVITY_CACHE_KEY = "kho_cntt_public_full_activity_v4";
+function publicInlineTransactionMedia(value){
+  const text=String(value||"").trim();
+  return text.length<=2048&&/^https?:\/\//i.test(text)?text:"";
+}
 function toPublicRecentTxItem(item){
   const tx=normalizeTxItem(item);
   if(!tx) return null;
@@ -14480,6 +14585,10 @@ function toPublicRecentTxItem(item){
     nv:tx.nv,
     qty:tx.qty,
     gia:tx.gia,
+    ghi:String(tx.ghi||"").slice(0,2000),
+    img:publicInlineTransactionMedia(tx.img),
+    warranty1:publicInlineTransactionMedia(tx.warranty1),
+    warranty2:publicInlineTransactionMedia(tx.warranty2),
     time:tx.time,
     branch:tx.branch,
     kind:getTransactionKind(tx)
@@ -14526,7 +14635,7 @@ function applyPublicRecentActivity(data){
 function loadPublicRecentCache(){
   try{
     applyPublicRecentActivity(JSON.parse(localStorage.getItem(PUBLIC_RECENT_ACTIVITY_CACHE_KEY)||"{}"));
-    // Chỉ lưu phần tóm tắt nhẹ; ảnh giao dịch được tải theo yêu cầu và giữ trong bộ nhớ phiên hiện tại.
+    // Chỉ lưu phần tóm tắt nhẹ và URL ảnh nhỏ; ảnh base64 vẫn tải theo yêu cầu trong phiên hiện tại.
     safeLocalStorageSet(PUBLIC_RECENT_ACTIVITY_CACHE_KEY,JSON.stringify({tx:TX_DATA.map(toPublicRecentTxItem).filter(Boolean),transfers:TRANSFER_DATA,nv:NV_LIST}));
   }
   catch(_){TX_DATA=[];TRANSFER_DATA=[];NV_LIST=[];}
@@ -15715,7 +15824,14 @@ function renderTxHistory(){
 	          </div>
           ${t.ghi?`<span class="tx-note">${txHistoryIcon("note","orange")}<span>${escapeHtml(t.ghi)}</span></span>`:""}
           ${renderSameDayEmployeeLinks(t, r)}
-          ${t.img?`<img class="tx-img" src="${escapeHtml(t.img)}" alt="Ảnh giao dịch" referrerpolicy="no-referrer" onclick="openImageViewer(this.src, this.alt)" onerror="this.style.display='none';">`:""}
+          ${t.img?`<button type="button" class="tx-bill-card" data-url="${escapeHtml(t.img)}" data-title="Ảnh bill - ${escapeHtml(t.ten||t.ma||'Giao dịch')}" aria-label="Xem ảnh bill giao dịch" onclick="openImageViewer(this.dataset.url,this.dataset.title)">
+            <span class="tx-bill-thumb">
+              <img class="tx-bill-image" src="${escapeHtml(t.img)}" alt="" loading="eager" decoding="async" fetchpriority="high" referrerpolicy="no-referrer" onload="this.parentElement.classList.add('loaded')" onerror="this.parentElement.classList.add('is-error');this.style.display='none';">
+              <span class="tx-bill-zoom" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><circle cx="10.5" cy="10.5" r="5.5"></circle><path d="m15 15 5 5M10.5 8v5M8 10.5h5"></path></svg></span>
+            </span>
+            <span class="tx-bill-copy"><small>ẢNH BILL</small><b>Hóa đơn giao dịch</b><em>Bấm để xem ảnh lớn</em></span>
+            <span class="tx-bill-open" aria-hidden="true">›</span>
+          </button>`:""}
           ${(t.warranty1||t.warranty2)?`<div class="prod-media">
             ${t.warranty1?`<button type="button" class="prod-extra-image" data-url="${escapeHtml(t.warranty1)}" data-title="Bảo hành 1 - ${escapeHtml(t.ten||t.ma||'Giao dịch')}" onclick="openImageViewer(this.dataset.url,this.dataset.title)">Bảo hành 1</button>`:""}
             ${t.warranty2?`<button type="button" class="prod-extra-image" data-url="${escapeHtml(t.warranty2)}" data-title="Bảo hành 2 - ${escapeHtml(t.ten||t.ma||'Giao dịch')}" onclick="openImageViewer(this.dataset.url,this.dataset.title)">Bảo hành 2</button>`:""}
