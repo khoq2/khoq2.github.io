@@ -10518,9 +10518,7 @@ function sanitizePublicProductRows(rows){
   return normalizeSheetRows(rows).map(row=>{
     const safe=row.slice();
     safe[4]=0;
-    const firstLine=String(safe[7]||"").split(/\r?\n/)[0].trim();
-    safe[7]=/^Vị trí (?:trong kho|kho)\s*:/i.test(firstLine)?firstLine:"";
-    for(let index=14;index<22;index++) safe[index]="";
+    safe[7]=String(safe[7]||"");
     return safe;
   });
 }
