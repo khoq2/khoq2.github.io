@@ -14506,15 +14506,26 @@ function toPublicRecentEmployee(item){
 }
 function applyPublicRecentActivity(data){
   // Dọn cả cache cũ trên máy: bảng công khai chỉ giữ các trường cần hiển thị.
-  TX_DATA=(Array.isArray(data?.tx)?data.tx:[]).map(toPublicRecentTxItem).filter(Boolean);
+  const publicDetailsById=new Map(TX_DATA.map(tx=>[String(tx?.id||""),{
+    ghi:String(tx?.ghi||""),img:String(tx?.img||""),
+    warranty1:String(tx?.warranty1||""),warranty2:String(tx?.warranty2||"")
+  }]));
+  TX_DATA=(Array.isArray(data?.tx)?data.tx:[]).map(toPublicRecentTxItem).filter(Boolean).map(tx=>{
+    const details=publicDetailsById.get(String(tx.id||""));
+    return details ? {...tx,...details} : tx;
+  });
   TRANSFER_DATA=(Array.isArray(data?.transfers)?data.transfers:[]).map(toPublicRecentTransferItem).filter(item=>item && item.id && item.status==="COMPLETED");
   NV_LIST=(Array.isArray(data?.nv)?data.nv:[]).map(toPublicRecentEmployee).filter(Boolean);
+  // Lần mở lịch sử kế tiếp phải kiểm tra lại để giao dịch mới cũng có ghi chú/ảnh.
+  PUBLIC_TX_DETAILS_LOADED.clear();
+  PUBLIC_TX_DETAILS_ERRORS.clear();
   refreshRecentActivityNotification();
 }
 function loadPublicRecentCache(){
   try{
     applyPublicRecentActivity(JSON.parse(localStorage.getItem(PUBLIC_RECENT_ACTIVITY_CACHE_KEY)||"{}"));
-    safeLocalStorageSet(PUBLIC_RECENT_ACTIVITY_CACHE_KEY,JSON.stringify({tx:TX_DATA,transfers:TRANSFER_DATA,nv:NV_LIST}));
+    // Chỉ lưu phần tóm tắt nhẹ; ảnh giao dịch được tải theo yêu cầu và giữ trong bộ nhớ phiên hiện tại.
+    safeLocalStorageSet(PUBLIC_RECENT_ACTIVITY_CACHE_KEY,JSON.stringify({tx:TX_DATA.map(toPublicRecentTxItem).filter(Boolean),transfers:TRANSFER_DATA,nv:NV_LIST}));
   }
   catch(_){TX_DATA=[];TRANSFER_DATA=[];NV_LIST=[];}
 }
@@ -14530,6 +14541,44 @@ async function loadPublicRecentActivityFromSheet(){
     applyPublicRecentActivity(snapshot);
     safeLocalStorageSet(PUBLIC_RECENT_ACTIVITY_CACHE_KEY,JSON.stringify(snapshot));
   }catch(error){console.warn("Chưa tải được giao dịch gần đây dùng chung:",error);}
+}
+const PUBLIC_TX_DETAILS_LOADED=new Set();
+const PUBLIC_TX_DETAILS_LOADING=new Set();
+const PUBLIC_TX_DETAILS_ERRORS=new Map();
+function publicTransactionDetailKey(row){
+  return `${String(row?.[13]||"Q2").toUpperCase()}|${normalizeProductCode(row?.[1]||"")}`;
+}
+async function loadPublicTransactionDetailsForProduct(index){
+  if(isAdminMode()) return true;
+  const row=DATA[index];
+  if(!row) return false;
+  const key=publicTransactionDetailKey(row);
+  if(PUBLIC_TX_DETAILS_LOADED.has(key)||PUBLIC_TX_DETAILS_LOADING.has(key)) return true;
+  PUBLIC_TX_DETAILS_LOADING.add(key);
+  PUBLIC_TX_DETAILS_ERRORS.delete(key);
+  if(TX_HISTORY_STATE.idx===index) renderTxHistory();
+  try{
+    const json=await fetchSheetJson(sheetUrl({type:"transaction_details",code:row[1],branch:row[13]||"Q2",_ts:Date.now()}),{},35000);
+    if(!Array.isArray(json.details)) throw new Error("API chưa được cập nhật chức năng ghi chú và hình ảnh giao dịch");
+    const detailsById=new Map(json.details.map(detail=>[String(detail?.id||""),detail]));
+    TX_DATA=TX_DATA.map(tx=>{
+      const detail=detailsById.get(String(tx?.id||""));
+      if(!detail) return tx;
+      return {...tx,
+        ghi:String(detail.ghi||""),img:String(detail.img||""),
+        warranty1:String(detail.warranty1||""),warranty2:String(detail.warranty2||"")
+      };
+    });
+    PUBLIC_TX_DETAILS_LOADED.add(key);
+    return true;
+  }catch(error){
+    PUBLIC_TX_DETAILS_ERRORS.set(key,String(error));
+    console.warn("Chưa tải được ghi chú và hình ảnh giao dịch:",error);
+    return false;
+  }finally{
+    PUBLIC_TX_DETAILS_LOADING.delete(key);
+    if(TX_HISTORY_STATE.idx===index) renderTxHistory();
+  }
 }
 let recentActivityRefreshRunning=false;
 let recentActivityRefreshTimer=null;
@@ -15595,6 +15644,9 @@ function renderTxHistory(){
   if(idx < 0 || !DATA[idx]) return;
   const r = DATA[idx];
   const canViewPrivateTransactionDetails = isAdminMode();
+  const publicDetailKey=publicTransactionDetailKey(r);
+  const publicDetailsLoading=!canViewPrivateTransactionDetails&&PUBLIC_TX_DETAILS_LOADING.has(publicDetailKey);
+  const publicDetailsError=!canViewPrivateTransactionDetails&&PUBLIC_TX_DETAILS_ERRORS.get(publicDetailKey);
   const txs = getTransactionsForProduct(r);
   const filtered = sortTxHistoryRows(txHistoryFilteredRows(txs));
   const nvOptions = [...new Set(txs.map(t=>t.nv).filter(Boolean))];
@@ -15640,7 +15692,7 @@ function renderTxHistory(){
       <div class="tx-kpi tx-kpi-in"><span class="tx-kpi-icon tx-modern-icon orange" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false">${TX_HISTORY_ICON_PATHS.import}</svg></span><span><small>Đã nhập</small><b>${totalImportedQty}</b></span></div>
       ${canViewPrivateTransactionDetails?`<div class="tx-kpi tx-kpi-money"><span class="tx-kpi-icon tx-modern-icon teal" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false">${TX_HISTORY_ICON_PATHS.money}</svg></span><span><small>Doanh thu</small><b>${fmt(totalGia)}</b></span></div>`:""}
     </div>`;
-  const privacyNotice = canViewPrivateTransactionDetails ? "" : `<div class="tx-private-notice">Serial, ảnh bảo hành và ghi chú riêng chỉ hiển thị khi đăng nhập Admin.</div>`;
+  const privacyNotice = canViewPrivateTransactionDetails ? "" : `<div class="tx-private-notice">Giá giao dịch và serial/mã cá thể chỉ dành cho vai trò Admin.${publicDetailsLoading?" Đang tải ghi chú và hình ảnh…":publicDetailsError?" Chưa tải được ghi chú và hình ảnh; hãy thử mở lại.":""}</div>`;
   const rows = filtered.length ? filtered.map(t=>{
         const productDisplay=getTransactionProductDisplay(t,r);
         const unitDetailText=(Array.isArray(t.unitDetails)&&t.unitDetails.length?t.unitDetails.map(item=>item.serial?`${item.id} · Serial ${item.serial}`:item.id):(Array.isArray(t.unitIds)?t.unitIds:[])).join(" | ");
@@ -15658,14 +15710,13 @@ function renderTxHistory(){
 	            <div><span class="tx-detail-label">${txHistoryIcon("box","blue")}<span>Sản phẩm</span></span><b>${escapeHtml(productDisplay.currentName)}${productDisplay.changed?`<small class="tx-historical-name">Tên lúc giao dịch: ${escapeHtml(productDisplay.historicalName)}</small>`:""}</b></div>
 	            <div><span class="tx-detail-label">${txHistoryIcon("id","purple")}<span>Mã giao dịch</span></span><b>${escapeHtml(String(t.id||""))}</b></div>
 	            <div><span class="tx-detail-label">${txHistoryIcon("quantity","orange")}<span>Số lượng</span></span><b>${Math.abs(Number(t.qty)||0)}</b></div>
-	            <div><span class="tx-detail-label">${txHistoryIcon("price","teal")}<span>Giá bán</span></span><b>${t.gia>0?fmt(t.gia):"Không ghi giá"}</b></div>
-	            <div class="tx-total"><span class="tx-detail-label">${txHistoryIcon("total","green")}<span>Thành tiền</span></span><b>${fmt((Number(t.gia)||0)*Math.abs(Number(t.qty)||0))}</b></div>
+	            ${canViewPrivateTransactionDetails?`<div><span class="tx-detail-label">${txHistoryIcon("price","teal")}<span>Giá bán</span></span><b>${t.gia>0?fmt(t.gia):"Không ghi giá"}</b></div><div class="tx-total"><span class="tx-detail-label">${txHistoryIcon("total","green")}<span>Thành tiền</span></span><b>${fmt((Number(t.gia)||0)*Math.abs(Number(t.qty)||0))}</b></div>`:""}
 	            ${canViewPrivateTransactionDetails&&unitDetailText?`<div class="tx-total"><span class="tx-detail-label">${txHistoryIcon("serial","purple")}<span>Serial / mã cá thể</span></span><b>${escapeHtml(unitDetailText)}</b></div>`:""}
 	          </div>
-          ${canViewPrivateTransactionDetails&&t.ghi?`<span class="tx-note">${txHistoryIcon("note","orange")}<span>${escapeHtml(t.ghi)}</span></span>`:""}
+          ${t.ghi?`<span class="tx-note">${txHistoryIcon("note","orange")}<span>${escapeHtml(t.ghi)}</span></span>`:""}
           ${renderSameDayEmployeeLinks(t, r)}
           ${t.img?`<img class="tx-img" src="${escapeHtml(t.img)}" alt="Ảnh giao dịch" referrerpolicy="no-referrer" onclick="openImageViewer(this.src, this.alt)" onerror="this.style.display='none';">`:""}
-          ${canViewPrivateTransactionDetails&&(t.warranty1||t.warranty2)?`<div class="prod-media">
+          ${(t.warranty1||t.warranty2)?`<div class="prod-media">
             ${t.warranty1?`<button type="button" class="prod-extra-image" data-url="${escapeHtml(t.warranty1)}" data-title="Bảo hành 1 - ${escapeHtml(t.ten||t.ma||'Giao dịch')}" onclick="openImageViewer(this.dataset.url,this.dataset.title)">Bảo hành 1</button>`:""}
             ${t.warranty2?`<button type="button" class="prod-extra-image" data-url="${escapeHtml(t.warranty2)}" data-title="Bảo hành 2 - ${escapeHtml(t.ten||t.ma||'Giao dịch')}" onclick="openImageViewer(this.dataset.url,this.dataset.title)">Bảo hành 2</button>`:""}
           </div>`:""}
@@ -15710,6 +15761,7 @@ function showTxHistory(idx){
   document.documentElement.classList.add("tx-overlay-open");
   document.body.classList.add("tx-overlay-open");
   document.getElementById("txOverlay").classList.add("open");
+  if(!isAdminMode()) void loadPublicTransactionDetailsForProduct(idx);
 }
 function editTX(id){ if(!requireActionPermission("TRANSACTION_EDIT","sửa giao dịch")) return;
   const tx = TX_DATA.find(t=>String(t.id)===String(id));
