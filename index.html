@@ -9738,7 +9738,7 @@ async function submitAdminPass(){
       method:"POST",
       headers:{"Content-Type":"text/plain;charset=utf-8"},
       body:JSON.stringify({action:"verify_admin",password:val,clientId:LOGIN_CLIENT_ID})
-    }, 20000);
+    }, 30000);
     if(!result.token) throw new Error("Backend không cấp phiên Admin");
     sessionStorage.setItem("kho_admin_session_token", result.token);
     setAdminMode(true);
@@ -9905,13 +9905,13 @@ async function verifySyncErrorPassword(){
   try{
     const verified=await fetchSheetJson(SHEET_API_URL,{
       method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},
-      body:JSON.stringify({action:"verify_admin",password})
-    },20000);
+      body:JSON.stringify({action:"verify_admin",password,clientId:LOGIN_CLIENT_ID})
+    },30000);
     syncErrorAuthToken=verified.token || "";
     const result=await fetchSheetJson(SHEET_API_URL,{
       method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},
       body:JSON.stringify({action:"get_error_logs",data:{},auth:syncErrorAuthToken})
-    },20000);
+    },45000);
     serverSyncErrorLogs=Array.isArray(result.logs)?result.logs:[];
     document.getElementById("syncErrorGate").style.display="none";
     document.getElementById("syncErrorContent").style.display="";
@@ -9956,7 +9956,7 @@ async function clearSyncErrorLog(){
     await fetchSheetJson(SHEET_API_URL,{
       method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},
       body:JSON.stringify({action:"clear_error_logs",data:{},auth:syncErrorAuthToken})
-    },20000);
+    },30000);
     serverSyncErrorLogs=[];
   }catch(e){ showToast("⚠️ Không xóa được nhật ký: "+String(e),4500); return; }
   try{ localStorage.removeItem(LAST_SYNC_ERROR_KEY); }catch(e){}
@@ -10239,6 +10239,9 @@ function sheetHttpError(status, context, responseText=""){
   return error;
 }
 function isSafeSheetGetRetry(error){
+  // API đã trả JSON hợp lệ nhưng từ chối nghiệp vụ (sai mật khẩu, thiếu quyền,
+  // phiên hết hạn...) thì tuyệt đối không gửi lại, tránh tính hai lần đăng nhập sai.
+  if(error?.serverRejected) return false;
   const status=Number(error?.status||0);
   return !status || status===404 || status===408 || status===429 || status>=500;
 }
@@ -10246,7 +10249,7 @@ async function fetchSheetJson(url, options={}, timeoutMs=SHEET_TIMEOUT_MS){
   const context=sheetRequestContext(url,options);
   // Các action đọc dùng POST để kèm phiên đăng nhập nhưng không thay đổi dữ liệu.
   // Cho phép thử lại khi mạng chập chờn; mọi POST có ghi dữ liệu vẫn chỉ gửi đúng một lần.
-  const safeReadPost=new Set(["private_products","private_customers","private_customer_records","private_partners","validate_admin_session","validate_employee_session"]).has(context.action);
+  const safeReadPost=new Set(["private_products","private_customers","private_customer_records","private_partners","validate_admin_session","validate_employee_session","verify_admin","verify_private_access","verify_employee_access","get_error_logs"]).has(context.action);
   const maxAttempts=context.method==="GET" ? 3 : safeReadPost ? 2 : 1;
   let lastError;
   for(let attempt=1;attempt<=maxAttempts;attempt++){
@@ -10265,7 +10268,12 @@ async function fetchSheetJson(url, options={}, timeoutMs=SHEET_TIMEOUT_MS){
       let json;
       try{ json=JSON.parse(text); }
       catch(_){ throw new Error(`Máy chủ trả dữ liệu không hợp lệ · ${context.method} ${context.label}`); }
-      if(!json || json.ok!==true) throw new Error(`${(json&&json.error)||"Phản hồi máy chủ không hợp lệ"} · ${context.method} ${context.label}`);
+      if(!json || json.ok!==true){
+        const rejected=new Error(`${(json&&json.error)||"Phản hồi máy chủ không hợp lệ"} · ${context.method} ${context.label}`);
+        rejected.serverRejected=true;
+        rejected.requestContext=context;
+        throw rejected;
+      }
       return json;
     }catch(rawError){
       const error=rawError?.name==="AbortError"
@@ -10356,7 +10364,8 @@ async function postSheet(action, data, timeoutMs=SHEET_TIMEOUT_MS){
     sessionStorage.removeItem("kho_cntt_admin");
     if(isAdminMode()) setAdminMode(false);
     finishSyncActionFeedback(feedbackBtn,false);
-    throw new Error("Phiên Admin đã hết hạn. Vui lòng đăng nhập Admin lại rồi thực hiện thao tác.");
+    setTimeout(()=>{ revealAdminEntry(false); if(!document.getElementById("adminOverlay")?.classList.contains("open")) onAdminBtnClick(); },0);
+    throw new Error("Phiên Admin đã hết hạn. Biểu mẫu vẫn được giữ; hãy đăng nhập lại rồi bấm Lưu/Thử lại.");
   }
 }
 let atomicApiVersionChecked = false;
@@ -10392,7 +10401,27 @@ async function commitInventoryTransaction(mode,row,tx,options={}){
     return result;
   }
 }
-async function saveProductRow(row, oldCode="", oldBranch="Q2"){
+function productRowsEqual(left,right){
+  if(!left || !right) return false;
+  return JSON.stringify(normalizeSheetRows([left])[0])===JSON.stringify(normalizeSheetRows([right])[0]);
+}
+async function reconcilePendingInventoryAfterTargetedWrite(){
+  if(!hasPendingSync()) return false;
+  try{
+    const latest=hasPrivateProductDataAccess()
+      ? await privateSheet("private_products",{},45000)
+      : await fetchSheetJson(sheetUrl({type:"data",_ts:Date.now()}),{},45000);
+    if(!Array.isArray(latest.data)) return true;
+    SERVER_DATA_FINGERPRINT=String(latest.fingerprint||SERVER_DATA_FINGERPRINT);
+    const stillDifferent=canonicalInventoryJson(DATA)!==canonicalInventoryJson(latest.data);
+    if(!stillDifferent) setPendingSync(false);
+    return stillDifferent;
+  }catch(error){
+    console.warn("Chưa đối chiếu được thay đổi đang chờ sau khi lưu sản phẩm:",error);
+    return true;
+  }
+}
+async function saveProductRow(row, oldCode="", oldBranch="Q2", originalRow=null){
   const hadPendingBefore = hasPendingSync();
   const validationIssues = validateInventoryRows(DATA);
   if(validationIssues.length){
@@ -10407,11 +10436,41 @@ async function saveProductRow(row, oldCode="", oldBranch="Q2"){
   setPendingSync(true, "Đang chờ đồng bộ sản phẩm");
   try{
     const safeRow = normalizeSheetRows([row])[0];
-    const result=await postSheet("upsert_product", {row: safeRow, oldCode, oldBranch, baseFingerprint:SERVER_DATA_FINGERPRINT}, 45000);
+    let result;
+    try{
+      result=await postSheet("upsert_product", {row: safeRow, oldCode, oldBranch, baseFingerprint:SERVER_DATA_FINGERPRINT}, 45000);
+    }catch(firstError){
+      if(!String(firstError).includes("SYNC_CONFLICT")) throw firstError;
+      // Dấu vân tay toàn kho có thể cũ vì một thiết bị khác vừa sửa sản phẩm khác.
+      // Chỉ thử lại khi chính dòng đang sửa vẫn giống bản người dùng đã mở, hoặc
+      // sản phẩm mới chưa tồn tại. Như vậy không ghi đè thay đổi cùng sản phẩm.
+      const latest=hasPrivateProductDataAccess()
+        ? await privateSheet("private_products",{},45000)
+        : await fetchSheetJson(sheetUrl({type:"data",_ts:Date.now()}),{},45000);
+      if(!Array.isArray(latest.data)) throw firstError;
+      const latestRows=normalizeSheetRows(latest.data);
+      SERVER_DATA_FINGERPRINT=String(latest.fingerprint||"");
+      const newCode=normalizeProductCode(safeRow[1]);
+      const newBranch=String(safeRow[13]||"Q2");
+      const oldCodeKey=normalizeProductCode(oldCode||safeRow[1]);
+      const oldBranchKey=String(oldBranch||safeRow[13]||"Q2");
+      const serverNewRow=latestRows.find(item=>normalizeProductCode(item[1])===newCode&&String(item[13]||"Q2")===newBranch);
+      if(serverNewRow&&productRowsEqual(serverNewRow,safeRow)){
+        result={ok:true,noop:true,fingerprint:SERVER_DATA_FINGERPRINT};
+      }else{
+        const serverOldRow=latestRows.find(item=>normalizeProductCode(item[1])===oldCodeKey&&String(item[13]||"Q2")===oldBranchKey);
+        const safeToRetry=originalRow ? productRowsEqual(serverOldRow,originalRow) : !serverNewRow;
+        if(!safeToRetry) throw firstError;
+        result=await postSheet("upsert_product", {row:safeRow,oldCode,oldBranch,baseFingerprint:SERVER_DATA_FINGERPRINT},45000);
+      }
+    }
     if(result.fingerprint) SERVER_DATA_FINGERPRINT=result.fingerprint;
     if(Array.isArray(result.links)) PRODUCT_LINKS=result.links;
     if(result.productLinksFingerprint) SERVER_PRODUCT_LINKS_FINGERPRINT=String(result.productLinksFingerprint);
-    setPendingSync(hadPendingBefore,hadPendingBefore?"Vẫn còn thay đổi khác đang chờ đồng bộ":""); setSyncBadge(hadPendingBefore?"pending":"synced"); markLastSync();
+    const pendingRemains=hadPendingBefore ? await reconcilePendingInventoryAfterTargetedWrite() : false;
+    setPendingSync(pendingRemains,pendingRemains?"Vẫn còn thay đổi khác đang chờ đồng bộ":"");
+    setSyncBadge(pendingRemains?"pending":"synced");
+    markLastSync();
     return true;
   }catch(e){
     // Hết thời gian chờ ở trình duyệt không đồng nghĩa Apps Script đã dừng.
@@ -10597,17 +10656,23 @@ async function manualSync(){
   await flushDataSaveQueue();
   setSyncBadge("syncing");
   try{
-    let dataOk = true;
-    const [dataPushOk, nvOk, txOk, configOk] = await Promise.all([
-      (hasPendingSync() ? pushToSheet() : Promise.resolve()).then(()=>true).catch(e=>{ dataOk=false; throw e; }),
-      saveNV(),
-      saveTX(),
-      saveDisplayConfig()
-    ]);
-    if(dataOk && dataPushOk && nvOk && txOk && configOk){
+    await ensureAtomicApi();
+    // Apps Script chỉ có một khóa ghi chung. Gửi tuần tự và chỉ gửi phần thực sự
+    // đang chờ để tránh bốn yêu cầu tự tranh khóa rồi cùng báo hết thời gian.
+    let dataOk=true, nvOk=true, txOk=true, configOk=true;
+    if(hasPendingSync()){
+      await pushToSheet();
+      setPendingSync(false);
+    }
+    if(hasAuxPendingSync(PENDING_NV_SYNC_KEY)) nvOk=await saveNV();
+    if(hasAuxPendingSync(PENDING_TX_SYNC_KEY)) txOk=await saveTX();
+    if(hasAuxPendingSync(PENDING_CONFIG_SYNC_KEY)) configOk=await saveDisplayConfig();
+    dataOk=!hasPendingSync();
+    if(dataOk && nvOk && txOk && configOk){
       setPendingSync(false);
       setSyncBadge("synced");
-      showToast("✅ Đã đẩy dữ liệu hiện tại lên máy chủ");
+      markLastSync();
+      showToast("✅ Đã đồng bộ an toàn với máy chủ");
     }else{
       setSyncBadge("error", "Một phần dữ liệu chưa đồng bộ được");
     }
@@ -14196,6 +14261,8 @@ function updateAdminProfileButton(open=document.body.classList.contains("admin-m
 function loadNV(){ if(!isAdminMode()){if(!NV_LIST.length)loadPublicRecentCache();updateAdminProfileButton();return;} try{ NV_LIST = normalizeNVList(JSON.parse(localStorage.getItem("kho_cntt_nv")||"[]")); }catch(e){ NV_LIST=[]; } updateAdminProfileButton(); }
 async function saveNV(){
   NV_LIST = normalizeNVList(NV_LIST);
+  const oversizedAvatar = NV_LIST.find(nv=>!validateSheetImageValue(nv.avatar,"Ảnh đại diện của "+(nv.name||"nhân viên")));
+  if(oversizedAvatar) return false;
   updateAdminProfileButton();
   try{ safeLocalStorageSet("kho_cntt_nv", JSON.stringify(NV_LIST)); }catch(e){}
   if(!SHEET_API_URL) return true;
@@ -14332,26 +14399,17 @@ function debounceNVRowLink(el, i){
   }, 500);
 }
 // Chọn file ảnh trên máy để đổi avatar cho 1 nhân viên đã có sẵn trong danh sách.
-function handleNVRowAvatarPick(i, input){
+async function handleNVRowAvatarPick(i, input){
   const file = input.files[0];
   if(!file) return;
-  if(!file.type.startsWith("image/")){ alert("Vui lòng chọn 1 file ảnh!"); return; }
-  const reader = new FileReader();
-  reader.onload = function(e){
-    const img = new Image();
-    img.onload = function(){
-      const MAX = 160; let w = img.width, h = img.height;
-      if(w>MAX || h>MAX){ if(w>h){ h = Math.round(h*MAX/w); w = MAX; } else { w = Math.round(w*MAX/h); h = MAX; } }
-      const canvas = document.createElement("canvas"); canvas.width = w; canvas.height = h; canvas.getContext("2d").drawImage(img,0,0,w,h);
-      if(NV_LIST[i]){
-        NV_LIST[i].avatar = canvas.toDataURL("image/jpeg", 0.72);
-        saveNV();
-        renderNVList();
-      }
-    };
-    img.src = e.target.result;
-  };
-  reader.readAsDataURL(file);
+  try{
+    const avatar = await compressImageForSheet(file,160,0.72);
+    if(NV_LIST[i]){
+      NV_LIST[i].avatar = avatar;
+      await saveNV();
+      renderNVList();
+    }
+  }catch(error){ input.value=""; alert(String(error.message||error)); }
 }
 async function addNV(){ if(!requireAdmin()) return;
   const val = document.getElementById("nvInput").value.trim();
@@ -14360,6 +14418,7 @@ async function addNV(){ if(!requireAdmin()) return;
   const badgeRaw = document.getElementById("nvBadgeIconLink").value.trim();
   const badgeIcon = badgeRaw ? resolveImageUrl(badgeRaw) : "";
   if(!val){ alert("Nhập tên nhân viên!"); return; }
+  if(!validateSheetImageValue(avatar,"Ảnh đại diện nhân viên")) return;
   if(findNVByName(val)){ alert("Nhân viên này đã có trong danh sách!"); return; }
   const backup=JSON.parse(JSON.stringify(NV_LIST));
   NV_LIST.push({ name:val, avatar, role, badgeIcon });
@@ -15019,6 +15078,7 @@ async function saveSale(){
   const warranty1 = resolveImageUrl(document.getElementById("saleWarranty1").value);
   const warranty2 = resolveImageUrl(document.getElementById("saleWarranty2").value);
   const timeInput = document.getElementById("saleTime").value;
+  if(!validateSheetImageValue(img,"Ảnh giao dịch")) return;
   if(!txId && (!Number.isInteger(qty) || qty <= 0)){
     alert("Số lượng xuất phải là số nguyên lớn hơn 0!");
     document.getElementById("saleQty").focus();
@@ -16071,56 +16131,70 @@ function setTxImagePreview(dataUrl){
   if(linkInput) linkInput.value = (dataUrl && dataUrl.startsWith("http")) ? dataUrl : "";
 }
 function removeTxImage(){ setTxImagePreview(""); document.getElementById("saleImgFile").value=""; }
-function handleNVAvatarPick(input){
-  const file = input.files[0];
-  if(!file) return;
-  if(!file.type.startsWith("image/")){ alert("Vui lòng chọn 1 file ảnh!"); return; }
-  const reader = new FileReader();
-  reader.onload = function(e){
-    const img = new Image();
-    img.onload = function(){
-      const MAX = 160; let w = img.width, h = img.height;
-      if(w>MAX || h>MAX){ if(w>h){ h = Math.round(h*MAX/w); w = MAX; } else { w = Math.round(w*MAX/h); h = MAX; } }
-      const canvas = document.createElement("canvas"); canvas.width = w; canvas.height = h; canvas.getContext("2d").drawImage(img,0,0,w,h);
-      setNVAvatarPreview(canvas.toDataURL("image/jpeg", 0.72));
-    };
-    img.src = e.target.result;
-  };
-  reader.readAsDataURL(file);
+// Google Sheets chỉ nhận tối đa 50.000 ký tự trong một ô. Ảnh chụp từ điện thoại
+// dù đã thu nhỏ theo chiều rộng vẫn có thể vượt giới hạn này nếu ảnh có nhiều chi tiết.
+// Nén lặp theo cả chất lượng lẫn kích thước để luôn chừa biên an toàn cho ô dữ liệu.
+const SHEET_IMAGE_SAFE_CHAR_LIMIT = 44000;
+function loadLocalImageFile(file){
+  return new Promise((resolve,reject)=>{
+    const objectUrl = URL.createObjectURL(file);
+    const image = new Image();
+    image.onload = ()=>{ URL.revokeObjectURL(objectUrl); resolve(image); };
+    image.onerror = ()=>{ URL.revokeObjectURL(objectUrl); reject(new Error("Không đọc được file ảnh này.")); };
+    image.src = objectUrl;
+  });
 }
-function handleTxImagePick(input){
-  const file = input.files[0];
-  if(!file) return;
-  if(!file.type.startsWith("image/")){ alert("Vui lòng chọn 1 file ảnh!"); return; }
-  const reader = new FileReader();
-  reader.onload = function(e){
-    const img = new Image();
-    img.onload = function(){
-      const MAX = 360; let w = img.width, h = img.height;
-      if(w>MAX || h>MAX){ if(w>h){ h = Math.round(h*MAX/w); w = MAX; } else { w = Math.round(w*MAX/h); h = MAX; } }
-      const canvas = document.createElement("canvas"); canvas.width = w; canvas.height = h; canvas.getContext("2d").drawImage(img,0,0,w,h);
-      setTxImagePreview(canvas.toDataURL("image/jpeg", 0.65));
-    };
-    img.src = e.target.result;
-  };
-  reader.readAsDataURL(file);
+async function compressImageForSheet(file, maxDimension, initialQuality=0.72){
+  if(!file || !String(file.type||"").startsWith("image/")) throw new Error("Vui lòng chọn một file ảnh hợp lệ.");
+  const image = await loadLocalImageFile(file);
+  let scale = Math.min(1, Number(maxDimension||400) / Math.max(image.naturalWidth||image.width||1, image.naturalHeight||image.height||1));
+  let best = "";
+  for(let sizePass=0; sizePass<7; sizePass++){
+    const width = Math.max(96, Math.round((image.naturalWidth||image.width) * scale));
+    const height = Math.max(96, Math.round((image.naturalHeight||image.height) * scale));
+    const canvas = document.createElement("canvas");
+    canvas.width = width; canvas.height = height;
+    const context = canvas.getContext("2d", {alpha:false});
+    context.fillStyle = "#fff"; context.fillRect(0,0,width,height);
+    context.drawImage(image,0,0,width,height);
+    for(const quality of [initialQuality,0.64,0.56,0.48,0.40,0.34]){
+      const dataUrl = canvas.toDataURL("image/jpeg", quality);
+      if(!best || dataUrl.length < best.length) best = dataUrl;
+      if(dataUrl.length <= SHEET_IMAGE_SAFE_CHAR_LIMIT) return dataUrl;
+    }
+    scale *= 0.80;
+  }
+  if(best && best.length <= SHEET_IMAGE_SAFE_CHAR_LIMIT) return best;
+  throw new Error("Ảnh vẫn quá lớn sau khi tối ưu. Hãy chọn ảnh khác hoặc dùng liên kết Google Drive.");
 }
-function handleImagePick(input){
+function validateSheetImageValue(value, label="Ảnh"){
+  const text = String(value||"");
+  if(text.length > SHEET_IMAGE_SAFE_CHAR_LIMIT){
+    alert(`${label} quá lớn để đồng bộ an toàn lên Google Sheets. Hãy chọn lại ảnh hoặc dùng liên kết Google Drive.`);
+    return false;
+  }
+  return true;
+}
+async function handleNVAvatarPick(input){
   const file = input.files[0];
   if(!file) return;
-  if(!file.type.startsWith("image/")){ alert("Vui lòng chọn 1 file ảnh!"); return; }
-  const reader = new FileReader();
-  reader.onload = function(e){
-    const img = new Image();
-    img.onload = function(){
-      const MAX = 400; let w = img.width, h = img.height;
-      if(w>MAX || h>MAX){ if(w>h){ h = Math.round(h*MAX/w); w = MAX; } else { w = Math.round(w*MAX/h); h = MAX; } }
-      const canvas = document.createElement("canvas"); canvas.width = w; canvas.height = h; canvas.getContext("2d").drawImage(img,0,0,w,h);
-      setImagePreview(canvas.toDataURL("image/jpeg", 0.7));
-    };
-    img.src = e.target.result;
-  };
-  reader.readAsDataURL(file);
+  try{
+    setNVAvatarPreview(await compressImageForSheet(file,160,0.72));
+  }catch(error){ input.value=""; alert(String(error.message||error)); }
+}
+async function handleTxImagePick(input){
+  const file = input.files[0];
+  if(!file) return;
+  try{
+    setTxImagePreview(await compressImageForSheet(file,360,0.68));
+  }catch(error){ input.value=""; alert(String(error.message||error)); }
+}
+async function handleImagePick(input){
+  const file = input.files[0];
+  if(!file) return;
+  try{
+    setImagePreview(await compressImageForSheet(file,400,0.72));
+  }catch(error){ input.value=""; alert(String(error.message||error)); }
 }
 let GROUP_OPTIONS = {
   MT: ["🔋  Nguồn — PSU","🔌  Mainboard","🧠  CPU — Bộ vi xử lý","💾  RAM — Bộ nhớ","⚡  SSD — Ổ cứng thể rắn","🗄️  HDD — Ổ cứng cơ","🖵  Màn hình","🖱️  Chuột & Bàn phím","💻  Laptop linh kiện","🎮  VGA — Card màn hình","🖥️  Case — Vỏ máy tính","❄️  Tản nhiệt — Cooling","🔌  Dây cáp chuyển","🛠️  Linh kiện khác"],
@@ -16444,6 +16518,10 @@ async function saveItem(){
   const costInputRaw = String(document.getElementById("fGia").value || "").trim();
   const saleInputRaw = String(document.getElementById("fGiaBan").value || "").trim();
   let quickTag = joinRowQuickTags(getSelectedQuickTags());
+  if(!validateSheetImageValue(img,"Ảnh sản phẩm")) return;
+  for(const [value,label] of [[warrantyImg1,"Ảnh bảo hành 1"],[warrantyImg2,"Ảnh bảo hành 2"],[warrantyImg3,"Ảnh bảo hành 3"],[warrantyImg4,"Ảnh bảo hành 4"]]){
+    if(!validateSheetImageValue(value,label)) return;
+  }
   if(!ma||!tenBase){alert("Vui lòng nhập Mã hàng và Tên sản phẩm!"); return;}
   if(!productCondition){ alert("Vui lòng chọn trạng thái MỚI hoặc CŨ!"); document.querySelector(".condition-picker")?.scrollIntoView({behavior:"smooth",block:"center"}); return; }
   if(stockInputRaw==="" || !/^\d+$/.test(stockInputRaw) || Number(stockInputRaw)<0){ alert("Vui lòng nhập Số lượng tồn là số nguyên từ 0 trở lên!"); document.getElementById("fTon").focus(); return; }
@@ -16505,7 +16583,7 @@ if(idx===""){
   showToast("Đã lưu: "+tenBase);
 }
 
-	const saved = await saveProductRow(row, oldCode, oldBranch);
+	const saved = await saveProductRow(row, oldCode, oldBranch, oldRow ? oldRow.slice() : null);
 	if(!saved){
   if(idx==="") document.getElementById("editIdx").value = "0";
   if(saveButton){ saveButton.disabled = false; saveButton.textContent = "🔄 Thử lưu lại"; }
@@ -17023,7 +17101,7 @@ async function submitPrivateAccess(){
     const verified=await fetchSheetJson(SHEET_API_URL,{
       method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},
       body:JSON.stringify({action:"verify_employee_access",employee:employeeName,password:value,scope:target,clientId:LOGIN_CLIENT_ID})
-    },20000);
+    },30000);
     if(!verified.token) throw new Error("API không cấp phiên đăng nhập nhân viên");
     if(!verified.employee) throw new Error("API chưa trả lại hồ sơ quyền của nhân viên");
     const needed=target==="customer"?"CUSTOMER_VIEW":target==="partner"?"PARTNER_VIEW":"";
@@ -17117,7 +17195,11 @@ function isPrivateAuthFailure(error){
 async function privateSheet(action,data={},timeoutMs=SHEET_TIMEOUT_MS){
   const adminToken=sessionStorage.getItem("kho_admin_session_token") || "";
   const areaToken=getEmployeePrivateAreaToken(privateAccessTarget);
-  const actingAsEmployee=employeeSessionValidated && !!employeeAccessToken && !!employeeAccessProfile?.name;
+  // Dữ liệu sản phẩm riêng phục vụ trực tiếp màn hình quản trị. Nếu Admin đang
+  // mở hợp lệ thì phải dùng phiên Admin, kể cả tab vẫn còn một phiên nhân viên.
+  // Các khu Khách hàng/Đối tác vẫn ưu tiên phiên nhân viên riêng và đúng phạm vi.
+  const adminOwnsProductRequest=action==="private_products" && isAdminMode() && !!adminToken;
+  const actingAsEmployee=!adminOwnsProductRequest && employeeSessionValidated && !!employeeAccessToken && !!employeeAccessProfile?.name;
   try{
     return await fetchSheetJson(SHEET_API_URL,{
       method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},
@@ -17142,9 +17224,14 @@ async function privateSheet(action,data={},timeoutMs=SHEET_TIMEOUT_MS){
         if(isAdminMode()) setAdminMode(false);
       }
       clearPrivateSession();
-      const expiredError=new Error("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại để tiếp tục.");
+      const expiredError=new Error(adminExpired
+        ? "Phiên Admin đã hết hạn. Nội dung đang nhập vẫn được giữ; hãy đăng nhập lại để tiếp tục."
+        : "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại để tiếp tục.");
       expiredError.code="PRIVATE_AUTH_REQUIRED";
-      setTimeout(()=>requestPrivateAccess(privateAccessTarget),0);
+      setTimeout(()=>{
+        if(adminExpired){ revealAdminEntry(false); if(!document.getElementById("adminOverlay")?.classList.contains("open")) onAdminBtnClick(); }
+        else requestPrivateAccess(privateAccessTarget);
+      },0);
       throw expiredError;
     }
     throw e;
@@ -19552,12 +19639,15 @@ window.addEventListener("beforeunload",event=>{
   event.returnValue="";
 });
 
-// PWA chỉ hoạt động khi đã đưa lên HTTPS; bản file:// review vẫn chạy bình thường.
+// Hosting hiện không phát hành sw.js. Gỡ đăng ký cũ nếu từng có để bản cache
+// ngoại tuyến không giữ HTML/API cũ và chặn nhầm các yêu cầu đăng nhập, đồng bộ.
 if("serviceWorker" in navigator && /^https?:$/.test(location.protocol)){
   window.addEventListener("load",()=>{
-    navigator.serviceWorker.register("./sw.js",{scope:"./"}).catch(error=>{
-      console.warn("Không đăng ký được chế độ ứng dụng ngoại tuyến:",error);
-    });
+    navigator.serviceWorker.getRegistrations?.().then(registrations=>{
+      registrations.forEach(registration=>{
+        if(String(registration.scope||"").startsWith(location.origin+"/")) registration.unregister().catch(()=>{});
+      });
+    }).catch(error=>console.warn("Chưa dọn được bộ nhớ ứng dụng cũ:",error));
   },{once:true});
 }
 
