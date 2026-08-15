@@ -235,16 +235,24 @@ button:disabled,input:disabled,select:disabled,[aria-disabled="true"] { cursor:n
 .kpi-modern-dashboard { display:grid; gap:10px; }
 .kpi-summary-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; }
 .kpi-summary-card { position:relative; min-width:0; min-height:92px; padding:11px 10px 10px; overflow:hidden; border:1px solid #DDE7F0; border-radius:13px; background:linear-gradient(145deg,#fff,#F7FAFD); box-shadow:0 5px 15px rgba(30,58,95,.07); }
+.kpi-summary-card.is-clickable { width:100%; margin:0; color:inherit; font:inherit; text-align:left; cursor:pointer; appearance:none; transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease; }
+.kpi-summary-card.is-clickable:hover { transform:translateY(-1px); border-color:var(--kpi-accent,#2E86C1); box-shadow:0 8px 20px rgba(30,58,95,.13); }
+.kpi-summary-card.is-clickable:focus-visible { outline:3px solid color-mix(in srgb,var(--kpi-accent,#2E86C1) 24%,transparent); outline-offset:2px; }
+.kpi-summary-card.is-selected { border-color:var(--kpi-accent,#2E86C1); background:linear-gradient(145deg,color-mix(in srgb,var(--kpi-accent-soft,#D6EAF8) 20%,#fff),#fff); box-shadow:0 8px 22px color-mix(in srgb,var(--kpi-accent,#2E86C1) 18%,transparent); }
 .kpi-summary-card::after { content:""; position:absolute; right:-18px; bottom:-22px; width:58px; height:58px; border-radius:50%; background:var(--kpi-accent-soft,#D6EAF8); opacity:.22; pointer-events:none; }
 .kpi-summary-icon { width:27px; height:27px; display:inline-flex; align-items:center; justify-content:center; margin-bottom:7px; border-radius:9px; background:var(--kpi-accent-soft,#D6EAF8); color:var(--kpi-accent-soft-text,#1A5276); font-size:13px; box-shadow:inset 0 1px 0 rgba(255,255,255,.72); }
 .kpi-summary-label { display:block; color:#718096; font-size:9px; font-weight:850; letter-spacing:.35px; line-height:1.2; text-transform:uppercase; }
 .kpi-summary-value { display:block; margin-top:3px; color:#172B45; font-size:18px; font-weight:950; line-height:1.1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .kpi-summary-note { display:block; margin-top:4px; color:#7B8C9D; font-size:9px; line-height:1.3; }
-.kpi-sortbar { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:9px 10px; border:1px solid #DCE6EF; border-radius:12px; background:rgba(255,255,255,.88); }
+.kpi-sortbar { display:flex; align-items:center; justify-content:flex-end; gap:10px; padding:9px 10px; border:1px solid #DCE6EF; border-radius:12px; background:rgba(255,255,255,.88); }
 .kpi-sort-copy { min-width:0; display:grid; gap:2px; }
 .kpi-sort-title { color:#1E3A5F; font-size:11px; font-weight:950; }
 .kpi-sort-note { color:#7A8B9B; font-size:9px; line-height:1.25; }
 .kpi-sort-select { flex:0 0 auto; min-width:156px; height:34px; margin:0; padding:5px 28px 5px 10px; border:1px solid #BFD0DE; border-radius:9px; background-color:#fff; color:#193A59; font-size:10px; font-weight:850; cursor:pointer; box-shadow:0 2px 7px rgba(30,58,95,.07); }
+.kpi-filter-head { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:10px 12px; border:1px solid color-mix(in srgb,var(--kpi-accent,#2E86C1) 26%,#DCE6EF); border-radius:12px; background:linear-gradient(105deg,color-mix(in srgb,var(--kpi-accent-soft,#D6EAF8) 18%,#fff),#fff); }
+.kpi-filter-head strong { display:block; color:#183A59; font-size:12px; font-weight:950; }
+.kpi-filter-head span { display:block; margin-top:2px; color:#738597; font-size:9px; font-weight:750; }
+.kpi-filter-reset { flex:0 0 auto; min-height:32px; margin:0; padding:6px 10px; border:1px solid #C9D8E5; border-radius:9px; background:#fff; color:#34516D; font-size:9px; font-weight:900; cursor:pointer; }
 .kpi-priority-panel { overflow:hidden; border:1px solid #DCE6EF; border-color:color-mix(in srgb,var(--kpi-accent,#2E86C1) 24%,#DCE6EF); border-radius:14px; background:#fff; box-shadow:0 7px 20px rgba(30,58,95,.08); }
 .kpi-priority-head { display:flex; align-items:center; justify-content:space-between; gap:8px; padding:10px 11px; background:#F5F9FC; background:linear-gradient(105deg,color-mix(in srgb,var(--kpi-accent,#2E86C1) 12%,#fff),#fff); border-bottom:1px solid #E3EBF2; }
 .kpi-priority-title { display:block; color:#183A59; font-size:11px; font-weight:950; }
@@ -258,6 +266,12 @@ button:disabled,input:disabled,select:disabled,[aria-disabled="true"] { cursor:n
 .kpi-category-stack .kpi-detail-badge { padding:5px 9px; border-radius:8px; box-shadow:0 2px 7px rgba(30,58,95,.12); }
 .kpi-category-stack .kpi-detail-count { display:flex; align-items:center; gap:3px; color:#263F58; font-size:12px; }
 .kpi-category-stack .kpi-product-list { margin:0 0 9px; border-color:#E4EBF2; background:#F8FAFC; }
+.kpi-subgroup + .kpi-subgroup { margin-top:8px; }
+.kpi-subgroup { overflow:hidden; border:1px solid #DFE8F0; border-radius:10px; background:#fff; }
+.kpi-subgroup-head { display:flex; align-items:center; justify-content:space-between; gap:8px; min-height:35px; padding:7px 9px; border-bottom:1px solid #E7EDF3; background:linear-gradient(105deg,color-mix(in srgb,var(--kpi-accent-soft,#D6EAF8) 16%,#fff),#fff); }
+.kpi-subgroup-head strong { min-width:0; color:#1F405E; font-size:10px; font-weight:950; line-height:1.3; }
+.kpi-subgroup-head span { flex:0 0 auto; padding:3px 7px; border-radius:999px; background:#EDF3F8; color:#526A7F; font-size:8px; font-weight:900; }
+.kpi-subgroup-items { display:grid; padding:3px 6px 5px; }
 .kpi-product-link.kpi-stacked-row { position:relative; display:grid; grid-template-columns:minmax(0,1fr) auto; gap:5px 10px; min-height:58px; padding:9px 8px; border-radius:8px; transition:background .15s ease,transform .15s ease; }
 .kpi-product-link.kpi-stacked-row:hover,.kpi-product-link.kpi-stacked-row:focus-visible { background:#EEF6FC; outline:none; transform:translateX(2px); }
 .kpi-stacked-title { grid-column:1; align-self:center; }
@@ -285,8 +299,9 @@ button:disabled,input:disabled,select:disabled,[aria-disabled="true"] { cursor:n
   .kpi-summary-card { min-height:80px; padding:9px; border-radius:11px; }
   .kpi-summary-icon { width:24px; height:24px; margin-bottom:5px; border-radius:8px; }
   .kpi-summary-value { font-size:16px; }
-  .kpi-sortbar { align-items:stretch; flex-direction:column; gap:7px; padding:8px; }
-  .kpi-sort-select { width:100%; min-width:0; height:36px; }
+  .kpi-sortbar { align-items:center; justify-content:flex-end; flex-direction:row; gap:7px; padding:8px; }
+  .kpi-sort-select { width:auto; max-width:100%; min-width:156px; height:36px; }
+  .kpi-filter-head { align-items:flex-start; }
   .kpi-priority-head { align-items:flex-start; }
   .kpi-priority-sub { display:block; margin-top:2px; }
   .kpi-category-stack .kpi-category { padding:0 6px; }
@@ -353,7 +368,7 @@ button:disabled,input:disabled,select:disabled,[aria-disabled="true"] { cursor:n
 #results { padding: 8px 10px 80px; }
 #results.home-enter { animation:homeContentEnter .42s cubic-bezier(.22,.8,.32,1) both; }
 #results.home-enter .search-landing-icon { animation:homeIconEnter .5s cubic-bezier(.2,.9,.25,1.25) both; }
-#results.home-enter .search-example { animation:homeChipEnter .38s ease-out both; animation-delay:.14s; }
+#results.home-enter .search-landing:not(.has-orbit) .search-example { animation:homeChipEnter .38s ease-out both; animation-delay:.14s; }
 @keyframes homeContentEnter {
   from { opacity:0; transform:translateY(14px); }
   to { opacity:1; transform:translateY(0); }
@@ -380,18 +395,33 @@ button:disabled,input:disabled,select:disabled,[aria-disabled="true"] { cursor:n
 .search-landing-icon svg { width:29px; height:29px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; }
 .search-landing-icon::after { content:""; position:absolute; width:7px; height:7px; border-radius:50%; background:#F5B041; box-shadow:0 0 9px rgba(245,176,65,.78); animation:searchOrbit 2.6s linear infinite; }
 .search-landing .empty-title { font-size:18px; color:#1E3A5F; margin-bottom:8px; }
-.search-examples { width:min(100%,500px); margin:18px auto 0; display:flex; flex-direction:column; align-items:stretch; gap:0; border-top:1px dotted #B9C7D2; }
-.search-example { width:100%; max-width:100%; display:flex; align-items:center; gap:6px; padding:5px 3px; border:0; border-bottom:1px dotted #B9C7D2; border-radius:0; background:transparent; color:#0969B6; font:inherit; font-size:11px; font-weight:850; line-height:1.3; box-shadow:none; cursor:pointer; text-align:left; transition:background .14s ease,color .14s ease,padding-left .14s ease; }
-.search-example:hover,.search-example:focus-visible { border-color:#9DB4C5; background:#F3F9FD; color:#064F91; padding-left:6px; transform:none; box-shadow:none; outline:none; }
-.search-example:active { background:#E8F3FA; transform:none; }
+.search-orbit-stage { --orbit-radius:64px; position:relative; width:min(100%,520px); height:225px; margin:10px auto 0; isolation:isolate; }
+.search-orbit-stage::before,.search-orbit-stage::after { content:none; }
+.search-orbit-stage .search-landing-icon { position:absolute; z-index:3; left:50%; top:50%; margin:-32px 0 0 -32px; }
+.search-examples { position:absolute; z-index:4; inset:0; width:100%; height:100%; margin:0; border:0; overflow:visible; pointer-events:none; }
+.search-example { position:absolute; left:50%; top:50%; width:clamp(142px,31vw,164px); min-height:30px; display:flex; align-items:center; gap:5px; padding:3px; border:0; border-radius:0; background:transparent; color:#0969B6; font:inherit; font-size:8.2px; font-weight:800; line-height:1.18; box-shadow:none; cursor:pointer; text-align:left; pointer-events:auto; animation:searchSatelliteOrbit 18s linear infinite; transition:color .16s ease,filter .16s ease; will-change:transform; }
+.search-orbit-stage:hover .search-example,.search-orbit-stage:focus-within .search-example { animation-play-state:paused; }
+.search-example:hover,.search-example:focus-visible { background:transparent; color:#064F91; filter:drop-shadow(0 2px 3px rgba(30,58,95,.18)); outline:none; }
+.search-example:active { background:transparent; color:#E67E22; }
 .search-example::after { display:none!important; }
 .search-example-rank { position:relative; isolation:isolate; flex:0 0 15px; width:15px; height:13px; display:grid; place-items:center; overflow:visible; border:1px solid rgba(255,255,255,.82); border-radius:3px; background:var(--rank-color); color:#fff; font-size:7px; font-weight:950; line-height:1; text-shadow:0 1px 1px rgba(0,0,0,.2); box-shadow:0 0 0 1px rgba(34,57,77,.16),0 1px 2px rgba(30,58,95,.15); }
 .search-example-rank::before { content:""; position:absolute; z-index:2; top:-1px; right:-1px; width:5px; height:5px; border-left:1px solid rgba(255,255,255,.9); border-bottom:1px solid rgba(255,255,255,.9); border-radius:0 2px 0 1px; background:#fff; clip-path:polygon(0 0,100% 100%,0 100%); }
 .search-example-rank::after { content:""; position:absolute; z-index:-1; left:-3px; top:3px; width:3px; height:1.5px; border-radius:2px 0 0 2px; background:var(--rank-color); box-shadow:0 3px 0 var(--rank-color),0 6px 0 var(--rank-color); opacity:.96; }
 .search-example-rank-number { position:relative; z-index:3; transform:translate(-1px,.5px); }
-.search-example-label { min-width:0; flex:1 1 auto; overflow-wrap:anywhere; text-decoration:underline; text-decoration-thickness:1px; text-underline-offset:1.5px; text-decoration-color:rgba(9,105,182,.6); }
+.search-example-label { min-width:0; flex:1 1 auto; overflow:hidden; display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:2; overflow-wrap:anywhere; text-decoration:underline; text-decoration-thickness:1px; text-underline-offset:1.5px; text-decoration-color:rgba(9,105,182,.6); }
 @keyframes searchBreathe { 0%,100%{transform:translateY(0);box-shadow:0 0 0 7px rgba(46,134,193,.08),0 10px 24px rgba(30,58,95,.22)} 50%{transform:translateY(-3px);box-shadow:0 0 0 10px rgba(46,134,193,.05),0 14px 28px rgba(30,58,95,.26)} }
 @keyframes searchOrbit { from{transform:rotate(0deg) translateX(40px) rotate(0deg)} to{transform:rotate(360deg) translateX(40px) rotate(-360deg)} }
+@keyframes searchSatelliteOrbit {
+  0% { transform:rotate(0deg) translateX(var(--orbit-radius)) rotate(0deg) translate(0,-50%); }
+  12.5% { transform:rotate(45deg) translateX(var(--orbit-radius)) rotate(-45deg) translate(0,0); }
+  25% { transform:rotate(90deg) translateX(var(--orbit-radius)) rotate(-90deg) translate(-50%,0); }
+  37.5% { transform:rotate(135deg) translateX(var(--orbit-radius)) rotate(-135deg) translate(-100%,0); }
+  50% { transform:rotate(180deg) translateX(var(--orbit-radius)) rotate(-180deg) translate(-100%,-50%); }
+  62.5% { transform:rotate(225deg) translateX(var(--orbit-radius)) rotate(-225deg) translate(-100%,-100%); }
+  75% { transform:rotate(270deg) translateX(var(--orbit-radius)) rotate(-270deg) translate(-50%,-100%); }
+  87.5% { transform:rotate(315deg) translateX(var(--orbit-radius)) rotate(-315deg) translate(0,-100%); }
+  100% { transform:rotate(360deg) translateX(var(--orbit-radius)) rotate(-360deg) translate(0,-50%); }
+}
 .card { position:relative; background: #fff; border-radius: 12px; margin-bottom: 8px; overflow: hidden; border: 1.5px solid #E8E8E8; box-shadow: 0 1px 4px rgba(0,0,0,.06); transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease,background-color .18s ease; }
 .card-body,.card-top,.ton-ctrl,.nguoi-ban-row { transition:background-color .18s ease,border-color .18s ease,box-shadow .18s ease; }
 .card:hover,.card:focus-within { transform:translateY(-2px); border-color:#2E86C1; background:#F4FAFE; box-shadow:0 0 0 3px rgba(46,134,193,.16),0 10px 24px rgba(30,58,95,.20),inset 4px 0 0 #2E86C1; }
@@ -1931,6 +1961,7 @@ body.fab-menu-open .category-view-bar .view-mode-switch { pointer-events:none; }
 .summary-click { appearance: none; color: inherit; font-family: inherit; cursor: pointer; transition: transform .16s ease, filter .16s ease, box-shadow .16s ease; }
 .summary-click:hover { filter: brightness(1.1); transform: translateY(-1px); box-shadow: 0 4px 10px rgba(0,0,0,.14); }
 .summary-click:active { transform: scale(.97); }
+.summary-click.is-selected { box-shadow:0 0 0 3px rgba(14,128,185,.22),0 8px 18px rgba(24,79,116,.14); }
 .summary-product-list { margin: -4px 0 14px; padding: 10px; border-radius: 12px; border: 1.5px solid rgba(30,58,95,.14); background: #fff; box-shadow: 0 5px 16px rgba(30,58,95,.10); }
 .summary-product-list-title { margin-bottom: 7px; color: #1E3A5F; font-size: 12px; font-weight: 900; }
 .summary-product-list-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr)); gap: 5px; }
@@ -2027,7 +2058,8 @@ body.fab-menu-open .category-view-bar .view-mode-switch { pointer-events:none; }
   #lastSyncText { margin-right: auto; }
   #syncBtn { width:28px; height:28px; flex-basis:28px; }
   .search-landing { padding:28px 12px 24px; }
-  .search-example { min-height:38px; padding:8px 12px; }
+  .search-orbit-stage { --orbit-radius:44px; height:205px; margin-top:8px; }
+  .search-orbit-stage .search-example { width:104px; min-height:28px; padding:2px; font-size:7.2px; line-height:1.15; }
   .filters { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
   .tabs { overflow-x: visible; width: 100%; }
   .tab-btn { flex: 1 1 20%; min-width: 0; padding: 9px 2px; font-size: 10px; text-align: center; }
@@ -7566,6 +7598,19 @@ body #results .search-landing-icon::after{
   animation:searchOrbit 2.6s linear infinite!important;
   will-change:transform;
 }
+body #results .search-orbit-stage button.search-example{
+  position:absolute!important;
+  left:50%!important;
+  top:50%!important;
+  margin:0!important;
+  animation:searchSatelliteOrbit 18s linear infinite!important;
+  will-change:transform;
+}
+body #results .search-orbit-stage button.search-example:nth-child(1){animation-delay:0s!important}
+body #results .search-orbit-stage button.search-example:nth-child(2){animation-delay:-6s!important}
+body #results .search-orbit-stage button.search-example:nth-child(3){animation-delay:-12s!important}
+body #results .search-orbit-stage:hover button.search-example,
+body #results .search-orbit-stage:focus-within button.search-example{animation-play-state:paused!important}
 body .warehouse-switch.active .warehouse-pin{
   animation:warehousePinFire .72s ease-in-out infinite alternate!important;
   filter:drop-shadow(0 0 3px #FF3B1F) drop-shadow(0 -2px 5px #FFB000);
@@ -9476,9 +9521,9 @@ const SEARCH_KEYWORD_POOL = ["SSD","RAM","Nguồn","Mainboard","CPU","HP","Canon
 let SEARCH_KEYWORDS_THIS_VISIT = [];
 const SEARCH_EXAMPLE_RANK_COLORS = (()=>{
   const colorSets=[
-    ["#F2A126","#31B66B","#5B82E6"],
-    ["#EC6575","#20AEC2","#A45FD2"],
-    ["#E98926","#45B85C","#6676DB"]
+    ["#F2A126","#31B66B","#5B82E6","#EC6575","#A45FD2"],
+    ["#EC6575","#20AEC2","#A45FD2","#E98926","#45B85C"],
+    ["#E98926","#45B85C","#6676DB","#20AEC2","#F2A126"]
   ];
   const colors=[...colorSets[Math.floor(Math.random()*colorSets.length)]];
   for(let i=colors.length-1;i>0;i--){
@@ -9526,7 +9571,7 @@ function renderSearchExampleButton(keyword,rankIndex=0){
     ? ` aria-describedby="relatedProductTooltip" onmouseenter="showRelatedProductTooltip(event,${productIndex})" onmouseleave="hideRelatedProductTooltip()" onfocus="showRelatedProductTooltip(event,${productIndex})" onblur="hideRelatedProductTooltip()"`
     : "";
   const rankColor=SEARCH_EXAMPLE_RANK_COLORS[rankIndex%SEARCH_EXAMPLE_RANK_COLORS.length];
-  return `<button type="button" class="search-example" data-keyword="${escapeHtml(keyword)}"${tooltipEvents} onclick="hideRelatedProductTooltip(true);applySearchExample(this.dataset.keyword)"><span class="search-example-rank" style="--rank-color:${rankColor}" aria-hidden="true"><span class="search-example-rank-number">${rankIndex+1}</span></span><span class="search-example-label">${escapeHtml(keyword)}</span></button>`;
+  return `<button type="button" class="search-example" style="animation-delay:${rankIndex*-6}s" data-keyword="${escapeHtml(keyword)}"${tooltipEvents} onclick="hideRelatedProductTooltip(true);applySearchExample(this.dataset.keyword)"><span class="search-example-rank" style="--rank-color:${rankColor}" aria-hidden="true"><span class="search-example-rank-number">${rankIndex+1}</span></span><span class="search-example-label">${escapeHtml(keyword)}</span></button>`;
 }
 let quickGroupFilter = null;
 let productViewMode = "card";
@@ -10800,10 +10845,16 @@ function kpiActivityKey(code,branch){
   const normalizedBranch=String(branch || "Q2").trim().toUpperCase()==="Q5" ? "Q5" : "Q2";
   return `${normalizedBranch}|${String(code || "").trim().toUpperCase()}`;
 }
+let kpiActivityIndexCache={source:null,length:-1,expiresAt:0,index:null};
 function buildKpiActivityIndex(){
+  const source=Array.isArray(TX_DATA) ? TX_DATA : [];
+  const now=Date.now();
+  if(kpiActivityIndexCache.index && kpiActivityIndexCache.source===source && kpiActivityIndexCache.length===source.length && now<kpiActivityIndexCache.expiresAt){
+    return kpiActivityIndexCache.index;
+  }
   const index=new Map();
-  const recentCutoff=Date.now()-(30*24*60*60*1000);
-  (Array.isArray(TX_DATA) ? TX_DATA : []).forEach(tx=>{
+  const recentCutoff=now-(30*24*60*60*1000);
+  source.forEach(tx=>{
     const code=String(tx?.ma || "").trim();
     if(!code) return;
     const key=kpiActivityKey(code,tx?.branch);
@@ -10818,6 +10869,9 @@ function buildKpiActivityIndex(){
     if(kind==="IMPORT") current.lastImportAt=Math.max(current.lastImportAt,timestamp||0);
     index.set(key,current);
   });
+  // KPI được dựng lại nhiều lần khi tìm kiếm. Cache rất ngắn giúp giao diện mượt,
+  // nhưng vẫn tự làm mới ngay khi mảng giao dịch được tải lại hoặc sau 5 giây.
+  kpiActivityIndexCache={source,length:source.length,expiresAt:now+5000,index};
   return index;
 }
 function getKpiEnrichedEntries(entries=getKpiScopedEntries()){
@@ -10830,6 +10884,16 @@ function getKpiEnrichedEntries(entries=getKpiScopedEntries()){
     return {...item,stock,threshold,state:getStockState(stock,threshold),activity,sales30:activity.sales30||0,salePrice:Number(r[10])||0,stockValue:stock*(Number(r[10])||0)};
   });
 }
+function getInventoryAction(item){
+  const state=item?.state || getStockState(item?.stock ?? item?.r?.[5],item?.threshold ?? item?.r?.[12]);
+  const sales30=Math.max(0,Number(item?.sales30)||0);
+  if(state==="HET" && sales30>0) return {key:"URGENT",rank:0,label:"Cần nhập ngay",shortLabel:"Nhập ngay",actionable:true};
+  if(state==="SAP" && sales30>0) return {key:"PREPARE",rank:1,label:"Chuẩn bị nhập",shortLabel:"Chuẩn bị",actionable:true};
+  if(state==="HET") return {key:"VERIFY",rank:2,label:"Chờ xác nhận nhu cầu",shortLabel:"Chờ xác nhận",actionable:false};
+  if(state==="SAP") return {key:"WATCH",rank:3,label:"Tồn thấp · chỉ theo dõi",shortLabel:"Theo dõi",actionable:false};
+  return {key:"STABLE",rank:4,label:"Tồn ổn định",shortLabel:"Ổn định",actionable:false};
+}
+function isInventoryActionable(item){ return getInventoryAction(item).actionable; }
 function kpiRelativeTime(timestamp){
   const time=Number(timestamp)||0;
   if(!time) return "chưa có lịch sử";
@@ -10847,7 +10911,7 @@ function kpiFilterEntries(type,entries){
   return entries;
 }
 function kpiDefaultSort(type){
-  return ({all:"priority",ton:"stock_desc",het:"recent",sap:"priority"})[type] || "priority";
+  return ({all:"action",ton:"stock_desc",het:"action",sap:"action"})[type] || "action";
 }
 function sortKpiEntries(entries,type,mode=currentKpiSort){
   const statusRank={HET:0,SAP:1,CON:2};
@@ -10858,6 +10922,14 @@ function sortKpiEntries(entries,type,mode=currentKpiSort){
     if(mode==="stock_desc") return b.stock-a.stock || b.sales30-a.sales30 || nameCompare(a,b);
     if(mode==="sales30") return b.sales30-a.sales30 || b.activity.latestAt-a.activity.latestAt || nameCompare(a,b);
     if(mode==="recent") return b.activity.latestAt-a.activity.latestAt || b.sales30-a.sales30 || nameCompare(a,b);
+    if(mode==="action" || mode==="priority"){
+      const actionA=getInventoryAction(a), actionB=getInventoryAction(b);
+      return actionA.rank-actionB.rank
+        || b.sales30-a.sales30
+        || (a.stock/Math.max(1,a.threshold))-(b.stock/Math.max(1,b.threshold))
+        || b.activity.latestAt-a.activity.latestAt
+        || nameCompare(a,b);
+    }
     if(type==="sap"){
       const ratioA=a.stock/Math.max(1,a.threshold), ratioB=b.stock/Math.max(1,b.threshold);
       return ratioA-ratioB || a.stock-b.stock || b.sales30-a.sales30 || b.activity.latestAt-a.activity.latestAt || nameCompare(a,b);
@@ -10872,17 +10944,16 @@ function renderKpiProductLinks(entries,type="all",options={}){
   return entries.map((entry,position)=>{
     const {r,i,stock,threshold,state,activity,sales30}=entry;
     const insight=[];
+    const action=getInventoryAction(entry);
     if(type==="het"){
-      if(activity.latestAt){
-        insight.push(`<span class="kpi-live-pill is-urgent">Cập nhật ${escapeHtml(kpiRelativeTime(activity.latestAt))}</span>`);
-        if(activity.latestTx) insight.push(`<span class="kpi-live-pill">${escapeHtml(getTransactionKindLabel(activity.latestTx))}</span>`);
-      }else insight.push('<span class="kpi-live-pill is-muted">Chưa có lịch sử giao dịch</span>');
-    }else if(type==="sap"){
-      insight.push(`<span class="kpi-live-pill is-warning">Còn ${stock} / ngưỡng ${threshold}</span>`);
+      insight.push(`<span class="kpi-live-pill ${action.actionable?"is-urgent":"is-muted"}">${escapeHtml(action.label)}</span>`);
       if(activity.latestAt) insight.push(`<span class="kpi-live-pill">Cập nhật ${escapeHtml(kpiRelativeTime(activity.latestAt))}</span>`);
+    }else if(type==="sap"){
+      insight.push(`<span class="kpi-live-pill ${action.actionable?"is-warning":"is-muted"}">${escapeHtml(action.label)}</span>`);
+      insight.push(`<span class="kpi-live-pill">Còn ${stock} / ngưỡng ${threshold}</span>`);
     }else{
-      const statusClass=state==="HET" ? "is-urgent" : state==="SAP" ? "is-warning" : "is-sales";
-      insight.push(`<span class="kpi-live-pill ${statusClass}">${kpiStatusLabel(state)}</span>`);
+      const statusClass=action.key==="URGENT" ? "is-urgent" : action.key==="PREPARE" ? "is-warning" : action.key==="STABLE" ? "is-sales" : "is-muted";
+      insight.push(`<span class="kpi-live-pill ${statusClass}">${escapeHtml(action.label)}</span>`);
     }
     if(sales30>0) insight.push(`<span class="kpi-live-pill is-sales">Đã bán ${sales30} / 30 ngày</span>`);
     else if(type==="sap"&&!activity.latestAt) insight.push('<span class="kpi-live-pill is-muted">Chưa có hoạt động gần đây</span>');
@@ -10892,6 +10963,19 @@ function renderKpiProductLinks(entries,type="all",options={}){
       <span class="kpi-row-side">${ranked?`<span class="kpi-row-rank">${position+1}</span>`:""}<span class="kpi-row-stock${stock<=0?" is-out":""}">Tồn ${stock}</span></span>
       <span class="kpi-row-insights">${insight.join("")}</span>
     </button>`;
+  }).join("");
+}
+function renderKpiProductSubgroups(entries,type="all"){
+  const groups=new Map();
+  entries.forEach(entry=>{
+    const label=getSummaryHierarchyGroup(entry.r)||NO_GROUP;
+    const key=normalizeQuickText(label)||String(label).toLowerCase();
+    if(!groups.has(key)) groups.set(key,{label,items:[]});
+    groups.get(key).items.push(entry);
+  });
+  return Array.from(groups.values()).map(({label,items})=>{
+    const value=type==="ton"?`${items.reduce((sum,item)=>sum+item.stock,0).toLocaleString("vi-VN")} tồn`:`${items.length} mặt hàng`;
+    return `<section class="kpi-subgroup"><div class="kpi-subgroup-head"><strong>${escapeHtml(cleanKpiPathLabel(label)||NO_GROUP)}</strong><span>${escapeHtml(value)}</span></div><div class="kpi-subgroup-items">${renderKpiProductLinks(items,type)}</div></section>`;
   }).join("");
 }
 function toggleKpiCategory(listId, button){
@@ -10925,6 +11009,7 @@ function getKpiScopedEntries(){
 }
 let kpiHoverCloseTimer=null;
 let currentKpiSort="priority";
+let currentKpiListMode="default";
 function kpiHoverEntries(type){
   const entries=kpiFilterEntries(type,getKpiEnrichedEntries());
   return sortKpiEntries(entries,type,kpiDefaultSort(type));
@@ -10970,8 +11055,13 @@ function openKpiHoverProduct(index){
   if(!DATA[index]) return;
   selectSearchSuggestion(index);
 }
-function kpiSummaryCard(icon,label,value,note="",title=""){
-  return `<div class="kpi-summary-card"${title?` title="${escapeHtml(title)}"`:""}><span class="kpi-summary-icon" aria-hidden="true">${icon}</span><span class="kpi-summary-label">${escapeHtml(label)}</span><strong class="kpi-summary-value">${escapeHtml(String(value))}</strong>${note?`<span class="kpi-summary-note">${escapeHtml(note)}</span>`:""}</div>`;
+function kpiSummaryCard(icon,label,value,note="",title="",action="",selected=false){
+  const tag=action?"button":"div";
+  const actionAttrs=action?` type="button" class="kpi-summary-card is-clickable${selected?" is-selected":""}" onclick="${action}" aria-pressed="${selected}" aria-label="${escapeHtml(`${label}: ${value}. Xem danh sách riêng`)}"`:` class="kpi-summary-card"`;
+  return `<${tag}${actionAttrs}${title?` title="${escapeHtml(title)}"`:""}><span class="kpi-summary-icon" aria-hidden="true">${icon}</span><span class="kpi-summary-label">${escapeHtml(label)}</span><strong class="kpi-summary-value">${escapeHtml(String(value))}</strong>${note?`<span class="kpi-summary-note">${escapeHtml(note)}</span>`:""}</${tag}>`;
+}
+function kpiMetricCard(icon,label,value,note,type,mode){
+  return kpiSummaryCard(icon,label,value,note,"",`showKpiMetricList('${type}','${mode}')`,currentKpiListMode===mode);
 }
 function kpiCompactMoney(value){
   const amount=Math.max(0,Number(value)||0);
@@ -10982,65 +11072,98 @@ function kpiCompactMoney(value){
 function renderKpiSummary(type,allEntries,entries){
   const totalSku=allEntries.length;
   const active=allEntries.filter(item=>item.stock>0);
-  const healthy=allEntries.filter(item=>item.state==="CON");
-  const recentSevenDays=entries.filter(item=>item.activity.latestAt>=Date.now()-(7*24*60*60*1000)).length;
+  const actionable=allEntries.filter(isInventoryActionable);
+  const monitor=allEntries.filter(item=>["VERIFY","WATCH"].includes(getInventoryAction(item).key));
   const percentage=count=>totalSku ? `${(count*100/totalSku).toLocaleString("vi-VN",{maximumFractionDigits:1})}%` : "0%";
   let cards=[];
   if(type==="all"){
     cards=[
-      kpiSummaryCard("▦","Tổng mã hàng",totalSku,"Toàn bộ danh mục đang xem"),
-      kpiSummaryCard("✓","Đang có tồn",active.length,`${percentage(active.length)} danh mục`),
-      kpiSummaryCard("●","Tồn ổn định",healthy.length,"Trên ngưỡng cảnh báo"),
-      kpiSummaryCard("!","Cần chú ý",totalSku-healthy.length,"Gồm hết hàng và sắp hết")
+      kpiMetricCard("▦","Tổng mã hàng",totalSku,"Toàn bộ danh mục đang xem","all","all-items"),
+      kpiMetricCard("✓","Đang có tồn",active.length,`${percentage(active.length)} danh mục`,"all","all-active"),
+      kpiMetricCard("!","Cần xử lý",actionable.length,"Có phát sinh bán trong 30 ngày","all","all-actionable"),
+      kpiMetricCard("◌","Chỉ theo dõi",monitor.length,"Chưa phát sinh bán trong 30 ngày","all","all-monitor")
     ];
   }else if(type==="ton"){
     const totalUnits=entries.reduce((sum,item)=>sum+item.stock,0);
-    const average=entries.length ? totalUnits/entries.length : 0;
-    const highest=entries.reduce((max,item)=>Math.max(max,item.stock),0);
-    const stockValue=entries.reduce((sum,item)=>sum+item.stockValue,0);
+    const selling=entries.filter(item=>item.sales30>0);
+    const idle=entries.filter(item=>item.sales30===0);
+    const salesQty=selling.reduce((sum,item)=>sum+item.sales30,0);
     cards=[
-      kpiSummaryCard("Σ","Tổng số lượng",totalUnits.toLocaleString("vi-VN"),"Chỉ tính sản phẩm còn tồn"),
-      kpiSummaryCard("▦","Mã đang có tồn",entries.length,`${percentage(entries.length)} danh mục`),
-      kpiSummaryCard("≈","Trung bình / mã",average.toLocaleString("vi-VN",{maximumFractionDigits:1}),"Số lượng bình quân"),
-      isAdminMode()
-        ? kpiSummaryCard("₫","Giá trị tồn",kpiCompactMoney(stockValue),"Tạm tính theo giá bán",`${formatVndNumber(stockValue)} VND`)
-        : kpiSummaryCard("↑","Tồn cao nhất",highest.toLocaleString("vi-VN"),"Số lượng của một mã hàng")
+      kpiMetricCard("Σ","Tổng số lượng",totalUnits.toLocaleString("vi-VN"),"Chỉ tính sản phẩm còn tồn","ton","ton-units"),
+      kpiMetricCard("▦","Mã đang có tồn",entries.length,`${percentage(entries.length)} danh mục`,"ton","ton-active"),
+      kpiMetricCard("↗","Có bán 30 ngày",selling.length,`Tổng ${salesQty} sản phẩm đã bán`,"ton","ton-selling"),
+      kpiMetricCard("◌","Chưa bán 30 ngày",idle.length,"Hàng chưa luân chuyển gần đây","ton","ton-idle")
     ];
   }else if(type==="het"){
-    const noHistory=entries.filter(item=>!item.activity.latestAt).length;
+    const urgent=entries.filter(isInventoryActionable);
+    const verify=entries.filter(item=>getInventoryAction(item).key==="VERIFY");
     cards=[
-      kpiSummaryCard("×","Đang hết hàng",entries.length,"Cần kiểm tra nhu cầu nhập"),
-      kpiSummaryCard("%","Tỷ lệ hết",percentage(entries.length),`Trên ${totalSku} mã hàng`),
-      kpiSummaryCard("↻","Có hoạt động 7 ngày",recentSevenDays,"Được ưu tiên lên đầu"),
-      kpiSummaryCard("?","Chưa có lịch sử",noHistory,"Nên kiểm tra dữ liệu cũ")
+      kpiMetricCard("×","Đang hết hàng",entries.length,"Danh sách đầy đủ","het","het-all"),
+      kpiMetricCard("!","Cần nhập ngay",urgent.length,"Có phát sinh bán trong 30 ngày","het","het-urgent"),
+      kpiMetricCard("?","Chờ xác nhận",verify.length,"Chưa phát sinh bán trong 30 ngày","het","het-verify"),
+      kpiMetricCard("↗","Lượng bán 30 ngày",urgent.reduce((sum,item)=>sum+item.sales30,0),"Các mã hết hàng đã phát sinh bán","het","het-selling")
     ];
   }else{
     const stockOne=entries.filter(item=>item.stock===1).length;
-    const selling=entries.filter(item=>item.sales30>0).length;
+    const prepare=entries.filter(isInventoryActionable);
+    const watch=entries.filter(item=>getInventoryAction(item).key==="WATCH");
     cards=[
-      kpiSummaryCard("!","Đang sắp hết",entries.length,"Theo ngưỡng từng mặt hàng"),
-      kpiSummaryCard("1","Chỉ còn 1",stockOne,"Mức cần chú ý cao"),
-      kpiSummaryCard("↗","Có bán 30 ngày",selling,"Nên cân nhắc nhập trước"),
-      kpiSummaryCard("%","Tỷ lệ sắp hết",percentage(entries.length),`Trên ${totalSku} mã hàng`)
+      kpiMetricCard("!","Đang sắp hết",entries.length,"Danh sách đầy đủ","sap","sap-all"),
+      kpiMetricCard("↗","Chuẩn bị nhập",prepare.length,"Có phát sinh bán trong 30 ngày","sap","sap-prepare"),
+      kpiMetricCard("◌","Chỉ theo dõi",watch.length,"Chưa phát sinh bán trong 30 ngày","sap","sap-watch"),
+      kpiMetricCard("1","Chỉ còn 1",stockOne,"Mức tồn cần chú ý cao","sap","sap-one")
     ];
   }
   return `<div class="kpi-summary-grid">${cards.join("")}</div>`;
 }
 function kpiSortConfig(type){
-  if(type==="ton") return {note:"Xếp theo lượng tồn để nhìn nhanh mã đang chiếm kho.",options:[["stock_desc","Tồn nhiều nhất"],["stock_asc","Tồn ít nhất"],["sales30","Bán nhiều trong 30 ngày"],["name","Tên A → Z"]]};
-  if(type==="het") return {note:"Mã có cập nhật gần nhất được đưa lên đầu; đây không phải thời điểm hết hàng chính xác.",options:[["recent","Cập nhật gần nhất"],["sales30","Đã bán nhiều trong 30 ngày"],["name","Tên A → Z"]]};
-  if(type==="sap") return {note:"Ưu tiên tồn thấp so với ngưỡng, sau đó xét sức bán gần đây.",options:[["priority","Ưu tiên cần nhập"],["stock_asc","Tồn ít nhất"],["sales30","Bán nhiều trong 30 ngày"],["recent","Cập nhật gần nhất"],["name","Tên A → Z"]]};
-  return {note:"Đưa hết hàng và sắp hết lên trước để dễ xử lý.",options:[["priority","Cần chú ý trước"],["stock_desc","Tồn nhiều nhất"],["stock_asc","Tồn ít nhất"],["name","Tên A → Z"]]};
+  if(type==="ton") return {options:[["stock_desc","Tồn nhiều nhất"],["stock_asc","Tồn ít nhất"],["sales30","Bán nhiều trong 30 ngày"],["name","Tên A → Z"]]};
+  if(type==="het") return {options:[["action","Cần nhập ngay trước"],["sales30","Bán nhiều trong 30 ngày"],["recent","Cập nhật gần nhất"],["name","Tên A → Z"]]};
+  if(type==="sap") return {options:[["action","Chuẩn bị nhập trước"],["stock_asc","Tồn ít nhất"],["sales30","Bán nhiều trong 30 ngày"],["recent","Cập nhật gần nhất"],["name","Tên A → Z"]]};
+  return {options:[["action","Việc cần làm trước"],["stock_desc","Tồn nhiều nhất"],["stock_asc","Tồn ít nhất"],["name","Tên A → Z"]]};
 }
 function renderKpiSortbar(type){
   const config=kpiSortConfig(type);
-  return `<div class="kpi-sortbar"><span class="kpi-sort-copy"><strong class="kpi-sort-title">Sắp xếp thông minh</strong><span class="kpi-sort-note">${escapeHtml(config.note)}</span></span><select class="kpi-sort-select" aria-label="Sắp xếp danh sách KPI" onchange="updateCurrentKpiSort(this.value)">${config.options.map(([value,label])=>`<option value="${value}"${currentKpiSort===value?" selected":""}>${escapeHtml(label)}</option>`).join("")}</select></div>`;
+  return `<div class="kpi-sortbar"><select class="kpi-sort-select" aria-label="Sắp xếp danh sách KPI" onchange="updateCurrentKpiSort(this.value)">${config.options.map(([value,label])=>`<option value="${value}"${currentKpiSort===value?" selected":""}>${escapeHtml(label)}</option>`).join("")}</select></div>`;
 }
 function renderKpiPriorityPanel(type,entries){
-  if((type!=="het"&&type!=="sap")||!entries.length) return "";
-  const top=entries.slice(0,8);
-  const sub=type==="het" ? "Dựa trên hoạt động gần nhất đang ghi nhận" : "Dựa trên tồn/ngưỡng và sức bán 30 ngày";
+  if(!["all","het","sap"].includes(type)||!entries.length) return "";
+  const top=sortKpiEntries(entries.filter(isInventoryActionable),type,"action").slice(0,8);
+  if(!top.length) return "";
+  const sub="Chỉ gồm mã hết/sắp hết có phát sinh bán trong 30 ngày";
   return `<section class="kpi-priority-panel"><div class="kpi-priority-head"><span><strong class="kpi-priority-title">Cần xử lý trước</strong><span class="kpi-priority-sub">${escapeHtml(sub)}</span></span><span class="kpi-priority-count">${top.length} ưu tiên</span></div><div class="kpi-priority-list">${renderKpiProductLinks(top,type,{ranked:true})}</div></section>`;
+}
+function getKpiMetricSelection(type,mode,entries){
+  const actionKey=item=>getInventoryAction(item).key;
+  const selections={
+    "all-items":{label:"Tất cả mặt hàng",items:entries},
+    "all-active":{label:"Mặt hàng đang có tồn",items:entries.filter(item=>item.stock>0)},
+    "all-actionable":{label:"Mặt hàng cần xử lý",items:entries.filter(isInventoryActionable)},
+    "all-monitor":{label:"Mặt hàng chỉ theo dõi",items:entries.filter(item=>["VERIFY","WATCH"].includes(actionKey(item)))},
+    "ton-units":{label:"Tổng số lượng tồn",items:entries},
+    "ton-active":{label:"Mã đang có tồn",items:entries},
+    "ton-selling":{label:"Có bán trong 30 ngày",items:entries.filter(item=>item.sales30>0)},
+    "ton-idle":{label:"Chưa bán trong 30 ngày",items:entries.filter(item=>item.sales30===0)},
+    "het-all":{label:"Đang hết hàng",items:entries},
+    "het-urgent":{label:"Cần nhập ngay",items:entries.filter(isInventoryActionable)},
+    "het-verify":{label:"Chờ xác nhận",items:entries.filter(item=>actionKey(item)==="VERIFY")},
+    "het-selling":{label:"Hết hàng có phát sinh bán",items:entries.filter(isInventoryActionable)},
+    "sap-all":{label:"Đang sắp hết",items:entries},
+    "sap-prepare":{label:"Chuẩn bị nhập",items:entries.filter(isInventoryActionable)},
+    "sap-watch":{label:"Sắp hết chỉ theo dõi",items:entries.filter(item=>actionKey(item)==="WATCH")},
+    "sap-one":{label:"Chỉ còn 1 sản phẩm",items:entries.filter(item=>item.stock===1)}
+  };
+  return selections[mode]||{label:"",items:entries};
+}
+function showKpiMetricList(type,mode){
+  currentKpiListMode=mode;
+  showKpiDetail(type,true);
+  requestAnimationFrame(()=>document.querySelector("#kpiModalBody .kpi-filter-head")?.scrollIntoView({behavior:"auto",block:"start"}));
+}
+function resetKpiMetricList(){
+  currentKpiListMode="default";
+  showKpiDetail(currentKpiExportType,true);
+  requestAnimationFrame(()=>document.getElementById("kpiModalBody")?.scrollIntoView({behavior:"auto",block:"start"}));
 }
 function updateCurrentKpiSort(value){
   currentKpiSort=String(value||kpiDefaultSort(currentKpiExportType));
@@ -11051,7 +11174,10 @@ function showKpiDetail(type,preserveSort=false){
   document.getElementById("kpiHoverMenu")?.classList.remove("open");
   document.querySelector(".sticky")?.classList.remove("kpi-menu-open");
   currentKpiExportType = type;
-  if(!preserveSort) currentKpiSort=kpiDefaultSort(type);
+  if(!preserveSort){
+    currentKpiSort=kpiDefaultSort(type);
+    currentKpiListMode="default";
+  }
   const kpiOverlay=document.getElementById("kpiOverlay");
   const kpiColors={
     all:["#2E86C1","#fff","#85C1E9","#154360"],
@@ -11072,52 +11198,63 @@ function showKpiDetail(type,preserveSort=false){
   }
   const cfg = SHEET_CFG;
   const allEntries=getKpiEnrichedEntries();
-  const entries=sortKpiEntries(kpiFilterEntries(type,allEntries),type,currentKpiSort);
+  const typeEntries=sortKpiEntries(kpiFilterEntries(type,allEntries),type,currentKpiSort);
+  const focused=currentKpiListMode!=="default";
+  const selection=getKpiMetricSelection(type,currentKpiListMode,typeEntries);
+  const entries=focused?selection.items:typeEntries;
+  const priorityEntries=focused ? [] : (["all","het","sap"].includes(type) ? sortKpiEntries(entries.filter(isInventoryActionable),type,"action").slice(0,8) : []);
+  const priorityIds=new Set(priorityEntries.map(item=>item.i));
+  const categorySource=priorityIds.size ? entries.filter(item=>!priorityIds.has(item.i)) : entries;
   const titles = {all:"📦 Chi tiết mặt hàng theo danh mục", ton:"📊 Tổng tồn kho theo danh mục", het:"🔴 Danh sách hết hàng", sap:"🟡 Danh sách sắp hết hàng"};
   const baseOrder=["MT","MI","CAM","INT"];
-  const shOrder=[...baseOrder,...Array.from(new Set(entries.map(item=>String(item.r[0]||"KHAC")))).filter(sh=>!baseOrder.includes(sh))];
-  document.getElementById("kpiModalTitle").textContent = titles[type];
+  const shOrder=[...baseOrder,...Array.from(new Set(categorySource.map(item=>String(item.r[0]||"KHAC")))).filter(sh=>!baseOrder.includes(sh))];
+  document.getElementById("kpiModalTitle").textContent = focused?`📋 ${selection.label}`:titles[type];
   const copyScope=document.getElementById("kpiCopyScope");
-  if(copyScope) copyScope.textContent=currentTab==="ALL" ? "TẤT CẢ DANH MỤC" : (cfg[currentTab]?.label || "DANH MỤC");
-  const firstCategory=shOrder.find(sh=>entries.some(item=>String(item.r[0]||"KHAC")===sh)) || "";
-  const categories=entries.length ? shOrder.map(sh=>{
-    const categoryEntries=entries.filter(item=>String(item.r[0]||"KHAC")===sh);
+  if(copyScope) copyScope.textContent=focused?selection.label.toLocaleUpperCase("vi"):(currentTab==="ALL" ? "TẤT CẢ DANH MỤC" : (cfg[currentTab]?.label || "DANH MỤC"));
+  const firstCategory=shOrder.find(sh=>categorySource.some(item=>String(item.r[0]||"KHAC")===sh)) || "";
+  const categories=categorySource.length ? shOrder.map(sh=>{
+    const categoryEntries=categorySource.filter(item=>String(item.r[0]||"KHAC")===sh);
     if(!categoryEntries.length) return "";
     const c=cfg[sh] || {label:relatedCategoryLabel(sh)||sh,c:"#607D8B"};
     const listId=`kpi-${type}-${String(sh).replace(/[^a-z0-9_-]/gi,"-")}`;
-    const initiallyOpen=sh===firstCategory;
+    const initiallyOpen=focused || sh===firstCategory;
     const categoryValue=type==="ton" ? `${categoryEntries.reduce((sum,item)=>sum+item.stock,0).toLocaleString("vi-VN")} tồn` : `${categoryEntries.length} mặt hàng`;
-    return `<div class="kpi-category"><button type="button" class="kpi-category-toggle" onclick="toggleKpiCategory('${listId}',this)" aria-expanded="${initiallyOpen}"><span class="kpi-detail-sh"><span class="kpi-detail-badge" style="background:${c.c};">${escapeHtml(c.label)}</span></span><span class="kpi-detail-count">${categoryValue}<span class="kpi-expand-mark">${initiallyOpen?"−":"+"}</span></span></button><div id="${listId}" class="kpi-product-list${initiallyOpen?" open":""}">${renderKpiProductLinks(categoryEntries,type)}</div></div>`;
+    return `<div class="kpi-category"><button type="button" class="kpi-category-toggle" onclick="toggleKpiCategory('${listId}',this)" aria-expanded="${initiallyOpen}"><span class="kpi-detail-sh"><span class="kpi-detail-badge" style="background:${c.c};">${escapeHtml(c.label)}</span></span><span class="kpi-detail-count">${categoryValue}<span class="kpi-expand-mark">${initiallyOpen?"−":"+"}</span></span></button><div id="${listId}" class="kpi-product-list${initiallyOpen?" open":""}">${renderKpiProductSubgroups(categoryEntries,type)}</div></div>`;
   }).join("") : `<div class="kpi-empty-modern"><strong>✅ ${type==="het"?"Không có mặt hàng hết hàng":type==="sap"?"Không có mặt hàng sắp hết":"Chưa có dữ liệu phù hợp"}</strong><span>Phạm vi kho hiện tại chưa có mục cần hiển thị.</span></div>`;
   const totalValue=type==="ton" ? `${entries.reduce((sum,item)=>sum+item.stock,0).toLocaleString("vi-VN")} sản phẩm` : `${entries.length} mặt hàng`;
-  const html=`<div class="kpi-modern-dashboard">${renderKpiSummary(type,allEntries,entries)}${renderKpiSortbar(type)}${renderKpiPriorityPanel(type,entries)}<div class="kpi-category-stack">${categories}</div><div class="kpi-total-modern"><span>Tổng trong phạm vi đang xem</span><strong>${totalValue}</strong></div></div>`;
+  const remainderIntro=priorityIds.size ? `<div class="kpi-sortbar"><span class="kpi-sort-copy"><strong class="kpi-sort-title">Danh sách còn lại</strong><span class="kpi-sort-note">${categorySource.length} mặt hàng sau khi đã tách nhóm ưu tiên phía trên</span></span></div>` : "";
+  const priorityPanel=focused ? "" : renderKpiPriorityPanel(type,entries);
+  const focusCount=type==="ton"?`${entries.length} mặt hàng · ${totalValue}`:`${entries.length} mặt hàng`;
+  const focusHead=focused?`<div class="kpi-filter-head"><div><strong>${escapeHtml(selection.label)}</strong><span>${escapeHtml(focusCount)}</span></div><button type="button" class="kpi-filter-reset" onclick="resetKpiMetricList()">← QUAY LẠI</button></div>`:"";
+  const overviewHead=focused?focusHead:renderKpiSummary(type,allEntries,typeEntries);
+  const html=`<div class="kpi-modern-dashboard${focused?" is-list-view":""}">${overviewHead}${renderKpiSortbar(type)}${priorityPanel}${remainderIntro}<div class="kpi-category-stack">${categories}</div><div class="kpi-total-modern"><span>Tổng trong danh sách đang xem</span><strong>${totalValue}</strong></div></div>`;
   document.getElementById("kpiModalBody").innerHTML = html;
   kpiOverlay.classList.add("open");
 }
 
 function initKPI(){
-  // Bộ đếm đầu trang chạy rất thường xuyên khi tìm kiếm; chỉ dùng dữ liệu tồn
-  // để tránh quét lại lịch sử giao dịch và gây giật giao diện.
-  const entries=getKpiScopedEntries().map(item=>{
-    const stock=Number(item.r[5])||0;
-    const threshold=Math.max(1,Number(item.r[12])||2);
-    return {...item,stock,threshold,state:getStockState(stock,threshold)};
-  });
+  // Giữ số KPI là số tồn thực tế; dòng chú thích dùng cache giao dịch 5 giây
+  // để phân biệt việc cần làm mà không quét lại lịch sử liên tục khi gõ tìm kiếm.
+  const entries=getKpiEnrichedEntries(getKpiScopedEntries());
   const totalSku=entries.length;
   const totalStock=entries.reduce((sum,item)=>sum+item.stock,0);
   const active=entries.filter(item=>item.stock>0).length;
   const out=entries.filter(item=>item.state==="HET").length;
   const low=entries.filter(item=>item.state==="SAP").length;
-  const pct=value=>totalSku ? `${(value*100/totalSku).toLocaleString("vi-VN",{maximumFractionDigits:1})}% danh mục` : "0% danh mục";
+  const urgent=entries.filter(item=>getInventoryAction(item).key==="URGENT").length;
+  const prepare=entries.filter(item=>getInventoryAction(item).key==="PREPARE").length;
+  const verify=entries.filter(item=>getInventoryAction(item).key==="VERIFY").length;
+  const watch=entries.filter(item=>getInventoryAction(item).key==="WATCH").length;
+  const sellingInStock=entries.filter(item=>item.stock>0&&item.sales30>0).length;
   document.getElementById("kpi-mh").textContent=totalSku;
   document.getElementById("kpi-ton").textContent=totalStock.toLocaleString("vi-VN");
   document.getElementById("kpi-het").textContent=out;
   document.getElementById("kpi-sap").textContent=low;
   const setInsight=(id,text)=>{ const element=document.getElementById(id); if(element) element.textContent=text; };
-  setInsight("kpi-insight-all",`${active} đang còn`);
-  setInsight("kpi-insight-ton",`TB ${active?(totalStock/active).toLocaleString("vi-VN",{maximumFractionDigits:1}):0} / mã còn`);
-  setInsight("kpi-insight-het",pct(out));
-  setInsight("kpi-insight-sap",pct(low));
+  setInsight("kpi-insight-all",`${urgent+prepare} cần xử lý · ${verify+watch} theo dõi`);
+  setInsight("kpi-insight-ton",`${sellingInStock} có bán · ${Math.max(0,active-sellingInStock)} chưa bán/30 ngày`);
+  setInsight("kpi-insight-het",`${urgent} cần nhập · ${verify} chờ xác nhận`);
+  setInsight("kpi-insight-sap",`${prepare} chuẩn bị · ${watch} theo dõi`);
 }
 
 function formatVndNumber(n){
@@ -12967,11 +13104,12 @@ function openSummaryInventoryItem(idx){
 }
 function getSummaryProductItems(key){
   if(Array.isArray(summaryProductSets[key])) return summaryProductSets[key];
+  const auditContext=String(key).startsWith("audit-") ? buildInventoryAuditContext() : null;
   return DATA.map((r,i)=>({r,i})).filter(({r})=>{
     const ton = Number(r[5])||0;
     const branch = r[13]||"Q2";
     const state = getStockState(r[5],r[12]);
-    const reasons = getInventoryAuditReasons(r);
+    const reasons = auditContext ? getInventoryAuditReasons(r,auditContext) : [];
     if(key==="total-all") return ton>0;
     if(key==="total-q2") return ton>0 && branch==="Q2";
     if(key==="total-q5") return ton>0 && branch==="Q5";
@@ -13008,15 +13146,23 @@ function getSummaryHierarchyGroup(row){
   }
   return baseGroup;
 }
-function getRestockMinimumSuggestion(item){
+function getRestockSuggestionDetails(item){
   const stock=Number(item?.stock ?? item?.r?.[5])||0;
   const threshold=Math.max(1,Number(item?.threshold ?? item?.r?.[12])||2);
-  return Math.max(0,(threshold+1)-stock);
+  const action=getInventoryAction(item);
+  if(!action.actionable) return {stock,threshold,demandTarget:0,target:stock,suggested:0};
+  // Mức đích lấy số lớn hơn giữa: vượt ngưỡng 1 đơn vị và khoảng 15 ngày bán gần đây.
+  const demandTarget=Math.max(1,Math.ceil((Number(item?.sales30)||0)/2));
+  const target=Math.max(threshold+1,demandTarget);
+  return {stock,threshold,demandTarget,target,suggested:Math.max(0,target-stock)};
+}
+function getRestockMinimumSuggestion(item){
+  return getRestockSuggestionDetails(item).suggested;
 }
 function sortRestockPriority(entries){
   return [...entries].sort((a,b)=>{
-    const stateRank={HET:0,SAP:1};
-    return (stateRank[a.state]??9)-(stateRank[b.state]??9)
+    const actionA=getInventoryAction(a), actionB=getInventoryAction(b);
+    return actionA.rank-actionB.rank
       || b.sales30-a.sales30
       || (a.stock/Math.max(1,a.threshold))-(b.stock/Math.max(1,b.threshold))
       || b.activity.latestAt-a.activity.latestAt
@@ -13026,8 +13172,8 @@ function sortRestockPriority(entries){
 function getSummaryGroupTotal(key,items){
   if(String(key).startsWith("audit-")) return `${items.length} mặt hàng cần bổ sung`;
   if(String(key).startsWith("restock-")){
-    const out=items.filter(item=>(item.state||getStockState(item.r[5],item.r[12]))==="HET").length;
-    return `${out} hết · ${items.length-out} sắp hết`;
+    const actionable=items.filter(isInventoryActionable).length;
+    return `${actionable} cần nhập · ${items.length-actionable} theo dõi`;
   }
   const qty=items.reduce((sum,item)=>sum+(Number(item.stock ?? item.r[5])||0),0);
   return `${items.length} mặt hàng · Tồn ${qty.toLocaleString("vi-VN")}`;
@@ -13045,12 +13191,20 @@ function renderSummaryItemBadges(item,key){
   }else if(String(key).startsWith("restock-")){
     const state=item.state||getStockState(stock,r[12]);
     const threshold=Math.max(1,Number(item.threshold ?? r[12])||2);
+    const action=getInventoryAction(item);
+    badges.push(`<span class="summary-mini-badge ${action.key==="URGENT"?"is-alert":action.key==="PREPARE"?"is-warn":"is-info"}">${escapeHtml(action.label)}</span>`);
     badges.push(`<span class="summary-mini-badge ${state==="HET"?"is-alert":"is-warn"}">${state==="HET"?"Hết hàng":`Còn ${stock} / ngưỡng ${threshold}`}</span>`);
-    badges.push(`<span class="summary-mini-badge is-info">Nhập tối thiểu +${getRestockMinimumSuggestion(item)}</span>`);
+    if(action.actionable){
+      const suggestion=getRestockSuggestionDetails(item);
+      badges.push(`<span class="summary-mini-badge is-info">Mục tiêu ${suggestion.target} · gợi ý +${suggestion.suggested}</span>`);
+    }
     if(item.sales30>0) badges.push(`<span class="summary-mini-badge">Đã bán ${item.sales30}/30 ngày</span>`);
     if(item.activity?.latestAt) badges.push(`<span class="summary-mini-badge">Cập nhật ${escapeHtml(kpiRelativeTime(item.activity.latestAt))}</span>`);
   }else{
     const reasons=Array.isArray(item.auditReasons)?item.auditReasons:getInventoryAuditReasons(r);
+    if(item.sales30>0 && reasons.some(reason=>reason==="Chưa có giá bán"||reason==="Chưa có vị trí kho")){
+      badges.push(`<span class="summary-mini-badge is-alert">Ưu tiên · đã bán ${item.sales30}/30 ngày</span>`);
+    }
     reasons.slice(0,4).forEach(reason=>badges.push(`<span class="summary-mini-badge is-alert">${escapeHtml(reason)}</span>`));
     if(reasons.length>4) badges.push(`<span class="summary-mini-badge">+${reasons.length-4} mục khác</span>`);
   }
@@ -13065,11 +13219,35 @@ function scrollSummaryResultIntoView(box){
     window.scrollTo({top:Math.max(0,top),behavior:window.matchMedia("(hover: none), (pointer: coarse)").matches?"auto":"smooth"});
   });
 }
+function summaryActionAttrs(key,title){
+  return `type="button" data-summary-key="${escapeHtml(key)}" data-summary-title="${escapeHtml(title)}"`;
+}
+function bindSummaryActionButtons(root=document){
+  root.querySelectorAll("[data-summary-key]").forEach(button=>{
+    if(button.dataset.summaryBound==="1") return;
+    button.dataset.summaryBound="1";
+    button.addEventListener("click",event=>{
+      event.preventDefault();
+      event.stopPropagation();
+      toggleSummaryProductList(button.dataset.summaryKey||"",button.dataset.summaryTitle||"Danh sách mặt hàng",true);
+    });
+  });
+}
 function toggleSummaryProductList(key,title,shouldScroll=true){
   const box = document.querySelector(".summary-product-list-host");
   if(!box) return;
-  if(openSummaryListKey===key){ openSummaryListKey=""; box.innerHTML=""; return; }
+  if(openSummaryListKey===key){
+    openSummaryListKey="";
+    box.innerHTML="";
+    document.querySelectorAll("[data-summary-key]").forEach(button=>{ button.classList.remove("is-selected"); button.setAttribute("aria-pressed","false"); });
+    return;
+  }
   openSummaryListKey=key;
+  document.querySelectorAll("[data-summary-key]").forEach(button=>{
+    const active=button.dataset.summaryKey===key;
+    button.classList.toggle("is-selected",active);
+    button.setAttribute("aria-pressed",String(active));
+  });
   const safeItems = getSummaryProductItems(key);
   const categoryOrder = ["MT","MI","CAM","INT"];
   const categoryMap = new Map();
@@ -13107,8 +13285,11 @@ function renderTotalStockOverview(el){
   const q2Items = inStock.filter(({r})=>(r[13]||"Q2")==="Q2");
   const q5Items = inStock.filter(({r})=>(r[13]||"Q2")==="Q5");
   const hasActivityData=Array.isArray(TX_DATA)&&TX_DATA.length>0;
+  const sellingItems=hasActivityData?inStock.filter(item=>item.sales30>0):[];
   const idleItems=hasActivityData?inStock.filter(item=>item.sales30===0):[];
-  summaryProductSets = {"total-all":inStock,"total-q2":q2Items,"total-q5":q5Items,"total-idle":idleItems};
+  const activeMissingPrice=sellingItems.filter(item=>!(Number(item.r[10])>0));
+  const idlePricedItems=idleItems.filter(item=>item.stockValue>0).sort((a,b)=>b.stockValue-a.stockValue || b.stock-a.stock);
+  summaryProductSets = {"total-all":inStock,"total-q2":q2Items,"total-q5":q5Items,"total-selling":sellingItems,"total-idle":idleItems,"total-active-missing-price":activeMissingPrice,"total-idle-value":idlePricedItems};
   const totalQty = inStock.reduce((sum,item)=>sum+item.stock,0);
   const canSeeCost=hasPrivateProductDataAccess();
   const totalCost = inStock.reduce((sum,item)=>sum+item.stock*(Number(item.r[4])||0),0);
@@ -13117,28 +13298,36 @@ function renderTotalStockOverview(el){
   const projectedMargin=totalSaleValue ? (projectedGross*100/totalSaleValue) : 0;
   const missingCost=canSeeCost?inStock.filter(item=>!(Number(item.r[4])>0)).length:0;
   const missingSale=inStock.filter(item=>!(Number(item.r[10])>0)).length;
+  const salePricedCount=inStock.length-missingSale;
+  const costPricedCount=canSeeCost?inStock.length-missingCost:0;
   const completePrices=inStock.filter(item=>Number(item.r[10])>0&&(!canSeeCost||Number(item.r[4])>0)).length;
   const priceCoverage=inStock.length ? Math.round(completePrices*100/inStock.length) : 0;
+  const saleCoverage=inStock.length ? Math.round(salePricedCount*100/inStock.length) : 0;
   const signedMoney=value=>`${Number(value)<0?"−":""}${formatVndNumber(Math.abs(Number(value)||0))}`;
   const reportBranches=currentBranch==="ALL" ? ["Q2","Q5"] : [currentBranch];
   const branchReport = reportBranches.map(code=>{ const items=code==="Q5"?q5Items:q2Items; const qty=items.reduce((s,item)=>s+item.stock,0), cost=items.reduce((s,item)=>s+item.stock*(Number(item.r[4])||0),0), sale=items.reduce((s,item)=>s+item.stockValue,0); return {code,items:items.length,qty,cost,sale,gross:sale-cost}; });
-  const highestValue=inStock.filter(item=>item.stockValue>0).slice(0,6);
+  const highestValue=idlePricedItems.slice(0,6);
   const priceNotice=canSeeCost
     ? ((missingCost||missingSale)
-      ? `<div class="overview-alert"><span class="overview-alert-icon">!</span><span>Còn <b>${missingCost}</b> mã chưa có giá nhập và <b>${missingSale}</b> mã chưa có giá bán. Các tổng tiền phía trên đang tạm tính phần thiếu bằng 0.</span></div>`
+      ? `<div class="overview-alert"><span class="overview-alert-icon">!</span><span>Các số tiền hiện chỉ tính trên dữ liệu đã có, <b>không phải tổng giá trị toàn kho</b>. Còn ${missingCost} mã thiếu giá nhập và ${missingSale} mã thiếu giá bán.</span></div>`
       : `<div class="overview-alert is-ok"><span class="overview-alert-icon">✓</span><span>Giá nhập và giá bán đã được khai báo đầy đủ cho toàn bộ mã hàng đang có tồn.</span></div>`)
     : (missingSale
-      ? `<div class="overview-alert"><span class="overview-alert-icon">!</span><span>Còn <b>${missingSale}</b> mã chưa có giá bán. Kỹ thuật vẫn có thể kiểm tồn và vị trí; giá nhập được bảo vệ theo quyền.</span></div>`
+      ? `<div class="overview-alert"><span class="overview-alert-icon">!</span><span><b>${formatVndNumber(totalSaleValue)} VND</b> chỉ là giá trị của ${salePricedCount}/${inStock.length} mã đã có giá bán, <b>không phải tổng giá trị toàn kho</b>.</span></div>`
       : `<div class="overview-alert is-ok"><span class="overview-alert-icon">✓</span><span>Giá bán đã đầy đủ. Giá nhập và lợi nhuận chỉ hiển thị trong phiên quản lý được cấp quyền.</span></div>`);
+  const grossCard=(!missingCost&&!missingSale)
+    ? `<div class="metric-card metric-green"><span class="metric-number">${signedMoney(projectedGross)}</span><span class="metric-label">Lãi gộp dự kiến · VND</span><span class="metric-note">Biên ${projectedMargin.toLocaleString("vi-VN",{maximumFractionDigits:1})}%</span></div>`
+    : `<div class="metric-card metric-yellow"><span class="metric-number">${priceCoverage}%</span><span class="metric-label">Đủ cả hai loại giá</span><span class="metric-note">${completePrices}/${inStock.length} mã đang có tồn</span></div>`;
   const financeCards=canSeeCost
-    ? `<div class="metric-card metric-purple"><span class="metric-number">${formatVndNumber(totalCost)}</span><span class="metric-label">Giá trị vốn · VND</span><span class="metric-note">Theo giá nhập đang lưu</span></div><div class="metric-card metric-green"><span class="metric-number">${formatVndNumber(totalSaleValue)}</span><span class="metric-label">Giá bán dự kiến · VND</span><span class="metric-note">Nếu bán hết tồn hiện tại</span></div><div class="metric-card metric-green"><span class="metric-number">${signedMoney(projectedGross)}</span><span class="metric-label">Lãi gộp dự kiến · VND</span><span class="metric-note">Biên ${projectedMargin.toLocaleString("vi-VN",{maximumFractionDigits:1})}%</span></div>`
-    : `<div class="metric-card metric-green"><span class="metric-number">${formatVndNumber(totalSaleValue)}</span><span class="metric-label">Giá bán dự kiến · VND</span><span class="metric-note">Theo giá bán công khai hiện tại</span></div>`;
+    ? `<div class="metric-card metric-purple"><span class="metric-number">${formatVndNumber(totalCost)}</span><span class="metric-label">Vốn đã khai báo · VND</span><span class="metric-note">${costPricedCount}/${inStock.length} mã có giá nhập</span></div><div class="metric-card metric-green"><span class="metric-number">${formatVndNumber(totalSaleValue)}</span><span class="metric-label">Giá bán đã định giá · VND</span><span class="metric-note">${salePricedCount}/${inStock.length} mã có giá bán</span></div>${grossCard}`
+    : `<div class="metric-card metric-green"><span class="metric-number">${formatVndNumber(totalSaleValue)}</span><span class="metric-label">Giá trị đã định giá · VND</span><span class="metric-note">${salePricedCount}/${inStock.length} mã · độ phủ ${saleCoverage}%</span></div>`;
   const reportTable=canSeeCost
-    ? `<div class="management-table-wrap"><table class="management-table"><thead><tr><th>Chi nhánh</th><th>Mã hàng</th><th>Số lượng</th><th>Giá vốn</th><th>Giá bán</th><th>Lãi gộp</th></tr></thead><tbody>${branchReport.map(x=>`<tr><td>📍 ${x.code}</td><td>${x.items}</td><td>${x.qty.toLocaleString("vi-VN")}</td><td>${formatVndNumber(x.cost)}</td><td>${formatVndNumber(x.sale)}</td><td>${signedMoney(x.gross)}</td></tr>`).join("")}</tbody></table></div>`
-    : `<div class="management-table-wrap"><table class="management-table"><thead><tr><th>Chi nhánh</th><th>Mã hàng</th><th>Số lượng</th><th>Giá bán dự kiến</th></tr></thead><tbody>${branchReport.map(x=>`<tr><td>📍 ${x.code}</td><td>${x.items}</td><td>${x.qty.toLocaleString("vi-VN")}</td><td>${formatVndNumber(x.sale)}</td></tr>`).join("")}</tbody></table></div>`;
-  const priorityHtml=highestValue.length?`<section class="overview-priority"><div class="overview-priority-head"><span><strong class="overview-priority-title">Giá trị tồn nổi bật</strong><span class="overview-priority-sub">Các mã có giá trị bán dự kiến cao để kế toán và quản lý kiểm tra nhanh</span></span><span class="overview-priority-badge">TOP ${highestValue.length}</span></div><div class="overview-priority-grid">${highestValue.map((item,index)=>`<button type="button" class="overview-priority-item" onclick="openSummaryInventoryItem(${item.i})"><span class="overview-priority-rank">${index+1}</span><span class="overview-priority-name">${renderProductTitleWithCondition(item.r[2]||"Chưa có tên")}</span><span class="overview-priority-meta">${escapeHtml(item.r[1]||"Chưa có mã")} · Tồn ${item.stock} · ${formatVndNumber(item.stockValue)}đ</span></button>`).join("")}</div></section>`:"";
-  const html = `<div class="total-stock-head"><span class="overview-eyebrow">Tổng quan vận hành</span><div class="total-stock-title">📦 BÁO CÁO TỒN KHO · ${scopeLabel}</div><div class="total-stock-sub">${canSeeCost?"Số lượng, giá trị hàng hóa và độ đầy đủ dữ liệu giá":"Số lượng, giá bán và tình trạng hàng hóa"} trong ${currentBranch==="ALL"?"toàn hệ thống":currentBranch}</div><div class="restock-summary"><button class="metric-card metric-green summary-click" onclick="toggleSummaryProductList('total-all','Hàng đang có · ${scopeLabel}')"><span class="metric-number">${inStock.length}</span><span class="metric-label">Mã hàng đang có tồn</span><span class="metric-note">Bấm để xem danh sách</span></button><div class="metric-card metric-blue"><span class="metric-number">${totalQty.toLocaleString("vi-VN")}</span><span class="metric-label">Tổng sản phẩm trong kho</span><span class="metric-note">Bình quân ${inStock.length?(totalQty/inStock.length).toLocaleString("vi-VN",{maximumFractionDigits:1}):0} / mã</span></div>${financeCards}<button class="metric-card metric-yellow summary-click" onclick="toggleSummaryProductList('total-idle','Chưa ghi nhận bán trong 30 ngày · ${scopeLabel}')"><span class="metric-number">${hasActivityData?idleItems.length:"—"}</span><span class="metric-label">Chưa ghi nhận bán 30 ngày</span><span class="metric-note">${hasActivityData?`Độ phủ giá bán ${priceCoverage}%`:"Chưa tải lịch sử giao dịch"}</span></button></div>${priceNotice}${reportTable}</div>${priorityHtml}<div class="summary-product-list-host"></div>`;
+    ? `<div class="management-table-wrap"><table class="management-table"><thead><tr><th>Chi nhánh</th><th>Mã hàng</th><th>Số lượng</th><th>Vốn đã khai báo</th><th>Giá bán đã định giá</th><th>Chênh lệch</th></tr></thead><tbody>${branchReport.map(x=>`<tr><td>📍 ${x.code}</td><td>${x.items}</td><td>${x.qty.toLocaleString("vi-VN")}</td><td>${formatVndNumber(x.cost)}</td><td>${formatVndNumber(x.sale)}</td><td>${signedMoney(x.gross)}</td></tr>`).join("")}</tbody></table></div>`
+    : `<div class="management-table-wrap"><table class="management-table"><thead><tr><th>Chi nhánh</th><th>Mã hàng</th><th>Số lượng</th><th>Giá trị đã định giá</th></tr></thead><tbody>${branchReport.map(x=>`<tr><td>📍 ${x.code}</td><td>${x.items}</td><td>${x.qty.toLocaleString("vi-VN")}</td><td>${formatVndNumber(x.sale)}</td></tr>`).join("")}</tbody></table></div>`;
+  const priorityHtml=highestValue.length?`<section class="overview-priority"><div class="overview-priority-head"><span><strong class="overview-priority-title">Giá trị cao nhưng chưa bán 30 ngày</strong><span class="overview-priority-sub">Nhóm hàng đang giữ giá trị tồn nhưng chưa phát sinh bán gần đây — chủ và kế toán nên kiểm tra trước</span></span><span class="overview-priority-badge">TOP ${highestValue.length}</span></div><div class="overview-priority-grid">${highestValue.map((item,index)=>`<button type="button" class="overview-priority-item" onclick="openSummaryInventoryItem(${item.i})"><span class="overview-priority-rank">${index+1}</span><span class="overview-priority-name">${renderProductTitleWithCondition(item.r[2]||"Chưa có tên")}</span><span class="overview-priority-meta">${escapeHtml(item.r[1]||"Chưa có mã")} · Tồn ${item.stock} · ${formatVndNumber(item.stockValue)}đ · Chưa bán 30 ngày</span></button>`).join("")}</div></section>`:"";
+  const decisionStrip=hasActivityData?`<div class="management-issues"><button class="management-issue summary-click" ${summaryActionAttrs('total-selling',`Mã có bán trong 30 ngày · ${scopeLabel}`)}><span>Có bán trong 30 ngày</span><b>${sellingItems.length}</b></button><button class="management-issue summary-click" ${summaryActionAttrs('total-active-missing-price',`Đang bán nhưng chưa có giá · ${scopeLabel}`)}><span>Đang bán thiếu giá</span><b>${activeMissingPrice.length}</b></button><button class="management-issue summary-click" ${summaryActionAttrs('total-idle-value',`Giá trị cao chưa bán 30 ngày · ${scopeLabel}`)}><span>Chậm bán đã có giá</span><b>${idlePricedItems.length}</b></button></div>`:"";
+  const html = `<div class="total-stock-head"><span class="overview-eyebrow">Tổng quan vận hành</span><div class="total-stock-title">📦 BÁO CÁO TỒN KHO · ${scopeLabel}</div><div class="total-stock-sub">${canSeeCost?"Số lượng, giá trị hàng hóa và độ đầy đủ dữ liệu giá":"Số lượng, giá bán và tình trạng hàng hóa"} trong ${currentBranch==="ALL"?"toàn hệ thống":currentBranch}</div><div class="restock-summary"><button class="metric-card metric-green summary-click" ${summaryActionAttrs('total-all',`Hàng đang có · ${scopeLabel}`)}><span class="metric-number">${inStock.length}</span><span class="metric-label">Mã hàng đang có tồn</span><span class="metric-note">Bấm để xem danh sách</span></button><div class="metric-card metric-blue"><span class="metric-number">${totalQty.toLocaleString("vi-VN")}</span><span class="metric-label">Tổng sản phẩm trong kho</span><span class="metric-note">Bình quân ${inStock.length?(totalQty/inStock.length).toLocaleString("vi-VN",{maximumFractionDigits:1}):0} / mã</span></div>${financeCards}<button class="metric-card metric-yellow summary-click" ${summaryActionAttrs('total-idle',`Chưa ghi nhận bán trong 30 ngày · ${scopeLabel}`)}><span class="metric-number">${hasActivityData?idleItems.length:"—"}</span><span class="metric-label">Chưa ghi nhận bán 30 ngày</span><span class="metric-note">${hasActivityData?`${idlePricedItems.length} mã chậm bán đã có giá`:"Chưa tải lịch sử giao dịch"}</span></button></div>${priceNotice}${decisionStrip}${reportTable}</div>${priorityHtml}<div class="summary-product-list-host"></div>`;
   el.innerHTML=html;
+  bindSummaryActionButtons(el);
   toggleSummaryProductList('total-all',`Hàng đang có · ${scopeLabel}`,false);
 }
 function buildInventoryAuditContext(rows=DATA){
@@ -13149,15 +13338,19 @@ function buildInventoryAuditContext(rows=DATA){
     const key=`${String(row?.[13]||"Q2").toUpperCase()}|${code}`;
     codeCounts.set(key,(codeCounts.get(key)||0)+1);
   });
-  return {codeCounts};
+  return {codeCounts,activityIndex:buildKpiActivityIndex()};
 }
 function getInventoryAuditReasons(r,context=buildInventoryAuditContext()){
   if(!context?.codeCounts) context=buildInventoryAuditContext();
   const reasons = [];
+  const stock=Math.max(0,Number(r[5])||0);
+  const activity=context.activityIndex?.get(kpiActivityKey(r[1],r[13]));
+  const hasRecentSale=(Number(activity?.sales30)||0)>0;
   const location = splitNoteLocation(r[7] || "").location;
-  if(!location) reasons.push("Chưa có vị trí kho");
-  if(hasPrivateProductDataAccess() && !(Number(r[4]) > 0)) reasons.push("Chưa có giá nhập");
-  if(!(Number(r[10]) > 0)) reasons.push("Chưa có giá bán");
+  // Vị trí và giá vốn chỉ có ý nghĩa vận hành khi hàng đang hiện diện trong kho.
+  if(stock>0 && !location) reasons.push("Chưa có vị trí kho");
+  if(stock>0 && hasPrivateProductDataAccess() && !(Number(r[4]) > 0)) reasons.push("Chưa có giá nhập");
+  if((stock>0 || hasRecentSale) && !(Number(r[10]) > 0)) reasons.push("Chưa có giá bán");
   if(!getPrimaryRowGroup(r[8])) reasons.push("Chưa phân nhóm");
   if(!String(r[3] || "").trim()) reasons.push("Thiếu thương hiệu");
   const code = String(r[1] || "").trim();
@@ -13169,10 +13362,35 @@ function getInventoryAuditReasons(r,context=buildInventoryAuditContext()){
   if(![r[9],r[14],r[15],r[18],r[19]].some(value=>String(value||"").trim())) reasons.push("Chưa có hình sản phẩm");
   return reasons;
 }
+function getInventoryAuditChecks(r,context=buildInventoryAuditContext()){
+  if(!context?.codeCounts) context=buildInventoryAuditContext();
+  const code=String(r[1]||"").trim();
+  const branch=String(r[13]||"Q2").toUpperCase();
+  const stock=Math.max(0,Number(r[5])||0);
+  const activity=context.activityIndex?.get(kpiActivityKey(r[1],r[13]));
+  const hasRecentSale=(Number(activity?.sales30)||0)>0;
+  const checks=[
+    !!code && (context.codeCounts.get(`${branch}|${normalizeProductCode(code)}`)||0)===1,
+    !!String(r[2]||"").trim(),
+    !!getPrimaryRowGroup(r[8]),
+    !!String(r[12]??"").trim() && Number(r[12])>=1
+  ];
+  if(stock>0){
+    checks.push(!!splitNoteLocation(r[7]||"").location);
+    if(hasPrivateProductDataAccess()) checks.push(Number(r[4])>0);
+  }
+  if(stock>0 || hasRecentSale) checks.push(Number(r[10])>0);
+  return checks;
+}
 function renderInventoryAudit(el,results,auditContext=buildInventoryAuditContext()){
-  const audited=results.map(item=>({...item,auditReasons:getInventoryAuditReasons(item.r,auditContext)}));
+  const enrichedByIndex=new Map(getKpiEnrichedEntries().map(item=>[item.i,item]));
+  const audited=results.map(item=>{
+    const enriched=enrichedByIndex.get(item.i)||item;
+    return {...enriched,auditReasons:getInventoryAuditReasons(item.r,auditContext)};
+  });
   const isCritical=item=>item.auditReasons.some(reason=>reason==="Thiếu mã hàng"||reason==="Trùng mã trong chi nhánh"||reason==="Thiếu tên sản phẩm");
-  audited.sort((a,b)=>Number(isCritical(b))-Number(isCritical(a)) || b.auditReasons.length-a.auditReasons.length || String(a.r[2]||"").localeCompare(String(b.r[2]||""),"vi"));
+  const affectsSales=item=>item.sales30>0&&item.auditReasons.some(reason=>reason==="Chưa có giá bán"||reason==="Chưa có vị trí kho");
+  audited.sort((a,b)=>Number(isCritical(b))-Number(isCritical(a)) || Number(affectsSales(b))-Number(affectsSales(a)) || b.sales30-a.sales30 || b.auditReasons.length-a.auditReasons.length || String(a.r[2]||"").localeCompare(String(b.r[2]||""),"vi"));
   const byReason=reason=>audited.filter(item=>item.auditReasons.includes(reason));
   const locationItems=byReason("Chưa có vị trí kho");
   const costItems=byReason("Chưa có giá nhập");
@@ -13185,10 +13403,15 @@ function renderInventoryAudit(el,results,auditContext=buildInventoryAuditContext
   const imageItems=byReason("Chưa có hình sản phẩm");
   const pricingItems=audited.filter(item=>item.auditReasons.includes("Chưa có giá nhập")||item.auditReasons.includes("Chưa có giá bán"));
   const criticalItems=audited.filter(isCritical);
-  const scopedTotal=getKpiScopedEntries().length;
-  const completeCount=Math.max(0,scopedTotal-audited.length);
-  const qualityScore=scopedTotal?Math.round(completeCount*100/scopedTotal):100;
-  summaryProductSets={"audit-all":audited,"audit-critical":criticalItems,"audit-pricing":pricingItems,"audit-location":locationItems,"audit-cost":costItems,"audit-price":priceItems,"audit-group":groupItems,"audit-brand":brandItems,"audit-code":codeItems,"audit-name":nameItems,"audit-threshold":thresholdItems,"audit-image":imageItems};
+  const operationalItems=audited.filter(affectsSales);
+  const scopedEntries=getKpiScopedEntries();
+  const scopedTotal=scopedEntries.length;
+  const scopedChecks=scopedEntries.map(item=>getInventoryAuditChecks(item.r,auditContext));
+  const totalChecks=scopedChecks.reduce((sum,checks)=>sum+checks.length,0);
+  const passedChecks=scopedChecks.reduce((sum,checks)=>sum+checks.filter(Boolean).length,0);
+  const completeCount=scopedChecks.filter(checks=>checks.every(Boolean)).length;
+  const qualityScore=totalChecks?Math.round(passedChecks*100/totalChecks):100;
+  summaryProductSets={"audit-all":audited,"audit-operational":operationalItems,"audit-critical":criticalItems,"audit-pricing":pricingItems,"audit-location":locationItems,"audit-cost":costItems,"audit-price":priceItems,"audit-group":groupItems,"audit-brand":brandItems,"audit-code":codeItems,"audit-name":nameItems,"audit-threshold":thresholdItems,"audit-image":imageItems};
   document.getElementById("count").textContent=audited.length+" mặt hàng cần bổ sung";
   if(!audited.length){
     el.innerHTML = `<div class="empty"><div class="empty-icon">✅</div><div class="empty-title">Không có mặt hàng cần kiểm tra</div><div class="empty-sub">Dữ liệu sản phẩm trong phạm vi này đã đầy đủ</div></div>`;
@@ -13196,8 +13419,9 @@ function renderInventoryAudit(el,results,auditContext=buildInventoryAuditContext
   }
   const scopeLabel=currentBranch==="ALL"?"TOÀN HỆ THỐNG":`KHO ${currentBranch}`;
   const canSeeCost=hasPrivateProductDataAccess();
-  const costIssueButton=canSeeCost?`<button class="management-issue summary-click" onclick="toggleSummaryProductList('audit-cost','Mặt hàng chưa có giá nhập')"><span>Chưa có giá nhập</span><b>${costItems.length}</b></button>`:"";
-  el.innerHTML=`<div class="audit-head"><span class="overview-eyebrow">Chất lượng dữ liệu</span><div class="audit-title">✓ CHUẨN HÓA DỮ LIỆU KHO · ${scopeLabel}</div><div class="audit-sub">Tách riêng lỗi thông tin sản phẩm; tồn thấp và hết hàng được xử lý tại mục Cần nhập</div><div class="restock-summary"><div class="metric-card metric-green"><span class="metric-number audit-score-ring">${qualityScore}%</span><span class="metric-label">Mã hàng hoàn chỉnh</span><span class="metric-note">${completeCount}/${scopedTotal} mã không thiếu dữ liệu</span></div><button class="metric-card metric-yellow summary-click" onclick="toggleSummaryProductList('audit-all','Toàn bộ mặt hàng cần bổ sung')"><span class="metric-number">${audited.length}</span><span class="metric-label">Cần bổ sung thông tin</span><span class="metric-note">Bấm để xem toàn bộ</span></button><button class="metric-card metric-red summary-click" onclick="toggleSummaryProductList('audit-critical','Mã hàng cần xử lý trước')"><span class="metric-number">${criticalItems.length}</span><span class="metric-label">Lỗi quan trọng</span><span class="metric-note">Thiếu/trùng mã hoặc thiếu tên</span></button><button class="metric-card metric-blue summary-click" onclick="toggleSummaryProductList('audit-location','Mặt hàng chưa có vị trí')"><span class="metric-number">${locationItems.length}</span><span class="metric-label">Thiếu vị trí kho</span><span class="metric-note">Ảnh hưởng việc tìm hàng</span></button><button class="metric-card metric-purple summary-click" onclick="toggleSummaryProductList('audit-pricing','Mặt hàng thiếu dữ liệu giá')"><span class="metric-number">${pricingItems.length}</span><span class="metric-label">Thiếu dữ liệu giá</span><span class="metric-note">${canSeeCost?"Giá nhập hoặc giá bán":"Giá bán công khai"}</span></button></div><div class="management-issues">${costIssueButton}<button class="management-issue summary-click" onclick="toggleSummaryProductList('audit-price','Mặt hàng chưa có giá bán')"><span>Chưa có giá bán</span><b>${priceItems.length}</b></button><button class="management-issue summary-click" onclick="toggleSummaryProductList('audit-group','Mặt hàng chưa phân nhóm')"><span>Chưa phân nhóm</span><b>${groupItems.length}</b></button><button class="management-issue summary-click" onclick="toggleSummaryProductList('audit-brand','Mặt hàng thiếu thương hiệu')"><span>Thiếu thương hiệu</span><b>${brandItems.length}</b></button><button class="management-issue summary-click" onclick="toggleSummaryProductList('audit-code','Mặt hàng lỗi mã')"><span>Thiếu / trùng mã</span><b>${codeItems.length}</b></button><button class="management-issue summary-click" onclick="toggleSummaryProductList('audit-name','Mặt hàng thiếu tên')"><span>Thiếu tên sản phẩm</span><b>${nameItems.length}</b></button><button class="management-issue summary-click" onclick="toggleSummaryProductList('audit-threshold','Mặt hàng chưa đặt ngưỡng nhập')"><span>Thiếu ngưỡng nhập</span><b>${thresholdItems.length}</b></button><button class="management-issue summary-click" onclick="toggleSummaryProductList('audit-image','Mặt hàng chưa có hình')"><span>Thiếu hình sản phẩm</span><b>${imageItems.length}</b></button></div><div class="overview-alert is-ok"><span class="overview-alert-icon">i</span><span>Mục này chỉ đánh giá độ đầy đủ của dữ liệu. Mỗi thẻ sản phẩm hiển thị đúng các trường cần bổ sung để mọi người xử lý nhanh.</span></div></div><div class="summary-product-list-host"></div>`;
+  const costIssueButton=canSeeCost?`<button class="management-issue summary-click" ${summaryActionAttrs('audit-cost','Mặt hàng chưa có giá nhập')}><span>Chưa có giá nhập</span><b>${costItems.length}</b></button>`:"";
+  el.innerHTML=`<div class="audit-head"><span class="overview-eyebrow">Chất lượng dữ liệu</span><div class="audit-title">✓ CHUẨN HÓA DỮ LIỆU KHO · ${scopeLabel}</div><div class="audit-sub">Ưu tiên dữ liệu đang ảnh hưởng bán hàng trước; thương hiệu và hình ảnh được xếp vào nhóm hoàn thiện sau</div><div class="restock-summary"><div class="metric-card metric-green"><span class="metric-number audit-score-ring">${qualityScore}%</span><span class="metric-label">Tiêu chí thiết yếu đạt</span><span class="metric-note">${passedChecks}/${totalChecks} trường vận hành · ${completeCount}/${scopedTotal} mã đầy đủ</span></div><button class="metric-card metric-red summary-click" ${summaryActionAttrs('audit-operational','Thiếu dữ liệu đang ảnh hưởng bán hàng')}><span class="metric-number">${operationalItems.length}</span><span class="metric-label">Ảnh hưởng bán hàng</span><span class="metric-note">Đã bán 30 ngày nhưng thiếu giá/vị trí</span></button><button class="metric-card metric-yellow summary-click" ${summaryActionAttrs('audit-all','Toàn bộ mặt hàng cần bổ sung')}><span class="metric-number">${audited.length}</span><span class="metric-label">Cần bổ sung thông tin</span><span class="metric-note">Danh sách đã xếp theo tác động</span></button><button class="metric-card metric-blue summary-click" ${summaryActionAttrs('audit-location','Mặt hàng chưa có vị trí')}><span class="metric-number">${locationItems.length}</span><span class="metric-label">Hàng tồn thiếu vị trí</span><span class="metric-note">Không tính các mã đang tồn 0</span></button><button class="metric-card metric-purple summary-click" ${summaryActionAttrs('audit-pricing','Mặt hàng thiếu dữ liệu giá')}><span class="metric-number">${pricingItems.length}</span><span class="metric-label">Thiếu dữ liệu giá</span><span class="metric-note">${canSeeCost?"Trên hàng tồn/đang bán":"Giá bán của hàng tồn/đang bán"}</span></button></div><div class="management-issues">${costIssueButton}<button class="management-issue summary-click" ${summaryActionAttrs('audit-price','Mặt hàng chưa có giá bán')}><span>Chưa có giá bán</span><b>${priceItems.length}</b></button><button class="management-issue summary-click" ${summaryActionAttrs('audit-critical','Mã hàng có lỗi quan trọng')}><span>Lỗi quan trọng</span><b>${criticalItems.length}</b></button><button class="management-issue summary-click" ${summaryActionAttrs('audit-group','Mặt hàng chưa phân nhóm')}><span>Chưa phân nhóm</span><b>${groupItems.length}</b></button><button class="management-issue summary-click" ${summaryActionAttrs('audit-brand','Mặt hàng thiếu thương hiệu')}><span>Thiếu thương hiệu</span><b>${brandItems.length}</b></button><button class="management-issue summary-click" ${summaryActionAttrs('audit-code','Mặt hàng lỗi mã')}><span>Thiếu / trùng mã</span><b>${codeItems.length}</b></button><button class="management-issue summary-click" ${summaryActionAttrs('audit-name','Mặt hàng thiếu tên')}><span>Thiếu tên sản phẩm</span><b>${nameItems.length}</b></button><button class="management-issue summary-click" ${summaryActionAttrs('audit-threshold','Mặt hàng chưa đặt ngưỡng nhập')}><span>Thiếu ngưỡng nhập</span><b>${thresholdItems.length}</b></button><button class="management-issue summary-click" ${summaryActionAttrs('audit-image','Mặt hàng chưa có hình')}><span>Thiếu hình sản phẩm</span><b>${imageItems.length}</b></button></div><div class="overview-alert is-ok"><span class="overview-alert-icon">i</span><span>Danh sách mặc định đưa mã đang bán nhưng thiếu giá/vị trí lên trước. Điểm chất lượng chỉ tính trường thiết yếu; thương hiệu và hình ảnh không làm toàn bộ kho rơi về 0%.</span></div></div><div class="summary-product-list-host"></div>`;
+  bindSummaryActionButtons(el);
   toggleSummaryProductList('audit-all','Toàn bộ mặt hàng cần bổ sung',false);
 }
 function renderRestockOverview(el){
@@ -13208,28 +13432,48 @@ function renderRestockOverview(el){
     if(item.state!=="HET" && item.state!=="SAP") return false;
     if(!kwTokens.length) return true;
     const hay = removeAccents([item.r[1],item.r[2],item.r[3],item.r[7],item.r[8],item.r[13]||"Q2"].join(" "));
-    return kwTokens.every(token=>hay.includes(token));
+      return kwTokens.every(token=>hay.includes(token));
   }));
-  const outCount = rows.filter(item=>item.state==="HET").length;
-  const lowCount = rows.filter(item=>item.state==="SAP").length;
-  const outItems = rows.filter(item=>item.state==="HET");
-  const lowItems = rows.filter(item=>item.state==="SAP");
-  const sellingItems=rows.filter(item=>item.sales30>0);
-  const salesQty30=sellingItems.reduce((sum,item)=>sum+item.sales30,0);
-  const minimumSuggestion=rows.reduce((sum,item)=>sum+getRestockMinimumSuggestion(item),0);
-  summaryProductSets = {"restock-all":rows,"restock-out":outItems,"restock-low":lowItems};
-  document.getElementById("count").textContent = rows.length + " mặt hàng cần nhập";
+  const urgentItems=rows.filter(item=>getInventoryAction(item).key==="URGENT");
+  const prepareItems=rows.filter(item=>getInventoryAction(item).key==="PREPARE");
+  const verifyItems=rows.filter(item=>getInventoryAction(item).key==="VERIFY");
+  const watchItems=rows.filter(item=>getInventoryAction(item).key==="WATCH");
+  const actionableItems=rows.filter(isInventoryActionable);
+  const monitorItems=rows.filter(item=>!isInventoryActionable(item));
+  const salesQty30=actionableItems.reduce((sum,item)=>sum+item.sales30,0);
+  const minimumSuggestion=actionableItems.reduce((sum,item)=>sum+getRestockMinimumSuggestion(item),0);
+  summaryProductSets = {
+    "restock-all":rows,
+    "restock-actionable":actionableItems,
+    "restock-monitor":monitorItems,
+    "restock-urgent":urgentItems,
+    "restock-prepare":prepareItems,
+    "restock-verify":verifyItems,
+    "restock-watch":watchItems
+  };
+  document.getElementById("count").textContent = `${actionableItems.length} cần nhập · ${monitorItems.length} theo dõi`;
   if(!rows.length){
     el.innerHTML = `<div class="empty"><div class="empty-icon">✅</div><div class="empty-title">${scopeLabel} chưa có mặt hàng cần nhập</div><div class="empty-sub">Không có hàng hết hoặc thấp hơn ngưỡng cảnh báo trong phạm vi này</div></div>`;
     return;
   }
   const reportBranches=currentBranch==="ALL" ? ["Q2","Q5"] : [currentBranch];
-  const restockBranches = reportBranches.map(code=>{ const items=rows.filter(item=>(item.r[13]||"Q2")===code); return {code,total:items.length,out:items.filter(item=>item.state==="HET").length,low:items.filter(item=>item.state==="SAP").length,suggested:items.reduce((sum,item)=>sum+getRestockMinimumSuggestion(item),0)}; });
-  const priorityItems=rows.slice(0,8);
-  const priorityHtml=`<section class="overview-priority"><div class="overview-priority-head"><span><strong class="overview-priority-title">Cần xử lý trước</strong><span class="overview-priority-sub">Hết hàng được ưu tiên, sau đó xét sức bán 30 ngày, mức tồn/ngưỡng và hoạt động gần nhất</span></span><span class="overview-priority-badge">TOP ${priorityItems.length}</span></div><div class="overview-priority-grid">${priorityItems.map((item,index)=>`<button type="button" class="overview-priority-item${item.state==="HET"?" is-out":""}" onclick="openSummaryInventoryItem(${item.i})"><span class="overview-priority-rank">${index+1}</span><span class="overview-priority-name">${renderProductTitleWithCondition(item.r[2]||"Chưa có tên")}</span><span class="overview-priority-meta">${item.state==="HET"?"Hết hàng":`Còn ${item.stock}/${item.threshold}`} · Nhập tối thiểu +${getRestockMinimumSuggestion(item)}${item.sales30?` · Đã bán ${item.sales30}/30 ngày`:""}</span></button>`).join("")}</div></section>`;
-  const html = `<div class="restock-head"><span class="overview-eyebrow">Kế hoạch hành động</span><div class="restock-title">📥 KẾ HOẠCH NHẬP HÀNG · ${scopeLabel}</div><div class="restock-sub">${rows.length} mã cần xử lý · danh sách được xếp theo mức ưu tiên thực tế, không theo thứ tự dữ liệu gốc</div><div class="restock-summary"><button class="metric-card metric-red summary-click" onclick="toggleSummaryProductList('restock-out','Mặt hàng đã hết · ${scopeLabel}')"><span class="metric-number">${outCount}</span><span class="metric-label">Hết hàng · ưu tiên ngay</span><span class="metric-note">Được đưa lên đầu danh sách</span></button><button class="metric-card metric-yellow summary-click" onclick="toggleSummaryProductList('restock-low','Mặt hàng sắp hết · ${scopeLabel}')"><span class="metric-number">${lowCount}</span><span class="metric-label">Sắp hết · cần chuẩn bị</span><span class="metric-note">Theo ngưỡng từng mã hàng</span></button><div class="metric-card metric-blue"><span class="metric-number">${sellingItems.length}</span><span class="metric-label">Có phát sinh bán 30 ngày</span><span class="metric-note">Tổng ${salesQty30} sản phẩm đã bán</span></div><button class="metric-card metric-purple summary-click" onclick="toggleSummaryProductList('restock-all','Mặt hàng cần xử lý · ${scopeLabel}')"><span class="metric-number">+${minimumSuggestion}</span><span class="metric-label">Gợi ý nhập tối thiểu</span><span class="metric-note">Để tồn vượt ngưỡng cảnh báo</span></button></div><div class="overview-alert"><span class="overview-alert-icon">i</span><span>Số lượng gợi ý là mức tối thiểu để đưa tồn lên cao hơn ngưỡng cảnh báo. Đây là chỉ báo vận hành, không thay thế quyết định mua hàng của quản lý.</span></div><div class="management-table-wrap"><table class="management-table"><thead><tr><th>Chi nhánh</th><th>Hết hàng</th><th>Sắp hết</th><th>Cần xử lý</th><th>Gợi ý nhập</th></tr></thead><tbody>${restockBranches.map(x=>`<tr><td>📍 ${x.code}</td><td style="color:#C0392B;font-weight:900">${x.out}</td><td style="color:#9A6700;font-weight:900">${x.low}</td><td><b>${x.total}</b></td><td style="color:#7D3C98;font-weight:900">+${x.suggested}</td></tr>`).join("")}</tbody></table></div></div>${priorityHtml}<div class="summary-product-list-host"></div>`;
+  const restockBranches = reportBranches.map(code=>{
+    const items=rows.filter(item=>(item.r[13]||"Q2")===code);
+    return {
+      code,
+      urgent:items.filter(item=>getInventoryAction(item).key==="URGENT").length,
+      prepare:items.filter(item=>getInventoryAction(item).key==="PREPARE").length,
+      monitor:items.filter(item=>!isInventoryActionable(item)).length,
+      suggested:items.filter(isInventoryActionable).reduce((sum,item)=>sum+getRestockMinimumSuggestion(item),0)
+    };
+  });
+  const priorityItems=actionableItems.slice(0,8);
+  const priorityHtml=priorityItems.length ? `<section class="overview-priority"><div class="overview-priority-head"><span><strong class="overview-priority-title">Cần xử lý trước</strong><span class="overview-priority-sub">Hiện rõ tồn, ngưỡng, sức bán và mục tiêu để chủ kiểm tra được lý do gợi ý</span></span><span class="overview-priority-badge">TOP ${priorityItems.length}</span></div><div class="overview-priority-grid">${priorityItems.map((item,index)=>{ const suggestion=getRestockSuggestionDetails(item); return `<button type="button" class="overview-priority-item${item.state==="HET"?" is-out":""}" onclick="openSummaryInventoryItem(${item.i})"><span class="overview-priority-rank">${index+1}</span><span class="overview-priority-name">${renderProductTitleWithCondition(item.r[2]||"Chưa có tên")}</span><span class="overview-priority-meta">${escapeHtml(getInventoryAction(item).label)} · Tồn ${suggestion.stock}/${suggestion.threshold} · Bán ${item.sales30}/30 ngày · Mục tiêu ${suggestion.target} · Gợi ý +${suggestion.suggested}</span></button>`; }).join("")}</div></section>` : "";
+  const html = `<div class="restock-head"><span class="overview-eyebrow">Kế hoạch hành động</span><div class="restock-title">📥 KẾ HOẠCH NHẬP HÀNG · ${scopeLabel}</div><div class="restock-sub"><b>${actionableItems.length}</b> mã có tín hiệu cần nhập · <b>${monitorItems.length}</b> mã chỉ theo dõi, không tự cộng vào kế hoạch mua</div><div class="restock-summary"><button class="metric-card metric-red summary-click" ${summaryActionAttrs('restock-urgent',`Cần nhập ngay · ${scopeLabel}`)}><span class="metric-number">${urgentItems.length}</span><span class="metric-label">Cần nhập ngay</span><span class="metric-note">Hết hàng và có bán 30 ngày</span></button><button class="metric-card metric-yellow summary-click" ${summaryActionAttrs('restock-prepare',`Chuẩn bị nhập · ${scopeLabel}`)}><span class="metric-number">${prepareItems.length}</span><span class="metric-label">Chuẩn bị nhập</span><span class="metric-note">Tồn thấp và có bán 30 ngày</span></button><button class="metric-card metric-blue summary-click" ${summaryActionAttrs('restock-verify',`Chờ xác nhận nhu cầu · ${scopeLabel}`)}><span class="metric-number">${verifyItems.length}</span><span class="metric-label">Chờ xác nhận</span><span class="metric-note">Hết hàng nhưng chưa bán 30 ngày</span></button><button class="metric-card metric-purple summary-click" ${summaryActionAttrs('restock-watch',`Tồn thấp chỉ theo dõi · ${scopeLabel}`)}><span class="metric-number">${watchItems.length}</span><span class="metric-label">Chỉ theo dõi</span><span class="metric-note">Tồn thấp nhưng chưa bán 30 ngày</span></button></div><div class="overview-alert"><span class="overview-alert-icon">i</span><span>Gợi ý nhập <b>+${minimumSuggestion}</b> sản phẩm cho ${actionableItems.length} mã. Mỗi sản phẩm phía dưới đều hiện căn cứ riêng; mã chưa bán 30 ngày không bị tự động đề xuất mua.</span></div><div class="management-table-wrap"><table class="management-table"><thead><tr><th>Chi nhánh</th><th>Nhập ngay</th><th>Chuẩn bị</th><th>Theo dõi</th><th>Gợi ý nhập</th></tr></thead><tbody>${restockBranches.map(x=>`<tr><td>📍 ${x.code}</td><td style="color:#C0392B;font-weight:900">${x.urgent}</td><td style="color:#9A6700;font-weight:900">${x.prepare}</td><td><b>${x.monitor}</b></td><td style="color:#7D3C98;font-weight:900">+${x.suggested}</td></tr>`).join("")}</tbody></table></div><div class="metric-note">Tổng sức bán của nhóm cần nhập: ${salesQty30.toLocaleString("vi-VN")} sản phẩm / 30 ngày.</div></div>${priorityHtml}<div class="summary-product-list-host"></div>`;
   el.innerHTML=html;
-  toggleSummaryProductList('restock-all',`Mặt hàng cần xử lý · ${scopeLabel}`,false);
+  bindSummaryActionButtons(el);
+  const defaultKey=actionableItems.length ? "restock-actionable" : "restock-monitor";
+  toggleSummaryProductList(defaultKey,actionableItems.length?`Mặt hàng cần nhập · ${scopeLabel}`:`Mặt hàng cần theo dõi · ${scopeLabel}`,false);
 }
 function render(){
   document.body.classList.remove("loading-layout-mode");
@@ -13443,7 +13687,7 @@ function render(){
     return;
   }
   if(!bulkSelectMode && !kw && currentTab==="ALL" && currentStatus==="ALL" && !restockOnly){
-    el.innerHTML = `<div class="empty search-landing"><div class="search-landing-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"></circle><path d="M15.5 15.5L21 21"></path></svg></div><div class="empty-title">Bạn muốn tìm thiết bị nào?</div><div class="empty-sub">Chọn gợi ý bên dưới hoặc nhập tên cần tìm vào ô phía trên.</div><div class="search-examples">${getSearchKeywordsForVisit().map((keyword,index)=>renderSearchExampleButton(keyword,index)).join("")}</div></div>`;
+    el.innerHTML = `<div class="empty search-landing has-orbit"><div class="empty-title">Bạn muốn tìm thiết bị nào?</div><div class="empty-sub">Chọn gợi ý bên dưới hoặc nhập tên cần tìm vào ô phía trên.</div><div class="search-orbit-stage"><div class="search-landing-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"></circle><path d="M15.5 15.5L21 21"></path></svg></div><div class="search-examples">${getSearchKeywordsForVisit().map((keyword,index)=>renderSearchExampleButton(keyword,index)).join("")}</div></div></div>`;
     return;
   }
   el.innerHTML = results.map(({r,i},idx)=>renderCard(r,i,idx+1)).join("");
@@ -18169,9 +18413,12 @@ function showToast(msg, duration=2200){ const t=document.getElementById("toast")
 let currentKpiExportType="all";
 function getCurrentKpiExport(){
   const type=currentKpiExportType, titles={all:"CHI TIẾT MẶT HÀNG",ton:"TỔNG TỒN KHO",het:"DANH SÁCH HẾT HÀNG",sap:"DANH SÁCH SẮP HẾT HÀNG"};
-  const ordered=sortKpiEntries(kpiFilterEntries(type,getKpiEnrichedEntries()),type,currentKpiSort);
-  const inventory=ordered.map(({r,stock,threshold,state,activity,sales30})=>({branch:r[13]||"Q2",code:r[1]||"",name:r[2]||"",category:r[0]||"",qty:stock,low:threshold,status:getStockStatusLabel(stock,threshold),location:splitNoteLocation(r[7]).location||"",activity:activity.latestAt?kpiRelativeTime(activity.latestAt):"",sales30,state}));
-  return {type,title:titles[type],branch:currentBranch==="ALL"?"TẤT CẢ":currentBranch,inventory,totalStock:inventory.reduce((sum,r)=>sum+r.qty,0),generatedAt:formatTxTime(new Date())};
+  const typeEntries=sortKpiEntries(kpiFilterEntries(type,getKpiEnrichedEntries()),type,currentKpiSort);
+  const selection=getKpiMetricSelection(type,currentKpiListMode,typeEntries);
+  const ordered=currentKpiListMode==="default"?typeEntries:selection.items;
+  const inventory=ordered.map(({r,stock,threshold,state,activity,sales30})=>({branch:r[13]||"Q2",code:r[1]||"",name:r[2]||"",category:r[0]||"",group:getSummaryHierarchyGroup(r)||NO_GROUP,qty:stock,low:threshold,status:getStockStatusLabel(stock,threshold),location:splitNoteLocation(r[7]).location||"",activity:activity.latestAt?kpiRelativeTime(activity.latestAt):"",sales30,state}));
+  const title=currentKpiListMode==="default"?titles[type]:selection.label.toLocaleUpperCase("vi");
+  return {type,title,branch:currentBranch==="ALL"?"TẤT CẢ":currentBranch,inventory,totalStock:inventory.reduce((sum,r)=>sum+r.qty,0),generatedAt:formatTxTime(new Date())};
 }
 function quickInventoryFileStamp(){
   const d=new Date(), p=n=>String(n).padStart(2,"0");
@@ -18189,8 +18436,11 @@ async function copyCurrentKpiContent(){
   const groups=new Map();
   r.inventory.forEach(item=>{
     const key=(item.category||"KHAC").toString().trim().toUpperCase()||"KHAC";
-    if(!groups.has(key)) groups.set(key,[]);
-    groups.get(key).push(item);
+    const groupLabel=cleanKpiPathLabel(item.group)||NO_GROUP;
+    const groupKey=normalizeQuickText(groupLabel)||groupLabel.toLowerCase();
+    if(!groups.has(key)) groups.set(key,new Map());
+    if(!groups.get(key).has(groupKey)) groups.get(key).set(groupKey,{label:groupLabel,items:[]});
+    groups.get(key).get(groupKey).items.push(item);
   });
   const orderedKeys=[...categoryOrder.filter(key=>groups.has(key)),...Array.from(groups.keys()).filter(key=>!categoryOrder.includes(key))];
   const itemLine=item=>{
@@ -18201,10 +18451,14 @@ async function copyCurrentKpiContent(){
   };
   const groupedLines=[];
   orderedKeys.forEach((key,index)=>{
-    const items=groups.get(key)||[];
+    const subgroupMap=groups.get(key)||new Map();
+    const items=Array.from(subgroupMap.values()).flatMap(group=>group.items);
     const meta=categoryMeta[key]||{label:key||"KHÁC",icon:"📦"};
     if(index) groupedLines.push("");
-    groupedLines.push(`${meta.icon} ${meta.label} (${items.length})`,...items.map(itemLine));
+    groupedLines.push(`${meta.icon} ${meta.label} (${items.length})`);
+    Array.from(subgroupMap.values()).forEach(group=>{
+      groupedLines.push(`  ${group.label} (${group.items.length})`,...group.items.map(item=>`  ${itemLine(item)}`));
+    });
   });
   const lines=[
     `📋 ${r.title} — KHO ${r.branch}`,
@@ -18280,15 +18534,15 @@ async function captureCurrentKpi(){
 }
 function exportCurrentKpiExcel(){
   if(typeof XLSX==="undefined"){ showToast("⚠️ Chưa tải được công cụ Excel.",4000); return; }
-  const r=getCurrentKpiExport(), headers=["Chi nhánh","Mã hàng","Tên sản phẩm","Nhóm hàng","Tồn hiện tại","Ngưỡng sắp hết","Trạng thái","Vị trí"], rows=list=>list.map(x=>[x.branch,x.code,x.name,x.category,x.qty,x.low,x.status,x.location]);
+  const r=getCurrentKpiExport(), headers=["Chi nhánh","Mã hàng","Tên sản phẩm","Danh mục","Nhóm hàng","Tồn hiện tại","Ngưỡng sắp hết","Trạng thái","Vị trí"], rows=list=>list.map(x=>[x.branch,x.code,x.name,x.category,cleanKpiPathLabel(x.group),x.qty,x.low,x.status,x.location]);
   const wb=XLSX.utils.book_new(), add=(name,data,widths)=>{ const ws=XLSX.utils.aoa_to_sheet(data); ws["!cols"]=widths.map(w=>({wch:w})); ws["!autofilter"]={ref:`A1:${XLSX.utils.encode_col(data[0].length-1)}${data.length}`}; XLSX.utils.book_append_sheet(wb,ws,name); };
-  add("Tổng hợp",[[r.title,"Số lượng"],["Thời điểm xuất",r.generatedAt],["Tổng mặt hàng",r.inventory.length],["Tổng tồn",r.totalStock]],[32,28]); add("Danh sách KPI",[headers,...rows(r.inventory)],[12,16,42,20,13,16,18,28]);
+  add("Tổng hợp",[[r.title,"Số lượng"],["Thời điểm xuất",r.generatedAt],["Tổng mặt hàng",r.inventory.length],["Tổng tồn",r.totalStock]],[32,28]); add("Danh sách KPI",[headers,...rows(r.inventory)],[12,16,42,12,26,13,16,18,28]);
   XLSX.writeFile(wb,`KPI-${r.type}-${quickInventoryFileStamp()}.xlsx`); showToast(`✅ Đã xuất Excel ${r.title.toLowerCase()}`);
 }
 function exportCurrentKpiPdf(){
   if(typeof pdfMake==="undefined"){ showToast("⚠️ Chưa tải được công cụ PDF.",4000); return; }
-  const r=getCurrentKpiExport(), body=[["Mã hàng","Sản phẩm","Nhóm","Tồn","Ngưỡng","Trạng thái"],...r.inventory.map(x=>[x.code,x.name,x.category,String(x.qty),String(x.low),x.status])];
-  const doc={pageSize:"A4",pageMargins:[28,30,28,30],defaultStyle:{font:"Roboto",fontSize:9},styles:{title:{fontSize:18,bold:true,alignment:"center",color:"#1E3A5F"}},content:[{text:`KHO ${r.branch} - ${r.title}`,style:"title"},{text:`Xuất lúc: ${r.generatedAt} • Tổng cộng: ${r.inventory.length} mặt hàng${r.type==="ton"?` • ${r.totalStock} tồn`:""}`,alignment:"center",margin:[0,4,0,12]},{table:{headerRows:1,widths:[65,"*",90,38,45,65],body},layout:"lightHorizontalLines"}],footer:(p,ps)=>({text:`Trang ${p}/${ps}`,alignment:"right",fontSize:8,margin:[0,5,28,0]})};
+  const r=getCurrentKpiExport(), body=[["Mã hàng","Sản phẩm","Danh mục","Nhóm hàng","Tồn","Ngưỡng","Trạng thái"],...r.inventory.map(x=>[x.code,x.name,x.category,cleanKpiPathLabel(x.group),String(x.qty),String(x.low),x.status])];
+  const doc={pageSize:"A4",pageMargins:[28,30,28,30],defaultStyle:{font:"Roboto",fontSize:8},styles:{title:{fontSize:18,bold:true,alignment:"center",color:"#1E3A5F"}},content:[{text:`KHO ${r.branch} - ${r.title}`,style:"title"},{text:`Xuất lúc: ${r.generatedAt} • Tổng cộng: ${r.inventory.length} mặt hàng${r.type==="ton"?` • ${r.totalStock} tồn`:""}`,alignment:"center",margin:[0,4,0,12]},{table:{headerRows:1,widths:[58,"*",42,72,32,38,58],body},layout:"lightHorizontalLines"}],footer:(p,ps)=>({text:`Trang ${p}/${ps}`,alignment:"right",fontSize:8,margin:[0,5,28,0]})};
   pdfMake.createPdf(doc).download(`KPI-${r.type}-${quickInventoryFileStamp()}.pdf`); showToast(`✅ Đã xuất PDF ${r.title.toLowerCase()}`);
 }
 function chooseAccountingMonth(){
