@@ -1695,18 +1695,35 @@ body.fab-menu-open .category-view-bar .view-mode-switch { pointer-events:none; }
 .group-header { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 15px; font-weight: 900; color: #17202A; padding: 8px 10px; border-radius: 9px; margin: 0 0 12px; border: 1.5px solid rgba(0,0,0,.1); border-top: 4px solid var(--group-strong,#1E3A5F); background: var(--group-bg,#D6EAF8); box-shadow: 0 3px 10px rgba(0,0,0,.13); }
 .group-header-main { display: flex; align-items: center; min-width: 0; flex: 1; }
 .group-header-label { flex: 1; min-width: 0; overflow-wrap: anywhere; line-height: 1.25; background: rgba(255,255,255,.88); border: 2px solid var(--group-strong,#1E3A5F); border-radius: 8px; padding: 9px 12px; box-shadow: inset 0 0 0 1px rgba(255,255,255,.8); }
-.group-header-count { flex-shrink: 0; min-height:30px; border:1px solid rgba(255,255,255,.55); font-size: 11px; font-weight: 900; color: #fff; background: var(--group-strong,#1E3A5F); padding: 6px 10px; border-radius: 999px; white-space: nowrap; box-shadow: 0 2px 6px rgba(0,0,0,.18); cursor:pointer; }
+.group-header-count { flex-shrink:0; display:flex; align-items:center; justify-content:center; gap:5px; min-height:30px; border:1px solid rgba(255,255,255,.55); font-size:11px; font-weight:900; color:#fff; background:var(--group-strong,#1E3A5F); padding:5px 7px 5px 10px; border-radius:999px; white-space:nowrap; box-shadow:0 2px 6px rgba(0,0,0,.18); cursor:pointer; }
+.group-count-main { padding-right:2px; }
+.group-count-alert { padding:3px 6px; border-radius:999px; background:#fff; font-size:9px; line-height:1.2; }
+.group-count-alert.is-low { background:#FEF5E7; color:#986500; }
+.group-count-alert.is-out { background:#FDEDEC; color:#B03A2E; }
 .group-header-count:hover { filter:brightness(1.12); transform:translateY(-1px); }
 .group-detail-modal { width:min(620px,100%); max-height:86dvh; overflow-y:auto; }
 #groupDetailOverlay { justify-content:center; align-items:center; padding:16px; }
-.group-detail-summary { margin:-5px 0 10px; padding:9px 11px; border-radius:10px; background:#EAF4FB; color:#1A5276; font-size:12px; font-weight:850; }
+.group-detail-summary { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:6px; margin:-5px 0 12px; padding:8px; border:1px solid #D6E8F3; border-radius:12px; background:linear-gradient(145deg,#F7FBFE,#EAF4FB); }
+.group-detail-stat { min-width:0; padding:8px 7px; border:1px solid rgba(30,58,95,.1); border-radius:9px; background:#fff; text-align:center; box-shadow:0 2px 7px rgba(30,58,95,.06); }
+.group-detail-stat b { display:block; color:#1E3A5F; font-size:14px; font-weight:950; line-height:1.1; }
+.group-detail-stat span { display:block; margin-top:3px; color:#718096; font-size:9px; font-weight:800; white-space:nowrap; }
+.group-detail-stat.is-low b { color:#B9770E; }
+.group-detail-stat.is-out b { color:#C0392B; }
 .group-detail-list { display:grid; gap:6px; }
+.group-detail-section { display:grid; gap:5px; margin-bottom:8px; }
+.group-detail-section:last-child { margin-bottom:0; }
+.group-detail-section-head { display:flex; align-items:center; justify-content:space-between; gap:8px; padding:6px 8px; border-radius:8px; background:#EEF4F8; color:#52697B; font-size:10px; font-weight:950; letter-spacing:.025em; }
+.group-detail-section.is-out .group-detail-section-head { background:#FDEDEC; color:#B03A2E; }
+.group-detail-section.is-low .group-detail-section-head { background:#FEF5E7; color:#A66B00; }
+.group-detail-section.is-ok .group-detail-section-head { background:#EAF8F1; color:#18794E; }
 .group-detail-item { width:100%; display:grid; grid-template-columns:minmax(0,1fr) auto; gap:8px; align-items:center; padding:9px 10px; border:1px solid #D6E4EE; border-radius:10px; background:#fff; color:#263B4A; text-align:left; cursor:pointer; }
 .group-detail-item:hover { border-color:#5DADE2; background:#F5FBFF; }
 .group-detail-name { min-width:0; font-size:12px; font-weight:850; line-height:1.3; overflow-wrap:anywhere; }
 .group-detail-meta { display:block; margin-top:3px; color:#718096; font-size:10px; font-weight:700; }
 .group-detail-stock { min-width:54px; padding:5px 7px; border-radius:999px; background:#E8F8F0; color:#1E8449; font-size:11px; font-weight:950; text-align:center; }
-@media(max-width:600px){.group-header{align-items:stretch}.group-header-count{min-height:38px;padding:7px 9px;white-space:normal;line-height:1.15;text-align:center}#groupDetailOverlay{align-items:flex-end;padding:0}.group-detail-modal{max-height:calc(100dvh - 20px);border-radius:20px 20px 0 0}.group-detail-item{padding:9px 8px}.group-detail-name{font-size:11px}}
+.group-detail-stock.is-out { background:#FDEDEC; color:#C0392B; }
+.group-detail-stock.is-low { background:#FEF5E7; color:#A66B00; }
+@media(max-width:600px){.group-header{align-items:stretch}.group-header-count{flex-wrap:wrap;min-height:38px;padding:7px 8px;white-space:normal;line-height:1.25;text-align:center}.group-count-main{flex:1 1 100%}.group-count-alert{font-size:8.5px}#groupDetailOverlay{align-items:flex-end;padding:0}.group-detail-modal{max-height:calc(100dvh - 20px);border-radius:20px 20px 0 0}.group-detail-summary{grid-template-columns:repeat(2,minmax(0,1fr))}.group-detail-item{padding:9px 8px}.group-detail-name{font-size:11px}}
 .group-header.jump-alert { animation: groupJumpAlert 1.15s ease-out; }
 @keyframes groupJumpAlert {
   0%, 100% { background: var(--group-bg, #FADBD8); color: #333; box-shadow: none; }
@@ -9019,10 +9036,18 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 
 <div class="overlay" id="groupDetailOverlay" onclick="overlayClose(event,'groupDetailOverlay')">
   <div class="modal group-detail-modal" onclick="event.stopPropagation()">
-    <div class="modal-title" id="groupDetailTitle">Chi tiết nhóm</div>
+    <div class="kpi-modal-head group-detail-modal-head">
+      <div class="modal-title" id="groupDetailTitle">Chi tiết nhóm</div>
+      <div class="kpi-export-actions" aria-label="Xuất danh sách nhóm đang xem">
+        <button type="button" class="kpi-export-btn kpi-export-camera" title="Chụp ảnh danh sách này" aria-label="Chụp ảnh danh sách này" onclick="captureGroupInventoryDetail()">📷</button>
+        <button type="button" class="kpi-export-btn kpi-export-excel" title="Xuất danh sách này ra Excel" aria-label="Xuất danh sách này ra Excel" onclick="exportGroupInventoryExcel()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 3.5h10v17H4z"></path><path d="M14 6.5h6v14h-6M7 9l4 6M11 9l-4 6M16.5 10h2M16.5 14h2M16.5 18h2"></path></svg></button>
+        <button type="button" class="kpi-export-btn kpi-export-pdf" title="Xuất danh sách này ra PDF" aria-label="Xuất danh sách này ra PDF" onclick="exportGroupInventoryPdf()">PDF</button>
+      </div>
+    </div>
     <div class="group-detail-summary" id="groupDetailSummary"></div>
     <div class="group-detail-list" id="groupDetailList"></div>
     <div class="simple-sticky-actions"><div class="edit-save-buttons">
+      <button type="button" class="btn-submit" onclick="copyGroupInventoryDetail()">📋 Copy nội dung</button>
       <button type="button" class="btn-submit" onclick="closeOverlay('groupDetailOverlay')">Đóng</button>
     </div></div>
   </div>
@@ -9726,6 +9751,7 @@ let buildQuoteCustomer = "";
 let buildQuoteAddress = "";
 let buildQuoteHotline = "";
 let currentGroupDetailSets = {};
+let currentGroupDetailKey = "";
 let ownerTapCount = 0;
 let ownerTapTimer = null;
 
@@ -12100,17 +12126,33 @@ function parseProductInkTitle(value){
   const marker=knownMarkers.find(item=>raw.startsWith(item));
   if(!marker) return {code:"",base:raw,raw};
   const withoutMarker=raw.slice(marker.length).trim();
+  if(marker!=="●"){
+    const markerEntry=Object.entries(PRODUCT_INK_COLORS).find(([,meta])=>meta.marker===marker);
+    if(markerEntry) return {code:markerEntry[0],base:withoutMarker,displayTitle:withoutMarker,placement:"marker",raw};
+  }
   const suffix=withoutMarker.match(/\s+(BK|LC|LM|C|M|Y)\s*$/iu);
-  if(!suffix) return {code:"",base:raw,raw};
-  const code=String(suffix[1]||"").toUpperCase();
-  if(!PRODUCT_INK_COLORS[code]) return {code:"",base:raw,raw};
-  return {code,base:withoutMarker.slice(0,suffix.index).trim(),raw};
+  if(suffix){
+    const code=String(suffix[1]||"").toUpperCase();
+    if(PRODUCT_INK_COLORS[code]) return {code,base:withoutMarker.slice(0,suffix.index).trim(),displayTitle:withoutMarker,placement:"suffix",raw};
+  }
+  const embedded=withoutMarker.match(/(^|\s)(BK|LC|LM|C|M|Y)(?=\s|$|[()[\],;/.\-])/iu);
+  if(!embedded) return {code:"",base:raw,raw};
+  const code=String(embedded[2]||"").toUpperCase();
+  return {code,base:withoutMarker,displayTitle:withoutMarker,placement:"embedded",raw};
+}
+function hasProductInkCode(value,code){
+  if(!code||!PRODUCT_INK_COLORS[code]) return false;
+  return new RegExp(`(^|\\s)${code}(?=\\s|$|[()[\\],;/.\\-])`,"iu").test(String(value||""));
+}
+function replaceProductInkCode(value,oldCode,newCode){
+  if(!oldCode) return String(value||"").trim();
+  return String(value||"").replace(new RegExp(`(^|\\s)${oldCode}(?=\\s|$|[()[\\],;/.\\-])`,"iu"),(_,space)=>`${space}${newCode}`).trim();
 }
 function formatProductInkTitle(base,code){
   const clean=String(base||"").trim();
   const meta=PRODUCT_INK_COLORS[code];
   if(!meta) return clean;
-  return `●${clean?" "+clean:""} ${code}`.trim();
+  return `${meta.marker}${clean?" "+clean:""}`.trim();
 }
 function stripProductInkCodeSuffix(value,code){
   const text=String(value||"").trim();
@@ -12123,14 +12165,14 @@ function hydrateProductInkInput(value){
   if(!input||!codeInput) return;
   const parsed=parseProductInkTitle(value);
   codeInput.value=parsed.code;
-  input.value=parsed.code?`${parsed.base} ${parsed.code}`.trim():String(value||"").trim();
+  input.value=parsed.code?String(parsed.displayTitle||parsed.base||"").trim():String(value||"").trim();
+  input.dataset.inkGenerated=parsed.placement==="suffix"?"1":"0";
   syncInkColorPickerVisibility();
 }
 function getProductInkFormValue(){
   const inputValue=String(document.getElementById("fTen")?.value||"").trim();
   const code=String(document.getElementById("fInkCode")?.value||"").toUpperCase();
-  const base=stripProductInkCodeSuffix(inputValue,code);
-  return {code,base,title:code&&PRODUCT_INK_COLORS[code]?formatProductInkTitle(base,code):base};
+  return {code,base:inputValue,title:code&&PRODUCT_INK_COLORS[code]?formatProductInkTitle(inputValue,code):inputValue};
 }
 function syncInkColorButtons(){
   const code=String(document.getElementById("fInkCode")?.value||"").toUpperCase();
@@ -12156,10 +12198,8 @@ function syncInkColorPickerVisibility(){
 function setProductInkColor(code){
   const input=document.getElementById("fTen"),codeInput=document.getElementById("fInkCode");
   if(!input||!codeInput) return;
-  const oldCode=String(codeInput.value||"").toUpperCase();
-  const base=stripProductInkCodeSuffix(input.value,oldCode);
   codeInput.value=code&&PRODUCT_INK_COLORS[code]?code:"";
-  input.value=codeInput.value?`${base} ${codeInput.value}`.trim():base;
+  input.dataset.inkGenerated="0";
   syncInkColorPickerVisibility();
   updateAddFormLiveInfo();
   input.focus();
@@ -12177,7 +12217,7 @@ function renderProductTitleWithCondition(value, kwTokens=[]){
   const cleanTitle = stripProductConditionFromTitle(value);
   const ink = parseProductInkTitle(cleanTitle);
   const inkMeta = PRODUCT_INK_COLORS[ink.code];
-  const visibleTitle = inkMeta ? `${ink.base} ${ink.code}`.trim() : cleanTitle;
+  const visibleTitle = inkMeta ? String(ink.displayTitle||`${ink.base} ${ink.code}`).trim() : cleanTitle;
   const inkDot = inkMeta
     ? `<span class="product-ink-dot" style="--ink-color:${inkMeta.color}" role="img" aria-label="${escapeHtml(inkMeta.label)}" title="${escapeHtml(inkMeta.label)}"></span>`
     : "";
@@ -13359,18 +13399,164 @@ function jumpToGroup(id){
   const target = document.getElementById(id);
   scrollToMarkedTarget(target);
 }
+function getGroupInventoryStats(items){
+  const stats={items:Array.isArray(items)?items:[],count:0,stock:0,low:0,out:0,ok:0};
+  stats.count=stats.items.length;
+  stats.items.forEach(item=>{
+    const row=item.r||[],stock=Math.max(0,Number(row[5])||0),state=getStockState(stock,row[12]);
+    stats.stock+=stock;
+    if(state==="HET") stats.out++;
+    else if(state==="SAP") stats.low++;
+    else stats.ok++;
+  });
+  return stats;
+}
+function getGroupPlainProductTitle(row){
+  const raw=String(row?.[2]||"Chưa có tên");
+  const condition=getProductConditionFromTitle(raw);
+  const clean=stripProductConditionFromTitle(raw);
+  const ink=parseProductInkTitle(clean);
+  const title=ink.code?String(ink.displayTitle||ink.base||clean).trim():clean;
+  return `${title}${condition?` (${condition})`:""}`;
+}
+function renderGroupInventorySection(items,state,label){
+  if(!items.length) return "";
+  const stateClass=state==="HET"?"is-out":state==="SAP"?"is-low":"is-ok";
+  const sorted=items.slice().sort((a,b)=>{
+    const stockDiff=(Number(a.r?.[5])||0)-(Number(b.r?.[5])||0);
+    if(stockDiff) return stockDiff;
+    return getGroupPlainProductTitle(a.r).localeCompare(getGroupPlainProductTitle(b.r),"vi");
+  });
+  const rows=sorted.map(item=>{
+    const row=item.r||[],stock=Math.max(0,Number(row[5])||0);
+    const stockText=state==="HET"?"Hết hàng":state==="SAP"?`Còn ${stock}`:`Tồn ${stock}`;
+    const stockClass=state==="HET"?"is-out":state==="SAP"?"is-low":"";
+    return `<button type="button" class="group-detail-item" onclick="openGroupDetailProduct(${item.i})"><span class="group-detail-name">${renderProductTitleWithCondition(row[2]||"Chưa có tên")}<span class="group-detail-meta">${escapeHtml(row[1]||"Chưa có mã")} · 📍 ${escapeHtml(row[13]||"Q2")}</span></span><span class="group-detail-stock ${stockClass}">${stockText}</span></button>`;
+  }).join("");
+  return `<section class="group-detail-section ${stateClass}"><div class="group-detail-section-head"><span>${escapeHtml(label)}</span><span>${items.length} mục</span></div>${rows}</section>`;
+}
 function showGroupInventoryDetail(key){
   const detail=currentGroupDetailSets[key];
   if(!detail) return;
   const items=Array.isArray(detail.items)?detail.items:[];
-  const total=items.reduce((sum,item)=>sum+(Number(item.r?.[5])||0),0);
+  const stats=getGroupInventoryStats(items);
+  const byState={HET:[],SAP:[],CON:[]};
+  items.forEach(item=>byState[getStockState(item.r?.[5],item.r?.[12])] .push(item));
+  currentGroupDetailKey=key;
   document.getElementById("groupDetailTitle").textContent=`📦 ${detail.label}`;
-  document.getElementById("groupDetailSummary").textContent=`${items.length} mặt hàng · Tổng tồn chính xác: ${total.toLocaleString("vi-VN")}`;
-  document.getElementById("groupDetailList").innerHTML=items.map(item=>{
-    const row=item.r||[], stock=Number(row[5])||0;
-    return `<button type="button" class="group-detail-item" onclick="openGroupDetailProduct(${item.i})"><span class="group-detail-name">${renderProductTitleWithCondition(row[2]||"Chưa có tên")}<span class="group-detail-meta">${escapeHtml(row[1]||"Chưa có mã")} · 📍 ${escapeHtml(row[13]||"Q2")}</span></span><span class="group-detail-stock">Tồn ${stock}</span></button>`;
-  }).join("") || '<div class="empty">Nhóm này chưa có mặt hàng.</div>';
+  document.getElementById("groupDetailSummary").innerHTML=`<span class="group-detail-stat"><b>${stats.count}</b><span>MỤC</span></span><span class="group-detail-stat"><b>${stats.stock.toLocaleString("vi-VN")}</b><span>TỔNG TỒN</span></span><span class="group-detail-stat is-low"><b>${stats.low}</b><span>SẮP HẾT</span></span><span class="group-detail-stat is-out"><b>${stats.out}</b><span>HẾT HÀNG</span></span>`;
+  document.getElementById("groupDetailList").innerHTML=[renderGroupInventorySection(byState.HET,"HET","HẾT HÀNG"),renderGroupInventorySection(byState.SAP,"SAP","SẮP HẾT"),renderGroupInventorySection(byState.CON,"CON","CÒN HÀNG")].join("") || '<div class="empty">Nhóm này chưa có mặt hàng.</div>';
   document.getElementById("groupDetailOverlay").classList.add("open");
+}
+async function copyGroupInventoryDetail(){
+  const detail=currentGroupDetailSets[currentGroupDetailKey];
+  if(!detail) return;
+  const items=Array.isArray(detail.items)?detail.items:[];
+  const stats=getGroupInventoryStats(items);
+  const cleanLabel=String(detail.label||"Nhóm hàng").replace(/^[^\p{L}\p{N}]+/u,"").trim();
+  const sections=[
+    {state:"HET",label:"HẾT HÀNG"},
+    {state:"SAP",label:"SẮP HẾT"},
+    {state:"CON",label:"CÒN HÀNG"}
+  ];
+  const lines=[`${cleanLabel.toLocaleUpperCase("vi")}: ${stats.count} mục · ${stats.stock.toLocaleString("vi-VN")} tồn · ${stats.low} sắp hết · ${stats.out} hết hàng`];
+  sections.forEach(section=>{
+    const sectionItems=items.filter(item=>getStockState(item.r?.[5],item.r?.[12])===section.state).sort((a,b)=>getGroupPlainProductTitle(a.r).localeCompare(getGroupPlainProductTitle(b.r),"vi"));
+    if(!sectionItems.length) return;
+    lines.push("",`${section.label} (${sectionItems.length})`);
+    sectionItems.forEach(item=>{
+      const row=item.r||[],stock=Math.max(0,Number(row[5])||0);
+      const status=section.state==="HET"?"Hết hàng":section.state==="SAP"?`Còn ${stock}`:`Tồn ${stock}`;
+      const branch=currentBranch==="ALL"?` · ${row[13]||"Q2"}`:"";
+      lines.push(`• ${row[1]||"Chưa có mã"} — ${getGroupPlainProductTitle(row)} — ${status}${branch}`);
+    });
+  });
+  const text=lines.join("\n");
+  try{
+    if(navigator.clipboard?.writeText) await navigator.clipboard.writeText(text);
+    else{
+      const area=document.createElement("textarea");
+      area.value=text; area.style.cssText="position:fixed;opacity:0;left:-9999px;top:-9999px";
+      document.body.appendChild(area); area.select(); area.setSelectionRange(0,area.value.length);
+      if(!document.execCommand("copy")) throw new Error("COPY_FAILED");
+      area.remove();
+    }
+    showToast(`✅ Đã copy ${stats.count} mặt hàng thuộc ${cleanLabel}`,3500);
+  }catch(error){
+    showToast("⚠️ Không copy tự động được. Hãy thử lại trên trang HTTPS.",4200);
+  }
+}
+function getCurrentGroupDetailExport(){
+  const detail=currentGroupDetailSets[currentGroupDetailKey];
+  if(!detail) return null;
+  const items=Array.isArray(detail.items)?detail.items:[];
+  const stats=getGroupInventoryStats(items);
+  const title=String(detail.label||"Nhóm hàng").replace(/^[^\p{L}\p{N}]+/u,"").trim();
+  const rank={HET:0,SAP:1,CON:2};
+  const inventory=items.map(item=>{
+    const row=item.r||[],qty=Math.max(0,Number(row[5])||0),low=Math.max(1,Number(row[12])||2),state=getStockState(qty,low);
+    return {branch:String(row[13]||"Q2"),code:String(row[1]||""),name:getGroupPlainProductTitle(row),qty,low,state,status:state==="HET"?"Hết hàng":state==="SAP"?"Sắp hết":"Còn hàng"};
+  }).sort((a,b)=>(rank[a.state]-rank[b.state])||a.name.localeCompare(b.name,"vi"));
+  return {title,branch:currentBranch==="ALL"?"TẤT CẢ":currentBranch,stats,inventory,generatedAt:formatTxTime(new Date())};
+}
+function groupInventoryExportStamp(){
+  const d=new Date(),p=n=>String(n).padStart(2,"0");
+  return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}_${p(d.getHours())}-${p(d.getMinutes())}`;
+}
+function groupInventoryExportName(report,extension){
+  const slug=removeAccents(report?.title||"nhom-hang").replace(/[^a-z0-9]+/gi,"-").replace(/^-+|-+$/g,"").slice(0,55)||"nhom-hang";
+  return `Ton-kho-${slug}-${groupInventoryExportStamp()}.${extension}`;
+}
+async function captureGroupInventoryDetail(){
+  const report=getCurrentGroupDetailExport();
+  if(!report){ showToast("⚠️ Chưa có danh sách nhóm để xuất.",3500); return; }
+  try{
+    showToast("⏳ Đang tạo ảnh danh sách...",2400);
+    const maxRows=120,rows=report.inventory.slice(0,maxRows),width=1200,rowH=54,height=205+rows.length*rowH+(report.inventory.length>maxRows?48:0);
+    const canvas=document.createElement("canvas"); canvas.width=width; canvas.height=Math.max(330,height);
+    const ctx=canvas.getContext("2d"); if(!ctx) throw new Error("Trình duyệt không hỗ trợ Canvas");
+    ctx.fillStyle="#F4F8FB"; ctx.fillRect(0,0,width,canvas.height);
+    ctx.fillStyle="#1E3A5F"; ctx.fillRect(0,0,width,137);
+    ctx.fillStyle="#fff"; ctx.font="900 34px Arial"; ctx.fillText(report.title.toLocaleUpperCase("vi"),38,51);
+    ctx.font="600 18px Arial"; ctx.fillText(`Kho ${report.branch} · ${report.generatedAt}`,38,84);
+    ctx.font="800 19px Arial"; ctx.fillText(`${report.stats.count} mục · ${report.stats.stock.toLocaleString("vi-VN")} tồn · ${report.stats.low} sắp hết · ${report.stats.out} hết hàng`,38,115);
+    const cols=[{x:34,w:58,t:"#"},{x:92,w:155,t:"MÃ HÀNG"},{x:247,w:590,t:"TÊN SẢN PHẨM"},{x:837,w:85,t:"KHO"},{x:922,w:82,t:"TỒN"},{x:1004,w:162,t:"TRẠNG THÁI"}];
+    ctx.fillStyle="#DCEAF4"; ctx.fillRect(24,151,width-48,42); ctx.fillStyle="#1E3A5F"; ctx.font="800 16px Arial"; cols.forEach(col=>ctx.fillText(col.t,col.x,178));
+    const fit=(text,maxWidth)=>{let value=String(text??"");if(ctx.measureText(value).width<=maxWidth)return value;while(value.length>1&&ctx.measureText(value+"…").width>maxWidth)value=value.slice(0,-1);return value+"…";};
+    rows.forEach((item,index)=>{
+      const y=193+index*rowH; ctx.fillStyle=index%2?"#F8FBFD":"#fff"; ctx.fillRect(24,y,width-48,rowH);
+      ctx.strokeStyle="#DDE6ED"; ctx.beginPath(); ctx.moveTo(24,y+rowH); ctx.lineTo(width-24,y+rowH); ctx.stroke();
+      ctx.fillStyle="#536B7D"; ctx.font="600 16px Arial"; ctx.fillText(String(index+1),cols[0].x,y+33);
+      ctx.fillStyle="#1A5276"; ctx.font="800 16px Arial"; ctx.fillText(fit(item.code,cols[1].w-12),cols[1].x,y+33);
+      ctx.fillStyle="#172B3A"; ctx.font="700 17px Arial"; ctx.fillText(fit(item.name,cols[2].w-16),cols[2].x,y+33);
+      ctx.fillStyle="#536B7D"; ctx.font="700 15px Arial"; ctx.fillText(item.branch,cols[3].x,y+33);
+      ctx.fillStyle=item.state==="HET"?"#C0392B":item.state==="SAP"?"#A66B00":"#1E8449"; ctx.font="900 18px Arial"; ctx.fillText(String(item.qty),cols[4].x,y+33);
+      ctx.font="800 15px Arial"; ctx.fillText(item.status,cols[5].x,y+33);
+    });
+    if(report.inventory.length>maxRows){ctx.fillStyle="#6A7E8E";ctx.font="italic 16px Arial";ctx.fillText(`Ảnh hiển thị ${maxRows}/${report.inventory.length} mặt hàng. Dùng Excel hoặc PDF để xem toàn bộ.`,34,canvas.height-17);}
+    const filename=groupInventoryExportName(report,"png");
+    openImageViewer(canvas.toDataURL("image/png",.96),filename.replace(/\.png$/i,"")); showImageSaveButton();
+    showToast("✅ Đã tạo ảnh — kiểm tra rồi bấm Lưu ảnh",3800);
+  }catch(error){ showToast(`⚠️ Không thể tạo ảnh: ${error?.message||error}`,4500); }
+}
+function exportGroupInventoryExcel(){
+  const report=getCurrentGroupDetailExport();
+  if(!report){ showToast("⚠️ Chưa có danh sách nhóm để xuất.",3500); return; }
+  if(typeof XLSX==="undefined"){ showToast("⚠️ Chưa tải được công cụ Excel.",4000); return; }
+  const summary=[["BÁO CÁO TỒN KHO NHÓM",report.title],["Kho",report.branch],["Thời điểm xuất",report.generatedAt],["Số mục",report.stats.count],["Tổng tồn",report.stats.stock],["Sắp hết",report.stats.low],["Hết hàng",report.stats.out]];
+  const rows=[["STT","Chi nhánh","Mã hàng","Tên sản phẩm","Tồn hiện tại","Ngưỡng sắp hết","Trạng thái"],...report.inventory.map((item,index)=>[index+1,item.branch,item.code,item.name,item.qty,item.low,item.status])];
+  const wb=XLSX.utils.book_new(),wsSummary=XLSX.utils.aoa_to_sheet(summary),wsList=XLSX.utils.aoa_to_sheet(rows);
+  wsSummary["!cols"]=[{wch:24},{wch:48}]; wsList["!cols"]=[{wch:7},{wch:12},{wch:17},{wch:52},{wch:13},{wch:16},{wch:16}]; wsList["!autofilter"]={ref:`A1:G${rows.length}`};
+  XLSX.utils.book_append_sheet(wb,wsSummary,"Tổng hợp"); XLSX.utils.book_append_sheet(wb,wsList,"Danh sách");
+  XLSX.writeFile(wb,groupInventoryExportName(report,"xlsx")); showToast(`✅ Đã xuất Excel ${report.title}`,3500);
+}
+function exportGroupInventoryPdf(){
+  const report=getCurrentGroupDetailExport();
+  if(!report){ showToast("⚠️ Chưa có danh sách nhóm để xuất.",3500); return; }
+  if(typeof pdfMake==="undefined"){ showToast("⚠️ Chưa tải được công cụ PDF.",4000); return; }
+  const body=[["STT","Kho","Mã hàng","Tên sản phẩm","Tồn","Ngưỡng","Trạng thái"],...report.inventory.map((item,index)=>[String(index+1),item.branch,item.code,item.name,String(item.qty),String(item.low),item.status])];
+  const doc={pageSize:"A4",pageMargins:[28,30,28,32],defaultStyle:{font:"Roboto",fontSize:8},styles:{title:{fontSize:17,bold:true,alignment:"center",color:"#1E3A5F"},summary:{fontSize:9,bold:true,alignment:"center",color:"#52697B"}},content:[{text:report.title.toLocaleUpperCase("vi"),style:"title"},{text:`Kho ${report.branch} · ${report.generatedAt}`,alignment:"center",margin:[0,4,0,3]},{text:`${report.stats.count} mục · ${report.stats.stock.toLocaleString("vi-VN")} tồn · ${report.stats.low} sắp hết · ${report.stats.out} hết hàng`,style:"summary",margin:[0,0,0,12]},{table:{headerRows:1,widths:[25,30,58,"*",30,38,52],body},layout:"lightHorizontalLines"}],footer:(page,pages)=>({text:`Trang ${page}/${pages}`,alignment:"right",fontSize:8,margin:[0,6,28,0]})};
+  pdfMake.createPdf(doc).download(groupInventoryExportName(report,"pdf")); showToast(`✅ Đã xuất PDF ${report.title}`,3500);
 }
 function openGroupDetailProduct(index){
   if(!DATA[index]) return;
@@ -13954,7 +14140,8 @@ function render(){
       const strongColor = GROUP_STRONG_COLORS[idx%GROUP_STRONG_COLORS.length];
       const itemCount = buckets[g].length;
       const groupStock = sumQuickStock(buckets[g]);
-      const groupSummary = `${itemCount} mục · ${groupStock.toLocaleString("vi-VN")} tồn`;
+      const groupStats = getGroupInventoryStats(buckets[g]);
+      const groupSummary = `${itemCount} mục · ${groupStock.toLocaleString("vi-VN")} tồn · ${groupStats.low} sắp hết · ${groupStats.out} hết hàng`;
       const detailKey = `group-${idx}`;
       currentGroupDetailSets[detailKey] = {label:g,items:buckets[g].slice()};
       return `<section class="group-section" style="--group-strong: ${strongColor};">
@@ -13962,7 +14149,7 @@ function render(){
           <div class="group-header-main">
             <span class="group-header-label">${g}</span>
           </div>
-          <button type="button" class="group-header-count metric-tooltip-host" aria-label="Xem chi tiết ${groupSummary}" title="Xem chi tiết tồn kho" onclick="showGroupInventoryDetail('${detailKey}')">${groupSummary}<span class="inventory-metric-tooltip" aria-hidden="true">XEM CHI TIẾT TỒN KHO</span></button>
+          <button type="button" class="group-header-count metric-tooltip-host" aria-label="Xem chi tiết ${groupSummary}" title="Xem chi tiết tồn kho" onclick="showGroupInventoryDetail('${detailKey}')"><span class="group-count-main">${itemCount} mục · ${groupStock.toLocaleString("vi-VN")} tồn</span><span class="group-count-alert is-low">${groupStats.low} sắp hết</span><span class="group-count-alert is-out">${groupStats.out} hết hàng</span><span class="inventory-metric-tooltip" aria-hidden="true">XEM CHI TIẾT TỒN KHO</span></button>
         </div>
         ${renderQuickSummary(buckets[g], g)}
         ${sortProductItemsForView(buckets[g]).map((item,itemIdx)=>renderCard(item.r,item.i,itemIdx+1)).join("")}
