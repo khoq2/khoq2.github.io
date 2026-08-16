@@ -17633,6 +17633,9 @@ async function doImport(){ if(!requireAdmin()) return;
 }
 let tabRenderFrame=0;
 function goToTab(tabCode){
+  // Tooltip gợi ý nằm ngoài #results; đóng trước khi render để không bị
+  // giữ lại khi phần tử đang hover bị thay thế bởi danh mục mới.
+  hideRelatedProductTooltip(true);
   document.querySelectorAll(".tab-btn").forEach(
     b=>b.classList.toggle("active", b.dataset.tab===tabCode)
   );
@@ -17747,6 +17750,9 @@ function positionTabDropdown(button){
   box.style.top=`${tabs.offsetTop+tabs.offsetHeight}px`;
 }
 function showTabDropdown(button){
+  // Khi rê từ gợi ý tìm kiếm lên menu danh mục, đóng tooltip cũ ngay
+  // trước khi mở dropdown để hai lớp giao diện không chồng lên nhau.
+  hideRelatedProductTooltip(true);
   const tabCode=String(button?.dataset?.tab||"ALL");
   if(tabCode==="ALL"){ closeTabDropdown(); return; }
   if(tabDropdownOpenFor===tabCode){
