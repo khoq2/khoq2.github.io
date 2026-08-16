@@ -13468,7 +13468,7 @@ async function copyGroupInventoryDetail(){
       const row=item.r||[],stock=Math.max(0,Number(row[5])||0);
       const status=section.state==="HET"?"Hết hàng":section.state==="SAP"?`Còn ${stock}`:`Tồn ${stock}`;
       const branch=currentBranch==="ALL"?` · ${row[13]||"Q2"}`:"";
-      lines.push(`• ${row[1]||"Chưa có mã"} — ${getGroupPlainProductTitle(row)} — ${status}${branch}`);
+      lines.push(`• ${getGroupPlainProductTitle(row)} — ${status}${branch}`);
     });
   });
   const text=lines.join("\n");
@@ -14149,7 +14149,7 @@ function render(){
           <div class="group-header-main">
             <span class="group-header-label">${g}</span>
           </div>
-          <button type="button" class="group-header-count metric-tooltip-host" aria-label="Xem chi tiết ${groupSummary}" title="Xem chi tiết tồn kho" onclick="showGroupInventoryDetail('${detailKey}')"><span class="group-count-main">${itemCount} mục · ${groupStock.toLocaleString("vi-VN")} tồn</span><span class="group-count-alert is-low">${groupStats.low} sắp hết</span><span class="group-count-alert is-out">${groupStats.out} hết hàng</span><span class="inventory-metric-tooltip" aria-hidden="true">XEM CHI TIẾT TỒN KHO</span></button>
+          <button type="button" class="group-header-count metric-tooltip-host" aria-label="Xem chi tiết ${groupSummary}" onclick="showGroupInventoryDetail('${detailKey}')"><span class="group-count-main">${itemCount} mục · ${groupStock.toLocaleString("vi-VN")} tồn</span><span class="group-count-alert is-low">${groupStats.low} sắp hết</span><span class="group-count-alert is-out">${groupStats.out} hết hàng</span><span class="inventory-metric-tooltip" aria-hidden="true">XEM CHI TIẾT TỒN KHO</span></button>
         </div>
         ${renderQuickSummary(buckets[g], g)}
         ${sortProductItemsForView(buckets[g]).map((item,itemIdx)=>renderCard(item.r,item.i,itemIdx+1)).join("")}
