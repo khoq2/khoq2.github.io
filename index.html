@@ -7720,8 +7720,8 @@ body .warehouse-switch.warehouse-switch-changing .warehouse-pin{
   white-space:nowrap;
   opacity:0;
   pointer-events:none;
-  transform:translate(-50%,-6px) scale(.96);
-  transition:opacity .13s ease,transform .17s cubic-bezier(.2,.8,.2,1);
+  transform:translate(-50%,0) scale(1);
+  transition:none;
 }
 .header .header-control-tooltip::after{
   content:"";
@@ -7753,7 +7753,7 @@ body .warehouse-switch.warehouse-switch-changing .warehouse-pin{
 .header .warehouse-switch:last-child .header-control-tooltip{
   right:0;
   left:auto;
-  transform:translateY(-6px) scale(.96);
+  transform:translateY(0) scale(1);
 }
 .header .warehouse-switch:last-child .header-control-tooltip::after{
   right:15px;
@@ -7772,6 +7772,26 @@ body .warehouse-switch.warehouse-switch-changing .warehouse-pin{
   .header .warehouse-switch:last-child:hover .header-control-tooltip,
   .header .warehouse-switch:last-child:focus-visible .header-control-tooltip{
     transform:translateY(0) scale(1);
+  }
+  .header .recent-activity-bell .header-control-tooltip{
+    top:50%;
+    right:calc(100% + 10px);
+    bottom:auto;
+    left:auto;
+    transform:translate(0,-50%) scale(1);
+    transform-origin:right center;
+    transition:none;
+  }
+  .header .recent-activity-bell .header-control-tooltip::after{
+    top:50%;
+    right:-5px;
+    left:auto;
+    transform:translateY(-50%) rotate(45deg);
+  }
+  .header .recent-activity-bell:hover .header-control-tooltip,
+  .header .recent-activity-bell:focus-visible .header-control-tooltip{
+    opacity:1;
+    transform:translate(0,-50%) scale(1);
   }
 }
 
@@ -8465,7 +8485,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
       <div class="qr-showcase-grid">
         <button class="qr-showcase-card" type="button" data-qr-title="QR CTY" data-qr-src="https://drive.google.com/thumbnail?id=1FcxEsU9JxB2r9wq-OOmEjkIS-gmae7oA&amp;sz=w1200" data-qr-link="https://drive.google.com/file/d/1FcxEsU9JxB2r9wq-OOmEjkIS-gmae7oA/view?usp=sharing" onclick="showQrForCustomer(this)">
           <span class="qr-image-shell">
-            <img src="https://drive.google.com/thumbnail?id=1FcxEsU9JxB2r9wq-OOmEjkIS-gmae7oA&amp;sz=w1200" alt="Ảnh QR CTY" loading="lazy" decoding="async" onerror="handleQrImageError(this)">
+            <img src="https://drive.google.com/thumbnail?id=1FcxEsU9JxB2r9wq-OOmEjkIS-gmae7oA&amp;sz=w480" alt="Ảnh QR CTY" loading="eager" decoding="async" fetchpriority="high" onerror="handleQrImageError(this)">
             <span class="qr-image-fallback">Không tải được ảnh QR</span>
           </span>
           <span class="qr-showcase-card-copy"><span class="qr-showcase-card-text"><strong class="qr-showcase-card-title">QR CTY</strong><small class="qr-showcase-card-hint">Bấm để phóng lớn</small></span><span class="qr-showcase-card-arrow" aria-hidden="true">›</span></span>
@@ -8473,7 +8493,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 
         <button class="qr-showcase-card" type="button" data-qr-title="QR HỘ KINH DOANH" data-qr-src="https://drive.google.com/thumbnail?id=1n0OSZPy8w9-MTGVcSziBImT93tW_-uia&amp;sz=w1200" data-qr-link="https://drive.google.com/file/d/1n0OSZPy8w9-MTGVcSziBImT93tW_-uia/view?usp=sharing" onclick="showQrForCustomer(this)">
           <span class="qr-image-shell">
-            <img src="https://drive.google.com/thumbnail?id=1n0OSZPy8w9-MTGVcSziBImT93tW_-uia&amp;sz=w1200" alt="Ảnh QR Hộ kinh doanh" loading="lazy" decoding="async" onerror="handleQrImageError(this)">
+            <img src="https://drive.google.com/thumbnail?id=1n0OSZPy8w9-MTGVcSziBImT93tW_-uia&amp;sz=w480" alt="Ảnh QR Hộ kinh doanh" loading="eager" decoding="async" fetchpriority="high" onerror="handleQrImageError(this)">
             <span class="qr-image-fallback">Không tải được ảnh QR</span>
           </span>
           <span class="qr-showcase-card-copy"><span class="qr-showcase-card-text"><strong class="qr-showcase-card-title">QR HỘ KINH DOANH</strong><small class="qr-showcase-card-hint">Bấm để phóng lớn</small></span><span class="qr-showcase-card-arrow" aria-hidden="true">›</span></span>
@@ -8481,7 +8501,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 
         <button class="qr-showcase-card" type="button" data-qr-title="LÃ THỊ THÚY" data-qr-src="https://drive.google.com/thumbnail?id=16NC3u8jnrsMGJKUYhjGxQkBKadvDLKNo&amp;sz=w1200" data-qr-link="https://drive.google.com/file/d/16NC3u8jnrsMGJKUYhjGxQkBKadvDLKNo/view?usp=sharing" onclick="showQrForCustomer(this)">
           <span class="qr-image-shell">
-            <img src="https://drive.google.com/thumbnail?id=16NC3u8jnrsMGJKUYhjGxQkBKadvDLKNo&amp;sz=w1200" alt="Ảnh QR Lã Thị Thúy" loading="lazy" decoding="async" onerror="handleQrImageError(this)">
+            <img src="https://drive.google.com/thumbnail?id=16NC3u8jnrsMGJKUYhjGxQkBKadvDLKNo&amp;sz=w480" alt="Ảnh QR Lã Thị Thúy" loading="eager" decoding="async" fetchpriority="high" onerror="handleQrImageError(this)">
             <span class="qr-image-fallback">Không tải được ảnh QR</span>
           </span>
           <span class="qr-showcase-card-copy"><span class="qr-showcase-card-text"><strong class="qr-showcase-card-title">LÃ THỊ THÚY</strong><small class="qr-showcase-card-hint">Bấm để phóng lớn</small></span><span class="qr-showcase-card-arrow" aria-hidden="true">›</span></span>
@@ -8489,7 +8509,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 
         <button class="qr-showcase-card" type="button" data-qr-title="GOOGLE MAPS" data-qr-src="https://drive.google.com/thumbnail?id=1qyuwZJ3L36yobcYMRrAJZMyL2hOYlMiU&amp;sz=w1200" data-qr-link="https://drive.google.com/file/d/1qyuwZJ3L36yobcYMRrAJZMyL2hOYlMiU/view?usp=sharing" onclick="showQrForCustomer(this)">
           <span class="qr-image-shell">
-            <img src="https://drive.google.com/thumbnail?id=1qyuwZJ3L36yobcYMRrAJZMyL2hOYlMiU&amp;sz=w1200" alt="Ảnh QR Google Maps" loading="lazy" decoding="async" onerror="handleQrImageError(this)">
+            <img src="https://drive.google.com/thumbnail?id=1qyuwZJ3L36yobcYMRrAJZMyL2hOYlMiU&amp;sz=w480" alt="Ảnh QR Google Maps" loading="eager" decoding="async" fetchpriority="high" onerror="handleQrImageError(this)">
             <span class="qr-image-fallback">Không tải được ảnh QR</span>
           </span>
           <span class="qr-showcase-card-copy"><span class="qr-showcase-card-text"><strong class="qr-showcase-card-title">GOOGLE MAPS</strong><small class="qr-showcase-card-hint">Bấm để phóng lớn</small></span><span class="qr-showcase-card-arrow" aria-hidden="true">›</span></span>
@@ -19995,9 +20015,22 @@ window.addEventListener("resize",()=>{
 // Thư viện QR demo: chọn một trong bốn ảnh rồi phóng lớn để khách hàng quét.
 let qrShowcaseLastFocus=null;
 let qrShowcaseCloseTimer=0;
+let qrShowcaseThumbsWarmed=false;
+function warmQrShowcaseThumbnails(){
+  if(qrShowcaseThumbsWarmed) return;
+  qrShowcaseThumbsWarmed=true;
+  document.querySelectorAll("#qrShowcaseBrowse .qr-image-shell img").forEach(image=>{
+    image.loading="eager";
+    image.fetchPriority="high";
+    if(typeof image.decode==="function") image.decode().catch(()=>{});
+  });
+}
+if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",warmQrShowcaseThumbnails,{once:true});
+else warmQrShowcaseThumbnails();
 function openQrShowcase(){
   const overlay=document.getElementById("qrShowcaseOverlay");
   if(!overlay) return;
+  warmQrShowcaseThumbnails();
   clearTimeout(qrShowcaseCloseTimer);
   qrShowcaseLastFocus=document.activeElement;
   resetQrShowcase(false);
