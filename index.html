@@ -7015,6 +7015,9 @@ body.private-panel-open{overflow:hidden}
 #adminOverlay .btn-submit:disabled,#syncErrorOverlay .btn-submit:disabled,#privateAccessOverlay .btn-submit:disabled{cursor:wait;opacity:.86}
 .auth-login-modal .btn-submit.is-loading{display:inline-flex;align-items:center;justify-content:center;gap:8px}
 #adminOverlay .auth-login-modal::before,#syncErrorOverlay .auth-login-modal::before{display:none}
+.caps-lock-warning{display:flex;align-items:center;gap:6px;margin-top:-6px;color:#A15C00;font-size:11px;font-weight:800;line-height:1.35}
+.caps-lock-warning[hidden]{display:none!important}
+.caps-lock-warning svg{width:14px;height:14px;flex:0 0 14px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 #syncErrorOverlay #syncErrorContent .modal-title{margin-bottom:10px!important;color:#172B3A!important;text-shadow:none}
 #syncErrorOverlay #syncErrorContent .sync-error-help{color:#647786!important;text-shadow:none}
 @media(max-width:760px){
@@ -8612,6 +8615,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     <button class="fab admin-only" style="background:#5B2C6F;color:#fff" onclick="openQuickOrderModal()">↕️ Sắp xếp lọc</button>
     <button class="fab admin-only" style="background:#8E44AD;color:#fff" onclick="openNVModal()">👥 Nhân viên</button>
     <button class="fab admin-only" style="background:#21618C;color:#fff" onclick="requestPrivateAccess('customer')">👤 Khách hàng</button>
+    <button class="fab admin-only" style="background:#7D3C98;color:#fff" aria-haspopup="dialog" aria-controls="partnerOverlay" onclick="requestPrivateAccess('partner')">🤝 Đối tác</button>
     <button class="fab admin-only" style="background:#1F618D;color:#fff" onclick="exportMonthlyAccountingExcel()">🧾 Xuất file Excel</button>
     <button class="fab admin-only" style="background:#922B21;color:#fff" onclick="exportMonthlyAccountingPdf()">📄 Xuất file PDF</button>
     <button class="fab admin-only" style="background:#A04000;color:#fff" onclick="openTrashModal()">♻️ Thùng rác</button>
@@ -9024,9 +9028,10 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     <div class="private-access-fields">
       <label class="private-access-field" for="privateAccessEmployee"><span>Tên đăng nhập</span><input id="privateAccessEmployee" class="employee-login-name" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="Nhập tên đăng nhập" oninput="handlePrivateEmployeeNameInput()" onkeydown="if(event.key==='Enter')document.getElementById('privateAccessPassword')?.focus()"></label>
       <label class="private-access-field" for="privateAccessPassword"><span>Mật khẩu</span><div class="admin-password-wrap">
-        <input id="privateAccessPassword" type="password" autocomplete="current-password" placeholder="Nhập mật khẩu" oninput="schedulePrivateAccessAutoSubmit()" onkeydown="if(event.key==='Enter')submitPrivateAccess()">
+        <input id="privateAccessPassword" type="password" autocomplete="current-password" placeholder="Nhập mật khẩu" oninput="schedulePrivateAccessAutoSubmit()" onkeydown="updateCapsLockHint(event,'privateAccessCapsLock');if(event.key==='Enter')submitPrivateAccess()" onkeyup="updateCapsLockHint(event,'privateAccessCapsLock')" onblur="hideCapsLockHint('privateAccessCapsLock')">
         <button type="button" class="admin-password-toggle" aria-label="Hiện hoặc ẩn mật khẩu" title="Hiện hoặc ẩn mật khẩu" onclick="const input=document.getElementById('privateAccessPassword');input.type=input.type==='password'?'text':'password';this.classList.toggle('password-visible',input.type==='text')"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"></path><circle cx="12" cy="12" r="2.7"></circle></svg></button>
       </div></label>
+      <div class="caps-lock-warning" id="privateAccessCapsLock" role="status" aria-live="polite" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 5 10h4v4h6v-4h4l-7-7Z"></path><path d="M7 19h10"></path></svg><span>Caps Lock đang bật</span></div>
     </div>
     <div class="private-access-error" id="privateAccessError" aria-live="polite"></div>
     <div class="private-access-actions"><button class="btn-cancel btn-cancel-danger" type="button" onclick="closePrivateAccess()">Hủy</button><button class="btn-submit" id="privateAccessSubmit" type="button" aria-live="polite" aria-busy="false" onclick="submitPrivateAccess()">Đăng nhập</button></div>
@@ -9186,9 +9191,10 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     </div>
     <div class="private-access-fields">
       <label class="private-access-field" for="adminPass"><span>Mật khẩu quản trị</span><div class="admin-password-wrap">
-        <input type="password" id="adminPass" placeholder="Nhập mật khẩu quản trị" autocomplete="current-password" onkeydown="if(event.key==='Enter')submitAdminPass()">
+        <input type="password" id="adminPass" placeholder="Nhập mật khẩu quản trị" autocomplete="current-password" onkeydown="updateCapsLockHint(event,'adminCapsLock');if(event.key==='Enter')submitAdminPass()" onkeyup="updateCapsLockHint(event,'adminCapsLock')" onblur="hideCapsLockHint('adminCapsLock')">
         <button type="button" class="admin-password-toggle" aria-label="Hiện hoặc ẩn mật khẩu" title="Hiện hoặc ẩn mật khẩu" onclick="const input=document.getElementById('adminPass');input.type=input.type==='password'?'text':'password';this.classList.toggle('password-visible',input.type==='text')"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"></path><circle cx="12" cy="12" r="2.7"></circle></svg></button>
       </div></label>
+      <div class="caps-lock-warning" id="adminCapsLock" role="status" aria-live="polite" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 5 10h4v4h6v-4h4l-7-7Z"></path><path d="M7 19h10"></path></svg><span>Caps Lock đang bật</span></div>
     </div>
     <div class="private-access-error" id="adminLoginError" aria-live="polite"></div>
     <div class="private-access-actions admin-login-actions">
@@ -9207,9 +9213,10 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
       </div>
       <div class="private-access-fields">
         <label class="private-access-field" for="syncErrorPassword"><span>Mật khẩu quản trị</span><div class="admin-password-wrap">
-          <input id="syncErrorPassword" type="password" autocomplete="current-password" placeholder="Nhập mật khẩu quản trị" onkeydown="if(event.key==='Enter') verifySyncErrorPassword()">
+          <input id="syncErrorPassword" type="password" autocomplete="current-password" placeholder="Nhập mật khẩu quản trị" onkeydown="updateCapsLockHint(event,'syncErrorCapsLock');if(event.key==='Enter') verifySyncErrorPassword()" onkeyup="updateCapsLockHint(event,'syncErrorCapsLock')" onblur="hideCapsLockHint('syncErrorCapsLock')">
           <button type="button" class="admin-password-toggle sync-error-password-toggle" aria-label="Hiện hoặc ẩn mật khẩu" title="Hiện hoặc ẩn mật khẩu" onclick="const input=document.getElementById('syncErrorPassword');input.type=input.type==='password'?'text':'password';this.classList.toggle('password-visible',input.type==='text')"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"></path><circle cx="12" cy="12" r="2.7"></circle></svg></button>
         </div></label>
+        <div class="caps-lock-warning" id="syncErrorCapsLock" role="status" aria-live="polite" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 5 10h4v4h6v-4h4l-7-7Z"></path><path d="M7 19h10"></path></svg><span>Caps Lock đang bật</span></div>
       </div>
       <div class="private-access-error" id="syncErrorLoginError" aria-live="polite"></div>
       <div class="private-access-actions admin-login-actions">
@@ -9956,6 +9963,16 @@ function setAdminMode(on){
   }
   refreshEmployeePermissionUI();
 }
+function updateCapsLockHint(event,hintId){
+  const hint=document.getElementById(hintId);
+  if(!hint) return;
+  const enabled=typeof event?.getModifierState==="function" && event.getModifierState("CapsLock");
+  hint.hidden=!enabled;
+}
+function hideCapsLockHint(hintId){
+  const hint=document.getElementById(hintId);
+  if(hint) hint.hidden=true;
+}
 function onAdminBtnClick(){
   if(document.body.classList.contains("admin-mode")){
     if(confirm("Khóa lại quyền Admin?")) {
@@ -9969,6 +9986,7 @@ function onAdminBtnClick(){
     adminPass.value="";
     adminPass.type="password";
     adminPass.disabled=false;
+    hideCapsLockHint("adminCapsLock");
     if(adminError) adminError.textContent="";
     if(submit){ submit.disabled=false; submit.classList.remove("is-loading"); submit.setAttribute("aria-busy","false"); submit.textContent="Đăng nhập"; }
     const passwordToggle=document.querySelector("#adminOverlay .admin-password-toggle");
@@ -10156,6 +10174,7 @@ function openSyncErrorLog(){
   if(gate) gate.style.display="";
   if(content) content.style.display="none";
   if(password){ password.disabled=false; password.value=""; password.type="password"; }
+  hideCapsLockHint("syncErrorCapsLock");
   if(errorBox) errorBox.textContent="";
   if(submit){
     submit.disabled=false;
@@ -10231,7 +10250,7 @@ function handleSyncBadgeActivation(){
     syncBadgeActivationTimer = null;
   }, 6000);
 }
-function closeSyncErrorLog(){ document.getElementById("syncErrorOverlay")?.classList.remove("open"); syncErrorAuthToken=""; serverSyncErrorLogs=[]; }
+function closeSyncErrorLog(){ document.getElementById("syncErrorOverlay")?.classList.remove("open"); hideCapsLockHint("syncErrorCapsLock"); syncErrorAuthToken=""; serverSyncErrorLogs=[]; }
 async function copySyncErrorLog(){
   const text = getSyncErrorText();
   try{
@@ -17645,6 +17664,7 @@ function requestPrivateAccess(target){
   const prefilledEmployee=employeeAccessProfile?.name ? findNVByName(employeeAccessProfile.name) : null;
   if(employeeInput){ employeeInput.value=prefilledEmployee?.name||employeeAccessProfile?.name||""; employeeInput.disabled=false; employeeInput.classList.toggle("name-matched",!!prefilledEmployee); }
   if(password){ password.value=""; password.type="password"; password.disabled=false; password.classList.remove("password-scanning"); }
+  hideCapsLockHint("privateAccessCapsLock");
   document.querySelector("#privateAccessOverlay .admin-password-toggle")?.classList.remove("password-visible");
   overlay?.classList.add("open");
   document.body.classList.add("private-panel-open");
@@ -17657,6 +17677,7 @@ function closePrivateAccess(){
   if(!document.getElementById("customerOverlay")?.classList.contains("open") && !document.getElementById("partnerOverlay")?.classList.contains("open")) document.body.classList.remove("private-panel-open");
   const password=document.getElementById("privateAccessPassword");
   if(password){password.value="";password.disabled=false;password.classList.remove("password-scanning");}
+  hideCapsLockHint("privateAccessCapsLock");
   const employeeInput=document.getElementById("privateAccessEmployee");
   if(employeeInput){employeeInput.disabled=false;employeeInput.classList.remove("name-matched");}
   privateAccessBusy=false;
@@ -19084,11 +19105,13 @@ function toggleFabMenu(){
   if(isOpen){
     menu.style.maxHeight = "0";
     menu.style.opacity = "0";
+    menu.style.overflowY = "hidden";
     btn.textContent = isAdminMode() ? "⚙️ Phạm Văn Chương" : "⚙️ Thao tác";
     document.body.classList.remove("fab-menu-open");
   } else {
-    menu.style.maxHeight = "400px";
+    menu.style.maxHeight = Math.min(menu.scrollHeight + 8, Math.max(320, window.innerHeight - 120)) + "px";
     menu.style.opacity = "1";
+    menu.style.overflowY = "auto";
     btn.textContent = "✖️ Đóng";
     document.body.classList.add("fab-menu-open");
   }
