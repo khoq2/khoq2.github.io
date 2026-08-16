@@ -6955,6 +6955,76 @@ body.private-panel-open{overflow:hidden}
 }
 @media(prefers-reduced-motion:reduce){#customerOverlay *,#partnerOverlay *,#privateAccessOverlay *{transition:none!important}}
 </style>
+<style id="unified-auth-ui-2026">
+/* Một chuẩn đăng nhập dùng chung; chỉ thay đổi giao diện và phản hồi phía trình duyệt. */
+#adminOverlay,#syncErrorOverlay{
+  align-items:center;
+  justify-content:center;
+  padding:18px;
+  background:rgba(15,23,42,.68);
+  -webkit-backdrop-filter:blur(8px);
+  backdrop-filter:blur(8px);
+}
+#privateAccessOverlay .auth-login-modal,
+#adminOverlay .auth-login-modal,
+#syncErrorOverlay .auth-login-modal{
+  position:relative;
+  width:min(410px,calc(100vw - 28px));
+  max-height:min(88dvh,760px);
+  padding:27px 27px 24px;
+  overflow-y:auto;
+  border:1px solid #D8E1E8;
+  border-radius:18px;
+  background:#fff;
+  color:#172B3A;
+  box-shadow:0 24px 60px rgba(15,23,42,.28);
+  text-align:left;
+}
+#adminOverlay .private-access-heading,#syncErrorOverlay .private-access-heading{display:flex;align-items:center;gap:13px;margin-bottom:22px}
+#adminOverlay .private-access-heading-copy,#syncErrorOverlay .private-access-heading-copy{min-width:0}
+#adminOverlay .private-access-badge,#syncErrorOverlay .private-access-badge{
+  position:relative;
+  display:grid;
+  place-items:center;
+  flex:0 0 50px;
+  width:50px;
+  height:50px;
+  margin:0;
+  border:0;
+  border-radius:12px;
+  background:#173A5A;
+  color:#fff;
+  box-shadow:0 7px 16px rgba(23,58,90,.2);
+}
+#adminOverlay .private-access-badge svg,#syncErrorOverlay .private-access-badge svg{width:25px;height:25px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+#adminOverlay .private-access-title,#syncErrorOverlay .private-access-title{position:relative;margin:0;color:#172B3A;font-size:19px;font-weight:850;letter-spacing:.1px;text-align:left;text-shadow:none}
+#adminOverlay .private-access-subtitle,#syncErrorOverlay .private-access-subtitle{position:relative;margin:4px 0 0;max-width:none;color:#647786;font-size:11.5px;line-height:1.45;text-align:left;text-shadow:none}
+#adminOverlay .private-access-fields,#syncErrorOverlay .private-access-fields{display:grid;gap:14px}
+#adminOverlay .private-access-field,#syncErrorOverlay .private-access-field{display:grid;gap:6px;color:#344B5C;font-size:11.5px;font-weight:800}
+#adminOverlay .admin-password-wrap,#syncErrorOverlay .admin-password-wrap{width:100%;min-height:48px;margin:0;border:1.5px solid #C8D5DF;border-radius:10px;background:#fff;box-shadow:none}
+#adminOverlay .admin-password-wrap:focus-within,#syncErrorOverlay .admin-password-wrap:focus-within{border-color:#246B9B;box-shadow:0 0 0 3px rgba(36,107,155,.11)}
+#adminOverlay .admin-password-wrap input,#syncErrorOverlay .admin-password-wrap input{min-height:46px;border:0;background:transparent;color:#172B3A;font-size:13.5px;font-weight:700;box-shadow:none}
+#adminOverlay .admin-password-wrap input:focus,#syncErrorOverlay .admin-password-wrap input:focus{border:0;box-shadow:none}
+#adminOverlay .private-access-error,#syncErrorOverlay .private-access-error{min-height:17px;margin:8px 0 0;color:#B42318;font-size:11px;font-weight:750;line-height:1.4;text-align:left}
+#adminOverlay .private-access-actions,#syncErrorOverlay .private-access-actions{display:grid;grid-template-columns:1fr 1.35fr;gap:10px;margin-top:14px}
+#adminOverlay .private-access-actions button,#syncErrorOverlay .private-access-actions button{min-height:44px;margin:0;border-radius:10px;font-size:13px;font-weight:800}
+#adminOverlay .btn-cancel-danger,#syncErrorOverlay .btn-cancel-danger{border:1px solid #C8D5DF!important;background:#fff!important;color:#344B5C!important;box-shadow:none!important}
+#adminOverlay .btn-cancel-danger:hover,#syncErrorOverlay .btn-cancel-danger:hover{border-color:#AABBC8!important;background:#F5F8FA!important;color:#172B3A!important}
+#adminOverlay .btn-submit,#syncErrorOverlay .btn-submit{border:1px solid #173A5A;background:#173A5A;box-shadow:0 5px 12px rgba(23,58,90,.18)}
+#adminOverlay .btn-submit:hover,#syncErrorOverlay .btn-submit:hover{background:#0F2E47}
+#adminOverlay .btn-submit:disabled,#syncErrorOverlay .btn-submit:disabled,#privateAccessOverlay .btn-submit:disabled{cursor:wait;opacity:.86}
+.auth-login-modal .btn-submit.is-loading{display:inline-flex;align-items:center;justify-content:center;gap:8px}
+#adminOverlay .auth-login-modal::before,#syncErrorOverlay .auth-login-modal::before{display:none}
+#syncErrorOverlay #syncErrorContent .modal-title{margin-bottom:10px!important;color:#172B3A!important;text-shadow:none}
+#syncErrorOverlay #syncErrorContent .sync-error-help{color:#647786!important;text-shadow:none}
+@media(max-width:760px){
+  #adminOverlay,#syncErrorOverlay{padding:8px}
+  #privateAccessOverlay .auth-login-modal,#adminOverlay .auth-login-modal,#syncErrorOverlay .auth-login-modal{width:min(410px,calc(100vw - 16px));padding:23px 18px max(20px,env(safe-area-inset-bottom));border-radius:16px}
+  #adminOverlay .auth-login-modal{padding:23px 18px max(20px,env(safe-area-inset-bottom))!important}
+  #privateAccessOverlay .private-access-actions button,#adminOverlay .private-access-actions button,#syncErrorOverlay .private-access-actions button{min-height:48px}
+}
+@media(prefers-reduced-motion:reduce){#adminOverlay *,#syncErrorOverlay *{transition:none!important}}
+</style>
 <style id="side-control-rail-2026">
 /* Thanh điều khiển nổi thống nhất: List/Grid -> tiện ích macOS -> cuộn nhanh. */
 body.admin-mode{padding-bottom:calc(88px + env(safe-area-inset-bottom))!important}
@@ -8946,7 +9016,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 </div>
 
 <div class="overlay" id="privateAccessOverlay" onclick="if(event.target===this)closePrivateAccess()">
-  <div class="modal private-access-modal" role="dialog" aria-modal="true" aria-labelledby="privateAccessTitle" onclick="event.stopPropagation()">
+  <div class="modal private-access-modal auth-login-modal" role="dialog" aria-modal="true" aria-labelledby="privateAccessTitle" onclick="event.stopPropagation()">
     <div class="private-access-heading">
       <div class="private-access-badge" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="11" rx="3"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v3"></path></svg></div>
       <div class="private-access-heading-copy"><h2 class="private-access-title" id="privateAccessTitle">ĐĂNG NHẬP HỆ THỐNG</h2><p class="private-access-subtitle" id="privateAccessSubtitle">Sử dụng tài khoản nhân viên do quản trị viên cấp.</p></div>
@@ -8959,7 +9029,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
       </div></label>
     </div>
     <div class="private-access-error" id="privateAccessError" aria-live="polite"></div>
-    <div class="private-access-actions"><button class="btn-cancel btn-cancel-danger" type="button" onclick="closePrivateAccess()">Hủy</button><button class="btn-submit" id="privateAccessSubmit" type="button" onclick="submitPrivateAccess()">Đăng nhập</button></div>
+    <div class="private-access-actions"><button class="btn-cancel btn-cancel-danger" type="button" onclick="closePrivateAccess()">Hủy</button><button class="btn-submit" id="privateAccessSubmit" type="button" aria-live="polite" aria-busy="false" onclick="submitPrivateAccess()">Đăng nhập</button></div>
   </div>
 </div>
 
@@ -9108,35 +9178,43 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
   </div>
 </div>
 
-<div class="overlay" id="adminOverlay">
-  <div class="modal admin-login-modal" onclick="event.stopPropagation()">
-    <div class="admin-login-icon" aria-hidden="true">🔐</div>
-    <div class="admin-login-title">ĐĂNG NHẬP</div>
-    <div class="admin-login-subtitle">Vui lòng nhập mật khẩu quản trị để quản trị trang</div>
-    <div class="admin-password-wrap">
-      <input type="password" id="adminPass" placeholder="Phạm Văn Chương" autocomplete="current-password" onkeydown="if(event.key==='Enter')submitAdminPass()">
-      <button type="button" class="admin-password-toggle" aria-label="Hiện hoặc ẩn mật khẩu" title="Hiện hoặc ẩn mật khẩu" onclick="const input=document.getElementById('adminPass');input.type=input.type==='password'?'text':'password';this.classList.toggle('password-visible',input.type==='text')"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"></path><circle cx="12" cy="12" r="2.7"></circle></svg></button>
+<div class="overlay" id="adminOverlay" onclick="if(event.target===this)closeOverlay('adminOverlay')">
+  <div class="modal admin-login-modal auth-login-modal" role="dialog" aria-modal="true" aria-labelledby="adminLoginTitle" onclick="event.stopPropagation()">
+    <div class="private-access-heading">
+      <div class="private-access-badge" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="11" rx="3"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v3"></path></svg></div>
+      <div class="private-access-heading-copy"><h2 class="private-access-title" id="adminLoginTitle">ĐĂNG NHẬP ADMIN</h2><p class="private-access-subtitle">Xác thực quyền quản trị để chỉnh sửa hệ thống.</p></div>
     </div>
-    <div class="admin-login-actions">
-      <button class="btn-cancel btn-cancel-danger" type="button" onclick="closeOverlay('adminOverlay')">Huỷ</button>
-      <button class="btn-submit" id="adminLoginSubmit" type="button" aria-live="polite" onclick="submitAdminPass()">🔓 Đăng nhập</button>
+    <div class="private-access-fields">
+      <label class="private-access-field" for="adminPass"><span>Mật khẩu quản trị</span><div class="admin-password-wrap">
+        <input type="password" id="adminPass" placeholder="Nhập mật khẩu quản trị" autocomplete="current-password" onkeydown="if(event.key==='Enter')submitAdminPass()">
+        <button type="button" class="admin-password-toggle" aria-label="Hiện hoặc ẩn mật khẩu" title="Hiện hoặc ẩn mật khẩu" onclick="const input=document.getElementById('adminPass');input.type=input.type==='password'?'text':'password';this.classList.toggle('password-visible',input.type==='text')"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"></path><circle cx="12" cy="12" r="2.7"></circle></svg></button>
+      </div></label>
+    </div>
+    <div class="private-access-error" id="adminLoginError" aria-live="polite"></div>
+    <div class="private-access-actions admin-login-actions">
+      <button class="btn-cancel btn-cancel-danger" type="button" onclick="closeOverlay('adminOverlay')">Hủy</button>
+      <button class="btn-submit" id="adminLoginSubmit" type="button" aria-live="polite" aria-busy="false" onclick="submitAdminPass()">Đăng nhập</button>
     </div>
   </div>
 </div>
 
-<div class="overlay" id="syncErrorOverlay">
-  <div class="modal sync-error-modal">
+<div class="overlay" id="syncErrorOverlay" onclick="if(event.target===this)closeSyncErrorLog()">
+  <div class="modal sync-error-modal auth-login-modal" role="dialog" aria-modal="true" aria-labelledby="syncErrorLoginTitle" onclick="event.stopPropagation()">
     <div id="syncErrorGate">
-      <div class="admin-login-icon" aria-hidden="true">☁️</div>
-      <div class="admin-login-title">ĐĂNG NHẬP</div>
-      <div class="admin-login-subtitle">Vui lòng nhập mật khẩu quản trị để xem báo cáo lỗi đồng bộ thiết bị</div>
-      <div class="admin-password-wrap">
-        <input id="syncErrorPassword" type="password" autocomplete="current-password" placeholder="Phạm Văn Chương" onkeydown="if(event.key==='Enter') verifySyncErrorPassword()">
-        <button type="button" class="admin-password-toggle sync-error-password-toggle" aria-label="Hiện hoặc ẩn mật khẩu" title="Hiện hoặc ẩn mật khẩu" onclick="const input=document.getElementById('syncErrorPassword');input.type=input.type==='password'?'text':'password';this.classList.toggle('password-visible',input.type==='text')"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"></path><circle cx="12" cy="12" r="2.7"></circle></svg></button>
+      <div class="private-access-heading">
+        <div class="private-access-badge" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="11" rx="3"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v3"></path></svg></div>
+        <div class="private-access-heading-copy"><h2 class="private-access-title" id="syncErrorLoginTitle">BÁO CÁO ĐỒNG BỘ</h2><p class="private-access-subtitle">Xác thực quyền quản trị để xem nhật ký lỗi thiết bị.</p></div>
       </div>
-      <div class="admin-login-actions">
-        <button type="button" class="btn-cancel btn-cancel-danger" onclick="closeSyncErrorLog()">Huỷ</button>
-        <button type="button" class="btn-submit" onclick="verifySyncErrorPassword()">🔓 Đăng nhập</button>
+      <div class="private-access-fields">
+        <label class="private-access-field" for="syncErrorPassword"><span>Mật khẩu quản trị</span><div class="admin-password-wrap">
+          <input id="syncErrorPassword" type="password" autocomplete="current-password" placeholder="Nhập mật khẩu quản trị" onkeydown="if(event.key==='Enter') verifySyncErrorPassword()">
+          <button type="button" class="admin-password-toggle sync-error-password-toggle" aria-label="Hiện hoặc ẩn mật khẩu" title="Hiện hoặc ẩn mật khẩu" onclick="const input=document.getElementById('syncErrorPassword');input.type=input.type==='password'?'text':'password';this.classList.toggle('password-visible',input.type==='text')"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"></path><circle cx="12" cy="12" r="2.7"></circle></svg></button>
+        </div></label>
+      </div>
+      <div class="private-access-error" id="syncErrorLoginError" aria-live="polite"></div>
+      <div class="private-access-actions admin-login-actions">
+        <button type="button" class="btn-cancel btn-cancel-danger" onclick="closeSyncErrorLog()">Hủy</button>
+        <button type="button" class="btn-submit" id="syncErrorLoginSubmit" aria-live="polite" aria-busy="false" onclick="verifySyncErrorPassword()">Đăng nhập</button>
       </div>
     </div>
     <div id="syncErrorContent" style="display:none">
@@ -9886,8 +9964,13 @@ function onAdminBtnClick(){
     }
   } else {
     const adminPass=document.getElementById("adminPass");
+    const adminError=document.getElementById("adminLoginError");
+    const submit=document.getElementById("adminLoginSubmit");
     adminPass.value="";
     adminPass.type="password";
+    adminPass.disabled=false;
+    if(adminError) adminError.textContent="";
+    if(submit){ submit.disabled=false; submit.classList.remove("is-loading"); submit.setAttribute("aria-busy","false"); submit.textContent="Đăng nhập"; }
     const passwordToggle=document.querySelector("#adminOverlay .admin-password-toggle");
     if(passwordToggle) passwordToggle.classList.remove("password-visible");
     document.getElementById("adminOverlay").classList.add("open");
@@ -9897,9 +9980,12 @@ function onAdminBtnClick(){
 async function submitAdminPass(){
   const input = document.getElementById("adminPass");
   const submit = document.getElementById("adminLoginSubmit");
+  const errorBox = document.getElementById("adminLoginError");
   if(submit?.disabled) return;
   const val = input.value;
-  if(!val){ alert("Vui lòng nhập mật khẩu Admin!"); input.focus(); return; }
+  if(!val){ if(errorBox) errorBox.textContent="Vui lòng nhập mật khẩu quản trị."; input.focus(); return; }
+  if(errorBox) errorBox.textContent="";
+  let completed=false;
   input.disabled = true;
   if(submit){
     submit.disabled=true;
@@ -9916,21 +10002,22 @@ async function submitAdminPass(){
     if(!result.token) throw new Error("Backend không cấp phiên Admin");
     sessionStorage.setItem("kho_admin_session_token", result.token);
     setAdminMode(true);
+    completed=true;
     closeOverlay("adminOverlay");
     showToast("✅ Đã mở quyền chỉnh sửa");
   }catch(e){
     sessionStorage.removeItem("kho_admin_session_token");
     sessionStorage.removeItem("kho_cntt_admin");
-    alert(String(e).includes("ADMIN_LOGIN_FAILED") ? "Sai mật khẩu!" : "Không thể xác thực Admin: "+String(e));
+    if(errorBox) errorBox.textContent=String(e).includes("ADMIN_LOGIN_FAILED") ? "Mật khẩu quản trị không chính xác." : "Không thể xác thực. Vui lòng kiểm tra kết nối và thử lại.";
     input.select();
   }finally{
     input.disabled = false;
-    input.value = "";
+    if(completed) input.value = "";
     if(submit){
       submit.disabled=false;
       submit.classList.remove("is-loading");
       submit.setAttribute("aria-busy","false");
-      submit.textContent="🔓 Đăng nhập";
+      submit.textContent="Đăng nhập";
     }
   }
 }
@@ -10065,23 +10152,45 @@ function getSyncErrorText(){
 function openSyncErrorLog(){
   syncErrorAuthToken = "";
   serverSyncErrorLogs = [];
-  const gate=document.getElementById("syncErrorGate"), content=document.getElementById("syncErrorContent"), password=document.getElementById("syncErrorPassword");
+  const gate=document.getElementById("syncErrorGate"), content=document.getElementById("syncErrorContent"), password=document.getElementById("syncErrorPassword"), submit=document.getElementById("syncErrorLoginSubmit"), errorBox=document.getElementById("syncErrorLoginError");
   if(gate) gate.style.display="";
   if(content) content.style.display="none";
-  if(password){ password.value=""; password.type="password"; }
+  if(password){ password.disabled=false; password.value=""; password.type="password"; }
+  if(errorBox) errorBox.textContent="";
+  if(submit){
+    submit.disabled=false;
+    submit.classList.remove("is-loading");
+    submit.setAttribute("aria-busy","false");
+    submit.textContent="Đăng nhập";
+  }
   document.querySelector("#syncErrorOverlay .sync-error-password-toggle")?.classList.remove("password-visible");
   document.getElementById("syncErrorOverlay")?.classList.add("open");
   requestAnimationFrame(()=>password?.focus({preventScroll:true}));
 }
 async function verifySyncErrorPassword(){
-  const password=document.getElementById("syncErrorPassword")?.value || "";
-  if(!password){ showToast("Vui lòng nhập mật khẩu Admin"); return; }
+  const input=document.getElementById("syncErrorPassword");
+  const submit=document.getElementById("syncErrorLoginSubmit");
+  const errorBox=document.getElementById("syncErrorLoginError");
+  if(!input || submit?.disabled) return;
+  const password=input.value || "";
+  if(!password){ if(errorBox) errorBox.textContent="Vui lòng nhập mật khẩu quản trị."; input.focus(); return; }
+  if(errorBox) errorBox.textContent="";
+  let completed=false;
+  input.disabled=true;
+  if(submit){
+    submit.disabled=true;
+    submit.classList.add("is-loading");
+    submit.setAttribute("aria-busy","true");
+    submit.innerHTML='<span class="admin-login-spinner" aria-hidden="true"></span><span>Đang xác thực…</span>';
+  }
   try{
     const verified=await fetchSheetJson(SHEET_API_URL,{
       method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},
       body:JSON.stringify({action:"verify_admin",password,clientId:LOGIN_CLIENT_ID})
     },30000);
     syncErrorAuthToken=verified.token || "";
+    if(!syncErrorAuthToken) throw new Error("Backend không cấp phiên Admin");
+    if(submit) submit.innerHTML='<span class="admin-login-spinner" aria-hidden="true"></span><span>Đang tải báo cáo…</span>';
     const result=await fetchSheetJson(SHEET_API_URL,{
       method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},
       body:JSON.stringify({action:"get_error_logs",data:{},auth:syncErrorAuthToken})
@@ -10090,9 +10199,20 @@ async function verifySyncErrorPassword(){
     document.getElementById("syncErrorGate").style.display="none";
     document.getElementById("syncErrorContent").style.display="";
     document.getElementById("syncErrorText").value=getSyncErrorText();
+    input.value="";
+    completed=true;
   }catch(e){
-    document.getElementById("syncErrorPassword")?.select();
-    showToast(String(e).includes("ADMIN_LOGIN_FAILED") ? "⚠️ Sai mật khẩu Admin" : "⚠️ Không tải được nhật ký lỗi: "+String(e),4500);
+    syncErrorAuthToken="";
+    if(errorBox) errorBox.textContent=String(e).includes("ADMIN_LOGIN_FAILED") ? "Mật khẩu quản trị không chính xác." : "Không thể tải báo cáo. Vui lòng kiểm tra kết nối và thử lại.";
+  }finally{
+    input.disabled=false;
+    if(submit){
+      submit.disabled=false;
+      submit.classList.remove("is-loading");
+      submit.setAttribute("aria-busy","false");
+      submit.textContent="Đăng nhập";
+    }
+    if(!completed) requestAnimationFrame(()=>{ input.focus({preventScroll:true}); input.select(); });
   }
 }
 let syncBadgeActivationCount = 0;
@@ -17559,7 +17679,7 @@ async function submitPrivateAccess(){
   password?.classList.add("password-scanning");
   if(password) password.disabled=true;
   if(employeeInput) employeeInput.disabled=true;
-  if(submit){submit.disabled=true;submit.textContent="Đang xác thực...";}
+  if(submit){submit.disabled=true;submit.classList.add("is-loading");submit.setAttribute("aria-busy","true");submit.innerHTML='<span class="admin-login-spinner" aria-hidden="true"></span><span>Đang xác thực…</span>';}
   errorBox.textContent="";
   try{
     const verified=await fetchSheetJson(SHEET_API_URL,{
@@ -17588,7 +17708,7 @@ async function submitPrivateAccess(){
     privateAccessBusy=false;
     if(password){ password.disabled=false; password.classList.remove("password-scanning"); }
     if(employeeInput) employeeInput.disabled=false;
-    if(submit){submit.disabled=false;submit.textContent="Đăng nhập";}
+    if(submit){submit.disabled=false;submit.classList.remove("is-loading");submit.setAttribute("aria-busy","false");submit.textContent="Đăng nhập";}
   }
 }
 function clearPrivateSession(){
