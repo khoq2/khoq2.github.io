@@ -1755,6 +1755,17 @@ body.fab-menu-open .category-view-bar .view-mode-switch { pointer-events:none; }
 .condition-icon { display:block; width:auto; height:14px; max-width:42px; object-fit:contain; image-rendering:auto; }
 .condition-choice { display:inline-flex; align-items:center; justify-content:center; gap:5px; }
 .product-condition-icon { display:inline-block; width:auto; height:12px; max-width:36px; margin-left:6px; vertical-align:-1px; object-fit:contain; }
+.ink-color-picker { display:flex; flex-wrap:wrap; align-items:center; gap:6px; margin-top:8px; padding:8px; border:1px solid #D8E7F1; border-radius:10px; background:rgba(255,255,255,.78); }
+.ink-color-picker[hidden] { display:none!important; }
+.ink-color-picker-label { flex:1 1 100%; color:#52697B; font-size:10px; font-weight:850; line-height:1.35; }
+.ink-color-choice { display:inline-flex; align-items:center; justify-content:center; gap:5px; min-width:48px; min-height:32px; padding:5px 8px; border:1px solid #C9D9E5; border-radius:9px; background:#fff; color:#29445B; font:inherit; font-size:10px; font-weight:950; cursor:pointer; transition:border-color .16s ease,box-shadow .16s ease,transform .16s ease,background-color .16s ease; }
+.ink-color-choice:hover,.ink-color-choice:focus-visible { border-color:var(--ink-color,#2E86C1); box-shadow:0 0 0 3px color-mix(in srgb,var(--ink-color,#2E86C1) 18%,transparent); outline:none; }
+.ink-color-choice:active { transform:scale(.96); }
+.ink-color-choice.active { border-color:var(--ink-color,#2E86C1); background:color-mix(in srgb,var(--ink-color,#2E86C1) 12%,#fff); box-shadow:0 3px 10px color-mix(in srgb,var(--ink-color,#2E86C1) 24%,transparent); color:#17324A; }
+.ink-color-choice-clear { min-width:64px; color:#7B8794; }
+.ink-color-choice-clear.active { border-color:#AAB7C4; background:#EDF2F6; box-shadow:none; }
+.ink-color-dot,.product-ink-dot { display:inline-block; flex:0 0 auto; width:12px; height:12px; border-radius:50%; background:var(--ink-color,#52697B); border:1px solid rgba(17,35,51,.16); box-shadow:inset 0 1px 1px rgba(255,255,255,.55),0 1px 3px color-mix(in srgb,var(--ink-color,#52697B) 35%,transparent); }
+.product-ink-dot { width:10px; height:10px; margin-right:5px; vertical-align:0; }
 .code-next-suggestion { display:inline-flex; align-items:center; gap:4px; margin-left:6px; padding:3px 8px; border:1px solid #58A9D4; border-radius:999px; background:#EBF5FB; color:#1A5276; font:inherit; font-size:11px; font-weight:900; cursor:pointer; }
 .code-next-suggestion:hover { background:#D6EAF8; border-color:#2E86C1; }
 .code-next-suggestion:active { transform:scale(.97); }
@@ -1882,6 +1893,8 @@ body.fab-menu-open .category-view-bar .view-mode-switch { pointer-events:none; }
   #editOverlay .primary-group-row label { white-space:normal; }
   #editOverlay .primary-group-row select { width:100%; }
   #editOverlay .condition-choice { min-width:76px; min-height:44px; }
+  #editOverlay .ink-color-picker { gap:5px; padding:7px; }
+  #editOverlay .ink-color-choice { flex:1 1 calc(25% - 5px); min-width:54px; min-height:38px; }
   #editOverlay .code-next-suggestion { max-width:100%; margin:6px 0 0; white-space:normal; text-align:left; overflow-wrap:anywhere; }
   #editOverlay .code-existing-hint,#editOverlay .form-live-hint { overflow-wrap:anywhere; }
   #editOverlay .supplementary-image-preview { flex-wrap:wrap; }
@@ -8638,7 +8651,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
       </div>
       <div class="form-row">
         <label>Danh mục *</label>
-        <select id="fSheet" onchange="updateGroupOptions()">
+        <select id="fSheet" onchange="updateGroupOptions();syncInkColorPickerVisibility()">
           <option value="MT">💻 Máy Tính</option>
           <option value="MI">🖨️ Máy In</option>
           <option value="CAM">📷 Camera</option>
@@ -8679,7 +8692,17 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
       <div class="form-section-body">
     <div class="form-row product-name-primary">
       <label>Tên sản phẩm *</label>
-      <input type="text" id="fTen" placeholder="VD: RAM LT DDR4 16GB 3200MHz" oninput="updateAddFormLiveInfo()">
+      <input type="text" id="fTen" placeholder="VD: RAM LT DDR4 16GB 3200MHz" oninput="syncInkColorButtons();updateAddFormLiveInfo()">
+      <div class="ink-color-picker" id="fInkColorPicker" role="group" aria-label="Chèn màu mực Epson vào tiêu đề" hidden>
+        <span class="ink-color-picker-label">Màu mực Epson · tự chèn ký hiệu ở đầu và mã màu ở cuối tiêu đề</span>
+        <button type="button" class="ink-color-choice" data-ink-code="BK" style="--ink-color:#111111" onclick="setProductInkColor('BK')" title="Black — Đen"><span class="ink-color-dot" aria-hidden="true"></span>BK</button>
+        <button type="button" class="ink-color-choice" data-ink-code="C" style="--ink-color:#00AEEF" onclick="setProductInkColor('C')" title="Cyan — Xanh"><span class="ink-color-dot" aria-hidden="true"></span>C</button>
+        <button type="button" class="ink-color-choice" data-ink-code="LC" style="--ink-color:#8ED8F8" onclick="setProductInkColor('LC')" title="Light Cyan — Xanh nhạt"><span class="ink-color-dot" aria-hidden="true"></span>LC</button>
+        <button type="button" class="ink-color-choice" data-ink-code="M" style="--ink-color:#EC008C" onclick="setProductInkColor('M')" title="Magenta — Hồng đậm"><span class="ink-color-dot" aria-hidden="true"></span>M</button>
+        <button type="button" class="ink-color-choice" data-ink-code="LM" style="--ink-color:#F49AC2" onclick="setProductInkColor('LM')" title="Light Magenta — Hồng nhạt"><span class="ink-color-dot" aria-hidden="true"></span>LM</button>
+        <button type="button" class="ink-color-choice" data-ink-code="Y" style="--ink-color:#FFF200" onclick="setProductInkColor('Y')" title="Yellow — Vàng"><span class="ink-color-dot" aria-hidden="true"></span>Y</button>
+        <button type="button" class="ink-color-choice ink-color-choice-clear" data-ink-code="" onclick="setProductInkColor('')" title="Bỏ màu khỏi tiêu đề">Bỏ màu</button>
+      </div>
       <div class="condition-picker" role="group" aria-label="Chọn tình trạng mới hoặc cũ">
         <button type="button" class="condition-choice condition-new" data-condition="Mới" onclick="setProductCondition('Mới')" title="Đánh dấu sản phẩm mới"><img class="condition-icon" src="https://lh3.googleusercontent.com/d/1PAIDkncymTQY5SldAXNWAKWVrhAFDNlL" alt="MỚI" referrerpolicy="no-referrer"></button>
         <button type="button" class="condition-choice condition-old" data-condition="Cũ" onclick="setProductCondition('Cũ')" title="Đánh dấu sản phẩm cũ"><img class="condition-icon" src="https://lh3.googleusercontent.com/d/15mgvNvvTtyjXVKSSCMom7n9woRIBS3wx" alt="CŨ" referrerpolicy="no-referrer"></button>
@@ -12054,6 +12077,58 @@ const PRODUCT_CONDITION_ICON_URLS = Object.freeze({
   "Cũ": "https://lh3.googleusercontent.com/d/15mgvNvvTtyjXVKSSCMom7n9woRIBS3wx"
 });
 
+const PRODUCT_INK_COLORS = Object.freeze({
+  BK: Object.freeze({label:"Black — Đen",color:"#111111",marker:"⚫"}),
+  C: Object.freeze({label:"Cyan — Xanh",color:"#00AEEF",marker:"🔵"}),
+  LC: Object.freeze({label:"Light Cyan — Xanh nhạt",color:"#8ED8F8",marker:"🩵"}),
+  M: Object.freeze({label:"Magenta — Hồng đậm",color:"#EC008C",marker:"🩷"}),
+  LM: Object.freeze({label:"Light Magenta — Hồng nhạt",color:"#F49AC2",marker:"🌸"}),
+  Y: Object.freeze({label:"Yellow — Vàng",color:"#FFF200",marker:"🟡"})
+});
+
+function parseProductInkTitle(value){
+  const raw=String(value||"").trim();
+  const markerEntry=Object.entries(PRODUCT_INK_COLORS).find(([,meta])=>raw.startsWith(meta.marker));
+  if(!markerEntry) return {code:"",base:raw,raw};
+  const withoutMarker=raw.slice(markerEntry[1].marker.length).trim();
+  const suffix=withoutMarker.match(/\s+(BK|LC|LM|C|M|Y)\s*$/iu);
+  if(!suffix) return {code:"",base:raw,raw};
+  const code=String(suffix[1]||"").toUpperCase();
+  if(!PRODUCT_INK_COLORS[code]) return {code:"",base:raw,raw};
+  return {code,base:withoutMarker.slice(0,suffix.index).trim(),raw};
+}
+function formatProductInkTitle(base,code){
+  const clean=String(base||"").trim();
+  const meta=PRODUCT_INK_COLORS[code];
+  if(!meta) return clean;
+  return `${meta.marker}${clean?" "+clean:""} ${code}`.trim();
+}
+function syncInkColorButtons(){
+  const parsed=parseProductInkTitle(document.getElementById("fTen")?.value||"");
+  document.querySelectorAll("#fInkColorPicker .ink-color-choice").forEach(btn=>{
+    const active=(btn.dataset.inkCode||"")===parsed.code;
+    btn.classList.toggle("active",active);
+    btn.setAttribute("aria-pressed",String(active));
+  });
+}
+function syncInkColorPickerVisibility(){
+  const picker=document.getElementById("fInkColorPicker");
+  if(!picker) return;
+  const hasInk=!!parseProductInkTitle(document.getElementById("fTen")?.value||"").code;
+  picker.hidden=document.getElementById("fSheet")?.value!=="MI"&&!hasInk;
+  syncInkColorButtons();
+}
+function setProductInkColor(code){
+  const input=document.getElementById("fTen");
+  if(!input) return;
+  const parsed=parseProductInkTitle(input.value);
+  const base=parsed.code?parsed.base:String(input.value||"").trim();
+  input.value=code&&PRODUCT_INK_COLORS[code]?formatProductInkTitle(base,code):base;
+  syncInkColorPickerVisibility();
+  updateAddFormLiveInfo();
+  input.focus();
+}
+
 function getProductConditionFromTitle(value){
   const match = String(value || "").trim().match(/\((Mới|Cũ)\)\s*$/iu);
   return match ? (match[1].toLocaleLowerCase("vi")==="mới" ? "Mới" : "Cũ") : "";
@@ -12064,11 +12139,17 @@ function stripProductConditionFromTitle(value){
 function renderProductTitleWithCondition(value, kwTokens=[]){
   const condition = getProductConditionFromTitle(value);
   const cleanTitle = stripProductConditionFromTitle(value);
+  const ink = parseProductInkTitle(cleanTitle);
+  const inkMeta = PRODUCT_INK_COLORS[ink.code];
+  const visibleTitle = inkMeta ? `${ink.base} ${ink.code}`.trim() : cleanTitle;
+  const inkDot = inkMeta
+    ? `<span class="product-ink-dot" style="--ink-color:${inkMeta.color}" role="img" aria-label="${escapeHtml(inkMeta.label)}" title="${escapeHtml(inkMeta.label)}"></span>`
+    : "";
   const iconUrl = PRODUCT_CONDITION_ICON_URLS[condition] || "";
   const icon = iconUrl
     ? `<img class="product-condition-icon" src="${escapeHtml(iconUrl)}" alt="${escapeHtml(condition)}" title="${escapeHtml(condition)}" referrerpolicy="no-referrer" onerror="this.replaceWith(document.createTextNode(' (${escapeHtml(condition)})'))">`
     : "";
-  return `${highlightMatch(cleanTitle,kwTokens)}${icon}`;
+  return `${inkDot}${highlightMatch(visibleTitle,kwTokens)}${icon}`;
 }
 function syncProductConditionButtons(){
   const value = document.getElementById("fCondition")?.value || "";
@@ -15867,11 +15948,12 @@ function getRelatedProductItems(row){
 function renderRelatedProducts(row){
   const items=getRelatedProductItems(row);
   if(!items.length) return "";
-  return `<div class="product-related"><span class="product-related-title">🔗 Bài viết / thiết bị liên quan (${items.length})</span><div class="product-related-list">${items.map(item=>`<button type="button" class="product-related-link" aria-describedby="relatedProductTooltip" onmouseenter="showRelatedProductTooltip(event,${item.index})" onmouseleave="hideRelatedProductTooltip()" onfocus="showRelatedProductTooltip(event,${item.index})" onblur="hideRelatedProductTooltip()" onclick="event.stopPropagation();hideRelatedProductTooltip(true);openRelatedProduct(${item.index})">${escapeHtml(item.row[1])} · ${escapeHtml(stripProductConditionFromTitle(item.row[2]))}</button>`).join("")}</div></div>`;
+  return `<div class="product-related"><span class="product-related-title">🔗 Bài viết / thiết bị liên quan (${items.length})</span><div class="product-related-list">${items.map(item=>`<button type="button" class="product-related-link" aria-describedby="relatedProductTooltip" onmouseenter="showRelatedProductTooltip(event,${item.index})" onmouseleave="hideRelatedProductTooltip()" onfocus="showRelatedProductTooltip(event,${item.index})" onblur="hideRelatedProductTooltip()" onclick="event.stopPropagation();hideRelatedProductTooltip(true);openRelatedProduct(${item.index})">${escapeHtml(item.row[1])} · ${renderProductTitleWithCondition(item.row[2]||"Chưa có tên")}</button>`).join("")}</div></div>`;
 }
 let relatedProductTooltipHideTimer=0;
-function relatedProductTooltipRow(label,value,extraClass=""){
-  return `<div class="related-product-tooltip-row ${extraClass}"><span class="related-product-tooltip-label">${escapeHtml(label)}:</span><span class="related-product-tooltip-value ${extraClass==="is-stock"?"is-stock":""}">${escapeHtml(value||"—")}</span></div>`;
+function relatedProductTooltipRow(label,value,extraClass="",allowHtml=false){
+  const displayValue=allowHtml?String(value||"—"):escapeHtml(value||"—");
+  return `<div class="related-product-tooltip-row ${extraClass}"><span class="related-product-tooltip-label">${escapeHtml(label)}:</span><span class="related-product-tooltip-value ${extraClass==="is-stock"?"is-stock":""}">${displayValue}</span></div>`;
 }
 function positionRelatedProductTooltip(anchor){
   const tooltip=document.getElementById("relatedProductTooltip");
@@ -15895,7 +15977,7 @@ function showRelatedProductTooltip(event,index){
   const condition=getProductConditionFromTitle(row[2]||"");
   const status=String(row[6]||"").trim()||(stock>0?"Còn hàng":"Hết hàng");
   const branch=String(row[13]||"Q2").trim().toUpperCase();
-  tooltip.innerHTML=`<div class="related-product-tooltip-head"><strong>THÔNG TIN BÀI VIẾT</strong><span>Bấm để mở</span></div><div class="related-product-tooltip-body">${relatedProductTooltipRow("Tiêu đề",stripProductConditionFromTitle(row[2]||"Chưa có tên"),"is-title")}${relatedProductTooltipRow("Mã hàng",String(row[1]||"Chưa có mã"))}${relatedProductTooltipRow("Chuyên mục",relatedCategoryLabel(row[0]))}${relatedProductTooltipRow("Kho hàng",branch)}${relatedProductTooltipRow("Tồn kho",`${stock.toLocaleString("vi-VN")} sản phẩm`,"is-stock")}${relatedProductTooltipRow("Trạng thái",[condition,status].filter(Boolean).join(" · "))}</div>`;
+  tooltip.innerHTML=`<div class="related-product-tooltip-head"><strong>THÔNG TIN BÀI VIẾT</strong><span>Bấm để mở</span></div><div class="related-product-tooltip-body">${relatedProductTooltipRow("Tiêu đề",renderProductTitleWithCondition(row[2]||"Chưa có tên"),"is-title",true)}${relatedProductTooltipRow("Mã hàng",String(row[1]||"Chưa có mã"))}${relatedProductTooltipRow("Chuyên mục",relatedCategoryLabel(row[0]))}${relatedProductTooltipRow("Kho hàng",branch)}${relatedProductTooltipRow("Tồn kho",`${stock.toLocaleString("vi-VN")} sản phẩm`,"is-stock")}${relatedProductTooltipRow("Trạng thái",[condition,status].filter(Boolean).join(" · "))}</div>`;
   tooltip.hidden=false;
   tooltip.classList.remove("show");
   positionRelatedProductTooltip(event.currentTarget);
@@ -15975,7 +16057,7 @@ function renderRelatedPickerResults(){
     box.innerHTML=matches.map(item=>{
       const row=item.row, branch=String(row[13]||"Q2"), group=getPrimaryRowGroup(row[8]||"");
       return `<button type="button" class="related-smart-result" onclick="addRelatedProductByIndex(${item.index})">
-        <span class="related-smart-result-name">${escapeHtml(stripProductConditionFromTitle(row[2]||"Chưa có tên"))}</span>
+        <span class="related-smart-result-name">${renderProductTitleWithCondition(row[2]||"Chưa có tên")}</span>
         <span class="related-smart-result-code">${escapeHtml(branch+" · "+String(row[1]||""))}</span>
         <span class="related-smart-result-meta">${escapeHtml(relatedCategoryLabel(row[0]))}${group?" · "+escapeHtml(group):""} · Tồn ${Number(row[5])||0}</span>
       </button>`;
@@ -16013,8 +16095,8 @@ function renderRelatedPickerPreview(){
   }
   preview.innerHTML=`<div class="related-selected-list">${targets.map((target,index)=>{
     const item=findProductByLinkKey(productLinkKey(target.branch,target.code));
-    const label=item?`${target.branch} · ${target.code} · ${stripProductConditionFromTitle(item.row[2]||"")}`:`${target.branch} · ${target.code}`;
-    return `<span class="related-selected-chip"><span>${escapeHtml(label)}</span><button type="button" onclick="removeRelatedProductAt(${index})" title="Bỏ liên kết" aria-label="Bỏ liên kết">×</button></span>`;
+    const label=item?`${escapeHtml(target.branch+" · "+target.code+" · ")}${renderProductTitleWithCondition(item.row[2]||"")}`:escapeHtml(`${target.branch} · ${target.code}`);
+    return `<span class="related-selected-chip"><span>${label}</span><button type="button" onclick="removeRelatedProductAt(${index})" title="Bỏ liên kết" aria-label="Bỏ liên kết">×</button></span>`;
   }).join("")}</div>`;
 }
 async function saveProductLinks(sourceBranch,sourceCode,targets,oldBranch,oldCode){
@@ -17106,7 +17188,7 @@ async function openAddModal(){ if(!requireActionPermission("PRODUCT_ADD","thêm 
   document.getElementById("fRelatedCodes").value = "";
   document.getElementById("fRelatedSearch").value = ""; setRelatedFormTargets([]);
   document.getElementById("fTon").value = "0"; document.getElementById("fSapHet").value = "2"; document.getElementById("fTT").value = "HẾT HÀNG";
-  document.getElementById("fGhi").value = ""; document.getElementById("fVitri").value = ""; document.getElementById("fImgFile").value = ""; [1,2,3,4].forEach(n=>{ document.getElementById(`fWarrantyImg${n}`).value=""; document.getElementById(`fWarrantyTitle${n}`).value=""; updateSupplementaryImagePreview(n); }); setImagePreview(""); updateLocationSuggestions(); updateGroupOptions(""); updateBrandSuggestions(); checkProductCodeDuplicate(); syncProductConditionButtons(); updateAddFormLiveInfo();
+  document.getElementById("fGhi").value = ""; document.getElementById("fVitri").value = ""; document.getElementById("fImgFile").value = ""; [1,2,3,4].forEach(n=>{ document.getElementById(`fWarrantyImg${n}`).value=""; document.getElementById(`fWarrantyTitle${n}`).value=""; updateSupplementaryImagePreview(n); }); setImagePreview(""); updateLocationSuggestions(); updateGroupOptions(""); updateBrandSuggestions(); checkProductCodeDuplicate(); syncProductConditionButtons(); syncInkColorPickerVisibility(); updateAddFormLiveInfo();
   document.getElementById("editOverlay").classList.add("open");
 }
 async function openEditModal(idx){ if(!requireActionPermission("PRODUCT_EDIT","sửa sản phẩm")) return;
@@ -17127,7 +17209,7 @@ async function openEditModal(idx){ if(!requireActionPermission("PRODUCT_EDIT","s
   setVndInputValue("fGia", r[4]); setVndInputValue("fGiaBan", r[10]||0);
   document.getElementById("fTon").value = r[5]; document.getElementById("fSapHet").value = r[12] || 2; document.getElementById("fTT").value = getStockStatusValue(r[5], r[12]);
   document.getElementById("fGhi").value = parts.note || ""; document.getElementById("fVitri").value = parts.location || ""; document.getElementById("fImgFile").value = ""; document.getElementById("fQuickTagNew").value = "";
-  document.getElementById("fWarrantyImg1").value = r[14] || ""; document.getElementById("fWarrantyImg2").value = r[15] || ""; document.getElementById("fWarrantyImg3").value = r[18] || ""; document.getElementById("fWarrantyImg4").value = r[19] || ""; document.getElementById("fWarrantyTitle1").value = r[16] || ""; document.getElementById("fWarrantyTitle2").value = r[17] || ""; document.getElementById("fWarrantyTitle3").value = r[20] || ""; document.getElementById("fWarrantyTitle4").value = r[21] || ""; setImagePreview(r[9]||""); [1,2,3,4].forEach(updateSupplementaryImagePreview); updateLocationSuggestions(); updateGroupOptions(r[8]||""); updateQuickTagOptions(r[11]||""); updateBrandSuggestions(); checkProductCodeDuplicate(); syncProductConditionButtons(); updateAddFormLiveInfo(); document.getElementById("editOverlay").classList.add("open");
+  document.getElementById("fWarrantyImg1").value = r[14] || ""; document.getElementById("fWarrantyImg2").value = r[15] || ""; document.getElementById("fWarrantyImg3").value = r[18] || ""; document.getElementById("fWarrantyImg4").value = r[19] || ""; document.getElementById("fWarrantyTitle1").value = r[16] || ""; document.getElementById("fWarrantyTitle2").value = r[17] || ""; document.getElementById("fWarrantyTitle3").value = r[20] || ""; document.getElementById("fWarrantyTitle4").value = r[21] || ""; setImagePreview(r[9]||""); [1,2,3,4].forEach(updateSupplementaryImagePreview); updateLocationSuggestions(); updateGroupOptions(r[8]||""); updateQuickTagOptions(r[11]||""); updateBrandSuggestions(); checkProductCodeDuplicate(); syncProductConditionButtons(); syncInkColorPickerVisibility(); updateAddFormLiveInfo(); document.getElementById("editOverlay").classList.add("open");
 }
 async function saveItem(){
   const savingExisting=String(document.getElementById("editIdx")?.value||"")!=="";
