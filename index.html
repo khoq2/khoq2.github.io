@@ -13200,16 +13200,32 @@ function openProductFromList(idx){
 
 const NO_GROUP = "🆕 Khác";
 const jumpAlertTimers = new WeakMap();
+function getMarkedTargetClearance(target){
+  const stickyHeight=document.querySelector(".sticky")?.getBoundingClientRect().height||0;
+  let clearance=stickyHeight;
+  const results=target?.closest?.("#results")||document.getElementById("results");
+  const quickNav=results?.querySelector?.(".quick-nav-wrap");
+  if(quickNav){
+    const rect=quickNav.getBoundingClientRect();
+    const style=getComputedStyle(quickNav);
+    if(rect.height>0 && style.display!=="none" && style.visibility!=="hidden"){
+      const configuredTop=parseFloat(style.top);
+      const stickyTop=Number.isFinite(configuredTop)?Math.max(stickyHeight,configuredTop):stickyHeight;
+      clearance=Math.max(clearance,stickyTop+rect.height);
+    }
+  }
+  return Math.ceil(clearance)+12;
+}
 function scrollToMarkedTarget(target){
   if(!target) return;
   requestAnimationFrame(()=>requestAnimationFrame(()=>{
-    const stickyHeight=document.querySelector(".sticky")?.getBoundingClientRect().height||0;
-    const top=target.getBoundingClientRect().top+window.pageYOffset-stickyHeight-10;
+    const clearance=getMarkedTargetClearance(target);
+    const top=target.getBoundingClientRect().top+window.pageYOffset-clearance;
     try{ headerAutoScrollGuardUntil=performance.now()+750; }catch(_err){}
     window.scrollTo({top:Math.max(0,top),left:0,behavior:"auto"});
     requestAnimationFrame(()=>{
-      const currentStickyHeight=document.querySelector(".sticky")?.getBoundingClientRect().height||0;
-      const correction=target.getBoundingClientRect().top-currentStickyHeight-10;
+      const currentClearance=getMarkedTargetClearance(target);
+      const correction=target.getBoundingClientRect().top-currentClearance;
       if(Math.abs(correction)>1) window.scrollBy({top:correction,left:0,behavior:"auto"});
       target.classList.remove("jump-alert");
       void target.offsetWidth;
