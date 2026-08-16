@@ -1766,6 +1766,10 @@ body.fab-menu-open .category-view-bar .view-mode-switch { pointer-events:none; }
 .ink-color-choice-clear.active { border-color:#AAB7C4; background:#EDF2F6; box-shadow:none; }
 .ink-color-dot,.product-ink-dot { display:inline-block; flex:0 0 auto; width:12px; height:12px; border-radius:50%; background:var(--ink-color,#52697B); border:1px solid rgba(17,35,51,.16); box-shadow:inset 0 1px 1px rgba(255,255,255,.55),0 1px 3px color-mix(in srgb,var(--ink-color,#52697B) 35%,transparent); }
 .product-ink-dot { width:10px; height:10px; margin-right:5px; vertical-align:0; }
+.ink-title-input-shell { position:relative; }
+.ink-title-input-preview { display:none; position:absolute; z-index:2; left:14px; top:50%; width:13px; height:13px; border-radius:50%; background:var(--ink-color,#52697B); border:1px solid rgba(17,35,51,.16); box-shadow:inset 0 1px 1px rgba(255,255,255,.58),0 1px 4px color-mix(in srgb,var(--ink-color,#52697B) 38%,transparent); transform:translateY(-50%); pointer-events:none; }
+.ink-title-input-shell.has-ink .ink-title-input-preview { display:block; }
+#editOverlay .product-name-primary .ink-title-input-shell.has-ink #fTen { padding-left:38px; }
 .code-next-suggestion { display:inline-flex; align-items:center; gap:4px; margin-left:6px; padding:3px 8px; border:1px solid #58A9D4; border-radius:999px; background:#EBF5FB; color:#1A5276; font:inherit; font-size:11px; font-weight:900; cursor:pointer; }
 .code-next-suggestion:hover { background:#D6EAF8; border-color:#2E86C1; }
 .code-next-suggestion:active { transform:scale(.97); }
@@ -8692,7 +8696,11 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
       <div class="form-section-body">
     <div class="form-row product-name-primary">
       <label>Tên sản phẩm *</label>
-      <input type="text" id="fTen" placeholder="VD: RAM LT DDR4 16GB 3200MHz" oninput="syncInkColorButtons();updateAddFormLiveInfo()">
+      <input type="hidden" id="fInkCode" value="">
+      <div class="ink-title-input-shell" id="fInkTitleInputShell">
+        <span class="ink-title-input-preview" id="fInkTitleDot" aria-hidden="true"></span>
+        <input type="text" id="fTen" placeholder="VD: RAM LT DDR4 16GB 3200MHz" oninput="syncInkColorButtons();updateAddFormLiveInfo()">
+      </div>
       <div class="ink-color-picker" id="fInkColorPicker" role="group" aria-label="Chèn màu mực Epson vào tiêu đề" hidden>
         <span class="ink-color-picker-label">Màu mực Epson · tự chèn ký hiệu ở đầu và mã màu ở cuối tiêu đề</span>
         <button type="button" class="ink-color-choice" data-ink-code="BK" style="--ink-color:#111111" onclick="setProductInkColor('BK')" title="Black — Đen"><span class="ink-color-dot" aria-hidden="true"></span>BK</button>
@@ -12088,9 +12096,10 @@ const PRODUCT_INK_COLORS = Object.freeze({
 
 function parseProductInkTitle(value){
   const raw=String(value||"").trim();
-  const markerEntry=Object.entries(PRODUCT_INK_COLORS).find(([,meta])=>raw.startsWith(meta.marker));
-  if(!markerEntry) return {code:"",base:raw,raw};
-  const withoutMarker=raw.slice(markerEntry[1].marker.length).trim();
+  const knownMarkers=["●",...new Set(Object.values(PRODUCT_INK_COLORS).map(meta=>meta.marker))];
+  const marker=knownMarkers.find(item=>raw.startsWith(item));
+  if(!marker) return {code:"",base:raw,raw};
+  const withoutMarker=raw.slice(marker.length).trim();
   const suffix=withoutMarker.match(/\s+(BK|LC|LM|C|M|Y)\s*$/iu);
   if(!suffix) return {code:"",base:raw,raw};
   const code=String(suffix[1]||"").toUpperCase();
@@ -12101,29 +12110,56 @@ function formatProductInkTitle(base,code){
   const clean=String(base||"").trim();
   const meta=PRODUCT_INK_COLORS[code];
   if(!meta) return clean;
-  return `${meta.marker}${clean?" "+clean:""} ${code}`.trim();
+  return `●${clean?" "+clean:""} ${code}`.trim();
+}
+function stripProductInkCodeSuffix(value,code){
+  const text=String(value||"").trim();
+  if(!code||!PRODUCT_INK_COLORS[code]) return text;
+  const suffix=new RegExp(`\\s+${code}\\s*$`,"iu");
+  return text.replace(suffix,"").trim();
+}
+function hydrateProductInkInput(value){
+  const input=document.getElementById("fTen"),codeInput=document.getElementById("fInkCode");
+  if(!input||!codeInput) return;
+  const parsed=parseProductInkTitle(value);
+  codeInput.value=parsed.code;
+  input.value=parsed.code?`${parsed.base} ${parsed.code}`.trim():String(value||"").trim();
+  syncInkColorPickerVisibility();
+}
+function getProductInkFormValue(){
+  const inputValue=String(document.getElementById("fTen")?.value||"").trim();
+  const code=String(document.getElementById("fInkCode")?.value||"").toUpperCase();
+  const base=stripProductInkCodeSuffix(inputValue,code);
+  return {code,base,title:code&&PRODUCT_INK_COLORS[code]?formatProductInkTitle(base,code):base};
 }
 function syncInkColorButtons(){
-  const parsed=parseProductInkTitle(document.getElementById("fTen")?.value||"");
+  const code=String(document.getElementById("fInkCode")?.value||"").toUpperCase();
   document.querySelectorAll("#fInkColorPicker .ink-color-choice").forEach(btn=>{
-    const active=(btn.dataset.inkCode||"")===parsed.code;
+    const active=(btn.dataset.inkCode||"")===code;
     btn.classList.toggle("active",active);
     btn.setAttribute("aria-pressed",String(active));
   });
+  const meta=PRODUCT_INK_COLORS[code],shell=document.getElementById("fInkTitleInputShell"),dot=document.getElementById("fInkTitleDot");
+  shell?.classList.toggle("has-ink",!!meta);
+  if(dot){
+    if(meta){ dot.style.setProperty("--ink-color",meta.color); dot.title=meta.label; }
+    else { dot.style.removeProperty("--ink-color"); dot.removeAttribute("title"); }
+  }
 }
 function syncInkColorPickerVisibility(){
   const picker=document.getElementById("fInkColorPicker");
   if(!picker) return;
-  const hasInk=!!parseProductInkTitle(document.getElementById("fTen")?.value||"").code;
+  const hasInk=!!document.getElementById("fInkCode")?.value;
   picker.hidden=document.getElementById("fSheet")?.value!=="MI"&&!hasInk;
   syncInkColorButtons();
 }
 function setProductInkColor(code){
-  const input=document.getElementById("fTen");
-  if(!input) return;
-  const parsed=parseProductInkTitle(input.value);
-  const base=parsed.code?parsed.base:String(input.value||"").trim();
-  input.value=code&&PRODUCT_INK_COLORS[code]?formatProductInkTitle(base,code):base;
+  const input=document.getElementById("fTen"),codeInput=document.getElementById("fInkCode");
+  if(!input||!codeInput) return;
+  const oldCode=String(codeInput.value||"").toUpperCase();
+  const base=stripProductInkCodeSuffix(input.value,oldCode);
+  codeInput.value=code&&PRODUCT_INK_COLORS[code]?code:"";
+  input.value=codeInput.value?`${base} ${codeInput.value}`.trim():base;
   syncInkColorPickerVisibility();
   updateAddFormLiveInfo();
   input.focus();
@@ -17183,7 +17219,7 @@ async function openAddModal(){ if(!requireActionPermission("PRODUCT_ADD","thêm 
   document.getElementById("fSaveBtn").disabled = false; document.getElementById("fSaveBtn").textContent = "💾 Lưu thiết bị";
   document.getElementById("fCondition").value = "";
   document.getElementById("fQuickTagNew").value = "";
-  document.getElementById("fBranch").disabled=false; document.getElementById("fBranch").value = currentBranch === "Q5" ? "Q5" : "Q2"; document.getElementById("fSheet").value = ["MT","MI","CAM","INT"].includes(currentTab) ? currentTab : "MT"; document.getElementById("fMa").value = ""; document.getElementById("fTen").value = "";
+  document.getElementById("fBranch").disabled=false; document.getElementById("fBranch").value = currentBranch === "Q5" ? "Q5" : "Q2"; document.getElementById("fSheet").value = ["MT","MI","CAM","INT"].includes(currentTab) ? currentTab : "MT"; document.getElementById("fMa").value = ""; hydrateProductInkInput("");
   document.getElementById("fTH").value = ""; setVndInputValue("fGia", 0); setVndInputValue("fGiaBan", 0);
   document.getElementById("fRelatedCodes").value = "";
   document.getElementById("fRelatedSearch").value = ""; setRelatedFormTargets([]);
@@ -17203,7 +17239,7 @@ async function openEditModal(idx){ if(!requireActionPermission("PRODUCT_EDIT","s
   document.getElementById("fSaveBtn").disabled = false; document.getElementById("fSaveBtn").textContent = "💾 Lưu thiết bị";
   document.getElementById("fCondition").value = productCondition;
   document.getElementById("fBranch").value = r[13] || "Q2"; document.getElementById("fBranch").disabled=true; document.getElementById("fSheet").value = r[0]; document.getElementById("fMa").value = r[1];
-  document.getElementById("fTen").value = stripProductConditionFromTitle(r[2]); document.getElementById("fTH").value = r[3];
+  hydrateProductInkInput(stripProductConditionFromTitle(r[2])); document.getElementById("fTH").value = r[3];
   document.getElementById("fRelatedCodes").value = directRelatedText(r[13]||"Q2",r[1]);
   document.getElementById("fRelatedSearch").value = ""; setRelatedFormTargets(getRelatedFormTargets());
   setVndInputValue("fGia", r[4]); setVndInputValue("fGiaBan", r[10]||0);
@@ -17214,7 +17250,8 @@ async function openEditModal(idx){ if(!requireActionPermission("PRODUCT_EDIT","s
 async function saveItem(){
   const savingExisting=String(document.getElementById("editIdx")?.value||"")!=="";
   if(!requireActionPermission(savingExisting?"PRODUCT_EDIT":"PRODUCT_ADD",savingExisting?"sửa sản phẩm":"thêm sản phẩm")) return;
-  const sh = document.getElementById("fSheet").value.trim(), ma = document.getElementById("fMa").value.trim(), tenBase = stripProductConditionFromTitle(document.getElementById("fTen").value), productCondition = document.getElementById("fCondition").value, ten = tenBase + (productCondition ? ` (${productCondition})` : ""), th = document.getElementById("fTH").value.trim(), gia = parseVndInput(document.getElementById("fGia").value), giaBan = parseVndInput(document.getElementById("fGiaBan").value), ton = Math.max(0, parseInt(document.getElementById("fTon").value)||0), sapHet = Math.max(1, parseInt(document.getElementById("fSapHet").value)||2), tt = document.getElementById("fTT").value, ghiNote = document.getElementById("fGhi").value.trim(), vitri = document.getElementById("fVitri").value.trim(), img = document.getElementById("fImg").value || "", warrantyImg1 = resolveImageUrl(document.getElementById("fWarrantyImg1").value), warrantyImg2 = resolveImageUrl(document.getElementById("fWarrantyImg2").value), warrantyImg3 = resolveImageUrl(document.getElementById("fWarrantyImg3").value), warrantyImg4 = resolveImageUrl(document.getElementById("fWarrantyImg4").value), warrantyTitle1 = cleanQuickLabel(document.getElementById("fWarrantyTitle1").value).slice(0,80), warrantyTitle2 = cleanQuickLabel(document.getElementById("fWarrantyTitle2").value).slice(0,80), warrantyTitle3 = cleanQuickLabel(document.getElementById("fWarrantyTitle3").value).slice(0,80), warrantyTitle4 = cleanQuickLabel(document.getElementById("fWarrantyTitle4").value).slice(0,80), idx = document.getElementById("editIdx").value, grp = joinRowGroups(getSelectedFormGroups());
+  const inkTitleForm=getProductInkFormValue();
+  const sh = document.getElementById("fSheet").value.trim(), ma = document.getElementById("fMa").value.trim(), tenBase = inkTitleForm.title, productCondition = document.getElementById("fCondition").value, ten = tenBase + (productCondition ? ` (${productCondition})` : ""), th = document.getElementById("fTH").value.trim(), gia = parseVndInput(document.getElementById("fGia").value), giaBan = parseVndInput(document.getElementById("fGiaBan").value), ton = Math.max(0, parseInt(document.getElementById("fTon").value)||0), sapHet = Math.max(1, parseInt(document.getElementById("fSapHet").value)||2), tt = document.getElementById("fTT").value, ghiNote = document.getElementById("fGhi").value.trim(), vitri = document.getElementById("fVitri").value.trim(), img = document.getElementById("fImg").value || "", warrantyImg1 = resolveImageUrl(document.getElementById("fWarrantyImg1").value), warrantyImg2 = resolveImageUrl(document.getElementById("fWarrantyImg2").value), warrantyImg3 = resolveImageUrl(document.getElementById("fWarrantyImg3").value), warrantyImg4 = resolveImageUrl(document.getElementById("fWarrantyImg4").value), warrantyTitle1 = cleanQuickLabel(document.getElementById("fWarrantyTitle1").value).slice(0,80), warrantyTitle2 = cleanQuickLabel(document.getElementById("fWarrantyTitle2").value).slice(0,80), warrantyTitle3 = cleanQuickLabel(document.getElementById("fWarrantyTitle3").value).slice(0,80), warrantyTitle4 = cleanQuickLabel(document.getElementById("fWarrantyTitle4").value).slice(0,80), idx = document.getElementById("editIdx").value, grp = joinRowGroups(getSelectedFormGroups());
   const stockInputRaw = String(document.getElementById("fTon").value ?? "").trim();
   const costInputRaw = String(document.getElementById("fGia").value || "").trim();
   const saleInputRaw = String(document.getElementById("fGiaBan").value || "").trim();
@@ -17223,7 +17260,7 @@ async function saveItem(){
   for(const [value,label] of [[warrantyImg1,"Ảnh bảo hành 1"],[warrantyImg2,"Ảnh bảo hành 2"],[warrantyImg3,"Ảnh bảo hành 3"],[warrantyImg4,"Ảnh bảo hành 4"]]){
     if(!validateSheetImageValue(value,label)) return;
   }
-  if(!ma||!tenBase){alert("Vui lòng nhập Mã hàng và Tên sản phẩm!"); return;}
+  if(!ma||!inkTitleForm.base){alert("Vui lòng nhập Mã hàng và Tên sản phẩm!"); return;}
   if(!productCondition){ alert("Vui lòng chọn trạng thái MỚI hoặc CŨ!"); document.querySelector(".condition-picker")?.scrollIntoView({behavior:"smooth",block:"center"}); return; }
   if(stockInputRaw==="" || !/^\d+$/.test(stockInputRaw) || Number(stockInputRaw)<0){ alert("Vui lòng nhập Số lượng tồn là số nguyên từ 0 trở lên!"); document.getElementById("fTon").focus(); return; }
   if(Number(stockInputRaw)===0 && !confirm("Số lượng tồn đang bằng 0, sản phẩm sẽ hiển thị HẾT HÀNG. Bạn vẫn muốn lưu?")) return;
