@@ -13950,6 +13950,7 @@ function renderRestockOverview(el){
   toggleSummaryProductList(defaultKey,actionableItems.length?`Mặt hàng cần nhập · ${scopeLabel}`:`Mặt hàng cần theo dõi · ${scopeLabel}`,false);
 }
 function render(){
+  hideRelatedProductTooltip(true);
   document.body.classList.remove("loading-layout-mode");
   setTimeout(refreshEmployeePermissionUI,0);
   syncWarehouseBranchUI();
@@ -16170,6 +16171,8 @@ function renderRelatedProducts(row){
   return `<div class="product-related"><span class="product-related-title">🔗 Bài viết / thiết bị liên quan (${items.length})</span><div class="product-related-list">${items.map(item=>`<button type="button" class="product-related-link" aria-describedby="relatedProductTooltip" onmouseenter="showRelatedProductTooltip(event,${item.index})" onmouseleave="hideRelatedProductTooltip()" onfocus="showRelatedProductTooltip(event,${item.index})" onblur="hideRelatedProductTooltip()" onclick="event.stopPropagation();hideRelatedProductTooltip(true);openRelatedProduct(${item.index})">${escapeHtml(item.row[1])} · ${renderProductTitleWithCondition(item.row[2]||"Chưa có tên")}</button>`).join("")}</div></div>`;
 }
 let relatedProductTooltipHideTimer=0;
+let relatedProductTooltipShowFrame=0;
+let relatedProductTooltipAnchor=null;
 function relatedProductTooltipRow(label,value,extraClass="",allowHtml=false){
   const displayValue=allowHtml?String(value||"—"):escapeHtml(value||"—");
   return `<div class="related-product-tooltip-row ${extraClass}"><span class="related-product-tooltip-label">${escapeHtml(label)}:</span><span class="related-product-tooltip-value ${extraClass==="is-stock"?"is-stock":""}">${displayValue}</span></div>`;
@@ -16192,6 +16195,9 @@ function showRelatedProductTooltip(event,index){
   const row=DATA[index],tooltip=document.getElementById("relatedProductTooltip");
   if(!row||!tooltip) return;
   clearTimeout(relatedProductTooltipHideTimer);
+  cancelAnimationFrame(relatedProductTooltipShowFrame);
+  const anchor=event.currentTarget;
+  relatedProductTooltipAnchor=anchor;
   const stock=Math.max(0,Number(row[5])||0);
   const condition=getProductConditionFromTitle(row[2]||"");
   const status=String(row[6]||"").trim()||(stock>0?"Còn hàng":"Hết hàng");
@@ -16199,17 +16205,38 @@ function showRelatedProductTooltip(event,index){
   tooltip.innerHTML=`<div class="related-product-tooltip-head"><strong>THÔNG TIN BÀI VIẾT</strong><span>Bấm để mở</span></div><div class="related-product-tooltip-body">${relatedProductTooltipRow("Tiêu đề",renderProductTitleWithCondition(row[2]||"Chưa có tên"),"is-title",true)}${relatedProductTooltipRow("Mã hàng",String(row[1]||"Chưa có mã"))}${relatedProductTooltipRow("Chuyên mục",relatedCategoryLabel(row[0]))}${relatedProductTooltipRow("Kho hàng",branch)}${relatedProductTooltipRow("Tồn kho",`${stock.toLocaleString("vi-VN")} sản phẩm`,"is-stock")}${relatedProductTooltipRow("Trạng thái",[condition,status].filter(Boolean).join(" · "))}</div>`;
   tooltip.hidden=false;
   tooltip.classList.remove("show");
-  positionRelatedProductTooltip(event.currentTarget);
-  requestAnimationFrame(()=>tooltip.classList.add("show"));
+  positionRelatedProductTooltip(anchor);
+  relatedProductTooltipShowFrame=requestAnimationFrame(()=>{
+    relatedProductTooltipShowFrame=0;
+    if(relatedProductTooltipAnchor!==anchor || !anchor?.isConnected || tooltip.hidden) return;
+    const pointerStillHere=anchor.matches?.(":hover");
+    const keyboardStillHere=document.activeElement===anchor;
+    if(!pointerStillHere && !keyboardStillHere){ hideRelatedProductTooltip(true); return; }
+    tooltip.classList.add("show");
+  });
 }
 function hideRelatedProductTooltip(immediate=false){
   const tooltip=document.getElementById("relatedProductTooltip");
   if(!tooltip) return;
   clearTimeout(relatedProductTooltipHideTimer);
+  cancelAnimationFrame(relatedProductTooltipShowFrame);
+  relatedProductTooltipShowFrame=0;
+  relatedProductTooltipAnchor=null;
   tooltip.classList.remove("show");
   if(immediate){ tooltip.hidden=true; return; }
   relatedProductTooltipHideTimer=setTimeout(()=>{ if(!tooltip.classList.contains("show")) tooltip.hidden=true; },180);
 }
+function bindRelatedProductTooltipDismiss(){
+  if(document.documentElement.dataset.relatedTooltipDismissBound) return;
+  document.documentElement.dataset.relatedTooltipDismissBound="1";
+  document.addEventListener("pointerdown",event=>{
+    if(!event.target.closest?.(".product-related-link,.search-example")) hideRelatedProductTooltip(true);
+  },true);
+  window.addEventListener("scroll",()=>hideRelatedProductTooltip(true),{passive:true,capture:true});
+  window.addEventListener("resize",()=>hideRelatedProductTooltip(true),{passive:true});
+  document.addEventListener("visibilitychange",()=>{ if(document.hidden) hideRelatedProductTooltip(true); });
+}
+bindRelatedProductTooltipDismiss();
 function openRelatedProduct(index){
   if(!DATA[index]) return;
   selectSearchSuggestion(index);
@@ -17711,8 +17738,7 @@ async function doImport(){ if(!requireAdmin()) return;
 }
 let tabRenderFrame=0;
 function goToTab(tabCode){
-  // Tooltip gợi ý nằm ngoài #results; đóng trước khi render để không bị
-  // giữ lại khi phần tử đang hover bị thay thế bởi danh mục mới.
+  // Đóng tooltip trước khi thay danh mục.
   hideRelatedProductTooltip(true);
   document.querySelectorAll(".tab-btn").forEach(
     b=>b.classList.toggle("active", b.dataset.tab===tabCode)
@@ -17828,8 +17854,7 @@ function positionTabDropdown(button){
   box.style.top=`${tabs.offsetTop+tabs.offsetHeight}px`;
 }
 function showTabDropdown(button){
-  // Khi rê từ gợi ý tìm kiếm lên menu danh mục, đóng tooltip cũ ngay
-  // trước khi mở dropdown để hai lớp giao diện không chồng lên nhau.
+  // Không chồng tooltip với menu danh mục.
   hideRelatedProductTooltip(true);
   const tabCode=String(button?.dataset?.tab||"ALL");
   if(tabCode==="ALL"){ closeTabDropdown(); return; }
