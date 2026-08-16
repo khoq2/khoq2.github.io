@@ -23,11 +23,11 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.10/pdfmake.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.10/vfs_fonts.js"></script>
 <style>
-/* CSS đầy đủ của bạn */
+/* Base styles */
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html { -webkit-text-size-adjust:100%; text-size-adjust:100%; }
 body { font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif; background: #F2F3F4; color: #1a1a1a; }
-/* Con trỏ thống nhất: nhìn là biết vùng nào có thể thao tác. */
+/* Interactive cursor states */
 html, body { cursor: default; }
 button:not(:disabled), a[href], label[for], select, summary,
 [role="button"], [onclick], .card[data-index], .product-list-row,
@@ -228,7 +228,7 @@ button:disabled,input:disabled,select:disabled,[aria-disabled="true"] { cursor:n
 @keyframes kpiYellowBlink { 0%,100% { opacity:.45; filter:brightness(.75) drop-shadow(0 0 0 rgba(255,215,0,0)); } 50% { opacity:1; filter:brightness(1.65) saturate(1.45) drop-shadow(0 0 5px #ffd700); } }
 .kpi-insight { min-height:10px; max-width:100%; margin-top:3px; color:rgba(255,255,255,.78); font-size:8px; font-weight:750; line-height:1.15; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 
-/* Dashboard KPI: ưu tiên thông tin có thể hành động, giữ nguyên dữ liệu nguồn. */
+/* KPI dashboard */
 #kpiOverlay .modal { border:1px solid rgba(30,58,95,.12); background:linear-gradient(180deg,#fff 0,#F7FAFD 100%); box-shadow:0 22px 55px rgba(14,37,64,.26); }
 #kpiOverlay .kpi-content-frame { padding:10px; border-color:rgba(30,58,95,.13); background:#F5F8FC; box-shadow:inset 0 1px 0 #fff; }
 #kpiOverlay .kpi-content-toolbar { margin-bottom:10px; border-bottom-color:#DCE5EE; }
@@ -2975,7 +2975,7 @@ body.admin-entry-visible .sticky:not(.collapsed) .header .admin-bar {
   .view-mode-btn svg { width:13px; height:13px; }
 }
 
-/* ===== Modern Inventory Dashboard 2026 — lớp giao diện, không thay đổi nghiệp vụ ===== */
+/* Inventory dashboard theme */
 :root {
   --dash-navy:#082f63;
   --dash-navy-2:#0b417f;
@@ -3295,7 +3295,7 @@ body {
   .modal { border-radius:18px 18px 0 0; }
 }
 
-/* Thẻ sản phẩm dashboard 2026 */
+/* Product cards */
 .card {
   isolation:isolate;
   border-color:#e1e8f1;
@@ -3541,7 +3541,7 @@ body {
   .card-actions > button { min-height:44px; font-size:10.5px; }
 }
 </style>
-<style id="vietnamese-mobile-typography-2026">
+<style id="mobile-typography">
 /* Font hệ thống rõ dấu tiếng Việt, nhẹ và ổn định trên Android/iPhone/Windows. */
 :root {
   --ui-font: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
@@ -3616,7 +3616,7 @@ html, body, button, input, select, textarea {
   }
 }
 
-/* Ba lối tắt tồn kho dạng dashboard 2026. */
+/* Inventory shortcuts */
 #homeInventoryBar .home-stock-actions {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -3941,7 +3941,7 @@ html, body, button, input, select, textarea {
   .overview-alert { padding:9px; }
 }
 
-/* Điều khiển nổi 2026: List/Grid và cuộn nhanh. */
+/* Floating controls */
 .category-view-bar .view-mode-switch,
 .scroll-btns {
   gap: 5px;
@@ -4261,9 +4261,8 @@ html, body, button, input, select, textarea {
   }
 }
 </style>
-<style id="modern-inventory-dashboard-2026-complete">
-/* Modern Inventory Dashboard 2026 — unified presentation layer.
-   DOM ids, handlers and data contracts remain unchanged. */
+<style id="inventory-dashboard-theme">
+/* Inventory dashboard theme */
 :root{
   --ui-bg:#f3f7fb;--ui-surface:rgba(255,255,255,.94);--ui-soft:#f7faff;
   --ui-ink:#10233f;--ui-muted:#64748b;--ui-line:#dbe6f1;--ui-line-2:#c8d7e7;
@@ -4307,7 +4306,7 @@ button:disabled{opacity:.55;cursor:not-allowed;filter:saturate(.5)}
   background:linear-gradient(105deg,#10233f 0%,#0f5f9f 30%,#06a8c4 44%,#fff 49%,#84e7f5 54%,#0f5f9f 68%,#10233f 100%);
   background-size:320% 100%;background-position:100% 50%;
   -webkit-background-clip:text;background-clip:text;
-  animation:titleTextSweepPause2026 10s ease-in-out infinite;
+  animation:titleTextSweepPause 10s ease-in-out infinite;
 }
 .title-shine{
   width:34%!important;height:1.6em!important;opacity:.92!important;
@@ -4320,7 +4319,7 @@ button:disabled{opacity:.55;cursor:not-allowed;filter:saturate(.5)}
   0%,8%{background-position:100% 50%}
   92%,100%{background-position:0% 50%}
 }
-@keyframes titleTextSweepPause2026{
+@keyframes titleTextSweepPause{
   0%{background-position:100% 50%}
   20%{background-position:0% 50%}
   50%{background-position:0% 50%}
@@ -4492,7 +4491,7 @@ body.home-landing-mode #homeInventoryBar #count{display:none!important}
 @media(prefers-reduced-motion:reduce){
   *,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
   .title-logo-slot::after{animation:none!important;opacity:0!important}
-  .title-base{animation:titleTextSweepPause2026 10s ease-in-out infinite!important}
+  .title-base{animation:titleTextSweepPause 10s ease-in-out infinite!important}
   .title-shine{animation:titleShinePause2026 10s ease-in-out infinite!important}
 }
 
@@ -5459,7 +5458,7 @@ body .card .nguoi-ban-row > .nguoi-ban-kind-icon {
   justify-self:start!important;
 }
 
-/* Professional polish 2026: focus rõ, chạm nhanh và số liệu dễ quét. */
+/* Focus and touch states */
 button,[role="button"],a[href],input,select,textarea{
   -webkit-tap-highlight-color:transparent;
   touch-action:manipulation;
@@ -6619,8 +6618,8 @@ body.private-panel-open{overflow:hidden}
 @media(max-width:680px){#partnerOverlay{padding:8px}.partner-modal{width:100%;max-height:calc(100dvh - 16px);padding:11px;border-radius:18px}.partner-filters{grid-template-columns:1fr}.partner-add{width:100%}.partner-list{grid-template-columns:1fr}.partner-editor-grid{grid-template-columns:1fr}.partner-editor-grid .wide{grid-column:auto}.partner-service-editor{grid-template-columns:1fr 1fr}.private-access-modal{padding:21px 17px}}
 @media(max-width:390px){.partner-service-editor{grid-template-columns:1fr}.private-access-actions{grid-template-columns:1fr}}
 </style>
-<style id="modern-private-hubs-2026">
-/* Customer & Partner Control Center 2026 — lớp giao diện cuối, không đổi nghiệp vụ. */
+<style id="private-hubs-theme">
+/* Customer and partner panels */
 #customerOverlay,#partnerOverlay,#privateAccessOverlay{
   padding:18px;
   background:
@@ -6989,7 +6988,7 @@ body.private-panel-open{overflow:hidden}
 }
 @media(prefers-reduced-motion:reduce){#customerOverlay *,#partnerOverlay *,#privateAccessOverlay *{transition:none!important}}
 </style>
-<style id="unified-auth-ui-2026">
+<style id="auth-ui">
 /* Một chuẩn đăng nhập dùng chung; chỉ thay đổi giao diện và phản hồi phía trình duyệt. */
 #adminOverlay,#syncErrorOverlay{
   align-items:center;
@@ -7062,7 +7061,7 @@ body.private-panel-open{overflow:hidden}
 }
 @media(prefers-reduced-motion:reduce){#adminOverlay *,#syncErrorOverlay *{transition:none!important}}
 </style>
-<style id="side-control-rail-2026">
+<style id="side-control-rail">
 /* Thanh điều khiển nổi thống nhất: List/Grid -> tiện ích macOS -> cuộn nhanh. */
 body.admin-mode{padding-bottom:calc(88px + env(safe-area-inset-bottom))!important}
 .side-control-rail{
@@ -7575,7 +7574,7 @@ body .card .nguoi-ban-row.has-transaction .nv-role-badge .nv-role-icon{
   will-change:filter,transform!important;
 }
 
-/* Bộ biểu tượng SVG hiện đại và ô ngày Việt Nam trong lịch sử giao dịch. */
+/* Transaction history icons */
 #txOverlay .tx-modern-icon{
   --tx-icon:#1769C2;
   --tx-icon-bg:#EAF3FF;
@@ -8302,7 +8301,7 @@ body .warehouse-switch.warehouse-switch-changing .warehouse-pin{
   }
 }
 </style>
-<style id="admin-stability-ui-2026">
+<style id="admin-stability-ui">
 :root{
   --ui-focus:#2E86C1;
   --ui-surface:#FFFFFF;
@@ -8719,7 +8718,6 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
         <input type="text" id="fTen" placeholder="VD: RAM LT DDR4 16GB 3200MHz" oninput="syncInkColorButtons();updateAddFormLiveInfo()">
       </div>
       <div class="ink-color-picker" id="fInkColorPicker" role="group" aria-label="Chèn màu mực Epson vào tiêu đề" hidden>
-        <span class="ink-color-picker-label">Màu mực Epson · tự chèn ký hiệu ở đầu và mã màu ở cuối tiêu đề</span>
         <button type="button" class="ink-color-choice" data-ink-code="BK" style="--ink-color:#111111" onclick="setProductInkColor('BK')" title="Black — Đen"><span class="ink-color-dot" aria-hidden="true"></span>BK</button>
         <button type="button" class="ink-color-choice" data-ink-code="C" style="--ink-color:#00AEEF" onclick="setProductInkColor('C')" title="Cyan — Xanh"><span class="ink-color-dot" aria-hidden="true"></span>C</button>
         <button type="button" class="ink-color-choice" data-ink-code="LC" style="--ink-color:#8ED8F8" onclick="setProductInkColor('LC')" title="Light Cyan — Xanh nhạt"><span class="ink-color-dot" aria-hidden="true"></span>LC</button>
@@ -8732,7 +8730,6 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
         <button type="button" class="condition-choice condition-new" data-condition="Mới" onclick="setProductCondition('Mới')" title="Đánh dấu sản phẩm mới"><img class="condition-icon" src="https://lh3.googleusercontent.com/d/1PAIDkncymTQY5SldAXNWAKWVrhAFDNlL" alt="MỚI" referrerpolicy="no-referrer"></button>
         <button type="button" class="condition-choice condition-old" data-condition="Cũ" onclick="setProductCondition('Cũ')" title="Đánh dấu sản phẩm cũ"><img class="condition-icon" src="https://lh3.googleusercontent.com/d/15mgvNvvTtyjXVKSSCMom7n9woRIBS3wx" alt="CŨ" referrerpolicy="no-referrer"></button>
       </div>
-      <div class="condition-note">Ô tên sản phẩm luôn giữ nguyên. Khi lưu, hệ thống ghi nhận trạng thái và hiển thị bằng icon tương ứng.</div>
     </div>
     <div class="form-row">
       <label>Ghi chú</label>
@@ -8750,7 +8747,6 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
       </div>
       <textarea id="fRelatedCodes" hidden aria-hidden="true"></textarea>
       <div id="fRelatedPreview" class="related-edit-preview"></div>
-      <div class="related-picker-help">Gõ tên hoặc mã rồi bấm đúng sản phẩm trong danh sách. Hệ thống tự ghi chính xác mã, kho và loại sản phẩm; không cần nhập thủ công.</div>
     </div>
     <div class="form-row">
       <label>Thương hiệu</label>
@@ -13315,7 +13311,7 @@ function renderCard(r,i,displayNo){
       <div class="card-actions admin-only" data-permission="PRODUCT_EDIT,PRODUCT_DELETE,TRANSFER">
         <button class="btn-units admin-only" data-permission="PRODUCT_EDIT" onclick="openUnitManager(${i})">＋ Thêm mã</button>
         <button class="btn-transfer admin-only" data-permission="TRANSFER" onclick="openTransferModal(${i})">⇄ Chuyển kho</button>
-        <button class="btn-edit admin-only" data-permission="PRODUCT_EDIT" onclick="openEditModal(${i})">✏️ Sửa</button>
+        <button class="btn-edit admin-only" data-permission="PRODUCT_EDIT" onclick="openEditModal(${i},this)">✏️ Sửa</button>
         <button class="btn-delete admin-only" data-permission="PRODUCT_DELETE" onclick="deleteItem(${i})">🗑️ Xóa</button>
       </div>
       </div>
@@ -14144,7 +14140,7 @@ function render(){
       const groupSummary = `${itemCount} mục · ${groupStock.toLocaleString("vi-VN")} tồn · ${groupStats.low} sắp hết · ${groupStats.out} hết hàng`;
       const detailKey = `group-${idx}`;
       currentGroupDetailSets[detailKey] = {label:g,items:buckets[g].slice()};
-      return `<section class="group-section" style="--group-strong: ${strongColor};">
+      return `<section class="group-section" data-group-anchor="${escapeHtml(quickGroupLabelMatchKey(g))}" style="--group-strong: ${strongColor};">
         <div class="group-header" id="grp-${idx}" style="--group-bg: ${groupColor}; --group-strong: ${strongColor}; background: ${groupColor};">
           <div class="group-header-main">
             <span class="group-header-label">${g}</span>
@@ -17362,16 +17358,63 @@ function captureAddReturnState(){
     anchorTop:visible ? visible.getBoundingClientRect().top : null
   };
 }
-function captureEditReturnState(index){
+function captureEditReturnState(index,trigger){
   const state=captureAddReturnState();
   const row=DATA[index];
-  const target=document.querySelector(`#results .card[data-index="${index}"],#results .product-list-row[data-index="${index}"]`);
+  const clickedTarget=trigger?.closest?.(".card[data-index],.product-list-row[data-index]");
+  const target=clickedTarget && document.getElementById("results")?.contains(clickedTarget)
+    ? clickedTarget
+    : document.querySelector(`#results .card[data-index="${index}"],#results .product-list-row[data-index="${index}"]`);
   if(row){
     state.anchorCode=String(row[1]||"");
     state.anchorBranch=String(row[13]||"Q2");
   }
-  if(target) state.anchorTop=target.getBoundingClientRect().top;
+  if(target){
+    state.anchorTop=target.getBoundingClientRect().top;
+    state.anchorGroup=String(target.closest(".group-section")?.dataset.groupAnchor||"");
+  }
   return state;
+}
+function findReturnAnchorTarget(state,index){
+  if(index<0) return null;
+  const candidates=[...document.querySelectorAll(`#results .card[data-index="${index}"],#results .product-list-row[data-index="${index}"]`)];
+  if(!candidates.length) return null;
+  if(state?.anchorGroup){
+    const sameGroup=candidates.find(target=>String(target.closest(".group-section")?.dataset.groupAnchor||"")===state.anchorGroup);
+    if(sameGroup) return sameGroup;
+  }
+  return candidates[0];
+}
+function markRestoredEditTarget(target){
+  if(!target) return;
+  target.classList.remove("jump-alert");
+  void target.offsetWidth;
+  target.classList.add("jump-alert");
+  clearTimeout(jumpAlertTimers.get(target));
+  jumpAlertTimers.set(target,setTimeout(()=>{
+    target.classList.remove("jump-alert");
+    jumpAlertTimers.delete(target);
+  },2400));
+}
+function restoreReturnAnchor(state,{highlight=false}={}){
+  if(!state) return false;
+  const idx=state.anchorCode
+    ? DATA.findIndex(r=>String(r[1]||"")===state.anchorCode && String(r[13]||"Q2")===state.anchorBranch)
+    : -1;
+  const target=findReturnAnchorTarget(state,idx);
+  if(!target || state.anchorTop==null) return false;
+  try{ headerAutoScrollGuardUntil=performance.now()+900; }catch(_err){}
+  const correctPosition=()=>{
+    if(!target.isConnected) return;
+    const delta=target.getBoundingClientRect().top-state.anchorTop;
+    if(Math.abs(delta)>1) window.scrollBy({top:delta,left:0,behavior:"auto"});
+  };
+  correctPosition();
+  requestAnimationFrame(()=>{
+    correctPosition();
+    if(highlight) markRestoredEditTarget(target);
+  });
+  return true;
 }
 function restoreAfterAdd(state){
   if(!state) return;
@@ -17385,15 +17428,49 @@ function restoreAfterAdd(state){
   syncHomeStockFilters(); syncRestockButton(restockOnly); syncStatusButtons(totalStockView ? currentStatus : "");
   syncWarehouseBranchUI(); render();
   requestAnimationFrame(()=>requestAnimationFrame(()=>{
-    if(state.anchorCode){
-      const idx=DATA.findIndex(r=>String(r[1]||"")===state.anchorCode && String(r[13]||"Q2")===state.anchorBranch);
-      const target=idx>=0 ? document.querySelector(`#results [data-index="${idx}"]`) : null;
-      if(target && state.anchorTop!=null){
-        window.scrollBy({top:target.getBoundingClientRect().top-state.anchorTop,left:0,behavior:"auto"});
-        return;
-      }
-    }
+    if(restoreReturnAnchor(state)) return;
     window.scrollTo({top:state.scrollY,left:0,behavior:"auto"});
+  }));
+}
+function restoreAfterEdit(state){
+  if(!state) return;
+  currentTab=state.tab; currentStatus=state.status; totalStockView=state.totalStockView;
+  restockOnly=state.restockOnly; searchQ=state.searchQ; quickGroupFilter=state.quickGroupFilter;
+  currentBranch=state.branch;
+  const syncView=()=>{
+    const searchEl=document.getElementById("search"), clearBtn=document.getElementById("clear-btn");
+    if(searchEl) searchEl.value=searchQ;
+    if(clearBtn) clearBtn.style.display=searchQ ? "" : "none";
+    document.querySelectorAll(".tab-btn").forEach(btn=>btn.classList.toggle("active",btn.dataset.tab===currentTab));
+    syncHomeStockFilters(); syncRestockButton(restockOnly); syncStatusButtons(totalStockView ? currentStatus : "");
+    syncWarehouseBranchUI();
+  };
+  syncView();
+  render();
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    if(restoreReturnAnchor(state,{highlight:true})) return;
+    const idx=state.anchorCode
+      ? DATA.findIndex(r=>String(r[1]||"")===state.anchorCode && String(r[13]||"Q2")===state.anchorBranch)
+      : -1;
+    const row=idx>=0 ? DATA[idx] : null;
+    if(!row){
+      window.scrollTo({top:state.scrollY,left:0,behavior:"auto"});
+      return;
+    }
+    // Mở danh mục mới khi sản phẩm không còn thuộc bộ lọc cũ.
+    currentTab=String(row[0]||"ALL");
+    currentStatus="ALL";
+    totalStockView=false;
+    restockOnly=false;
+    searchQ="";
+    quickGroupFilter="";
+    currentBranch=String(row[13]||"Q2");
+    state.anchorTop=Math.max((document.querySelector(".sticky")?.getBoundingClientRect().bottom||0)+12,state.anchorTop||0);
+    syncView();
+    render();
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{
+      if(!restoreReturnAnchor(state,{highlight:true})) window.scrollTo({top:state.scrollY,left:0,behavior:"auto"});
+    }));
   }));
 }
 
@@ -17414,10 +17491,11 @@ async function openAddModal(){ if(!requireActionPermission("PRODUCT_ADD","thêm 
   document.getElementById("fGhi").value = ""; document.getElementById("fVitri").value = ""; document.getElementById("fImgFile").value = ""; [1,2,3,4].forEach(n=>{ document.getElementById(`fWarrantyImg${n}`).value=""; document.getElementById(`fWarrantyTitle${n}`).value=""; updateSupplementaryImagePreview(n); }); setImagePreview(""); updateLocationSuggestions(); updateGroupOptions(""); updateBrandSuggestions(); checkProductCodeDuplicate(); syncProductConditionButtons(); syncInkColorPickerVisibility(); updateAddFormLiveInfo();
   document.getElementById("editOverlay").classList.add("open");
 }
-async function openEditModal(idx){ if(!requireActionPermission("PRODUCT_EDIT","sửa sản phẩm")) return;
+async function openEditModal(idx,trigger){ if(!requireActionPermission("PRODUCT_EDIT","sửa sản phẩm")) return;
+  const returnState=captureEditReturnState(idx,trigger);
   if(SHEET_API_URL&&!SERVER_PRODUCT_LINKS_FINGERPRINT) try{await loadProductLinks();}catch(e){showToast("⚠️ Chưa tải được liên kết sản phẩm: "+String(e),5000);return;}
   const r = DATA[idx];
-  editModalReturnState = captureEditReturnState(idx);
+  editModalReturnState = returnState;
   const parts = splitNoteLocation(r[7]||"");
   const productCondition = getProductConditionFromTitle(r[2] || "");
   const editIndex=document.getElementById("editIdx");
@@ -17548,7 +17626,7 @@ if(idx===""){
     // Nếu Admin đổi mã hoặc chi nhánh, neo theo giá trị mới của chính sản phẩm vừa lưu.
     returnState.anchorCode=String(row[1]||"");
     returnState.anchorBranch=String(row[13]||"Q2");
-    restoreAfterAdd(returnState);
+    restoreAfterEdit(returnState);
   }else{
     currentBranch = row[13] || "Q2";
     document.querySelectorAll('.filter-btn[data-branch]').forEach(b=>b.classList.toggle('active', b.dataset.branch===currentBranch));
