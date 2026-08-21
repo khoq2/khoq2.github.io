@@ -9932,13 +9932,19 @@ async function validateRestoredEmployeeSession(){
   if(!employeeAccessToken) return false;
   try{
     const result=await fetchSheetJson(SHEET_API_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({action:"validate_employee_session",employeeAuth:employeeAccessToken})},16000);
-    if(!result.valid||!result.employee) throw new Error("Phiên nhân viên đã hết hạn");
+    if(!result.valid||!result.employee){ const error=new Error("Phiên nhân viên đã hết hạn"); error.sessionInvalid=true; throw error; }
     setEmployeeSession(employeeAccessToken,result.employee);
     if(hasPrivateProductDataAccess()) await loadData();
     return true;
-  }catch(_){
-    clearEmployeeSession(false,false);
-    return false;
+  }catch(error){
+    // Chỉ xóa phiên khi máy chủ đã phản hồi JSON và xác nhận token không hợp lệ.
+    // 404/timeout/mất mạng chỉ là lỗi tạm thời, không được biến thành đăng xuất.
+    if(error?.sessionInvalid || error?.serverRejected){
+      clearEmployeeSession(false,false);
+      return false;
+    }
+    setEmployeeSession(employeeAccessToken,employeeAccessProfile,false);
+    return true;
   }
 }
 function requireActionPermission(permission,label="thao tác này"){
@@ -10009,15 +10015,17 @@ function setupAdminEntry(){
 function setAdminMode(on){
   if(on){
     sessionStorage.setItem("kho_cntt_admin","1");
+    try{ localStorage.setItem("kho_cntt_admin","1"); }catch(_){}
     document.body.classList.add("admin-entry-visible");
     document.body.classList.add("admin-mode");
     updateAdminProfileButton(true);
     setTimeout(refreshPrivateOperationalData,0);
   } else {
-    const closingAdminToken=sessionStorage.getItem("kho_admin_session_token")||"";
+    const closingAdminToken=sessionStorage.getItem("kho_admin_session_token")||localStorage.getItem("kho_admin_session_token")||"";
     if(closingAdminToken) void revokeServerSession("logout_admin",{auth:closingAdminToken});
     sessionStorage.removeItem("kho_cntt_admin");
     sessionStorage.removeItem("kho_admin_session_token");
+    try{ localStorage.removeItem("kho_cntt_admin"); localStorage.removeItem("kho_admin_session_token"); }catch(_){}
     document.body.classList.remove("admin-mode");
     document.body.classList.remove("fab-menu-open");
     const fabMenu = document.getElementById("fabMenuItems");
@@ -10095,6 +10103,7 @@ async function submitAdminPass(){
     }, 30000);
     if(!result.token) throw new Error("Backend không cấp phiên Admin");
     sessionStorage.setItem("kho_admin_session_token", result.token);
+    try{ localStorage.setItem("kho_admin_session_token",result.token); localStorage.setItem("kho_cntt_admin","1"); }catch(_){}
     setAdminMode(true);
     completed=true;
     closeOverlay("adminOverlay");
@@ -10102,6 +10111,7 @@ async function submitAdminPass(){
   }catch(e){
     sessionStorage.removeItem("kho_admin_session_token");
     sessionStorage.removeItem("kho_cntt_admin");
+    try{ localStorage.removeItem("kho_admin_session_token"); localStorage.removeItem("kho_cntt_admin"); }catch(_){}
     if(errorBox) errorBox.textContent=String(e).includes("ADMIN_LOGIN_FAILED") ? "Mật khẩu quản trị không chính xác." : "Không thể xác thực. Vui lòng kiểm tra kết nối và thử lại.";
     input.select();
   }finally{
@@ -10116,20 +10126,30 @@ async function submitAdminPass(){
   }
 }
 async function checkAdminSession(){
-  const token=sessionStorage.getItem("kho_admin_session_token")||"";
-  if(sessionStorage.getItem("kho_cntt_admin")!=="1" || !token){
+  const token=sessionStorage.getItem("kho_admin_session_token")||localStorage.getItem("kho_admin_session_token")||"";
+  const remembered=sessionStorage.getItem("kho_cntt_admin")==="1"||localStorage.getItem("kho_cntt_admin")==="1";
+  if(!remembered || !token){
     sessionStorage.removeItem("kho_cntt_admin");
     sessionStorage.removeItem("kho_admin_session_token");
     return false;
   }
   try{
     const result=await fetchSheetJson(SHEET_API_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({action:"validate_admin_session",auth:token})},16000);
-    if(!result.valid) throw new Error("Phiên Admin đã hết hạn");
+    if(!result.valid){ const error=new Error("Phiên Admin đã hết hạn"); error.sessionInvalid=true; throw error; }
+    sessionStorage.setItem("kho_admin_session_token",token);
     setAdminMode(true);
     return true;
-  }catch(_){
+  }catch(error){
+    if(!error?.sessionInvalid && !error?.serverRejected){
+      // Giữ quyền giao diện khi chỉ không liên lạc được với Google. Mọi lệnh ghi
+      // vẫn phải qua backend nên không làm giảm bảo mật, còn biểu mẫu không bị mất.
+      sessionStorage.setItem("kho_admin_session_token",token);
+      setAdminMode(true);
+      return true;
+    }
     sessionStorage.removeItem("kho_cntt_admin");
     sessionStorage.removeItem("kho_admin_session_token");
+    try{ localStorage.removeItem("kho_cntt_admin"); localStorage.removeItem("kho_admin_session_token"); }catch(_){}
     document.body.classList.remove("admin-mode");
     updateAdminProfileButton(false);
     stripPrivateProductFieldsFromLocalData();
@@ -10139,7 +10159,7 @@ async function checkAdminSession(){
 
 // Dòng URL duy nhất
 const SHEET_API_URL = "https://script.google.com/macros/s/AKfycby6YH69F7sfO1ZoUJsDm4BeX6Luj2GrhUfYWWJWNvqjraAEhkBck16EphrPBBm1BT3YqA/exec";
-const REQUIRED_API_VERSION = "2026.08.11-admin-stable-08";
+const REQUIRED_API_VERSION = "2026.08.21-resilient-sync-01";
 // Apps Script có thể phải chờ khóa ghi khi nhiều thao tác diễn ra gần nhau.
 // 45 giây dài hơn thời gian chờ khóa phía máy chủ, tránh báo lỗi giả trong khi Sheet vẫn đang ghi.
 const SHEET_TIMEOUT_MS = 45000;
@@ -10364,7 +10384,7 @@ let headerServerSyncState = "unconfirmed";
 let headerPresenceTimer = null;
 function isRetryableSyncError(detail){
   const text = String(detail || "").toLocaleLowerCase("vi");
-  return /phản hồi quá lâu|failed to fetch|network|kết nối|http\s*(408|429|5\d\d)|load failed|timeout|timed out/.test(text);
+  return /phản hồi quá lâu|failed to fetch|network|kết nối|http\s*(404|408|429|5\d\d)|load failed|timeout|timed out|dữ liệu không hợp lệ/.test(text);
 }
 function clearSyncRetry(resetAttempts=false){
   clearTimeout(syncRetryTimer);
@@ -10639,7 +10659,10 @@ async function fetchSheetJson(url, options={}, timeoutMs=SHEET_TIMEOUT_MS){
   // Các action đọc dùng POST để kèm phiên đăng nhập nhưng không thay đổi dữ liệu.
   // Cho phép thử lại khi mạng chập chờn; mọi POST có ghi dữ liệu vẫn chỉ gửi đúng một lần.
   const safeReadPost=new Set(["private_products","private_customers","private_customer_records","private_partners","validate_admin_session","validate_employee_session","verify_admin","verify_private_access","verify_employee_access","get_error_logs"]).has(context.action);
-  const maxAttempts=context.method==="GET" ? 3 : safeReadPost ? 2 : 1;
+  // replace_all có fingerprint và có thể đối chiếu noop sau khi phản hồi bị mất,
+  // vì vậy retry 404/timeout an toàn hơn để người dùng không phải chờ chu kỳ hôm sau.
+  const safeIdempotentWritePost=new Set(["replace_all"]).has(context.action);
+  const maxAttempts=context.method==="GET" ? 3 : safeReadPost ? 2 : safeIdempotentWritePost ? 3 : 1;
   let lastError;
   for(let attempt=1;attempt<=maxAttempts;attempt++){
     const ctrl=new AbortController();
@@ -10671,7 +10694,7 @@ async function fetchSheetJson(url, options={}, timeoutMs=SHEET_TIMEOUT_MS){
       if(!error.requestContext) error.requestContext=context;
       lastError=error;
       if(attempt>=maxAttempts || !isSafeSheetGetRetry(error)) break;
-      await new Promise(resolve=>setTimeout(resolve,500*attempt+Math.floor(Math.random()*250)));
+      await new Promise(resolve=>setTimeout(resolve,(safeIdempotentWritePost?1200:500)*attempt+Math.floor(Math.random()*350)));
     }finally{
       clearTimeout(timer);
     }
@@ -10734,7 +10757,7 @@ async function postSheet(action, data, timeoutMs=SHEET_TIMEOUT_MS){
     headers:{"Content-Type":"text/plain;charset=utf-8"},
     body:JSON.stringify({action,data,auth:auth||"",employeeAuth:employeeSessionValidated?(employeeAccessToken||""):""})
   },timeoutMs);
-  const sessionToken = sessionStorage.getItem("kho_admin_session_token") || "";
+  const sessionToken = sessionStorage.getItem("kho_admin_session_token") || localStorage.getItem("kho_admin_session_token") || "";
   try{
     const result=await send(sessionToken);
     finishSyncActionFeedback(feedbackBtn,true);
@@ -10751,6 +10774,7 @@ async function postSheet(action, data, timeoutMs=SHEET_TIMEOUT_MS){
     if(!message.includes("AUTH_REQUIRED")){ finishSyncActionFeedback(feedbackBtn,false); throw e; }
     sessionStorage.removeItem("kho_admin_session_token");
     sessionStorage.removeItem("kho_cntt_admin");
+    try{ localStorage.removeItem("kho_admin_session_token"); localStorage.removeItem("kho_cntt_admin"); }catch(_){}
     if(isAdminMode()) setAdminMode(false);
     finishSyncActionFeedback(feedbackBtn,false);
     setTimeout(()=>{ revealAdminEntry(false); if(!document.getElementById("adminOverlay")?.classList.contains("open")) onAdminBtnClick(); },0);
