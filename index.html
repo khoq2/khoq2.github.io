@@ -2394,6 +2394,12 @@ html::-webkit-scrollbar-corner { background: #EAF2F8; }
 .customer-profile-name { font-size:16px; font-weight:950; }
 .customer-profile-phone { margin-top:3px; color:#F9D38B; font-size:14px; font-weight:900; }
 .customer-profile-note { margin-top:8px; padding-top:8px; border-top:1px solid rgba(255,255,255,.18); font-size:12px; line-height:1.45; white-space:pre-wrap; }
+.customer-contact-line{position:relative;z-index:1;display:flex;align-items:flex-start;gap:8px;margin-top:10px;padding:9px;border:1px solid rgba(255,255,255,.2);border-radius:10px;background:rgba(255,255,255,.1)}
+.customer-contact-line span{flex:1;min-width:0;font-size:11px;font-weight:750;line-height:1.45;white-space:pre-wrap;overflow-wrap:anywhere}
+.customer-contact-line button{flex:0 0 auto;min-height:32px;padding:6px 9px;border:1px solid rgba(255,255,255,.35);border-radius:8px;background:rgba(255,255,255,.14);color:#fff;font-size:10px;font-weight:900;cursor:pointer}
+.customer-visit-stats{position:relative;z-index:1;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-top:10px}
+.customer-visit-stat{padding:8px 5px;border:1px solid rgba(255,255,255,.16);border-radius:9px;background:rgba(4,28,53,.2);text-align:center}
+.customer-visit-stat b{display:block;color:#fff;font-size:12px}.customer-visit-stat small{display:block;margin-top:3px;color:#bdefff;font-size:8px;font-weight:800}
 .customer-profile-machine { position:relative; z-index:1; display:flex; flex-wrap:wrap; gap:6px; margin-top:10px; padding-top:10px; border-top:1px solid rgba(255,255,255,.18); }
 .customer-profile-machine-title { flex:0 0 100%; color:#BDEFFF; font-size:10px; font-weight:950; letter-spacing:.06em; }
 .customer-profile-machine-spec { padding:5px 8px; border:1px solid rgba(255,255,255,.15); border-radius:999px; background:rgba(255,255,255,.11); color:#fff; font-size:10px; font-weight:800; }
@@ -9165,6 +9171,9 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
       <div class="customer-editor-grid">
         <label>Số điện thoại *<input id="customerEditPhone" type="tel" inputmode="tel" autocomplete="off" placeholder="VD: 0901234567"><small id="customerPhoneSafetyHint" hidden>Số điện thoại là mã liên kết hồ sơ nên được khóa để tránh thất lạc lịch sử.</small></label>
         <label>Tên khách hàng<input id="customerEditName" type="text" autocomplete="off" placeholder="Tên khách"></label>
+        <label class="wide">Địa chỉ nhà<textarea id="customerEditAddress" placeholder="Số nhà, đường, phường/xã, quận/huyện..."></textarea></label>
+        <label class="wide">Link định vị GPS / Google Maps<input id="customerEditMap" type="url" inputmode="url" autocomplete="off" placeholder="https://maps.google.com/..."></label>
+        <label class="wide">Dòng ghi chú gửi nhân viên<textarea id="customerEditDispatchNote" placeholder="Để trống để hệ thống tự ghép: Tên · SĐT · Địa chỉ · GPS"></textarea><small>Một dòng sẵn để sao chép và gửi cho nhân viên.</small></label>
         <label class="wide">Ghi chú chung<textarea id="customerEditNote" placeholder="Khách quen, loại thiết bị thường sửa..."></textarea></label>
       </div>
       <div class="customer-editor-subheading"><b>THÔNG TIN MÁY ĐANG SỬ DỤNG</b><small>Tùy chọn · có thể bổ sung cho hồ sơ cũ</small></div>
@@ -9943,7 +9952,9 @@ async function validateRestoredEmployeeSession(){
       clearEmployeeSession(false,false);
       return false;
     }
-    setEmployeeSession(employeeAccessToken,employeeAccessProfile,false);
+    // Token ký vẫn có thể hợp lệ; chỉ lần kiểm tra mạng bị thất bại. Giữ phiên để
+    // backend tự xác thực ở thao tác kế tiếp, không khóa nhầm quyền người dùng.
+    setEmployeeSession(employeeAccessToken,employeeAccessProfile,true);
     return true;
   }
 }
@@ -10159,7 +10170,7 @@ async function checkAdminSession(){
 
 // Dòng URL duy nhất
 const SHEET_API_URL = "https://script.google.com/macros/s/AKfycby6YH69F7sfO1ZoUJsDm4BeX6Luj2GrhUfYWWJWNvqjraAEhkBck16EphrPBBm1BT3YqA/exec";
-const REQUIRED_API_VERSION = "2026.08.21-resilient-sync-01";
+const REQUIRED_API_VERSION = "2026.08.21-resilient-sync-03";
 // Apps Script có thể phải chờ khóa ghi khi nhiều thao tác diễn ra gần nhau.
 // 45 giây dài hơn thời gian chờ khóa phía máy chủ, tránh báo lỗi giả trong khi Sheet vẫn đang ghi.
 const SHEET_TIMEOUT_MS = 45000;
@@ -10614,6 +10625,8 @@ async function replaceAllInventoryRows(snapshot){
   try{
     const result = await postSheet("replace_all", {rows:snapshot,baseFingerprint:SERVER_DATA_FINGERPRINT});
     if(result.fingerprint) SERVER_DATA_FINGERPRINT = result.fingerprint;
+    if(Array.isArray(result.links)) PRODUCT_LINKS=result.links;
+    if(result.productLinksFingerprint) SERVER_PRODUCT_LINKS_FINGERPRINT=String(result.productLinksFingerprint);
     return result;
   }catch(e){
     if(!String(e).includes("SYNC_CONFLICT")) throw e;
@@ -10661,7 +10674,7 @@ async function fetchSheetJson(url, options={}, timeoutMs=SHEET_TIMEOUT_MS){
   const safeReadPost=new Set(["private_products","private_customers","private_customer_records","private_partners","validate_admin_session","validate_employee_session","verify_admin","verify_private_access","verify_employee_access","get_error_logs"]).has(context.action);
   // replace_all có fingerprint và có thể đối chiếu noop sau khi phản hồi bị mất,
   // vì vậy retry 404/timeout an toàn hơn để người dùng không phải chờ chu kỳ hôm sau.
-  const safeIdempotentWritePost=new Set(["replace_all"]).has(context.action);
+  const safeIdempotentWritePost=new Set(["replace_all","upsert_customer","upsert_customer_record","upsert_partner"]).has(context.action);
   const maxAttempts=context.method==="GET" ? 3 : safeReadPost ? 2 : safeIdempotentWritePost ? 3 : 1;
   let lastError;
   for(let attempt=1;attempt<=maxAttempts;attempt++){
@@ -14913,28 +14926,26 @@ async function deleteSelectedItems(){
   const indexes = [...selectedItems].filter(i=>i>=0 && i<DATA.length).sort((a,b)=>b-a);
   if(!indexes.length){ showToast("Chưa chọn sản phẩm nào"); return; }
   if(!confirm(`Xóa ${indexes.length} sản phẩm đã chọn?`)) return;
-  const backupData = JSON.parse(JSON.stringify(DATA));
-  const hadPendingBefore = hasPendingSync();
-  indexes.forEach(i=>DATA.splice(i,1));
-  selectedItems.clear();
-  buildQtyByIndex.clear();
-  buildPriceByIndex.clear();
-  buildTitleByIndex.clear();
-  buildWarrantyByIndex.clear();
-  buildCodeByIndex.clear();
-  buildUnitByIndex.clear();
-  bulkSelectMode = false;
-  const synced = await saveData();
-  if(!synced){
-    DATA = backupData;
+  const items=indexes.map(index=>({code:DATA[index][1],branch:DATA[index][13]||"Q2"}));
+  try{
+    const result=await postSheet("delete_products",{items,baseFingerprint:SERVER_DATA_FINGERPRINT},60000);
+    if(result.fingerprint) SERVER_DATA_FINGERPRINT=String(result.fingerprint);
+    if(Array.isArray(result.links)) PRODUCT_LINKS=result.links;
+    if(result.productLinksFingerprint) SERVER_PRODUCT_LINKS_FINGERPRINT=String(result.productLinksFingerprint);
+    const removedKeys=new Set(items.map(item=>`${item.branch}|${normalizeProductCode(item.code)}`));
+    DATA=DATA.filter(row=>!removedKeys.has(`${row[13]||"Q2"}|${normalizeProductCode(row[1])}`));
     safeLocalStorageSet("kho_cntt_data",JSON.stringify(normalizeSheetRows(DATA)));
-    setPendingSync(hadPendingBefore,hadPendingBefore?"Vẫn còn thay đổi trước đó đang chờ đồng bộ":"");
+    selectedItems.clear();
+    buildQtyByIndex.clear(); buildPriceByIndex.clear(); buildTitleByIndex.clear();
+    buildWarrantyByIndex.clear(); buildCodeByIndex.clear(); buildUnitByIndex.clear();
+    bulkSelectMode=false;
+    setPendingSync(false); setSyncBadge("synced"); markLastSync();
     render();
-    showToast("⚠️ Máy chủ chưa xác nhận xóa. Danh sách đã được hoàn tác để tránh sai lệch.",6000);
-    return;
+    showToast(`Đã xóa ${Number(result.deleted)||items.length} sản phẩm`);
+  }catch(error){
+    setSyncBadge("error",String(error));
+    showToast("⚠️ Máy chủ chưa xác nhận xóa; danh sách trên máy vẫn được giữ nguyên: "+String(error),6500);
   }
-  render();
-  showToast(`Đã xóa ${indexes.length} sản phẩm`);
 }
 
 async function deleteAllItems(){
@@ -14983,7 +14994,8 @@ async function changeTon(idx, delta){
   const newTon = Math.max(0, r[5] + delta);
   const actualDelta = newTon - r[5];
   if(!actualDelta) return;
-  const tx = { id: Date.now(), ma:r[1], ten:r[2], sh:r[0], nv:"Điều chỉnh kho", qty:-actualDelta, gia:0, ghi:`[ĐIỀU CHỈNH] ${reason.trim() || "Không ghi lý do"}`, img:"", time:formatTxTime(new Date()), branch:r[13]||"Q2" };
+  const adjustmentActor=employeeSessionValidated&&employeeAccessProfile?.name ? employeeAccessProfile.name : "Điều chỉnh kho";
+  const tx = { id: Date.now(), ma:r[1], ten:r[2], sh:r[0], nv:adjustmentActor, qty:-actualDelta, gia:0, ghi:`[ĐIỀU CHỈNH] ${reason.trim() || "Không ghi lý do"}`, img:"", time:formatTxTime(new Date()), branch:r[13]||"Q2" };
   try{
     const result = await commitInventoryTransaction("ADJUST",r,tx,{delta:actualDelta});
     DATA[idx][5] = Number(result.stock);
@@ -18298,7 +18310,7 @@ function isPrivateAuthFailure(error){
   return error?.code==="PRIVATE_AUTH_REQUIRED" || /(?:PRIVATE_|EMPLOYEE_)?AUTH_REQUIRED/.test(privateErrorText(error));
 }
 async function privateSheet(action,data={},timeoutMs=SHEET_TIMEOUT_MS){
-  const adminToken=sessionStorage.getItem("kho_admin_session_token") || "";
+  const adminToken=sessionStorage.getItem("kho_admin_session_token") || localStorage.getItem("kho_admin_session_token") || "";
   const areaToken=getEmployeePrivateAreaToken(privateAccessTarget);
   // Dữ liệu sản phẩm riêng phục vụ trực tiếp màn hình quản trị. Nếu Admin đang
   // mở hợp lệ thì phải dùng phiên Admin, kể cả tab vẫn còn một phiên nhân viên.
@@ -18313,7 +18325,14 @@ async function privateSheet(action,data={},timeoutMs=SHEET_TIMEOUT_MS){
   }catch(e){
     const rawMessage=privateErrorText(e);
     if(rawMessage.includes("EMPLOYEE_PERMISSION_REQUIRED")) throw e;
-    if(rawMessage.includes("EMPLOYEE_AUTH_REQUIRED")||rawMessage.includes("EMPLOYEE_SCOPE_REQUIRED")){
+    if(rawMessage.includes("EMPLOYEE_SCOPE_REQUIRED")){
+      clearEmployeePrivateAreaSessions(privateAccessTarget);
+      const scopeError=new Error("Phiên đăng nhập chưa đúng khu vực. Vui lòng đăng nhập riêng vào mục này.");
+      scopeError.code="PRIVATE_AUTH_REQUIRED";
+      setTimeout(()=>requestPrivateAccess(privateAccessTarget),0);
+      throw scopeError;
+    }
+    if(rawMessage.includes("EMPLOYEE_AUTH_REQUIRED")){
       clearEmployeeSession(false);
       const expiredError=new Error("Phiên nhân viên đã hết hạn. Vui lòng đăng nhập lại để tiếp tục.");
       expiredError.code="PRIVATE_AUTH_REQUIRED";
@@ -18326,6 +18345,7 @@ async function privateSheet(action,data={},timeoutMs=SHEET_TIMEOUT_MS){
       if(adminExpired){
         sessionStorage.removeItem("kho_admin_session_token");
         sessionStorage.removeItem("kho_cntt_admin");
+        try{ localStorage.removeItem("kho_admin_session_token"); localStorage.removeItem("kho_cntt_admin"); }catch(_){}
         if(isAdminMode()) setAdminMode(false);
       }
       clearPrivateSession();
@@ -18372,7 +18392,8 @@ function normalizeCustomerList(list){
     cpu:String(item?.cpu || ""), ram:String(item?.ram || ""), storage:String(item?.storage || ""),
     serialTag:String(item?.serialTag || ""), psu:String(item?.psu || ""), mainboard:String(item?.mainboard || ""),
     ssd:String(item?.ssd || ""), hdd:String(item?.hdd || ""), vga:String(item?.vga || ""),
-    accessories:String(item?.accessories || ""),
+    accessories:String(item?.accessories || ""),address:String(item?.address || ""),mapUrl:String(item?.mapUrl || ""),
+    dispatchNote:String(item?.dispatchNote || ""),
     createdAt:String(item?.createdAt || ""), updatedAt:String(item?.updatedAt || "")
   })).filter(item=>item.phone && !seen.has(item.phone) && seen.add(item.phone));
 }
@@ -18422,7 +18443,7 @@ function setupCustomerMachineFieldMirror(){
 setupCustomerMachineFieldMirror();
 function customerMatchesProfilePayload(customer,payload){
   if(!customer) return false;
-  const fields=["device","model","cpu","ram","storage","serialTag","psu","mainboard","ssd","hdd","vga","accessories"];
+  const fields=["device","model","cpu","ram","storage","serialTag","psu","mainboard","ssd","hdd","vga","accessories","address","mapUrl","dispatchNote"];
   return customer.name===cleanQuickLabel(payload.name||"")
     && customer.note===String(payload.note||"")
     && fields.every(key=>!Object.prototype.hasOwnProperty.call(payload,key) || customer[key]===String(payload[key]||""));
@@ -18589,7 +18610,6 @@ async function openCustomerDetail(phone){
   setCustomerBackVisible(true);
   document.getElementById("customerResults").innerHTML="";
   renderCustomerDetail(false);
-  if(!isAdminMode()) return;
   customerRecordsLoading=true;
   renderCustomerDetail(true);
   try{
@@ -18603,7 +18623,7 @@ async function openCustomerDetail(phone){
   renderCustomerDetail(false);
 }
 function canViewCustomerHistory(){
-  return isAdminMode() && !!sessionStorage.getItem("kho_admin_session_token");
+  return isAdminMode() && !!(sessionStorage.getItem("kho_admin_session_token")||localStorage.getItem("kho_admin_session_token"));
 }
 function requestCustomerHistory(){
   if(!canViewCustomerHistory()){
@@ -18651,9 +18671,37 @@ function formatCustomerRecordTime(value){
   const hour12=String(hour24%12 || 12).padStart(2,"0");
   return `${day}/${month}/${year} ${hour12}:${minute}${period}`;
 }
+function customerRecordDate(value){
+  const text=String(value||"").trim(),match=text.match(/^(\d{4})-(\d{2})-(\d{2})(?:[ T](\d{2}):(\d{2}))?/);
+  if(match){const date=new Date(Number(match[1]),Number(match[2])-1,Number(match[3]),Number(match[4]||0),Number(match[5]||0));return Number.isNaN(date.getTime())?null:date;}
+  const date=new Date(text);return Number.isNaN(date.getTime())?null:date;
+}
+function customerVisitStats(records=CUSTOMER_RECORDS){
+  const visits=(Array.isArray(records)?records:[]).filter(record=>record?.status!=="CANCELLED").map(record=>customerRecordDate(record.time)).filter(Boolean).sort((a,b)=>a-b);
+  if(!visits.length) return {first:"Chưa có",latest:"Chưa quay lại",yearCount:0,total:0};
+  const monthLabel=date=>`T${date.getMonth()+1}/${date.getFullYear()}`;
+  const cutoff=new Date();cutoff.setFullYear(cutoff.getFullYear()-1);
+  return {first:monthLabel(visits[0]),latest:visits.length>1?monthLabel(visits[visits.length-1]):"Chưa quay lại",yearCount:visits.filter(date=>date>=cutoff).length,total:visits.length};
+}
+function customerDispatchLine(customer=selectedCustomer){
+  if(!customer) return "";
+  const custom=String(customer.dispatchNote||"").trim();
+  if(custom) return custom;
+  return [customer.name||"Khách hàng",formatCustomerPhone(customer.phone),customer.address,customer.mapUrl].map(value=>String(value||"").trim()).filter(Boolean).join(" | ");
+}
+async function copyCustomerDispatchNote(){
+  const text=customerDispatchLine();
+  if(!text){showToast("Chưa có thông tin để sao chép");return;}
+  try{
+    if(navigator.clipboard?.writeText) await navigator.clipboard.writeText(text);
+    else{const box=document.createElement("textarea");box.value=text;box.style.position="fixed";box.style.opacity="0";document.body.appendChild(box);box.select();document.execCommand("copy");box.remove();}
+    showToast("✅ Đã sao chép thông tin gửi nhân viên");
+  }catch(_){showToast("⚠️ Không sao chép tự động được",4000);}
+}
 function renderCustomerDetail(loading=false){
   if(!selectedCustomer) return;
   const c=selectedCustomer;
+  const safeCustomerMapUrl=safePartnerMapUrl(c.mapUrl);
   const savedSsd=c.ssd || c.storage;
   const machineSpecs=[
     c.model?`MODEL: ${c.model}`:"", c.serialTag?`SERIAL / SERVICE TAG: ${c.serialTag}`:"",
@@ -18663,6 +18711,9 @@ function renderCustomerDetail(loading=false){
     c.accessories?`PHỤ KIỆN KÈM: ${c.accessories}`:""
   ].filter(Boolean);
   const machineHtml=machineSpecs.length?`<div class="customer-profile-machine"><div class="customer-profile-machine-title">MÁY ĐANG SỬ DỤNG</div>${machineSpecs.map(spec=>`<span class="customer-profile-machine-spec">${escapeHtml(spec)}</span>`).join("")}</div>`:"";
+  const dispatchLine=customerDispatchLine(c),visitStats=customerVisitStats();
+  const contactHtml=dispatchLine?`<div class="customer-contact-line"><span>${escapeHtml(dispatchLine)}</span><button type="button" onclick="copyCustomerDispatchNote()">📋 Sao chép</button></div>`:"";
+  const visitStatsHtml=(loading||customerRecordsLoading)?'<div class="customer-visit-stats"><div class="customer-visit-stat"><b>…</b><small>Đang tải lịch sử</small></div></div>':`<div class="customer-visit-stats"><div class="customer-visit-stat"><b>${escapeHtml(visitStats.first)}</b><small>SỬA TỪ THÁNG</small></div><div class="customer-visit-stat"><b>${escapeHtml(visitStats.latest)}</b><small>QUAY LẠI GẦN NHẤT</small></div><div class="customer-visit-stat"><b>${visitStats.yearCount} lần</b><small>TRONG 12 THÁNG</small></div></div>`;
   const recordsHtml = (loading||customerRecordsLoading) ? '<div class="customer-empty">⏳ Đang tải lịch sử sửa chữa...</div>' : (customerHistoryLoadError ? `<div class="customer-empty">⚠️ Không tải được lịch sử: ${escapeHtml(customerHistoryLoadError)}</div>` : (CUSTOMER_RECORDS.length ? CUSTOMER_RECORDS.map(record=>{
     const images=splitCustomerImages(record.images);
     const savedRecordSsd=record.ssd || "";
@@ -18672,7 +18723,7 @@ function renderCustomerDetail(loading=false){
   const editActions=canPrivateEdit("CUSTOMER_EDIT")?`<button type="button" class="customer-secondary" onclick="openCustomerEditor('${c.phone}')">✏️ Sửa thông tin khách</button><button type="button" class="customer-primary" onclick="openCustomerRecordEditor()">＋ Tạo phiếu sửa chữa</button><button type="button" class="btn-delete admin-only" onclick="deleteSelectedCustomer()">🗑️ Xóa khách</button>`:"";
   const historyLabel=customerHistoryVisible&&canViewCustomerHistory()?"Ẩn lịch sử":"Xem lịch sử";
   const historySection=customerHistoryVisible&&canViewCustomerHistory()?`<div class="customer-records">${recordsHtml}</div>`:"";
-  document.getElementById("customerDetail").innerHTML=`<div class="customer-profile"><div class="customer-profile-name">${escapeHtml(c.name || "KHÁCH CHƯA GHI TÊN")}</div><div class="customer-profile-phone">☎ ${escapeHtml(formatCustomerPhone(c.phone))}</div>${c.note?`<div class="customer-profile-note">${escapeHtml(c.note)}</div>`:""}${machineHtml}</div><div class="customer-toolbar">${editActions}<button type="button" class="customer-history-link" aria-expanded="${customerHistoryVisible&&canViewCustomerHistory()}" onclick="requestCustomerHistory()">🕘 ${historyLabel}</button></div>${historySection}`;
+  document.getElementById("customerDetail").innerHTML=`<div class="customer-profile"><div class="customer-profile-name">${escapeHtml(c.name || "KHÁCH CHƯA GHI TÊN")}</div><div class="customer-profile-phone">☎ ${escapeHtml(formatCustomerPhone(c.phone))}</div>${c.address?`<div class="customer-profile-note">📍 ${escapeHtml(c.address)}${safeCustomerMapUrl?`<br><a href="${escapeHtml(safeCustomerMapUrl)}" target="_blank" rel="noopener" style="color:#bdefff">Mở định vị GPS</a>`:""}</div>`:""}${c.note?`<div class="customer-profile-note">${escapeHtml(c.note)}</div>`:""}${contactHtml}${visitStatsHtml}${machineHtml}</div><div class="customer-toolbar">${editActions}<button type="button" class="customer-history-link" aria-expanded="${customerHistoryVisible&&canViewCustomerHistory()}" onclick="requestCustomerHistory()">🕘 ${historyLabel}</button></div>${historySection}`;
 }
 function openCustomerBillImage(img){
   const record=img?.closest?.(".customer-record");
@@ -18720,6 +18771,9 @@ function openCustomerEditor(phone=""){
   const phoneHint=document.getElementById("customerPhoneSafetyHint");
   if(phoneHint) phoneHint.hidden=!customer;
   document.getElementById("customerEditName").value=customer?.name || "";
+  document.getElementById("customerEditAddress").value=customer?.address || "";
+  document.getElementById("customerEditMap").value=customer?.mapUrl || "";
+  document.getElementById("customerEditDispatchNote").value=customer?.dispatchNote || "";
   document.getElementById("customerEditNote").value=customer?.note || "";
   document.getElementById("customerEditModel").value=customer?.model || "";
   document.getElementById("customerEditSerialTag").value=customer?.serialTag || "";
@@ -18735,7 +18789,7 @@ function openCustomerEditor(phone=""){
   document.getElementById("customerEditor").classList.add("open");
   if(!customer){
     customerCreatingCombined=true;
-    selectedCustomer={id:"",phone:normalizeCustomerPhone(document.getElementById("customerEditPhone").value),name:"",note:"",model:"",serialTag:"",psu:"",mainboard:"",cpu:"",ram:"",ssd:"",hdd:"",vga:"",accessories:""};
+    selectedCustomer={id:"",phone:normalizeCustomerPhone(document.getElementById("customerEditPhone").value),name:"",note:"",address:"",mapUrl:"",dispatchNote:"",model:"",serialTag:"",psu:"",mainboard:"",cpu:"",ram:"",ssd:"",hdd:"",vga:"",accessories:""};
     document.getElementById("customerOverlay").classList.add("combined-new");
     fillCustomerRecordEditor();
     document.getElementById("customerRecordEditor").classList.add("open");
@@ -18755,7 +18809,9 @@ async function saveCustomerProfile(){
   try{
     const idField=document.getElementById("customerEditId");
     if(!idField.value) idField.value=makeCustomerRequestId("KH");
-    const json=await upsertCustomerSafely({id:idField.value,phone,name:document.getElementById("customerEditName").value.trim(),note:document.getElementById("customerEditNote").value.trim(),...customerMachineEditorPayload()});
+    const mapRaw=document.getElementById("customerEditMap").value.trim(),mapUrl=mapRaw?safePartnerMapUrl(mapRaw):"";
+    if(mapRaw&&!mapUrl) throw new Error("Link GPS phải bắt đầu bằng http:// hoặc https://");
+    const json=await upsertCustomerSafely({id:idField.value,phone,name:document.getElementById("customerEditName").value.trim(),address:document.getElementById("customerEditAddress").value.trim(),mapUrl,dispatchNote:document.getElementById("customerEditDispatchNote").value.trim(),note:document.getElementById("customerEditNote").value.trim(),...customerMachineEditorPayload()});
     cacheSavedCustomer(json.customer);
     closeCustomerEditors();
     document.getElementById("customerSearch").value=json.customer.phone;
@@ -18826,7 +18882,9 @@ async function saveCustomerRecord(){
     if(customerCreatingCombined){
       const customerIdField=document.getElementById("customerEditId");
       if(!customerIdField.value) customerIdField.value=makeCustomerRequestId("KH");
-      const profile=await upsertCustomerSafely({id:customerIdField.value,phone:recordPhone,name:recordCustomerName,note:document.getElementById("customerEditNote").value.trim(),...customerMachineEditorPayload()});
+      const mapRaw=document.getElementById("customerEditMap").value.trim(),mapUrl=mapRaw?safePartnerMapUrl(mapRaw):"";
+      if(mapRaw&&!mapUrl) throw new Error("Link GPS phải bắt đầu bằng http:// hoặc https://");
+      const profile=await upsertCustomerSafely({id:customerIdField.value,phone:recordPhone,name:recordCustomerName,address:document.getElementById("customerEditAddress").value.trim(),mapUrl,dispatchNote:document.getElementById("customerEditDispatchNote").value.trim(),note:document.getElementById("customerEditNote").value.trim(),...customerMachineEditorPayload()});
       recordPhone=profile.customer.phone;
       recordCustomerName=profile.customer.name || recordCustomerName;
       selectedCustomer=cacheSavedCustomer(profile.customer) || profile.customer;
@@ -18894,6 +18952,7 @@ function partnerMatchesPayload(partner,payload){
 async function upsertPartnerSafely(payload){
   const data={...payload};
   if(!data.id) data.id=makeCustomerRequestId("DT");
+  await ensureAtomicApi();
   try{
     return await privateSheet("upsert_partner",data,70000);
   }catch(originalError){
