@@ -18,7 +18,7 @@
 <link rel="preconnect" href="https://script.google.com" crossorigin />
 <link rel="preconnect" href="https://lh3.googleusercontent.com" crossorigin />
 <link rel="dns-prefetch" href="https://drive.google.com" />
-<title>🏪 KHO Q2 (HOÀNG GIA COMPUTER) [v13]</title>
+<title>🏪 KHO Q2 (HOÀNG GIA COMPUTER) [v15]</title>
 <script defer crossorigin="anonymous" integrity="sha384-vtjasyidUo0kW94K5MXDXntzOJpQgBKXmE7e2Ga4LG0skTTLeBi97eFAXsqewJjw" src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script defer crossorigin="anonymous" integrity="sha384-vseuUuO/VRMn00lXYd5m/Pk4l/7RjMqhXGf6G0RALy+On0txYb39dQsUQDAd7q5L" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.10/pdfmake.min.js"></script>
 <script defer crossorigin="anonymous" integrity="sha384-1y8s2U/Jjn4/oeCEBcfYH3M6XeQtcg4LRmluN92FS69UgtLzoyhn3swew8Ynj8Ai" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.10/vfs_fonts.js"></script>
@@ -189,7 +189,9 @@ button:disabled,input:disabled,select:disabled,[aria-disabled="true"] { cursor:n
   .kpi-export-btn svg { width:14px; height:14px; }
 }
 .kpi-hint { font-size: 7px; opacity: .7; vertical-align: middle; }
-.kpi { flex: 1; border-radius: 8px; padding: 5px 6px; text-align: center; }
+.kpi { flex:1; min-width:0; margin:0; border:0; border-radius:8px; padding:5px 6px; color:inherit; font:inherit; text-align:center; cursor:pointer; appearance:none; box-shadow:inset 0 1px 0 rgba(255,255,255,.18); transition:transform .14s ease,filter .14s ease,box-shadow .14s ease; }
+.kpi:hover,.kpi:focus-visible { filter:brightness(1.08); transform:translateY(-1px); box-shadow:inset 0 1px 0 rgba(255,255,255,.25),0 4px 10px rgba(11,38,61,.2); outline:none; }
+.kpi:focus-visible { outline:3px solid rgba(255,255,255,.8); outline-offset:2px; }
 .kpi:active { opacity: .8; }
 .kpi-detail-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 4px; border-bottom: 1px solid #f0f0f0; font-size: 13px; }
 .kpi-detail-row:last-child { border-bottom: none; }
@@ -245,6 +247,18 @@ button:disabled,input:disabled,select:disabled,[aria-disabled="true"] { cursor:n
 .kpi-summary-value { display:block; margin-top:3px; color:#172B45; font-size:18px; font-weight:950; line-height:1.1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .kpi-summary-note { display:block; margin-top:4px; color:#7B8C9D; font-size:9px; line-height:1.3; }
 .kpi-sortbar { display:flex; align-items:center; justify-content:flex-end; gap:10px; padding:9px 10px; border:1px solid #DCE6EF; border-radius:12px; background:rgba(255,255,255,.88); }
+.kpi-actionbar { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px; padding:10px; border:1px solid #D8E5EF; border-radius:12px; background:linear-gradient(135deg,#EEF6FC,#fff); }
+.kpi-action-copy { min-width:180px; flex:1; display:grid; gap:2px; }
+.kpi-action-copy strong { color:#1E3A5F; font-size:11px; font-weight:950; }
+.kpi-action-copy span { color:#6E8192; font-size:9px; line-height:1.3; }
+.kpi-action-buttons { display:flex; flex-wrap:wrap; gap:6px; }
+.kpi-action-btn { min-height:34px; padding:7px 11px; border:1px solid color-mix(in srgb,var(--kpi-accent,#2E86C1) 32%,#D5E2EC); border-radius:9px; background:#fff; color:var(--kpi-accent,#1E3A5F); font-size:9px; font-weight:950; cursor:pointer; }
+.kpi-action-btn.primary { border-color:var(--kpi-accent,#2E86C1); background:var(--kpi-accent,#2E86C1); color:var(--kpi-accent-text,#fff); }
+.kpi-action-btn:hover,.kpi-action-btn:focus-visible { filter:brightness(1.05); transform:translateY(-1px); outline:none; }
+.kpi-searchbar { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:8px; align-items:center; padding:8px 10px; border:1px solid #DCE6EF; border-radius:12px; background:#fff; }
+.kpi-search-input { width:100%; min-width:0; height:34px; margin:0; padding:6px 10px; border:1px solid #BFD0DE; border-radius:9px; background:#F8FBFD; color:#193A59; font-size:10px; font-weight:750; }
+.kpi-search-input:focus { border-color:var(--kpi-accent,#2E86C1); outline:3px solid color-mix(in srgb,var(--kpi-accent,#2E86C1) 16%,transparent); }
+.kpi-search-count { min-width:74px; color:#607587; font-size:9px; font-weight:900; text-align:right; white-space:nowrap; }
 .kpi-sort-copy { min-width:0; display:grid; gap:2px; }
 .kpi-sort-title { color:#1E3A5F; font-size:11px; font-weight:950; }
 .kpi-sort-note { color:#7A8B9B; font-size:9px; line-height:1.25; }
@@ -300,6 +314,9 @@ button:disabled,input:disabled,select:disabled,[aria-disabled="true"] { cursor:n
   .kpi-summary-icon { width:24px; height:24px; margin-bottom:5px; border-radius:8px; }
   .kpi-summary-value { font-size:16px; }
   .kpi-sortbar { align-items:center; justify-content:flex-end; flex-direction:row; gap:7px; padding:8px; }
+  .kpi-actionbar { align-items:stretch; flex-direction:column; }
+  .kpi-action-buttons { display:grid; grid-template-columns:1fr 1fr; }
+  .kpi-action-btn { width:100%; }
   .kpi-sort-select { width:auto; max-width:100%; min-width:156px; height:36px; }
   .kpi-filter-head { align-items:flex-start; }
   .kpi-priority-head { align-items:flex-start; }
@@ -8529,13 +8546,13 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     </div>
     <div class="title"><span class="title-logo-slot"><img class="title-icon title-brand-logo" id="headerBrandLogo" src="" alt="Logo cửa hàng" hidden onerror="this.hidden=true;document.getElementById('headerBrandFallback').hidden=false"><span class="title-icon title-brand-fallback" id="headerBrandFallback" aria-hidden="true">🏪</span></span><span class="title-text"><span class="title-base">HOÀNG GIA COMPUTER</span><span class="title-shine" aria-hidden="true"></span></span><div class="recent-activity-wrap" id="recentActivityWrap"><button type="button" class="recent-activity-bell" id="recentActivityBell" aria-label="Mở thông báo giao dịch mới" aria-expanded="false" onclick="toggleRecentActivity(event)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"></path><path d="M10 21h4"></path></svg><span class="recent-activity-count" id="recentActivityCount"></span><span class="header-control-tooltip" aria-hidden="true"><span class="header-tooltip-title">GIAO DỊCH GẦN ĐÂY</span><span class="header-tooltip-status" id="recentActivityTooltipStatus">Không có giao dịch mới</span></span></button><div class="recent-activity-panel" id="recentActivityPanel"><div class="recent-activity-head"><span class="recent-activity-title">GIAO DỊCH GẦN ĐÂY</span><span class="recent-activity-head-actions"><button type="button" class="recent-activity-all" id="recentActivityAll" onclick="toggleAllRecentActivity(event)">Xem tất cả</button><button type="button" class="recent-activity-close" aria-label="Đóng giao dịch gần đây" onclick="closeRecentActivity();event.stopPropagation()">×</button></span></div><div class="recent-activity-overview" id="recentActivityOverview" aria-label="Tóm tắt hoạt động hôm nay"></div><div class="recent-activity-filters" id="recentActivityFilters" role="group" aria-label="Lọc giao dịch"><button type="button" class="recent-activity-filter active" data-recent-filter="ALL" aria-pressed="true" onclick="setRecentActivityFilter('ALL',event)">Tất cả <span>0</span></button><button type="button" class="recent-activity-filter" data-recent-filter="IMPORT" aria-pressed="false" onclick="setRecentActivityFilter('IMPORT',event)">Nhập <span>0</span></button><button type="button" class="recent-activity-filter" data-recent-filter="SALE" aria-pressed="false" onclick="setRecentActivityFilter('SALE',event)">Xuất <span>0</span></button><button type="button" class="recent-activity-filter" data-recent-filter="TRANSFER" aria-pressed="false" onclick="setRecentActivityFilter('TRANSFER',event)">Chuyển <span>0</span></button><button type="button" class="recent-activity-filter" data-recent-filter="ADJUST" aria-pressed="false" onclick="setRecentActivityFilter('ADJUST',event)">Điều chỉnh <span>0</span></button></div><div class="recent-activity-list" id="recentActivityList"></div></div></div><span class="warehouse-switcher" role="group" aria-label="Chọn kho đang xem"><button type="button" class="warehouse-switch" data-warehouse="Q2" aria-label="KHO Q2" onclick="selectWarehouseBranch('Q2')"><span class="warehouse-pin">📍</span> Q2<span class="header-control-tooltip" aria-hidden="true"><span class="header-tooltip-title">KHO Q2</span></span></button><button type="button" class="warehouse-switch" data-warehouse="Q5" aria-label="KHO Q5" onclick="selectWarehouseBranch('Q5')"><span class="warehouse-pin">📍</span> Q5<span class="header-control-tooltip" aria-hidden="true"><span class="header-tooltip-title">KHO Q5</span></span></button></span></div>
     <div class="kpi-row">
-      <div class="kpi" style="background: #2E86C1;" onclick="showKpiDetail('all')" onmouseenter="showKpiHoverMenu('all',this)" onmouseleave="scheduleKpiHoverClose()"><div class="kpi-v"><span class="kpi-icon kpi-icon-box" aria-hidden="true">📦</span><span id="kpi-mh">0</span></div><div class="kpi-l">mặt hàng <span class="kpi-hint">▼</span></div><div class="kpi-insight" id="kpi-insight-all"></div></div>
-      <div class="kpi" style="background: #1E8449;" onclick="showKpiDetail('ton')" onmouseenter="showKpiHoverMenu('ton',this)" onmouseleave="scheduleKpiHoverClose()"><div class="kpi-v"><span class="kpi-icon kpi-icon-stock" aria-hidden="true">📊</span><span id="kpi-ton">0</span></div><div class="kpi-l">tổng tồn <span class="kpi-hint">▼</span></div><div class="kpi-insight" id="kpi-insight-ton"></div></div>
-     <div class="kpi" style="background: #C0392B;" onclick="showKpiDetail('het')" onmouseenter="showKpiHoverMenu('het',this)" onmouseleave="scheduleKpiHoverClose()">
+      <button type="button" class="kpi" style="background:#2E86C1" aria-label="Xem phân tích mặt hàng" onclick="showKpiDetail('all')" onmouseenter="showKpiHoverMenu('all',this)" onmouseleave="scheduleKpiHoverClose()"><span class="kpi-v"><span class="kpi-icon kpi-icon-box" aria-hidden="true">📦</span><span id="kpi-mh">0</span></span><span class="kpi-l">mặt hàng <span class="kpi-hint">▼</span></span><span class="kpi-insight" id="kpi-insight-all"></span></button>
+      <button type="button" class="kpi" style="background:#1E8449" aria-label="Xem phân tích tổng tồn" onclick="showKpiDetail('ton')" onmouseenter="showKpiHoverMenu('ton',this)" onmouseleave="scheduleKpiHoverClose()"><span class="kpi-v"><span class="kpi-icon kpi-icon-stock" aria-hidden="true">📊</span><span id="kpi-ton">0</span></span><span class="kpi-l">tổng tồn <span class="kpi-hint">▼</span></span><span class="kpi-insight" id="kpi-insight-ton"></span></button>
+     <button type="button" class="kpi" style="background:#C0392B" aria-label="Xem và xử lý mặt hàng hết hàng" onclick="showKpiDetail('het')" onmouseenter="showKpiHoverMenu('het',this)" onmouseleave="scheduleKpiHoverClose()">
     <div class="kpi-v"><span class="kpi-icon kpi-icon-out" aria-hidden="true">🔴</span><span id="kpi-het">0</span></div>
     <div class="kpi-l">hết hàng <span class="kpi-hint">▼</span></div><div class="kpi-insight" id="kpi-insight-het"></div>
-</div>
-      <div class="kpi" style="background: #B7950B;" onclick="showKpiDetail('sap')" onmouseenter="showKpiHoverMenu('sap',this)" onmouseleave="scheduleKpiHoverClose()"><div class="kpi-v"><span class="kpi-icon kpi-icon-low" aria-hidden="true">🟡</span><span id="kpi-sap">0</span></div><div class="kpi-l">sắp hết <span class="kpi-hint">▼</span></div><div class="kpi-insight" id="kpi-insight-sap"></div></div>
+</button>
+      <button type="button" class="kpi" style="background:#B7950B" aria-label="Xem và xử lý mặt hàng sắp hết" onclick="showKpiDetail('sap')" onmouseenter="showKpiHoverMenu('sap',this)" onmouseleave="scheduleKpiHoverClose()"><span class="kpi-v"><span class="kpi-icon kpi-icon-low" aria-hidden="true">🟡</span><span id="kpi-sap">0</span></span><span class="kpi-l">sắp hết <span class="kpi-hint">▼</span></span><span class="kpi-insight" id="kpi-insight-sap"></span></button>
       <div id="kpiHoverMenu" class="kpi-hover-menu" onmouseenter="cancelKpiHoverClose()" onmouseleave="scheduleKpiHoverClose()" onwheel="event.stopPropagation();cancelKpiHoverClose()"></div>
     </div>
     <div class="search-box">
@@ -10001,7 +10018,6 @@ async function validateRestoredEmployeeSession(){
     const result=await fetchSheetJson(SHEET_API_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({action:"validate_employee_session",employeeAuth:employeeAccessToken})},16000);
     if(!result.valid||!result.employee){ const error=new Error("Phiên nhân viên đã hết hạn"); error.sessionInvalid=true; throw error; }
     setEmployeeSession(employeeAccessToken,result.employee);
-    if(hasPrivateProductDataAccess()) await loadData();
     return true;
   }catch(error){
     // Chỉ xóa phiên khi máy chủ đã phản hồi JSON và xác nhận token không hợp lệ.
@@ -10240,7 +10256,7 @@ async function checkAdminSession(){
 
 // Dòng URL duy nhất
 const SHEET_API_URL = "https://script.google.com/macros/s/AKfycby6YH69F7sfO1ZoUJsDm4BeX6Luj2GrhUfYWWJWNvqjraAEhkBck16EphrPBBm1BT3YqA/exec";
-const REQUIRED_API_VERSION = "2026.08.24-menu-filter-performance-13";
+const REQUIRED_API_VERSION = "2026.08.24-startup-resilience-kpi-15";
 // Apps Script có thể phải chờ khóa ghi khi nhiều thao tác diễn ra gần nhau.
 // 45 giây dài hơn thời gian chờ khóa phía máy chủ, tránh báo lỗi giả trong khi Sheet vẫn đang ghi.
 const SHEET_TIMEOUT_MS = 45000;
@@ -10534,6 +10550,10 @@ function setSyncBadge(state, detail){
   switch(state){
 case "loading":
     el.textContent = "⏳ Đang tải...";
+    break;
+
+case "checking":
+    el.textContent = "🔎 Đang xác nhận máy chủ...";
     break;
 
 case "syncing":
@@ -10847,7 +10867,10 @@ async function fetchSheetJson(url, options={}, timeoutMs=SHEET_TIMEOUT_MS){
   // replace_all có fingerprint và có thể đối chiếu noop sau khi phản hồi bị mất,
   // vì vậy retry 404/timeout an toàn hơn để người dùng không phải chờ chu kỳ hôm sau.
   const safeIdempotentWritePost=new Set(["replace_all","upsert_product","delete_product","delete_products","delete_products_by_branch","create_units","restore_trash","delete_customer","delete_customer_record","delete_partner_job","delete_inventory_transaction"]).has(context.action);
-  const maxAttempts=context.method==="GET" ? 3 : safeReadPost ? 2 : safeIdempotentWritePost ? 3 : 1;
+  // Request đọc dữ liệu khởi động có thể chậm khi Apps Script vừa nguội. Chỉ thử
+  // tối đa hai lần để không giữ giao diện ở "Đang tải" qua nhiều chu kỳ 45 giây.
+  const startupReadTypes=new Set(["data","config","product_links","recent_activity"]);
+  const maxAttempts=context.method==="GET" ? (startupReadTypes.has(context.requestType)?2:3) : safeReadPost ? 2 : safeIdempotentWritePost ? 3 : 1;
   let lastError;
   for(let attempt=1;attempt<=maxAttempts;attempt++){
     const ctrl=new AbortController();
@@ -11133,22 +11156,27 @@ function stripPrivateProductFieldsFromLocalData(){
   DATA=sanitizePublicProductRows(DATA);
   persistProductCache(DATA,false);
 }
-async function loadData(){
+async function loadData({forcePublic=false}={}){
   // Cờ pending toàn-snapshot của các bản cũ không còn được phép tự đẩy lên Sheet.
   // Xóa nó trước khi đọc để một cache public cũ không bao giờ trở thành nguồn ghi.
   setPendingSync(false);
-  const requestedPrivateData=hasPrivateProductDataAccess();
+  const requestedPrivateData=!forcePublic&&hasPrivateProductDataAccess();
   if(requestedPrivateData) PRIVATE_PRODUCT_DATA_READY=false;
-  loadLocal();
+  loadLocal(forcePublic);
+  const hadVisibleData=DATA.length>0;
   const localSnapshot = JSON.parse(JSON.stringify(DATA));
   const loadStartSaveSeq = dataSaveSeq;
   if(SHEET_API_URL){
-    setSyncBadge("loading");
+    // Chỉ hiện "Đang tải" khi màn hình thực sự chưa có dữ liệu. Nếu bản công
+    // khai đã hiển thị và hệ thống đang nâng cấp sang dữ liệu private, giữ trạng
+    // thái đã kết nối để người dùng không tưởng toàn bộ trang đang bị treo.
+    if(!hadVisibleData) setSyncBadge("loading");
+    else if(forcePublic) setSyncBadge("checking");
     try{
       const privateData=requestedPrivateData;
       const json = privateData
         ? await privateSheet("private_products",{},35000)
-        : await fetchSheetJson(sheetUrl({type:"data", _ts: Date.now()}));
+        : await fetchSheetJson(sheetUrl({type:"data", _ts: Date.now()}),{},70000);
       if(!Array.isArray(json.data)) throw new Error("Máy chủ không có dữ liệu sản phẩm hợp lệ");
       const validationIssues = validateInventoryRows(json.data);
       if(validationIssues.length) throw new Error(inventoryValidationMessage(validationIssues,"máy chủ"));
@@ -11193,9 +11221,9 @@ async function loadData(){
   }
   setSyncBadge();
 }
-function loadLocal(){
+function loadLocal(forcePublic=false){
   try {
-    const privateData=hasPrivateProductDataAccess();
+    const privateData=!forcePublic&&hasPrivateProductDataAccess();
     let saved=privateData?sessionStorage.getItem(PRIVATE_PRODUCT_CACHE_KEY):localStorage.getItem(PUBLIC_PRODUCT_CACHE_KEY);
     if(!saved && !privateData){saved=localStorage.getItem("kho_cntt_data");try{localStorage.removeItem("kho_cntt_data");}catch(_){}} // chỉ migrate cache cũ sang public
     const storedRows=saved ? JSON.parse(saved) : (SHEET_API_URL ? [] : JSON.parse(JSON.stringify(DEFAULT_DATA)));
@@ -11468,6 +11496,13 @@ function renderKpiProductSubgroups(entries,type="all"){
 function toggleKpiCategory(listId, button){
   const list = document.getElementById(listId);
   if(!list) return;
+  if(list.dataset.loaded!=="1"){
+    const category=String(list.dataset.kpiCategory||"");
+    const type=String(list.dataset.kpiType||currentKpiExportType||"all");
+    const entries=currentKpiRenderedEntries.filter(item=>String(item.r[0]||"KHAC")===category);
+    list.innerHTML=renderKpiProductSubgroups(entries,type);
+    list.dataset.loaded="1";
+  }
   const willOpen = !list.classList.contains("open");
   if(willOpen){
     document.querySelectorAll("#kpiModalBody .kpi-product-list.open").forEach(other=>other.classList.remove("open"));
@@ -11497,6 +11532,9 @@ function getKpiScopedEntries(){
 let kpiHoverCloseTimer=null;
 let currentKpiSort="priority";
 let currentKpiListMode="default";
+let currentKpiSearch="";
+let currentKpiRenderedEntries=[];
+let kpiSearchTimer=null;
 function kpiHoverEntries(type){
   const entries=kpiFilterEntries(type,getKpiEnrichedEntries());
   return sortKpiEntries(entries,type,kpiDefaultSort(type));
@@ -11559,46 +11597,48 @@ function kpiCompactMoney(value){
 function renderKpiSummary(type,allEntries,entries){
   const totalSku=allEntries.length;
   const active=allEntries.filter(item=>item.stock>0);
-  const actionable=allEntries.filter(isInventoryActionable);
-  const monitor=allEntries.filter(item=>["VERIFY","WATCH"].includes(getInventoryAction(item).key));
+  const out=allEntries.filter(item=>item.state==="HET");
+  const low=allEntries.filter(item=>item.state==="SAP");
   const percentage=count=>totalSku ? `${(count*100/totalSku).toLocaleString("vi-VN",{maximumFractionDigits:1})}%` : "0%";
   let cards=[];
   if(type==="all"){
     cards=[
       kpiMetricCard("▦","Tổng mã hàng",totalSku,"Toàn bộ danh mục đang xem","all","all-items"),
-      kpiMetricCard("✓","Đang có tồn",active.length,`${percentage(active.length)} danh mục`,"all","all-active"),
-      kpiMetricCard("!","Cần xử lý",actionable.length,"Có phát sinh bán trong 30 ngày","all","all-actionable"),
-      kpiMetricCard("◌","Chỉ theo dõi",monitor.length,"Chưa phát sinh bán trong 30 ngày","all","all-monitor")
+      kpiMetricCard("✓","Đang có tồn",active.length,`${percentage(active.length)} mã hàng`,"all","all-active"),
+      kpiMetricCard("×","Hết hàng",out.length,"Cần kiểm tra nhu cầu nhập","all","all-out"),
+      kpiMetricCard("!","Sắp hết",low.length,"Đang bằng hoặc dưới ngưỡng","all","all-low")
     ];
   }else if(type==="ton"){
     const totalUnits=entries.reduce((sum,item)=>sum+item.stock,0);
-    const selling=entries.filter(item=>item.sales30>0);
-    const idle=entries.filter(item=>item.sales30===0);
-    const salesQty=selling.reduce((sum,item)=>sum+item.sales30,0);
+    const average=entries.length?totalUnits/entries.length:0;
+    const highest=entries.reduce((max,item)=>Math.max(max,item.stock),0);
     cards=[
-      kpiMetricCard("Σ","Tổng số lượng",totalUnits.toLocaleString("vi-VN"),"Chỉ tính sản phẩm còn tồn","ton","ton-units"),
-      kpiMetricCard("▦","Mã đang có tồn",entries.length,`${percentage(entries.length)} danh mục`,"ton","ton-active"),
-      kpiMetricCard("↗","Có bán 30 ngày",selling.length,`Tổng ${salesQty} sản phẩm đã bán`,"ton","ton-selling"),
-      kpiMetricCard("◌","Chưa bán 30 ngày",idle.length,"Hàng chưa luân chuyển gần đây","ton","ton-idle")
+      kpiMetricCard("Σ","Tổng số lượng",totalUnits.toLocaleString("vi-VN"),"Tổng sản phẩm thực tế đang còn","ton","ton-units"),
+      kpiMetricCard("▦","Mã đang có tồn",entries.length,`${percentage(entries.length)} mã hàng`,"ton","ton-active"),
+      kpiSummaryCard("÷","Bình quân / mã",average.toLocaleString("vi-VN",{maximumFractionDigits:1}),"Giúp nhận ra kho dàn trải hay tập trung"),
+      kpiMetricCard("↑","Tồn cao nhất",highest,"Bấm để xem nhóm tồn nhiều nhất","ton","ton-highest")
     ];
   }else if(type==="het"){
-    const urgent=entries.filter(isInventoryActionable);
-    const verify=entries.filter(item=>getInventoryAction(item).key==="VERIFY");
+    const groupCounts=new Map();
+    entries.forEach(item=>{const label=cleanKpiPathLabel(getSummaryHierarchyGroup(item.r)||NO_GROUP);groupCounts.set(label,(groupCounts.get(label)||0)+1);});
+    const worstGroup=[...groupCounts.entries()].sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0],"vi"))[0]||["Chưa có nhóm",0];
+    const affectedCategoryCodes=[...new Set(entries.map(item=>String(item.r[0]||"KHAC")))];
+    const affectedCategoryLabels=affectedCategoryCodes.map(code=>relatedCategoryLabel(code)||code).join(" · ");
     cards=[
-      kpiMetricCard("×","Đang hết hàng",entries.length,"Danh sách đầy đủ","het","het-all"),
-      kpiMetricCard("!","Cần nhập ngay",urgent.length,"Có phát sinh bán trong 30 ngày","het","het-urgent"),
-      kpiMetricCard("?","Chờ xác nhận",verify.length,"Chưa phát sinh bán trong 30 ngày","het","het-verify"),
-      kpiMetricCard("↗","Lượng bán 30 ngày",urgent.reduce((sum,item)=>sum+item.sales30,0),"Các mã hết hàng đã phát sinh bán","het","het-selling")
+      kpiMetricCard("×","Đang hết hàng",entries.length,"Bấm để xem toàn bộ danh sách","het","het-all"),
+      kpiSummaryCard("▤","Nhóm ảnh hưởng",groupCounts.size,"Mở từng nhóm để kiểm tra"),
+      kpiSummaryCard("▦","Danh mục ảnh hưởng",affectedCategoryCodes.length,affectedCategoryLabels||"Chưa có danh mục"),
+      kpiSummaryCard("↑","Nhóm hết nhiều nhất",worstGroup[1],worstGroup[0])
     ];
   }else{
     const stockOne=entries.filter(item=>item.stock===1).length;
-    const prepare=entries.filter(isInventoryActionable);
-    const watch=entries.filter(item=>getInventoryAction(item).key==="WATCH");
+    const atThreshold=entries.filter(item=>item.stock===item.threshold);
+    const average=entries.length?entries.reduce((sum,item)=>sum+item.stock,0)/entries.length:0;
     cards=[
-      kpiMetricCard("!","Đang sắp hết",entries.length,"Danh sách đầy đủ","sap","sap-all"),
-      kpiMetricCard("↗","Chuẩn bị nhập",prepare.length,"Có phát sinh bán trong 30 ngày","sap","sap-prepare"),
-      kpiMetricCard("◌","Chỉ theo dõi",watch.length,"Chưa phát sinh bán trong 30 ngày","sap","sap-watch"),
-      kpiMetricCard("1","Chỉ còn 1",stockOne,"Mức tồn cần chú ý cao","sap","sap-one")
+      kpiMetricCard("!","Đang sắp hết",entries.length,"Bấm để xem toàn bộ danh sách","sap","sap-all"),
+      kpiMetricCard("1","Chỉ còn 1",stockOne,"Mức tồn cần chú ý cao","sap","sap-one"),
+      kpiMetricCard("=","Đang chạm ngưỡng",atThreshold.length,"Cần chuẩn bị trước khi giảm thêm","sap","sap-threshold"),
+      kpiSummaryCard("÷","Bình quân tồn",average.toLocaleString("vi-VN",{maximumFractionDigits:1}),"Trên mỗi mã đang sắp hết")
     ];
   }
   return `<div class="kpi-summary-grid">${cards.join("")}</div>`;
@@ -11615,22 +11655,30 @@ function renderKpiSortbar(type){
 }
 function renderKpiPriorityPanel(type,entries){
   if(!["all","het","sap"].includes(type)||!entries.length) return "";
-  const top=sortKpiEntries(entries.filter(isInventoryActionable),type,"action").slice(0,8);
+  const top=getKpiPriorityEntries(type,entries);
   if(!top.length) return "";
-  const sub="Chỉ gồm mã hết/sắp hết có phát sinh bán trong 30 ngày";
-  return `<section class="kpi-priority-panel"><div class="kpi-priority-head"><span><strong class="kpi-priority-title">Cần xử lý trước</strong><span class="kpi-priority-sub">${escapeHtml(sub)}</span></span><span class="kpi-priority-count">${top.length} ưu tiên</span></div><div class="kpi-priority-list">${renderKpiProductLinks(top,type,{ranked:true})}</div></section>`;
+  const withSales=top.filter(item=>item.sales30>0).length;
+  const sub=withSales?`${withSales} mã có phát sinh bán; các mã còn lại ưu tiên theo mức tồn/ngưỡng`:`Ưu tiên theo hết hàng và tỷ lệ tồn so với ngưỡng`;
+  return `<section class="kpi-priority-panel"><div class="kpi-priority-head"><span><strong class="kpi-priority-title">Cần kiểm tra trước</strong><span class="kpi-priority-sub">${escapeHtml(sub)}</span></span><span class="kpi-priority-count">TOP ${top.length}</span></div><div class="kpi-priority-list">${renderKpiProductLinks(top,type,{ranked:true})}</div></section>`;
+}
+function getKpiPriorityEntries(type,entries){
+  if(!["all","het","sap"].includes(type)) return [];
+  return sortKpiEntries(entries.filter(item=>item.state==="HET"||item.state==="SAP"),type,"action").slice(0,8);
 }
 function getKpiMetricSelection(type,mode,entries){
   const actionKey=item=>getInventoryAction(item).key;
   const selections={
     "all-items":{label:"Tất cả mặt hàng",items:entries},
     "all-active":{label:"Mặt hàng đang có tồn",items:entries.filter(item=>item.stock>0)},
+    "all-out":{label:"Mặt hàng hết hàng",items:entries.filter(item=>item.state==="HET")},
+    "all-low":{label:"Mặt hàng sắp hết",items:entries.filter(item=>item.state==="SAP")},
     "all-actionable":{label:"Mặt hàng cần xử lý",items:entries.filter(isInventoryActionable)},
     "all-monitor":{label:"Mặt hàng chỉ theo dõi",items:entries.filter(item=>["VERIFY","WATCH"].includes(actionKey(item)))},
     "ton-units":{label:"Tổng số lượng tồn",items:entries},
     "ton-active":{label:"Mã đang có tồn",items:entries},
     "ton-selling":{label:"Có bán trong 30 ngày",items:entries.filter(item=>item.sales30>0)},
     "ton-idle":{label:"Chưa bán trong 30 ngày",items:entries.filter(item=>item.sales30===0)},
+    "ton-highest":{label:"Mặt hàng tồn nhiều nhất",items:[...entries].sort((a,b)=>b.stock-a.stock).slice(0,30)},
     "het-all":{label:"Đang hết hàng",items:entries},
     "het-urgent":{label:"Cần nhập ngay",items:entries.filter(isInventoryActionable)},
     "het-verify":{label:"Chờ xác nhận",items:entries.filter(item=>actionKey(item)==="VERIFY")},
@@ -11638,23 +11686,65 @@ function getKpiMetricSelection(type,mode,entries){
     "sap-all":{label:"Đang sắp hết",items:entries},
     "sap-prepare":{label:"Chuẩn bị nhập",items:entries.filter(isInventoryActionable)},
     "sap-watch":{label:"Sắp hết chỉ theo dõi",items:entries.filter(item=>actionKey(item)==="WATCH")},
-    "sap-one":{label:"Chỉ còn 1 sản phẩm",items:entries.filter(item=>item.stock===1)}
+    "sap-one":{label:"Chỉ còn 1 sản phẩm",items:entries.filter(item=>item.stock===1)},
+    "sap-critical":{label:"Tồn không quá nửa ngưỡng",items:entries.filter(item=>item.stock/Math.max(1,item.threshold)<=0.5)},
+    "sap-threshold":{label:"Đang chạm ngưỡng cảnh báo",items:entries.filter(item=>item.stock===item.threshold)}
   };
   return selections[mode]||{label:"",items:entries};
 }
 function showKpiMetricList(type,mode){
   currentKpiListMode=mode;
+  currentKpiSearch="";
   showKpiDetail(type,true);
   requestAnimationFrame(()=>document.querySelector("#kpiModalBody .kpi-filter-head")?.scrollIntoView({behavior:"auto",block:"start"}));
 }
 function resetKpiMetricList(){
   currentKpiListMode="default";
+  currentKpiSearch="";
   showKpiDetail(currentKpiExportType,true);
   requestAnimationFrame(()=>document.getElementById("kpiModalBody")?.scrollIntoView({behavior:"auto",block:"start"}));
 }
 function updateCurrentKpiSort(value){
   currentKpiSort=String(value||kpiDefaultSort(currentKpiExportType));
   showKpiDetail(currentKpiExportType,true);
+}
+function kpiEntryMatchesSearch(item,query){
+  const needle=removeAccents(String(query||"").trim()).toLowerCase();
+  if(!needle) return true;
+  const r=item.r;
+  const hay=removeAccents([r[1],r[2],r[3],relatedCategoryLabel(r[0]),getKpiProductPath(r),getSummaryHierarchyGroup(r)].join(" ")).toLowerCase();
+  return needle.split(/\s+/).filter(Boolean).every(token=>hay.includes(token));
+}
+function scheduleKpiSearch(value){
+  currentKpiSearch=String(value||"");
+  clearTimeout(kpiSearchTimer);
+  kpiSearchTimer=setTimeout(()=>{
+    showKpiDetail(currentKpiExportType,true);
+    requestAnimationFrame(()=>{const input=document.getElementById("kpiSearchInput");if(input){input.focus();input.setSelectionRange(input.value.length,input.value.length);}});
+  },180);
+}
+function applyKpiToMainView(mode){
+  closeOverlay("kpiOverlay");
+  searchQ="";quickGroupFilter=null;restockOnly=mode==="restock";totalStockView=mode==="ton"||mode==="all";
+  currentTab="ALL";
+  currentStatus=mode==="het"?"HET":mode==="sap"?"SAP":"ALL";
+  const search=document.getElementById("search"),clear=document.getElementById("clear-btn");
+  if(search)search.value="";if(clear)clear.style.display="none";
+  syncHomeStockFilters();syncRestockButton(restockOnly);syncStatusButtons(totalStockView?"ALL":currentStatus);render();
+  requestAnimationFrame(()=>{const target=document.getElementById("results"),sticky=document.querySelector(".sticky");if(target)window.scrollTo({top:Math.max(0,target.offsetTop-(sticky?.offsetHeight||0)-10),left:0,behavior:"smooth"});});
+}
+function renderKpiActionbar(type){
+  const config={
+    all:["Báo cáo tồn theo danh mục","Xem số mã, số lượng và nhóm cần kiểm tra.","MỞ BÁO CÁO TỒN","all"],
+    ton:["Đưa số liệu ra màn hình chính","Xem bảng tổng tồn theo nhóm và danh mục.","MỞ BÁO CÁO TỒN","ton"],
+    het:["Xử lý hàng hết","Lọc đúng các mã hết hàng để kiểm tra hoặc nhập lại.","LỌC HẾT HÀNG","het"],
+    sap:["Xử lý hàng sắp hết","Lọc đúng các mã bằng hoặc dưới ngưỡng cảnh báo.","LỌC SẮP HẾT","sap"]
+  }[type]||[];
+  // Chỉ mở kế hoạch mua khi lịch sử giao dịch đã tải; nếu chưa có dữ liệu bán,
+  // việc đề xuất số lượng nhập sẽ dễ thành con số 0 gây hiểu nhầm.
+  const hasActivityData=Array.isArray(TX_DATA)&&TX_DATA.length>0;
+  const restock=["het","sap"].includes(type)&&hasActivityData?'<button type="button" class="kpi-action-btn" onclick="applyKpiToMainView(\'restock\')">MỞ KẾ HOẠCH NHẬP</button>':"";
+  return `<div class="kpi-actionbar"><span class="kpi-action-copy"><strong>${escapeHtml(config[0]||"")}</strong><span>${escapeHtml(config[1]||"")}</span></span><span class="kpi-action-buttons"><button type="button" class="kpi-action-btn primary" onclick="applyKpiToMainView('${config[3]||"all"}')">${escapeHtml(config[2]||"MỞ DANH SÁCH")}</button>${restock}</span></div>`;
 }
 function showKpiDetail(type,preserveSort=false){
   cancelKpiHoverClose();
@@ -11664,6 +11754,7 @@ function showKpiDetail(type,preserveSort=false){
   if(!preserveSort){
     currentKpiSort=kpiDefaultSort(type);
     currentKpiListMode="default";
+    currentKpiSearch="";
   }
   const kpiOverlay=document.getElementById("kpiOverlay");
   const kpiColors={
@@ -11688,8 +11779,9 @@ function showKpiDetail(type,preserveSort=false){
   const typeEntries=sortKpiEntries(kpiFilterEntries(type,allEntries),type,currentKpiSort);
   const focused=currentKpiListMode!=="default";
   const selection=getKpiMetricSelection(type,currentKpiListMode,typeEntries);
-  const entries=focused?selection.items:typeEntries;
-  const priorityEntries=focused ? [] : (["all","het","sap"].includes(type) ? sortKpiEntries(entries.filter(isInventoryActionable),type,"action").slice(0,8) : []);
+  const selectedEntries=focused?selection.items:typeEntries;
+  const entries=currentKpiSearch?selectedEntries.filter(item=>kpiEntryMatchesSearch(item,currentKpiSearch)):selectedEntries;
+  const priorityEntries=focused ? [] : getKpiPriorityEntries(type,entries);
   const priorityIds=new Set(priorityEntries.map(item=>item.i));
   const categorySource=priorityIds.size ? entries.filter(item=>!priorityIds.has(item.i)) : entries;
   const titles = {all:"📦 Chi tiết mặt hàng theo danh mục", ton:"📊 Tổng tồn kho theo danh mục", het:"🔴 Danh sách hết hàng", sap:"🟡 Danh sách sắp hết hàng"};
@@ -11704,9 +11796,9 @@ function showKpiDetail(type,preserveSort=false){
     if(!categoryEntries.length) return "";
     const c=cfg[sh] || {label:relatedCategoryLabel(sh)||sh,c:"#607D8B"};
     const listId=`kpi-${type}-${String(sh).replace(/[^a-z0-9_-]/gi,"-")}`;
-    const initiallyOpen=focused || sh===firstCategory;
+    const initiallyOpen=(focused||!!currentKpiSearch) && sh===firstCategory;
     const categoryValue=type==="ton" ? `${categoryEntries.reduce((sum,item)=>sum+item.stock,0).toLocaleString("vi-VN")} tồn` : `${categoryEntries.length} mặt hàng`;
-    return `<div class="kpi-category"><button type="button" class="kpi-category-toggle" onclick="toggleKpiCategory('${listId}',this)" aria-expanded="${initiallyOpen}"><span class="kpi-detail-sh"><span class="kpi-detail-badge" style="background:${c.c};">${escapeHtml(c.label)}</span></span><span class="kpi-detail-count">${categoryValue}<span class="kpi-expand-mark">${initiallyOpen?"−":"+"}</span></span></button><div id="${listId}" class="kpi-product-list${initiallyOpen?" open":""}">${renderKpiProductSubgroups(categoryEntries,type)}</div></div>`;
+    return `<div class="kpi-category"><button type="button" class="kpi-category-toggle" onclick="toggleKpiCategory('${listId}',this)" aria-expanded="${initiallyOpen}"><span class="kpi-detail-sh"><span class="kpi-detail-badge" style="background:${c.c};">${escapeHtml(c.label)}</span></span><span class="kpi-detail-count">${categoryValue}<span class="kpi-expand-mark">${initiallyOpen?"−":"+"}</span></span></button><div id="${listId}" class="kpi-product-list${initiallyOpen?" open":""}" data-kpi-category="${escapeHtml(sh)}" data-kpi-type="${escapeHtml(type)}" data-loaded="${initiallyOpen?"1":"0"}">${initiallyOpen?renderKpiProductSubgroups(categoryEntries,type):""}</div></div>`;
   }).join("") : `<div class="kpi-empty-modern"><strong>✅ ${type==="het"?"Không có mặt hàng hết hàng":type==="sap"?"Không có mặt hàng sắp hết":"Chưa có dữ liệu phù hợp"}</strong><span>Phạm vi kho hiện tại chưa có mục cần hiển thị.</span></div>`;
   const totalValue=type==="ton" ? `${entries.reduce((sum,item)=>sum+item.stock,0).toLocaleString("vi-VN")} sản phẩm` : `${entries.length} mặt hàng`;
   const remainderIntro=priorityIds.size ? `<div class="kpi-sortbar"><span class="kpi-sort-copy"><strong class="kpi-sort-title">Danh sách còn lại</strong><span class="kpi-sort-note">${categorySource.length} mặt hàng sau khi đã tách nhóm ưu tiên phía trên</span></span></div>` : "";
@@ -11714,7 +11806,9 @@ function showKpiDetail(type,preserveSort=false){
   const focusCount=type==="ton"?`${entries.length} mặt hàng · ${totalValue}`:`${entries.length} mặt hàng`;
   const focusHead=focused?`<div class="kpi-filter-head"><div><strong>${escapeHtml(selection.label)}</strong><span>${escapeHtml(focusCount)}</span></div><button type="button" class="kpi-filter-reset" onclick="resetKpiMetricList()">← QUAY LẠI</button></div>`:"";
   const overviewHead=focused?focusHead:renderKpiSummary(type,allEntries,typeEntries);
-  const html=`<div class="kpi-modern-dashboard${focused?" is-list-view":""}">${overviewHead}${renderKpiSortbar(type)}${priorityPanel}${remainderIntro}<div class="kpi-category-stack">${categories}</div><div class="kpi-total-modern"><span>Tổng trong danh sách đang xem</span><strong>${totalValue}</strong></div></div>`;
+  currentKpiRenderedEntries=categorySource;
+  const searchBar=`<div class="kpi-searchbar"><input id="kpiSearchInput" class="kpi-search-input" type="search" value="${escapeHtml(currentKpiSearch)}" placeholder="Tìm mã, tên, nhóm trong báo cáo..." oninput="scheduleKpiSearch(this.value)"><span class="kpi-search-count">${entries.length}/${selectedEntries.length} mã</span></div>`;
+  const html=`<div class="kpi-modern-dashboard${focused?" is-list-view":""}">${overviewHead}${renderKpiActionbar(type)}${searchBar}${renderKpiSortbar(type)}${priorityPanel}${remainderIntro}<div class="kpi-category-stack">${categories}</div><div class="kpi-total-modern"><span>Tổng trong danh sách đang xem</span><strong>${totalValue}</strong></div></div>`;
   document.getElementById("kpiModalBody").innerHTML = html;
   kpiOverlay.classList.add("open");
 }
@@ -11728,20 +11822,18 @@ function initKPI(){
   const active=entries.filter(item=>item.stock>0).length;
   const out=entries.filter(item=>item.state==="HET").length;
   const low=entries.filter(item=>item.state==="SAP").length;
-  const urgent=entries.filter(item=>getInventoryAction(item).key==="URGENT").length;
-  const prepare=entries.filter(item=>getInventoryAction(item).key==="PREPARE").length;
-  const verify=entries.filter(item=>getInventoryAction(item).key==="VERIFY").length;
-  const watch=entries.filter(item=>getInventoryAction(item).key==="WATCH").length;
-  const sellingInStock=entries.filter(item=>item.stock>0&&item.sales30>0).length;
+  const oneLeft=entries.filter(item=>item.state==="SAP"&&item.stock===1).length;
+  const atThreshold=entries.filter(item=>item.state==="SAP"&&item.stock===item.threshold).length;
   document.getElementById("kpi-mh").textContent=totalSku;
   document.getElementById("kpi-ton").textContent=totalStock.toLocaleString("vi-VN");
   document.getElementById("kpi-het").textContent=out;
   document.getElementById("kpi-sap").textContent=low;
   const setInsight=(id,text)=>{ const element=document.getElementById(id); if(element) element.textContent=text; };
-  setInsight("kpi-insight-all",`${urgent+prepare} cần xử lý · ${verify+watch} theo dõi`);
-  setInsight("kpi-insight-ton",`${sellingInStock} có bán · ${Math.max(0,active-sellingInStock)} chưa bán/30 ngày`);
-  setInsight("kpi-insight-het",`${urgent} cần nhập · ${verify} chờ xác nhận`);
-  setInsight("kpi-insight-sap",`${prepare} chuẩn bị · ${watch} theo dõi`);
+  const average=active?totalStock/active:0;
+  setInsight("kpi-insight-all",`${active} còn · ${out} hết`);
+  setInsight("kpi-insight-ton",`${active} mã · TB ${average.toLocaleString("vi-VN",{maximumFractionDigits:1})}/mã`);
+  setInsight("kpi-insight-het",`${out} mã cần kiểm tra nhập`);
+  setInsight("kpi-insight-sap",`${oneLeft} chỉ còn 1 · ${atThreshold} chạm ngưỡng`);
 }
 
 function formatVndNumber(n){
@@ -21352,23 +21444,42 @@ async function submitInventoryTransfer(){
   refreshLatestItemsTicker();
   syncStatusButtons(totalStockView ? currentStatus : "");
   render();
-  startRecentActivityAutoRefresh();
-
   // Đồng bộ Google Sheet hoàn toàn ở nền. loadData() vẫn kiểm tra cờ pending:
   // nếu thiết bị có thay đổi chưa gửi thì giữ nguyên bản cục bộ, tuyệt đối không
   // lấy dữ liệu máy chủ về ghi đè.
   void (async()=>{
-    await sessionValidationPromise;
     try{
-      await Promise.allSettled([
-        loadData(),
-        loadTXFromSheet(),
-        loadTransfersFromSheet(),
-        loadNVFromSheet(),
-        loadPublicRecentActivityFromSheet(),
-        loadDisplayConfig(),
-        loadProductLinks()
-      ]);
+      // Dữ liệu sản phẩm là phần bắt buộc để mở kho. Không bắn đồng thời 6-7
+      // request Apps Script vì Google có thể xếp hàng, phản hồi quá lâu hoặc trả
+      // trang HTML lỗi Drive. Tải kho trước, render ngay, rồi mới tải tuần tự
+      // các phần phụ để giao diện không kẹt ở "Đang tải...".
+      // Luôn mở dữ liệu công khai trước. Phiên Admin/nhân viên cũ có thể mất
+      // hàng chục giây để xác minh sau một lần Deploy và không được phép chặn
+      // toàn bộ trang ở trạng thái "Đang tải...".
+      await loadData({forcePublic:true});
+      refreshLatestItemsTicker();
+      syncStatusButtons(totalStockView ? currentStatus : "");
+      render();
+
+      await sessionValidationPromise;
+      if(hasPrivateProductDataAccess()){
+        await loadData();
+        refreshLatestItemsTicker();
+        syncStatusButtons(totalStockView ? currentStatus : "");
+        render();
+      }
+      const auxiliaryLoads=[
+        loadTXFromSheet,
+        loadTransfersFromSheet,
+        loadNVFromSheet,
+        loadPublicRecentActivityFromSheet,
+        loadDisplayConfig,
+        loadProductLinks
+      ];
+      for(const loadAuxiliary of auxiliaryLoads){
+        try{ await loadAuxiliary(); }
+        catch(error){ console.warn("Phần dữ liệu phụ chưa tải được:",error); }
+      }
       refreshLatestItemsTicker();
       syncStatusButtons(totalStockView ? currentStatus : "");
       render();
@@ -21383,6 +21494,7 @@ async function submitInventoryTransfer(){
     }catch(e){
       console.warn("Đồng bộ khởi động chạy nền chưa hoàn tất:",e);
     }finally{
+      startRecentActivityAutoRefresh();
       startBackgroundSync();
     }
   })();
