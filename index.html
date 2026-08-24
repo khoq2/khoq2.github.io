@@ -18,7 +18,7 @@
 <link rel="preconnect" href="https://script.google.com" crossorigin />
 <link rel="preconnect" href="https://lh3.googleusercontent.com" crossorigin />
 <link rel="dns-prefetch" href="https://drive.google.com" />
-<title>🏪 KHO Q2 (HOÀNG GIA COMPUTER) [v08]</title>
+<title>🏪 KHO Q2 (HOÀNG GIA COMPUTER) [v10]</title>
 <script defer crossorigin="anonymous" integrity="sha384-vtjasyidUo0kW94K5MXDXntzOJpQgBKXmE7e2Ga4LG0skTTLeBi97eFAXsqewJjw" src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script defer crossorigin="anonymous" integrity="sha384-vseuUuO/VRMn00lXYd5m/Pk4l/7RjMqhXGf6G0RALy+On0txYb39dQsUQDAd7q5L" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.10/pdfmake.min.js"></script>
 <script defer crossorigin="anonymous" integrity="sha384-1y8s2U/Jjn4/oeCEBcfYH3M6XeQtcg4LRmluN92FS69UgtLzoyhn3swew8Ynj8Ai" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.10/vfs_fonts.js"></script>
@@ -10209,7 +10209,7 @@ async function checkAdminSession(){
 
 // Dòng URL duy nhất
 const SHEET_API_URL = "https://script.google.com/macros/s/AKfycby6YH69F7sfO1ZoUJsDm4BeX6Luj2GrhUfYWWJWNvqjraAEhkBck16EphrPBBm1BT3YqA/exec";
-const REQUIRED_API_VERSION = "2026.08.23-resilient-sync-08";
+const REQUIRED_API_VERSION = "2026.08.24-filter-sync-10";
 // Apps Script có thể phải chờ khóa ghi khi nhiều thao tác diễn ra gần nhau.
 // 45 giây dài hơn thời gian chờ khóa phía máy chủ, tránh báo lỗi giả trong khi Sheet vẫn đang ghi.
 const SHEET_TIMEOUT_MS = 45000;
@@ -11948,7 +11948,7 @@ function normalizeQuickText(text){
 // Nhãn nhóm trong dữ liệu cũ có thể khác icon hoặc số khoảng trắng với nhãn đang hiển thị.
 // Dùng cùng một khóa chữ để phần thống kê và phần lọc luôn nhận ra đó là cùng một nhóm.
 function quickGroupLabelMatchKey(value){
-  return normalizeQuickText(value).replace(/^[^a-z0-9]+/,"").trim();
+  return quickOrderKey(value);
 }
 
 function isRamGroupLabel(groupNorm){
@@ -12129,6 +12129,7 @@ async function loadDisplayConfig(){
     if(json.config?.groupOrder && typeof json.config.groupOrder === "object") GROUP_ORDER = json.config.groupOrder;
     if(json.config?.customQuickTags && typeof json.config.customQuickTags === "object") QUICK_CUSTOM_TAGS = json.config.customQuickTags;
     if(json.config?.hiddenQuickTags && typeof json.config.hiddenQuickTags === "object") QUICK_HIDDEN_TAGS = json.config.hiddenQuickTags;
+    normalizeQuickConfigStores();
     if(json.config?.itemCreatedAt && typeof json.config.itemCreatedAt === "object") ITEM_CREATED_AT = json.config.itemCreatedAt;
     if(json.config?.groupOptions && typeof json.config.groupOptions === "object"){
       Object.keys(GROUP_OPTIONS).forEach(tab=>{ if(Array.isArray(json.config.groupOptions[tab])) GROUP_OPTIONS[tab]=json.config.groupOptions[tab]; });
@@ -12223,6 +12224,8 @@ function buildSectionSummaryBucketsV2(items, groupLabel){
   const map = new Map();
   const resolvedGroupLabel = resolveQuickGroupLabelFromRow(items?.[0]?.r, groupLabel || "");
   const family = getQuickGroupKind(resolvedGroupLabel);
+  const configuredCatalog = getQuickFixedCatalog(resolvedGroupLabel);
+  const configuredKeys = new Set(configuredCatalog.map(meta=>normalizeQuickText(meta.primary)));
   const addBucket = (meta, countDelta=0, stockDelta=0, isFixed=false) => {
     if(!meta || meta.family === "other") return;
     const key = `${meta.family}|${quickMetaKey(meta)}`;
@@ -12241,10 +12244,13 @@ function buildSectionSummaryBucketsV2(items, groupLabel){
     if(isFixed) current.isFixed = true;
     map.set(key, current);
   };
-  getQuickFixedCatalog(resolvedGroupLabel).forEach(meta=>addBucket(meta, 0, 0, true));
+  configuredCatalog.forEach(meta=>addBucket(meta, 0, 0, true));
   items.forEach(({r})=>{
     const stock = Number(r[5]) || 0;
-    const metas = getQuickMetaCandidates(r, resolvedGroupLabel);
+    // Không đưa nhãn tự suy đoán nằm ngoài danh mục Admin vào trang chủ. Trước đây
+    // đây là lý do trang chủ có thêm mục nhưng màn Sắp xếp lại không có mục đó.
+    const metas = getQuickMetaCandidates(r, resolvedGroupLabel)
+      .filter(meta=>configuredKeys.has(normalizeQuickText(meta.primary)));
     metas.forEach(meta=>addBucket(meta, 1, stock));
   });
   // Nhãn nhanh tùy chỉnh cũ (đặc biệt SẠC + hãng) có thể chưa được ghi vào
@@ -12544,6 +12550,22 @@ function makeQuickMeta(family, primary, secondary="", label=""){
   };
 }
 
+// Nhãn do Admin chủ động cấu hình được phép dùng cả "Khác". Quy tắc tự nhận diện
+// vẫn loại "Khác" để tránh sinh bộ lọc rác, nhưng một lựa chọn Admin đã tạo phải
+// xuất hiện và lọc được giống mọi lựa chọn khác.
+function makeConfiguredQuickMeta(family, primary, secondary="", label=""){
+  primary = cleanQuickLabel(primary);
+  secondary = cleanQuickLabel(secondary);
+  if(!primary) return null;
+  return {
+    family,
+    kind: family,
+    primary,
+    secondary: secondary && normalizeQuickText(secondary)!=="khac" ? secondary : "",
+    label: cleanQuickLabel(label) || primary
+  };
+}
+
 function isPrinterGroupLabel(groupNorm){
   return /\b(may in|printer|hop muc|muc nap|muc in|drum|gat tu|gat muc|truc|bao lua|formatter|main nguon|motor|sensor|cum say|photocopy|scan)\b/i.test(groupNorm)
     || /\blinh kien\b(?!\s*khac)/i.test(groupNorm);
@@ -12780,19 +12802,77 @@ try {
   const savedGroupOptions=JSON.parse(localStorage.getItem("kho_cntt_group_options") || "{}");
   Object.keys(GROUP_OPTIONS).forEach(tab=>{ if(Array.isArray(savedGroupOptions[tab])) GROUP_OPTIONS[tab]=savedGroupOptions[tab]; });
 } catch(e) {}
-function quickOrderKey(groupLabel){ return normalizeQuickText(groupLabel || ""); }
+// Khóa cấu hình cũ từng chứa emoji và dấu câu của tên nhóm. Khi Admin đổi
+// "Dây cáp chuyển" thành "Dây + Cáp chuyển", ba màn hình đã đọc hai khóa khác
+// nhau. Khóa mới chỉ giữ phần chữ/số nên đổi icon, dấu +, gạch ngang hay khoảng
+// trắng sẽ không làm mất danh mục bộ lọc đã có.
+function quickOrderKey(groupLabel){
+  return normalizeQuickText(groupLabel || "")
+    .replace(/^[^a-z0-9]+/, "")
+    .replace(/[^a-z0-9]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+function normalizeQuickStoreObject(source){
+  const output = {};
+  if(!source || typeof source !== "object" || Array.isArray(source)) return output;
+  Object.entries(source).forEach(([rawKey, rawValues])=>{
+    const key = quickOrderKey(rawKey);
+    if(!key || !Array.isArray(rawValues)) return;
+    const target = output[key] || (output[key] = []);
+    rawValues.forEach(rawValue=>{
+      const value = cleanQuickLabel(rawValue);
+      const valueKey = normalizeQuickText(value);
+      if(valueKey && !target.some(item=>normalizeQuickText(item)===valueKey)) target.push(value);
+    });
+  });
+  return output;
+}
+function normalizeQuickConfigStores(){
+  QUICK_ORDER = normalizeQuickStoreObject(QUICK_ORDER);
+  QUICK_CUSTOM_TAGS = normalizeQuickStoreObject(QUICK_CUSTOM_TAGS);
+  QUICK_HIDDEN_TAGS = normalizeQuickStoreObject(QUICK_HIDDEN_TAGS);
+  // Bản cũ của nút "Thêm phân loại nhanh" chỉ thêm vào customQuickTags mà
+  // quên quickOrder. Tự nối các mục đó vào cuối thứ tự để sửa luôn dữ liệu cũ.
+  Object.entries(QUICK_CUSTOM_TAGS).forEach(([key, values])=>{
+    const hidden = new Set((QUICK_HIDDEN_TAGS[key] || []).map(normalizeQuickText));
+    const order = Array.isArray(QUICK_ORDER[key]) ? QUICK_ORDER[key] : [];
+    values.forEach(value=>{
+      const valueKey = normalizeQuickText(value);
+      if(!hidden.has(valueKey) && !order.some(item=>normalizeQuickText(item)===valueKey)) order.push(value);
+    });
+    QUICK_ORDER[key] = order;
+  });
+}
+normalizeQuickConfigStores();
+
+function getObservedQuickTagsForGroup(groupLabel){
+  const groupKey = quickOrderKey(groupLabel);
+  if(!groupKey || !Array.isArray(DATA)) return [];
+  const values = [];
+  DATA.forEach(row=>{
+    if(quickOrderKey(getPrimaryRowGroup(row?.[8] || "")) !== groupKey) return;
+    getRowQuickTags(row?.[11] || "").forEach(value=>{
+      const valueKey = normalizeQuickText(value);
+      if(valueKey && !values.some(item=>normalizeQuickText(item)===valueKey)) values.push(value);
+    });
+  });
+  return values;
+}
 function getQuickFixedCatalog(groupLabel){
   const kind = getQuickGroupKind(groupLabel);
   const groupKey = quickOrderKey(groupLabel);
   const hidden = new Set((QUICK_HIDDEN_TAGS[groupKey] || []).map(normalizeQuickText));
   const catalog = [...getQuickFixedCatalogBase(groupLabel)].filter(meta=>!hidden.has(normalizeQuickText(meta.primary)));
   const seen = new Set(catalog.map(meta=>normalizeQuickText(meta.primary)));
-  (QUICK_CUSTOM_TAGS[quickOrderKey(groupLabel)] || []).forEach(value=>{
-    const meta = makeQuickMeta(kind, value, "", value);
+  const order = QUICK_ORDER[groupKey] || [];
+  // Hợp nhất bốn nguồn: mặc định, Admin tạo, thứ tự cũ và nhãn đang có trên
+  // sản phẩm. Nhờ đó Form thêm thiết bị, màn Sắp xếp và trang chủ luôn cùng danh sách.
+  [...(QUICK_CUSTOM_TAGS[groupKey] || []), ...order, ...getObservedQuickTagsForGroup(groupLabel)].forEach(value=>{
+    const meta = makeConfiguredQuickMeta(kind, value, "", value);
     const key = meta && normalizeQuickText(meta.primary);
-    if(meta && key && !seen.has(key)){ catalog.push(meta); seen.add(key); }
+    if(meta && key && !hidden.has(key) && !seen.has(key)){ catalog.push(meta); seen.add(key); }
   });
-  const order = QUICK_ORDER[quickOrderKey(groupLabel)] || [];
   // Tên đã chỉnh trong phần quản trị phải thắng tên cố định/tên cũ lấy từ dữ liệu.
   const displayNames = new Map();
   order.forEach(value=>displayNames.set(normalizeQuickText(value), value));
@@ -13011,15 +13091,20 @@ async function renameGroupOrderItem(index){
     custom: JSON.parse(JSON.stringify(QUICK_CUSTOM_TAGS)), hidden: JSON.parse(JSON.stringify(QUICK_HIDDEN_TAGS))
   };
   const oldKey=groupOrderKey(oldValue), newKey=groupOrderKey(newValue);
+  const oldQuickKey=quickOrderKey(oldValue), newQuickKey=quickOrderKey(newValue);
   DATA.forEach(row=>{
     if(String(row[0]||"").trim().toUpperCase()!==tab) return;
     row[8]=joinRowGroups(getRowGroups(row[8]).map(value=>groupOrderKey(value)===oldKey ? newValue : value));
   });
   GROUP_OPTIONS[tab]=(GROUP_OPTIONS[tab]||[]).map(value=>groupOrderKey(value)===oldKey ? newValue : value);
   GROUP_ORDER[tab]=(GROUP_ORDER[tab]||groups.map(groupOrderKey)).map(value=>value===oldKey ? newKey : value);
-  if(oldKey!==newKey){
+  if(oldQuickKey!==newQuickKey){
     [QUICK_ORDER,QUICK_CUSTOM_TAGS,QUICK_HIDDEN_TAGS].forEach(store=>{
-      if(store[oldKey]!==undefined){ store[newKey]=store[oldKey]; delete store[oldKey]; }
+      if(store[oldQuickKey]===undefined) return;
+      const moved=Array.isArray(store[oldQuickKey])?store[oldQuickKey]:[];
+      const existing=Array.isArray(store[newQuickKey])?store[newQuickKey]:[];
+      store[newQuickKey]=[...existing,...moved].filter((value,index,list)=>list.findIndex(item=>normalizeQuickText(item)===normalizeQuickText(value))===index);
+      delete store[oldQuickKey];
     });
   }
   if(quickGroupFilter?.groupLabel && groupOrderKey(quickGroupFilter.groupLabel)===oldKey) quickGroupFilter.groupLabel=newValue;
@@ -13136,7 +13221,7 @@ function getQuickMetaCandidates(r, groupLabel){
   const groupKind = getQuickGroupKind(resolvedGroupLabel);
   const manualTags = getRowQuickTags(r?.[11] || "");
   if(manualTags.length){
-    const manualMetas = manualTags.map(tag=>makeQuickMeta(groupKind, tag, "", tag)).filter(Boolean);
+    const manualMetas = manualTags.map(tag=>makeConfiguredQuickMeta(groupKind, tag, "", tag)).filter(Boolean);
     if(manualMetas.length) return manualMetas;
   }
   const configuredMeta = detectConfiguredQuickMeta(r, resolvedGroupLabel);
@@ -17630,49 +17715,69 @@ function updateQuickTagOptions(selectedTag){
     if(hint) hint.textContent = groupLabel ? "Bạn có thể tạo phân loại dùng chung mới cho nhóm chính này." : "Hãy chọn Nhóm sản phẩm trước để xem phân loại phù hợp.";
     return;
   }
-  if(hint) hint.textContent = `Đang hiển thị phân loại của nhóm chính: ${groupLabel}.`;
+  if(hint) hint.textContent = `Dùng chung với Sắp xếp bộ lọc và ngoài trang chủ · Nhóm chính: ${groupLabel}.`;
   box.innerHTML = catalog.map(meta=>{
     const value = String(meta.primary || "");
     return `<label class="group-check"><input type="checkbox" value="${escapeHtml(value)}"${selectedKeys.has(normalizeQuickText(value))?" checked":""}><span>${escapeHtml(meta.label || value)}</span></label>`;
   }).join("");
 }
 
-function addQuickTagFromForm(){
+function registerQuickTagForGroup(group, rawValue){
+  const value = cleanQuickLabel(rawValue);
+  const key = quickOrderKey(group);
+  if(!key || !value) return false;
+  const valueKey = normalizeQuickText(value);
+  let changed = false;
+  const hidden = Array.isArray(QUICK_HIDDEN_TAGS[key]) ? QUICK_HIDDEN_TAGS[key] : [];
+  const visibleHidden = hidden.filter(item=>normalizeQuickText(item)!==valueKey);
+  if(visibleHidden.length !== hidden.length){
+    changed = true;
+    if(visibleHidden.length) QUICK_HIDDEN_TAGS[key] = visibleHidden;
+    else delete QUICK_HIDDEN_TAGS[key];
+  }
+  const fixedExists = getQuickFixedCatalogBase(group).some(meta=>normalizeQuickText(meta.primary)===valueKey);
+  const custom = Array.isArray(QUICK_CUSTOM_TAGS[key]) ? QUICK_CUSTOM_TAGS[key] : [];
+  if(!fixedExists && !custom.some(item=>normalizeQuickText(item)===valueKey)){
+    QUICK_CUSTOM_TAGS[key] = [...custom, value];
+    changed = true;
+  }
+  const order = Array.isArray(QUICK_ORDER[key]) ? QUICK_ORDER[key] : getQuickFixedCatalog(group).map(meta=>meta.primary);
+  if(!order.some(item=>normalizeQuickText(item)===valueKey)){
+    QUICK_ORDER[key] = [...order, value];
+    changed = true;
+  }else if(!Array.isArray(QUICK_ORDER[key])){
+    QUICK_ORDER[key] = order;
+  }
+  return changed;
+}
+
+async function addQuickTagFromForm(){
   if(!requireAdmin()) return;
   const input = document.getElementById("fQuickTagNew");
   const value = cleanQuickLabel(input?.value || "");
-  const groups = getSelectedFormGroups();
+  const group = document.getElementById("fPrimaryGroup")?.value || getSelectedFormGroups()[0] || "";
   if(!value){ showToast("⚠️ Nhập tên phân loại trước"); input?.focus(); return; }
-  if(!groups.length){ showToast("⚠️ Chọn nhóm sản phẩm trước"); return; }
-  if(!confirm(`Tạo phân loại dùng chung "${value}" cho ${groups.length} nhóm đã chọn? Phân loại này sẽ xuất hiện trong bộ lọc của các sản phẩm khác.`)) return;
-  let added = false;
-  groups.forEach(group=>{
-    const key = quickOrderKey(group);
-    const values = Array.isArray(QUICK_CUSTOM_TAGS[key]) ? QUICK_CUSTOM_TAGS[key] : [];
-    const hidden = Array.isArray(QUICK_HIDDEN_TAGS[key]) ? QUICK_HIDDEN_TAGS[key] : [];
-    const wasHidden = hidden.some(item=>normalizeQuickText(item) === normalizeQuickText(value));
-    if(wasHidden){
-      QUICK_HIDDEN_TAGS[key] = hidden.filter(item=>normalizeQuickText(item) !== normalizeQuickText(value));
-      if(!QUICK_HIDDEN_TAGS[key].length) delete QUICK_HIDDEN_TAGS[key];
-      added = true;
-    }
-    if(!values.some(item=>normalizeQuickText(item) === normalizeQuickText(value))
-      && !getQuickFixedCatalogBase(group).some(meta=>normalizeQuickText(meta.primary) === normalizeQuickText(value))){
-      values.push(value);
-      QUICK_CUSTOM_TAGS[key] = values;
-      added = true;
-    }
-  });
+  if(!group){ showToast("⚠️ Chọn nhóm sản phẩm trước"); return; }
+  if(!confirm(`Tạo phân loại dùng chung "${value}" cho nhóm chính "${group}"? Mục này sẽ xuất hiện ngay trong Form, Sắp xếp bộ lọc và ngoài trang chủ.`)) return;
+  const added = registerQuickTagForGroup(group, value);
   input.value = "";
   const currentlySelected = getSelectedQuickTags();
   if(!currentlySelected.some(item=>normalizeQuickText(item) === normalizeQuickText(value))) currentlySelected.push(value);
   updateQuickTagOptions(currentlySelected.join(" | "));
   if(added){
-    saveDisplayConfig();
-    showToast(`✓ Đã thêm phân loại: ${value}`);
+    renderQuickOrderListIfOpen(group);
+    render();
+    const saved = await saveDisplayConfig();
+    showToast(saved ? `✅ Đã thêm và đồng bộ: ${value}` : `⚠️ Đã thêm trên máy, đang chờ đồng bộ: ${value}`, saved ? 2800 : 5200);
   }else{
     showToast("Phân loại này đã có sẵn");
   }
+}
+
+function renderQuickOrderListIfOpen(group){
+  const overlay = document.getElementById("quickOrderOverlay");
+  const select = document.getElementById("quickOrderGroup");
+  if(overlay?.classList.contains("open") && select && quickOrderKey(select.value)===quickOrderKey(group)) renderQuickOrderList();
 }
 
 function getSelectedQuickTags(){
@@ -17858,7 +17963,9 @@ async function saveItem(){
   const stockInputRaw = String(document.getElementById("fTon").value ?? "").trim();
   const costInputRaw = String(document.getElementById("fGia").value || "").trim();
   const saleInputRaw = String(document.getElementById("fGiaBan").value || "").trim();
-  let quickTag = joinRowQuickTags(getSelectedQuickTags());
+  let selectedQuickTags = getSelectedQuickTags();
+  let quickTag = joinRowQuickTags(selectedQuickTags);
+  let formQuickConfigChanged = false;
   if(!validateSheetImageValue(img,"Ảnh sản phẩm")) return;
   for(const [value,label] of [[warrantyImg1,"Ảnh bảo hành 1"],[warrantyImg2,"Ảnh bảo hành 2"],[warrantyImg3,"Ảnh bảo hành 3"],[warrantyImg4,"Ảnh bảo hành 4"]]){
     if(!validateSheetImageValue(value,label)) return;
@@ -17871,6 +17978,18 @@ async function saveItem(){
   if(saleInputRaw && !/\d/.test(saleInputRaw)){ alert("Giá bán không hợp lệ. Hãy nhập số hoặc để trống!"); document.getElementById("fGiaBan").focus(); return; }
   if(costInputRaw && saleInputRaw && giaBan < gia && !confirm(`Giá bán thấp hơn giá nhập ${formatVndNumber(gia-giaBan)} Vnd. Bạn vẫn muốn lưu?`)) return;
   const primaryGroup = getPrimaryRowGroup(grp);
+  // Nếu Admin đã gõ tên mới nhưng quên bấm nút "+ Thêm phân loại nhanh", nút
+  // Lưu thiết bị vẫn tạo, chọn và đồng bộ bộ lọc đó. Không còn tình trạng tên
+  // nằm trong ô nhập nhưng bị bỏ qua âm thầm.
+  const pendingQuickTag = cleanQuickLabel(document.getElementById("fQuickTagNew")?.value || "");
+  if(pendingQuickTag){
+    if(!primaryGroup){ alert("Hãy chọn Nhóm sản phẩm trước khi tạo Phân loại nhanh mới."); return; }
+    registerQuickTagForGroup(primaryGroup, pendingQuickTag);
+    formQuickConfigChanged = true;
+    if(!selectedQuickTags.some(value=>normalizeQuickText(value)===normalizeQuickText(pendingQuickTag))) selectedQuickTags.push(pendingQuickTag);
+    quickTag = joinRowQuickTags(selectedQuickTags);
+    updateQuickTagOptions(quickTag);
+  }
   if(primaryGroup && !quickTag){
     const previewRow = [sh,ma,ten,th,gia,ton,tt,ghiNote,grp,img,giaBan,"",sapHet,document.getElementById("fBranch").value,warrantyImg1,warrantyImg2,warrantyTitle1,warrantyTitle2];
     const inferredTags = getQuickMetaCandidates(previewRow, primaryGroup).map(meta=>meta.primary).filter(isKnownQuickValue);
@@ -17905,7 +18024,7 @@ async function saveItem(){
     return;
   }
 const row = normalizeSheetRows([[sh,ma,ten,th,gia,ton,getStockStatusValue(ton, sapHet),mergeNoteLocation(ghiNote, vitri),grp,img,giaBan,quickTag,sapHet,document.getElementById("fBranch").value,warrantyImg1,warrantyImg2,warrantyTitle1,warrantyTitle2,warrantyImg3,warrantyImg4,warrantyTitle3,warrantyTitle4]])[0];
-let shouldSaveDisplayConfig = false;
+let shouldSaveDisplayConfig = formQuickConfigChanged;
 const saveButton = document.getElementById("fSaveBtn");
 if(saveButton){ saveButton.disabled = true; saveButton.textContent = "⏳ Đang lưu lên máy chủ..."; }
 if(isCreating && !pendingCreate){
@@ -17960,6 +18079,7 @@ if(isCreating && !pendingCreate){
 // Chỉ ghi cấu hình sau khi sản phẩm đã ghi xong để hai POST không tranh cùng khóa Apps Script.
 if(shouldSaveDisplayConfig && isAdminMode()) await saveDisplayConfig();
 if(saveButton){ saveButton.disabled = false; saveButton.textContent = "💾 Lưu thiết bị"; }
+if(pendingQuickTag) document.getElementById("fQuickTagNew").value = "";
 
 closeOverlay("editOverlay");
 if(isCreating){
