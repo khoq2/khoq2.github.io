@@ -18,7 +18,7 @@
 <link rel="preconnect" href="https://script.google.com" crossorigin />
 <link rel="preconnect" href="https://lh3.googleusercontent.com" crossorigin />
 <link rel="dns-prefetch" href="https://drive.google.com" />
-<title>🏪 KHO Q2 (HOÀNG GIA COMPUTER) [v16]</title>
+<title>🏪 KHO Q2 (HOÀNG GIA COMPUTER) [v18]</title>
 <script defer crossorigin="anonymous" integrity="sha384-vtjasyidUo0kW94K5MXDXntzOJpQgBKXmE7e2Ga4LG0skTTLeBi97eFAXsqewJjw" src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script defer crossorigin="anonymous" integrity="sha384-vseuUuO/VRMn00lXYd5m/Pk4l/7RjMqhXGf6G0RALy+On0txYb39dQsUQDAd7q5L" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.10/pdfmake.min.js"></script>
 <script defer crossorigin="anonymous" integrity="sha384-1y8s2U/Jjn4/oeCEBcfYH3M6XeQtcg4LRmluN92FS69UgtLzoyhn3swew8Ynj8Ai" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.10/vfs_fonts.js"></script>
@@ -8533,6 +8533,79 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
   }
 }
 </style>
+<style id="kpi-workview-ui">
+.kpi.is-active{
+  filter:brightness(1.08);
+  transform:translateY(-1px);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.28),0 0 0 3px #fff,0 0 0 6px rgba(41,128,185,.35),0 7px 18px rgba(8,32,54,.22)!important;
+}
+.kpi-workbar{
+  --work-accent:#2E86C1;
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:10px 16px;
+  align-items:center;
+  margin:0 0 13px;
+  padding:12px 14px;
+  border:1px solid color-mix(in srgb,var(--work-accent) 32%,#D9E4EC);
+  border-left:5px solid var(--work-accent);
+  border-radius:13px;
+  background:linear-gradient(110deg,color-mix(in srgb,var(--work-accent) 8%,#fff),#fff 70%);
+  box-shadow:0 5px 16px rgba(31,61,87,.08);
+}
+.kpi-workbar-copy{min-width:0;display:grid;gap:3px}
+.kpi-workbar-title{color:#183A59;font-size:14px;font-weight:950;line-height:1.25}
+.kpi-workbar-note{color:#63798B;font-size:10px;font-weight:700;line-height:1.4}
+.kpi-workbar-actions{display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:6px}
+.kpi-work-metrics{grid-column:1/-1;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;padding-top:9px;border-top:1px solid color-mix(in srgb,var(--work-accent) 18%,#E3EBF1)}
+.kpi-work-metric{min-width:0;display:grid;gap:2px;padding:8px 10px;border:1px solid #E0E8EF;border-radius:10px;background:rgba(255,255,255,.9)}
+.kpi-work-metric b{overflow:hidden;color:#193A59;font-size:13px;font-weight:950;text-overflow:ellipsis;white-space:nowrap}
+.kpi-work-metric span{overflow:hidden;color:#718395;font-size:9px;font-weight:800;text-overflow:ellipsis;white-space:nowrap}
+.kpi-work-chip,.kpi-work-clear,.kpi-work-plan{
+  min-height:32px;
+  margin:0;
+  padding:6px 10px;
+  border:1px solid #CAD9E5;
+  border-radius:9px;
+  background:#fff;
+  color:#294A65;
+  font:800 10px/1.2 inherit;
+  white-space:nowrap;
+  cursor:pointer;
+}
+.kpi-work-chip:hover,.kpi-work-chip:focus-visible,.kpi-work-clear:hover,.kpi-work-clear:focus-visible,.kpi-work-plan:hover,.kpi-work-plan:focus-visible{border-color:var(--work-accent);outline:none}
+.kpi-work-chip.is-active{border-color:var(--work-accent);background:var(--work-accent);color:#fff;box-shadow:0 3px 9px color-mix(in srgb,var(--work-accent) 24%,transparent)}
+.kpi-work-chip span{opacity:.78}
+.kpi-work-plan{border-color:color-mix(in srgb,#1E8449 42%,#CAD9E5);color:#176D3C}
+.kpi-work-clear{color:#8A3340}
+.kpi-ops-shell{margin-top:0;border:1px solid #DCE6ED;border-radius:13px;background:#fff;box-shadow:0 5px 18px rgba(25,57,82,.07);overflow:hidden}
+.kpi-ops-toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 12px;border-bottom:1px solid #E3EBF1;background:#F7FAFC;color:#5D7283;font-size:10px;font-weight:800}
+.kpi-ops-table{min-width:940px}
+.kpi-ops-head,.kpi-ops-row{display:grid;grid-template-columns:92px minmax(260px,2.2fr) minmax(150px,1fr) 82px 90px 100px 128px;gap:9px;align-items:center;padding:8px 11px}
+.kpi-ops-head{position:sticky;top:0;z-index:2;border-bottom:1px solid #DCE6ED;background:#EDF4F8;color:#52697D;font-size:8px;font-weight:950;letter-spacing:.3px;text-transform:uppercase}
+.kpi-ops-row{width:100%;margin:0;border:0;border-bottom:1px solid #E8EEF3;background:#fff;color:#2C3E50;font:inherit;text-align:left;cursor:pointer;appearance:none}
+.kpi-ops-row:nth-child(odd){background:#FBFDFE}
+.kpi-ops-row:last-child{border-bottom:0}
+.kpi-ops-row:hover,.kpi-ops-row:focus-visible{z-index:1;background:#EEF7FC;outline:2px solid #85C1E9;outline-offset:-2px}
+.kpi-ops-priority{display:inline-flex;align-items:center;justify-content:center;min-height:26px;padding:4px 7px;border-radius:8px;background:#EAF2F8;color:#1A5276;font-size:8px;font-weight:950;text-align:center}
+.kpi-ops-priority.urgent{background:#FADBD8;color:#922B21}.kpi-ops-priority.prepare{background:#FEF5D7;color:#8A6500}.kpi-ops-priority.verify{background:#EAF2F8;color:#1A5276}.kpi-ops-priority.watch{background:#F2EAF8;color:#6C3483}.kpi-ops-priority.stable{background:#E5F5EC;color:#176D3C}
+.kpi-ops-product{min-width:0;display:grid;gap:2px}.kpi-ops-product b{overflow:hidden;color:#183A59;font-size:11px;font-weight:950;text-overflow:ellipsis;white-space:nowrap}.kpi-ops-product small,.kpi-ops-group small{overflow:hidden;color:#748697;font-size:9px;font-weight:750;text-overflow:ellipsis;white-space:nowrap}
+.kpi-ops-group{min-width:0;display:grid;gap:2px}.kpi-ops-group b{overflow:hidden;color:#35546D;font-size:9px;font-weight:900;text-overflow:ellipsis;white-space:nowrap}
+.kpi-ops-number{display:grid;gap:2px;color:#294A65;font-size:10px;font-weight:950;text-align:right}.kpi-ops-number small{color:#80909E;font-size:8px;font-weight:750}
+.kpi-ops-number.is-alert{color:#C0392B}.kpi-ops-number.is-warn{color:#9A7100}.kpi-ops-number.is-money{color:#176D3C}
+.kpi-ops-empty{padding:24px;text-align:center;color:#708392;font-size:11px}
+.kpi-ops-more{width:100%;min-height:40px;margin:0;border:0;border-top:1px solid #DCE6ED;background:#F5F9FC;color:#1A5276;font-size:10px;font-weight:950;cursor:pointer}
+.kpi-ops-more:hover,.kpi-ops-more:focus-visible{background:#EAF4FA;outline:none}
+@media(min-width:900px){.kpi-workbar,.kpi-ops-shell{width:calc(100% - 62px)}}
+@media(max-width:700px){
+  .kpi-workbar{grid-template-columns:1fr;padding:10px 11px;gap:9px}
+  .kpi-workbar-actions{justify-content:flex-start;overflow-x:auto;flex-wrap:nowrap;padding-bottom:2px;scrollbar-width:thin}
+  .kpi-work-chip,.kpi-work-clear,.kpi-work-plan{flex:0 0 auto}
+  .kpi-work-metrics{display:flex;overflow-x:auto;gap:6px;padding-bottom:2px;scrollbar-width:thin}
+  .kpi-work-metric{flex:0 0 140px}
+  .kpi-ops-shell{overflow-x:auto}
+}
+</style>
 </head>
 <body>
 <div class="sticky">
@@ -8546,14 +8619,13 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     </div>
     <div class="title"><span class="title-logo-slot"><img class="title-icon title-brand-logo" id="headerBrandLogo" src="" alt="Logo cửa hàng" hidden onerror="this.hidden=true;document.getElementById('headerBrandFallback').hidden=false"><span class="title-icon title-brand-fallback" id="headerBrandFallback" aria-hidden="true">🏪</span></span><span class="title-text"><span class="title-base">HOÀNG GIA COMPUTER</span><span class="title-shine" aria-hidden="true"></span></span><div class="recent-activity-wrap" id="recentActivityWrap"><button type="button" class="recent-activity-bell" id="recentActivityBell" aria-label="Mở thông báo giao dịch mới" aria-expanded="false" onclick="toggleRecentActivity(event)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"></path><path d="M10 21h4"></path></svg><span class="recent-activity-count" id="recentActivityCount"></span><span class="header-control-tooltip" aria-hidden="true"><span class="header-tooltip-title">GIAO DỊCH GẦN ĐÂY</span><span class="header-tooltip-status" id="recentActivityTooltipStatus">Không có giao dịch mới</span></span></button><div class="recent-activity-panel" id="recentActivityPanel"><div class="recent-activity-head"><span class="recent-activity-title">GIAO DỊCH GẦN ĐÂY</span><span class="recent-activity-head-actions"><button type="button" class="recent-activity-all" id="recentActivityAll" onclick="toggleAllRecentActivity(event)">Xem tất cả</button><button type="button" class="recent-activity-close" aria-label="Đóng giao dịch gần đây" onclick="closeRecentActivity();event.stopPropagation()">×</button></span></div><div class="recent-activity-overview" id="recentActivityOverview" aria-label="Tóm tắt hoạt động hôm nay"></div><div class="recent-activity-filters" id="recentActivityFilters" role="group" aria-label="Lọc giao dịch"><button type="button" class="recent-activity-filter active" data-recent-filter="ALL" aria-pressed="true" onclick="setRecentActivityFilter('ALL',event)">Tất cả <span>0</span></button><button type="button" class="recent-activity-filter" data-recent-filter="IMPORT" aria-pressed="false" onclick="setRecentActivityFilter('IMPORT',event)">Nhập <span>0</span></button><button type="button" class="recent-activity-filter" data-recent-filter="SALE" aria-pressed="false" onclick="setRecentActivityFilter('SALE',event)">Xuất <span>0</span></button><button type="button" class="recent-activity-filter" data-recent-filter="TRANSFER" aria-pressed="false" onclick="setRecentActivityFilter('TRANSFER',event)">Chuyển <span>0</span></button><button type="button" class="recent-activity-filter" data-recent-filter="ADJUST" aria-pressed="false" onclick="setRecentActivityFilter('ADJUST',event)">Điều chỉnh <span>0</span></button></div><div class="recent-activity-list" id="recentActivityList"></div></div></div><span class="warehouse-switcher" role="group" aria-label="Chọn kho đang xem"><button type="button" class="warehouse-switch" data-warehouse="Q2" aria-label="KHO Q2" onclick="selectWarehouseBranch('Q2')"><span class="warehouse-pin">📍</span> Q2<span class="header-control-tooltip" aria-hidden="true"><span class="header-tooltip-title">KHO Q2</span></span></button><button type="button" class="warehouse-switch" data-warehouse="Q5" aria-label="KHO Q5" onclick="selectWarehouseBranch('Q5')"><span class="warehouse-pin">📍</span> Q5<span class="header-control-tooltip" aria-hidden="true"><span class="header-tooltip-title">KHO Q5</span></span></button></span></div>
     <div class="kpi-row">
-      <button type="button" class="kpi" style="background:#2E86C1" aria-label="Xem phân tích mặt hàng" onclick="showKpiDetail('all')" onmouseenter="showKpiHoverMenu('all',this)" onmouseleave="scheduleKpiHoverClose()"><span class="kpi-v"><span class="kpi-icon kpi-icon-box" aria-hidden="true">📦</span><span id="kpi-mh">0</span></span><span class="kpi-l">mặt hàng <span class="kpi-hint">▼</span></span><span class="kpi-insight" id="kpi-insight-all"></span></button>
-      <button type="button" class="kpi" style="background:#1E8449" aria-label="Xem phân tích tổng tồn" onclick="showKpiDetail('ton')" onmouseenter="showKpiHoverMenu('ton',this)" onmouseleave="scheduleKpiHoverClose()"><span class="kpi-v"><span class="kpi-icon kpi-icon-stock" aria-hidden="true">📊</span><span id="kpi-ton">0</span></span><span class="kpi-l">tổng tồn <span class="kpi-hint">▼</span></span><span class="kpi-insight" id="kpi-insight-ton"></span></button>
-     <button type="button" class="kpi" style="background:#C0392B" aria-label="Xem và xử lý mặt hàng hết hàng" onclick="showKpiDetail('het')" onmouseenter="showKpiHoverMenu('het',this)" onmouseleave="scheduleKpiHoverClose()">
+      <button type="button" class="kpi" data-kpi-work="all" style="background:#2E86C1" aria-label="Lọc tất cả mặt hàng" aria-pressed="false" onclick="openKpiWorkView('all')"><span class="kpi-v"><span class="kpi-icon kpi-icon-box" aria-hidden="true">📦</span><span id="kpi-mh">0</span></span><span class="kpi-l">mặt hàng <span class="kpi-hint">→</span></span><span class="kpi-insight" id="kpi-insight-all"></span></button>
+      <button type="button" class="kpi" data-kpi-work="ton" style="background:#1E8449" aria-label="Lọc các mặt hàng đang còn tồn" aria-pressed="false" onclick="openKpiWorkView('ton')"><span class="kpi-v"><span class="kpi-icon kpi-icon-stock" aria-hidden="true">📊</span><span id="kpi-ton">0</span></span><span class="kpi-l">tổng tồn <span class="kpi-hint">→</span></span><span class="kpi-insight" id="kpi-insight-ton"></span></button>
+     <button type="button" class="kpi" data-kpi-work="het" style="background:#C0392B" aria-label="Lọc mặt hàng hết hàng" aria-pressed="false" onclick="openKpiWorkView('het')">
     <div class="kpi-v"><span class="kpi-icon kpi-icon-out" aria-hidden="true">🔴</span><span id="kpi-het">0</span></div>
-    <div class="kpi-l">hết hàng <span class="kpi-hint">▼</span></div><div class="kpi-insight" id="kpi-insight-het"></div>
+    <div class="kpi-l">hết hàng <span class="kpi-hint">→</span></div><div class="kpi-insight" id="kpi-insight-het"></div>
 </button>
-      <button type="button" class="kpi" style="background:#B7950B" aria-label="Xem và xử lý mặt hàng sắp hết" onclick="showKpiDetail('sap')" onmouseenter="showKpiHoverMenu('sap',this)" onmouseleave="scheduleKpiHoverClose()"><span class="kpi-v"><span class="kpi-icon kpi-icon-low" aria-hidden="true">🟡</span><span id="kpi-sap">0</span></span><span class="kpi-l">sắp hết <span class="kpi-hint">▼</span></span><span class="kpi-insight" id="kpi-insight-sap"></span></button>
-      <div id="kpiHoverMenu" class="kpi-hover-menu" onmouseenter="cancelKpiHoverClose()" onmouseleave="scheduleKpiHoverClose()" onwheel="event.stopPropagation();cancelKpiHoverClose()"></div>
+      <button type="button" class="kpi" data-kpi-work="sap" style="background:#B7950B" aria-label="Lọc mặt hàng sắp hết" aria-pressed="false" onclick="openKpiWorkView('sap')"><span class="kpi-v"><span class="kpi-icon kpi-icon-low" aria-hidden="true">🟡</span><span id="kpi-sap">0</span></span><span class="kpi-l">sắp hết <span class="kpi-hint">→</span></span><span class="kpi-insight" id="kpi-insight-sap"></span></button>
     </div>
     <div class="search-box">
       <span class="search-icon" aria-hidden="true">
@@ -9820,6 +9892,7 @@ function selectWarehouseBranch(branch){
   SEARCH_KEYWORDS_THIS_VISIT=[];
   try{ localStorage.setItem("kho_active_warehouse",branch); }catch(_){}
   totalStockView=false; restockOnly=false;
+  if(activeKpiView) kpiWorkVisibleLimit=120;
   const formBranch=document.getElementById("fBranch"); if(formBranch && !document.getElementById("editOverlay")?.classList.contains("open")) formBranch.value=branch;
   closeSearchSuggestions();
   latestItemsTickerIndex=0; latestItemsTickerKey=""; latestItemsTickerHasShown=false;
@@ -9831,6 +9904,10 @@ function selectWarehouseBranch(branch){
 }
 let restockOnly = false;
 let totalStockView = false;
+let activeKpiView = "";
+let kpiWorkSubfilter = "all";
+let kpiWorkVisibleLimit = 120;
+let currentKpiWorkResults = [];
 let searchQ = "";
 const SEARCH_KEYWORD_POOL = ["SSD","RAM","Nguồn","Mainboard","CPU","HP","Canon","Camera wifi","Laptop","Màn hình","Chuột","Bàn phím","Router","Switch","HDMI","Máy in"];
 let SEARCH_KEYWORDS_THIS_VISIT = [];
@@ -11831,14 +11908,183 @@ function scheduleKpiSearch(value){
   },180);
 }
 function applyKpiToMainView(mode){
+  if(mode==="restock"){
+    closeOverlay("kpiOverlay");
+    activeKpiView="";kpiWorkSubfilter="all";
+    searchQ="";quickGroupFilter=null;restockOnly=true;totalStockView=false;
+    currentTab="ALL";currentStatus="ALL";
+    const search=document.getElementById("search"),clear=document.getElementById("clear-btn");
+    if(search)search.value="";if(clear)clear.style.display="none";
+    syncHomeStockFilters();syncRestockButton(true);syncStatusButtons("");render();
+    scrollKpiWorkViewIntoPlace();
+    return;
+  }
+  openKpiWorkView(mode);
+}
+function syncKpiWorkButtons(){
+  document.querySelectorAll(".kpi[data-kpi-work]").forEach(button=>{
+    const selected=button.dataset.kpiWork===activeKpiView;
+    button.classList.toggle("is-active",selected);
+    button.setAttribute("aria-pressed",String(selected));
+  });
+}
+function scrollKpiWorkViewIntoPlace(){
+  requestAnimationFrame(()=>{
+    const target=document.getElementById("results"),sticky=document.querySelector(".sticky");
+    if(target) window.scrollTo({top:Math.max(0,target.offsetTop-(sticky?.offsetHeight||0)-10),left:0,behavior:"auto"});
+  });
+}
+function openKpiWorkView(mode){
   closeOverlay("kpiOverlay");
-  searchQ="";quickGroupFilter=null;restockOnly=mode==="restock";totalStockView=mode==="ton"||mode==="all";
+  const next=["all","ton","het","sap"].includes(mode)?mode:"all";
+  activeKpiView=next;kpiWorkSubfilter="all";kpiWorkVisibleLimit=120;
+  searchQ="";quickGroupFilter=null;restockOnly=false;totalStockView=false;
   currentTab="ALL";
-  currentStatus=mode==="het"?"HET":mode==="sap"?"SAP":"ALL";
+  currentStatus=next==="het"?"HET":next==="sap"?"SAP":"ALL";
   const search=document.getElementById("search"),clear=document.getElementById("clear-btn");
   if(search)search.value="";if(clear)clear.style.display="none";
-  syncHomeStockFilters();syncRestockButton(restockOnly);syncStatusButtons(totalStockView?"ALL":currentStatus);render();
-  requestAnimationFrame(()=>{const target=document.getElementById("results"),sticky=document.querySelector(".sticky");if(target)window.scrollTo({top:Math.max(0,target.offsetTop-(sticky?.offsetHeight||0)-10),left:0,behavior:"smooth"});});
+  document.querySelectorAll(".tab-btn").forEach(button=>button.classList.toggle("active",button.dataset.tab==="ALL"));
+  syncHomeStockFilters();syncRestockButton(false);syncStatusButtons(currentStatus);render();
+  scrollKpiWorkViewIntoPlace();
+}
+function clearKpiWorkView(){
+  activeKpiView="";kpiWorkSubfilter="all";kpiWorkVisibleLimit=120;currentKpiWorkResults=[];
+  searchQ="";quickGroupFilter=null;restockOnly=false;totalStockView=false;
+  currentTab="ALL";currentStatus="ALL";
+  const search=document.getElementById("search"),clear=document.getElementById("clear-btn");
+  if(search)search.value="";if(clear)clear.style.display="none";
+  syncHomeStockFilters();syncRestockButton(false);syncStatusButtons("");render();
+  window.scrollTo({top:0,left:0,behavior:"auto"});
+}
+function setKpiWorkSubfilter(value){
+  kpiWorkSubfilter=String(value||"all");
+  kpiWorkVisibleLimit=120;
+  render();
+}
+function renderKpiWorkChip(value,label,count){
+  const selected=kpiWorkSubfilter===value;
+  return `<button type="button" class="kpi-work-chip${selected?" is-active":""}" aria-pressed="${selected}" onclick="setKpiWorkSubfilter('${value}')">${escapeHtml(label)} <span>${Number(count)||0}</span></button>`;
+}
+function renderKpiWorkMetric(value,label){
+  return `<span class="kpi-work-metric"><b>${escapeHtml(String(value))}</b><span>${escapeHtml(label)}</span></span>`;
+}
+function renderKpiWorkbar(visibleResults){
+  if(!activeKpiView) return "";
+  const allScoped=getKpiEnrichedEntries();
+  const scoped=kpiFilterEntries(activeKpiView,allScoped);
+  const visible=getKpiEnrichedEntries(visibleResults);
+  const count=visibleResults.length;
+  const totalUnits=visible.reduce((sum,item)=>sum+item.stock,0);
+  const salesCount=scoped.filter(item=>item.sales30>0).length;
+  const actionable=visible.filter(isInventoryActionable);
+  const monitor=visible.filter(item=>!isInventoryActionable(item));
+  const suggestedQty=actionable.reduce((sum,item)=>sum+getRestockMinimumSuggestion(item),0);
+  const canSeeCost=hasPrivateProductDataAccess();
+  const missingCost=actionable.filter(item=>!(Number(item.r[4])>0)).length;
+  const purchaseBudget=actionable.reduce((sum,item)=>sum+getRestockMinimumSuggestion(item)*(Number(item.r[4])||0),0);
+  const inventoryCost=visible.reduce((sum,item)=>sum+item.stock*(Number(item.r[4])||0),0);
+  const inventorySale=visible.reduce((sum,item)=>sum+item.stock*(Number(item.r[10])||0),0);
+  const idleCount=visible.filter(item=>item.sales30===0).length;
+  const config={
+    all:{accent:"#2E86C1",title:`Tất cả mặt hàng · ${count} mã`,note:`Bảng kiểm kho gọn cho quy mô lớn. Gõ mã hoặc tên ở ô tìm kiếm để thu hẹp trong danh sách này.`},
+    ton:{accent:"#1E8449",title:`Đang còn hàng · ${count} mã`,note:`Tổng ${totalUnits.toLocaleString("vi-VN")} sản phẩm; xếp tồn nhiều trước để kiểm tra vốn và hàng chậm bán.`},
+    het:{accent:"#C0392B",title:`Hết hàng · ${count} mã`,note:Array.isArray(TX_DATA)&&TX_DATA.length?`Tách rõ mã cần nhập và mã chỉ chờ xác nhận. Chưa có liên kết mã hàng–đối tác nên chưa thể tự chọn nhà cung cấp.`:"Chưa tải lịch sử giao dịch nên chưa đề xuất mua; chỉ hiển thị để xác nhận nhu cầu."},
+    sap:{accent:"#B7950B",title:`Sắp hết · ${count} mã`,note:Array.isArray(TX_DATA)&&TX_DATA.length?`Ưu tiên theo sức bán và mức tồn; số lượng gợi ý đủ khoảng 15 ngày hoặc vượt ngưỡng.`:"Chưa tải lịch sử giao dịch nên chưa đề xuất mua; chỉ xếp theo mức tồn."}
+  }[activeKpiView];
+  let chips="";
+  if(activeKpiView==="het"){
+    chips=renderKpiWorkChip("all","Tất cả",scoped.length);
+    if(Array.isArray(TX_DATA)&&TX_DATA.length){
+      chips+=renderKpiWorkChip("selling","Có bán 30 ngày",salesCount);
+      chips+=renderKpiWorkChip("no-sales","Chưa bán 30 ngày",scoped.length-salesCount);
+    }
+  }else if(activeKpiView==="sap"){
+    chips=renderKpiWorkChip("all","Tất cả",scoped.length)
+      +renderKpiWorkChip("one","Chỉ còn 1",scoped.filter(item=>item.stock===1).length)
+      +renderKpiWorkChip("threshold","Chạm ngưỡng",scoped.filter(item=>item.stock===item.threshold).length);
+    if(Array.isArray(TX_DATA)&&TX_DATA.length) chips+=renderKpiWorkChip("selling","Có bán 30 ngày",salesCount);
+  }
+  let metrics="";
+  if(activeKpiView==="het"||activeKpiView==="sap"){
+    metrics=renderKpiWorkMetric(actionable.length,"Mã có tín hiệu cần mua")
+      +renderKpiWorkMetric(`+${suggestedQty.toLocaleString("vi-VN")}`,"Số lượng đề xuất")
+      +(canSeeCost
+        ? renderKpiWorkMetric(`${formatVndNumber(purchaseBudget)}đ`,missingCost?`Ngân sách tạm tính · thiếu giá ${missingCost} mã`:"Ngân sách nhập dự kiến")
+        : renderKpiWorkMetric("Đăng nhập","Xem giá vốn và ngân sách"))
+      +renderKpiWorkMetric(monitor.length,"Chỉ theo dõi / xác nhận");
+  }else{
+    metrics=renderKpiWorkMetric(count,"Mã đang hiển thị")
+      +renderKpiWorkMetric(totalUnits.toLocaleString("vi-VN"),"Tổng sản phẩm")
+      +(canSeeCost?renderKpiWorkMetric(`${formatVndNumber(inventoryCost)}đ`,"Vốn tồn đã khai báo"):renderKpiWorkMetric(`${formatVndNumber(inventorySale)}đ`,"Giá trị theo giá bán"))
+      +renderKpiWorkMetric(Array.isArray(TX_DATA)&&TX_DATA.length?idleCount:"—","Chưa bán trong 30 ngày");
+  }
+  const exportLabel=activeKpiView==="het"||activeKpiView==="sap"?"Xuất kế hoạch CSV":"Xuất danh sách CSV";
+  const exportButton=`<button type="button" class="kpi-work-plan" onclick="exportKpiWorkCsv()">${exportLabel}</button>`;
+  return `<section class="kpi-workbar" style="--work-accent:${config.accent}" aria-label="Bộ lọc tồn kho đang dùng"><span class="kpi-workbar-copy"><strong class="kpi-workbar-title">${escapeHtml(config.title)}</strong><span class="kpi-workbar-note">${escapeHtml(config.note)}</span></span><span class="kpi-workbar-actions">${chips}${exportButton}<button type="button" class="kpi-work-clear" onclick="clearKpiWorkView()">Bỏ lọc</button></span><span class="kpi-work-metrics">${metrics}</span></section>`;
+}
+function showMoreKpiWorkRows(){
+  kpiWorkVisibleLimit+=120;
+  render();
+}
+function renderKpiOperationalList(results){
+  const entries=getKpiEnrichedEntries(results);
+  const canSeeCost=hasPrivateProductDataAccess();
+  const purchaseMode=activeKpiView==="het"||activeKpiView==="sap";
+  const financeHead=canSeeCost?(purchaseMode?"Ngân sách nhập":"Giá trị vốn"):"Giá bán";
+  const shown=entries.slice(0,kpiWorkVisibleLimit);
+  const rows=shown.map(item=>{
+    const r=item.r;
+    const action=getInventoryAction(item);
+    const suggestion=getRestockSuggestionDetails(item);
+    const priorityClass={URGENT:"urgent",PREPARE:"prepare",VERIFY:"verify",WATCH:"watch",STABLE:"stable"}[action.key]||"stable";
+    const group=cleanKpiPathLabel(getSummaryHierarchyGroup(r)||NO_GROUP);
+    const stockClass=item.state==="HET"?"is-alert":item.state==="SAP"?"is-warn":"";
+    let financeValue="",financeNote="";
+    if(canSeeCost){
+      const unitCost=Number(r[4])||0;
+      const qty=purchaseMode?suggestion.suggested:item.stock;
+      if(purchaseMode&&suggestion.suggested<=0){
+        financeValue="—";financeNote="Không đưa vào kế hoạch";
+      }else{
+        financeValue=unitCost?`${formatVndNumber(unitCost*qty)}đ`:"Thiếu giá vốn";
+        financeNote=unitCost?`${formatVndNumber(unitCost)}đ / sp`:"Cần kế toán bổ sung";
+      }
+    }else{
+      financeValue=Number(r[10])>0?`${formatVndNumber(Number(r[10]))}đ`:"Chưa có giá";
+      financeNote="Giá bán / sp";
+    }
+    const suggestedText=suggestion.suggested>0?`+${suggestion.suggested}`:"—";
+    const suggestedNote=suggestion.suggested>0?`Mục tiêu ${suggestion.target}`:(item.state==="CON"?"Đủ tồn":"Chưa có sức bán");
+    const financeClass=canSeeCost?(purchaseMode&&suggestion.suggested<=0?"":Number(r[4])>0?"is-money":"is-alert"):"";
+    return `<button type="button" class="kpi-ops-row" onclick="openSummaryInventoryItem(${item.i})" aria-label="Mở ${escapeHtml(r[2]||r[1]||"mặt hàng")}"><span class="kpi-ops-priority ${priorityClass}">${escapeHtml(action.shortLabel)}</span><span class="kpi-ops-product"><b>${escapeHtml(r[2]||"Chưa có tên")}</b><small>${escapeHtml(r[1]||"Chưa có mã")} · ${escapeHtml(r[3]||"Chưa rõ hãng")}</small></span><span class="kpi-ops-group"><b>${escapeHtml(group||"Chưa phân nhóm")}</b><small>Kho ${escapeHtml(r[13]||"Q2")}</small></span><span class="kpi-ops-number ${stockClass}">${item.stock}<small>Ngưỡng ${item.threshold}</small></span><span class="kpi-ops-number">${item.sales30.toLocaleString("vi-VN")}<small>Bán 30 ngày</small></span><span class="kpi-ops-number ${suggestion.suggested>0?"is-warn":""}">${suggestedText}<small>${escapeHtml(suggestedNote)}</small></span><span class="kpi-ops-number ${financeClass}">${escapeHtml(financeValue)}<small>${escapeHtml(financeNote)}</small></span></button>`;
+  }).join("");
+  const more=entries.length>shown.length?`<button type="button" class="kpi-ops-more" onclick="showMoreKpiWorkRows()">Hiện thêm 120 dòng · Còn ${(entries.length-shown.length).toLocaleString("vi-VN")}</button>`:"";
+  return `<section class="kpi-ops-shell"><div class="kpi-ops-toolbar"><span>Đang hiển thị ${shown.length.toLocaleString("vi-VN")}/${entries.length.toLocaleString("vi-VN")} mã · Bấm dòng để mở chi tiết</span><span>Không tải ảnh để danh sách lớn vẫn nhẹ</span></div><div class="kpi-ops-table"><div class="kpi-ops-head"><span>Quyết định</span><span>Mã / mặt hàng</span><span>Nhóm / kho</span><span>Tồn</span><span>Sức bán</span><span>Đề xuất nhập</span><span>${escapeHtml(financeHead)}</span></div>${rows||'<div class="kpi-ops-empty">Không có mặt hàng phù hợp.</div>'}</div>${more}</section>`;
+}
+function kpiCsvCell(value){
+  return `"${String(value??"").replace(/"/g,'""')}"`;
+}
+function exportKpiWorkCsv(){
+  if(!activeKpiView||!currentKpiWorkResults.length){ showToast("Không có dữ liệu để xuất."); return; }
+  const canSeeCost=hasPrivateProductDataAccess();
+  const purchaseMode=activeKpiView==="het"||activeKpiView==="sap";
+  const entries=getKpiEnrichedEntries(currentKpiWorkResults);
+  const headers=["Kho","Quyết định","Mã hàng","Tên mặt hàng","Nhóm","Tồn","Ngưỡng","Đã bán 30 ngày","Đề xuất nhập"];
+  if(canSeeCost) headers.push("Giá nhập","Ngân sách nhập dự kiến");
+  headers.push("Giá bán");
+  const rows=entries.map(item=>{
+    const suggestion=getRestockSuggestionDetails(item);
+    const row=[item.r[13]||"Q2",getInventoryAction(item).label,item.r[1]||"",item.r[2]||"",cleanKpiPathLabel(getSummaryHierarchyGroup(item.r)||NO_GROUP),item.stock,item.threshold,item.sales30,purchaseMode?suggestion.suggested:0];
+    if(canSeeCost){const cost=Number(item.r[4])||0;row.push(cost,purchaseMode?cost*suggestion.suggested:cost*item.stock);}
+    row.push(Number(item.r[10])||0);
+    return row;
+  });
+  const csv="\uFEFF"+[headers,...rows].map(row=>row.map(kpiCsvCell).join(",")).join("\r\n");
+  const blob=new Blob([csv],{type:"text/csv;charset=utf-8"});
+  const url=URL.createObjectURL(blob),link=document.createElement("a");
+  link.href=url;link.download=`${purchaseMode?"Ke-hoach-nhap":"Danh-sach-ton"}-${currentBranch}-${quickInventoryFileStamp()}.csv`;
+  document.body.appendChild(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
+  showToast(`Đã xuất ${entries.length} dòng CSV.`);
 }
 function renderKpiActionbar(type){
   const config={
@@ -13732,7 +13978,7 @@ function focusFirstQuickMatch(){
 }
 
 function isProductViewModeAvailable(){
-  return currentTab!=="ALL" || totalStockView || currentStatus==="AUDIT" || restockOnly;
+  return currentTab!=="ALL" || totalStockView || currentStatus==="AUDIT" || restockOnly || !!activeKpiView;
 }
 function getListSpecSortValue(row){
   const text = removeAccents(String(row?.[2] || "")).toLowerCase();
@@ -14569,13 +14815,15 @@ function render(){
   syncLatestItemsTickerVisibility();
   openSummaryListKey = "";
   initKPI();
+  syncKpiWorkButtons();
   selectedItems.forEach(i=>{ if(i>=DATA.length) selectedItems.delete(i); });
   updateBulkControls();
   const kw = removeAccents(searchQ.trim());
   const kwTokens = kw ? kw.split(/\s+/).filter(Boolean) : [];
   const auditContext=currentStatus==="AUDIT"&&!kwTokens.length ? buildInventoryAuditContext() : null;
-  const homeLandingMode = !bulkSelectMode && !kw && currentTab==="ALL" && currentStatus==="ALL" && !restockOnly && !totalStockView;
+  const homeLandingMode = !bulkSelectMode && !kw && currentTab==="ALL" && currentStatus==="ALL" && !restockOnly && !totalStockView && !activeKpiView;
   document.body.classList.toggle("home-landing-mode", homeLandingMode);
+  const kpiActivityIndex=activeKpiView ? buildKpiActivityIndex() : null;
   const results = DATA.map((r,i)=>({r,i})).filter(({r})=>{
     const [sh,,ten,th,,,tt,ghi] = r;
     // Khi có từ khóa, tìm toàn bộ danh mục trong kho hiện tại; tab chỉ giới hạn
@@ -14588,13 +14836,41 @@ function render(){
     if(!kwTokens.length && currentStatus==="HET" && stockState!=="HET") return false;
     if(!kwTokens.length && currentStatus==="AUDIT" && !getInventoryAuditReasons(r,auditContext).length) return false;
     if(!kwTokens.length && restockOnly && stockState!=="SAP" && stockState!=="HET") return false;
+    if(activeKpiView==="ton" && Number(r[5])<=0) return false;
+    if(activeKpiView==="het" && stockState!=="HET") return false;
+    if(activeKpiView==="sap" && stockState!=="SAP") return false;
+    if(activeKpiView){
+      const stock=Number(r[5])||0;
+      const threshold=Math.max(1,Number(r[12])||2);
+      const activity=kpiActivityIndex?.get(kpiActivityKey(r[1],r[13]));
+      const sales30=Math.max(0,Number(activity?.sales30)||0);
+      if(kpiWorkSubfilter==="selling" && sales30<=0) return false;
+      if(kpiWorkSubfilter==="no-sales" && sales30>0) return false;
+      if(kpiWorkSubfilter==="one" && stock!==1) return false;
+      if(kpiWorkSubfilter==="threshold" && stock!==threshold) return false;
+    }
     const resolvedGroupLabel = resolveQuickGroupLabelFromRow(r, r[8] || "");
     if(!kwTokens.length && !matchesQuickGroupFilter(r, resolvedGroupLabel)) return false;
     if(!kwTokens.length) return true;
     const hay = removeAccents([r[1],ten,th,ghi||"",r[8]||"",r[11]||"",SHEET_CFG[sh]?.label||""].join(" "));
     return kwTokens.every(t => hay.includes(t));
   });
-  if(currentStatus==="CON" || currentStatus==="SAP" || currentStatus==="HET"){
+  if(activeKpiView){
+    results.sort((a,b)=>{
+      const stockA=Number(a.r[5])||0,stockB=Number(b.r[5])||0;
+      const activityA=kpiActivityIndex?.get(kpiActivityKey(a.r[1],a.r[13]))||{};
+      const activityB=kpiActivityIndex?.get(kpiActivityKey(b.r[1],b.r[13]))||{};
+      const salesDiff=(Number(activityB.sales30)||0)-(Number(activityA.sales30)||0);
+      const nameDiff=String(a.r[2]||"").localeCompare(String(b.r[2]||""),"vi",{numeric:true,sensitivity:"base"});
+      if(activeKpiView==="ton") return stockB-stockA || salesDiff || nameDiff;
+      if(activeKpiView==="het") return salesDiff || (Number(activityB.latestAt)||0)-(Number(activityA.latestAt)||0) || nameDiff;
+      if(activeKpiView==="sap"){
+        const soldRankDiff=Number((Number(activityB.sales30)||0)>0)-Number((Number(activityA.sales30)||0)>0);
+        return soldRankDiff || stockA-stockB || salesDiff || nameDiff;
+      }
+      return String(a.r[0]||"").localeCompare(String(b.r[0]||""),"vi") || nameDiff;
+    });
+  }else if(currentStatus==="CON" || currentStatus==="SAP" || currentStatus==="HET"){
     const transactionProductKey=(branch,code)=>{
       const safeBranch=String(branch || "Q2").trim().toUpperCase()==="Q5" ? "Q5" : "Q2";
       return safeBranch+"|"+normalizeProductCode(code);
@@ -14619,6 +14895,8 @@ function render(){
 
   document.getElementById("count").textContent = results.length + " kết quả";
   const el = document.getElementById("results");
+  currentKpiWorkResults=activeKpiView ? results.slice() : [];
+  const kpiWorkbar=activeKpiView ? renderKpiWorkbar(results) : "";
 
   if(totalStockView){
     renderTotalStockOverview(el);
@@ -14637,9 +14915,15 @@ function render(){
 
   if(results.length===0){
     const hasSearch = !!kwTokens.length;
-    const emptyTitle = hasSearch ? "Không tìm thấy kết quả" : "Danh mục chưa có thiết bị";
-    const emptySub = hasSearch ? `<div class="empty-sub">Thử từ khóa khác hoặc xóa bộ lọc đang chọn</div>` : "";
-    el.innerHTML = `<div class="empty"><div class="empty-icon">${hasSearch ? "😕" : "📭"}</div><div class="empty-title">${emptyTitle}</div>${emptySub}</div>`;
+    const kpiEmptyTitle={all:"Kho chưa có mặt hàng",ton:"Không có mặt hàng đang còn tồn",het:"Không có mặt hàng hết hàng",sap:"Không có mặt hàng sắp hết"}[activeKpiView];
+    const emptyTitle = hasSearch ? "Không tìm thấy kết quả" : (kpiEmptyTitle||"Danh mục chưa có thiết bị");
+    const emptySub = hasSearch ? `<div class="empty-sub">Thử từ khóa khác hoặc xóa bộ lọc đang chọn</div>` : (activeKpiView?`<div class="empty-sub">Bộ lọc này hiện không có mặt hàng cần xử lý trong kho ${escapeHtml(currentBranch)}.</div>`:"");
+    el.innerHTML = kpiWorkbar+`<div class="empty"><div class="empty-icon">${hasSearch ? "😕" : "📭"}</div><div class="empty-title">${emptyTitle}</div>${emptySub}</div>`;
+    return;
+  }
+
+  if(activeKpiView){
+    el.innerHTML=kpiWorkbar+renderKpiOperationalList(results);
     return;
   }
 
@@ -14770,15 +15054,15 @@ function render(){
     restoreGroupNavigationAnchor();
     return;
   }
-  if(!results.length && !bulkSelectMode && !kw && currentTab==="ALL" && currentStatus==="ALL" && !restockOnly && (currentBranch==="Q2" || currentBranch==="Q5")){
+  if(!results.length && !bulkSelectMode && !kw && currentTab==="ALL" && currentStatus==="ALL" && !restockOnly && !activeKpiView && (currentBranch==="Q2" || currentBranch==="Q5")){
     el.innerHTML = `<div class="empty search-landing"><div class="search-landing-icon">📍</div><div class="empty-title">Kho ${escapeHtml(currentBranch)} chưa có sản phẩm</div><div class="empty-sub">Hãy bấm “Thêm thiết bị” để nhập mặt hàng đầu tiên cho đúng chi nhánh này.</div></div>`;
     return;
   }
-  if(!bulkSelectMode && !kw && currentTab==="ALL" && currentStatus==="ALL" && !restockOnly){
+  if(!bulkSelectMode && !kw && currentTab==="ALL" && currentStatus==="ALL" && !restockOnly && !activeKpiView){
     el.innerHTML = `<div class="empty search-landing has-orbit"><div class="empty-title">Bạn muốn tìm thiết bị nào?</div><div class="empty-sub">Chọn gợi ý bên dưới hoặc nhập tên cần tìm vào ô phía trên.</div><div class="search-orbit-stage"><div class="search-landing-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"></circle><path d="M15.5 15.5L21 21"></path></svg></div><div class="search-examples">${getSearchKeywordsForVisit().map((keyword,index)=>renderSearchExampleButton(keyword,index)).join("")}</div></div></div>`;
     return;
   }
-  el.innerHTML = results.map(({r,i},idx)=>renderCard(r,i,idx+1)).join("");
+  el.innerHTML = kpiWorkbar+results.map(({r,i},idx)=>renderCard(r,i,idx+1)).join("");
   if(quickGroupFilter) focusFirstQuickMatch();
 }
 function updateBulkControls(){
@@ -18164,6 +18448,7 @@ function captureAddReturnState(){
   const row=idx>=0 ? DATA[idx] : null;
   return {
     tab:currentTab, status:currentStatus, totalStockView, restockOnly, searchQ,
+    activeKpiView, kpiWorkSubfilter,
     quickGroupFilter, branch:currentBranch, scrollY:window.scrollY,
     anchorCode:row ? String(row[1]||"") : "", anchorBranch:row ? String(row[13]||"Q2") : "",
     anchorTop:visible ? visible.getBoundingClientRect().top : null
@@ -18231,6 +18516,7 @@ function restoreAfterAdd(state){
   if(!state) return;
   currentTab=state.tab; currentStatus=state.status; totalStockView=state.totalStockView;
   restockOnly=state.restockOnly; searchQ=state.searchQ; quickGroupFilter=state.quickGroupFilter;
+  activeKpiView=state.activeKpiView||""; kpiWorkSubfilter=state.kpiWorkSubfilter||"all";
   currentBranch=state.branch;
   const searchEl=document.getElementById("search"), clearBtn=document.getElementById("clear-btn");
   if(searchEl) searchEl.value=searchQ;
@@ -18247,6 +18533,7 @@ function restoreAfterEdit(state){
   if(!state) return;
   currentTab=state.tab; currentStatus=state.status; totalStockView=state.totalStockView;
   restockOnly=state.restockOnly; searchQ=state.searchQ; quickGroupFilter=state.quickGroupFilter;
+  activeKpiView=state.activeKpiView||""; kpiWorkSubfilter=state.kpiWorkSubfilter||"all";
   currentBranch=state.branch;
   const syncView=()=>{
     const searchEl=document.getElementById("search"), clearBtn=document.getElementById("clear-btn");
@@ -18273,6 +18560,8 @@ function restoreAfterEdit(state){
     currentStatus="ALL";
     totalStockView=false;
     restockOnly=false;
+    activeKpiView="";
+    kpiWorkSubfilter="all";
     searchQ="";
     quickGroupFilter="";
     currentBranch=String(row[13]||"Q2");
@@ -18567,6 +18856,8 @@ function goToTab(tabCode,{groupKey=""}={}){
   currentStatus = "ALL";
   totalStockView = false;
   restockOnly = false;
+  activeKpiView = "";
+  kpiWorkSubfilter = "all";
   syncRestockButton(false);
 
   const searchEl = document.getElementById("search");
@@ -18754,6 +19045,8 @@ document.getElementById("tabs")?.addEventListener("mouseleave",()=>scheduleTabDr
 document.getElementById("tabDropdown")?.addEventListener("mouseenter",cancelTabDropdownHoverClose);
 document.getElementById("tabDropdown")?.addEventListener("mouseleave",()=>scheduleTabDropdownHoverClose(450));
 function setStatus(btn){
+  activeKpiView = "";
+  kpiWorkSubfilter = "all";
   currentStatus = btn.dataset.status;
   restockOnly = false;
   totalStockView = currentStatus === "ALL";
@@ -18779,6 +19072,8 @@ function setBranchFilter(btn){
   if(branch==="Q2" || branch==="Q5") selectWarehouseBranch(branch);
 }
 function setRestockFilter(){
+  activeKpiView = "";
+  kpiWorkSubfilter = "all";
   restockOnly = !restockOnly;
   totalStockView = false;
   currentStatus = "ALL";
@@ -18808,7 +19103,7 @@ function applySearchExample(keyword){
   const sticky = document.querySelector(".sticky");
   if(sticky) window.scrollTo({top:Math.max(0,sticky.offsetTop),behavior:"smooth"});
 }
-function clearSearch(){ clearTimeout(searchRenderTimer); document.getElementById("search").value=""; searchQ=""; quickGroupFilter = null; closeSearchSuggestions(); document.getElementById("clear-btn").style.display="none"; render(); document.getElementById("search").focus(); }
+function clearSearch(){ clearTimeout(searchRenderTimer); document.getElementById("search").value=""; searchQ=""; quickGroupFilter = null; if(activeKpiView) kpiWorkVisibleLimit=120; closeSearchSuggestions(); document.getElementById("clear-btn").style.display="none"; render(); document.getElementById("search").focus(); }
 function filterByBrand(brand){
   const value = String(brand||"").trim();
   if(!value) return;
@@ -18818,6 +19113,8 @@ function filterByBrand(brand){
   currentStatus = "ALL";
   totalStockView = false;
   restockOnly = false;
+  activeKpiView = "";
+  kpiWorkSubfilter = "all";
   quickGroupFilter = null;
   searchQ = value;
   const searchEl = document.getElementById("search");
@@ -20633,6 +20930,8 @@ function selectSearchSuggestion(idx){
   quickGroupFilter = null;
   totalStockView = false;
   restockOnly = false;
+  activeKpiView = "";
+  kpiWorkSubfilter = "all";
   currentStatus = "ALL";
   syncStatusButtons("");
   syncRestockButton(false);
@@ -20642,13 +20941,17 @@ function selectSearchSuggestion(idx){
 }
 document.getElementById("search").addEventListener("input", function(){
   searchQ=this.value;
-  renderSearchSuggestions(searchQ);
+  if(activeKpiView) closeSearchSuggestions(); else renderSearchSuggestions(searchQ);
   if(searchQ.trim()){
     quickGroupFilter=null;
     totalStockView=false;
     restockOnly=false;
-    currentStatus="ALL";
-    syncStatusButtons("");
+    kpiWorkVisibleLimit=120;
+    if(!activeKpiView){
+      kpiWorkSubfilter="all";
+      currentStatus="ALL";
+      syncStatusButtons("");
+    }
     syncRestockButton(false);
   }
   document.getElementById("clear-btn").style.display=searchQ?"flex":"none";
