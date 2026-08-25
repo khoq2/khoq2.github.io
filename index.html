@@ -14,11 +14,11 @@
 <meta name="apple-mobile-web-app-title" content="KHO Q2" />
 <meta name="description" content="Quản lý kho và giao dịch Hoàng Gia Computer" />
 <link rel="manifest" href="manifest.webmanifest" />
-<link rel="icon" href="app-icon.svg" type="image/svg+xml" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ctext y='.9em' font-size='56'%3E🏪%3C/text%3E%3C/svg%3E" type="image/svg+xml" />
 <link rel="preconnect" href="https://script.google.com" crossorigin />
 <link rel="preconnect" href="https://lh3.googleusercontent.com" crossorigin />
 <link rel="dns-prefetch" href="https://drive.google.com" />
-<title>🏪 KHO Q2 (HOÀNG GIA COMPUTER) [v15]</title>
+<title>🏪 KHO Q2 (HOÀNG GIA COMPUTER) [v16]</title>
 <script defer crossorigin="anonymous" integrity="sha384-vtjasyidUo0kW94K5MXDXntzOJpQgBKXmE7e2Ga4LG0skTTLeBi97eFAXsqewJjw" src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script defer crossorigin="anonymous" integrity="sha384-vseuUuO/VRMn00lXYd5m/Pk4l/7RjMqhXGf6G0RALy+On0txYb39dQsUQDAd7q5L" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.10/pdfmake.min.js"></script>
 <script defer crossorigin="anonymous" integrity="sha384-1y8s2U/Jjn4/oeCEBcfYH3M6XeQtcg4LRmluN92FS69UgtLzoyhn3swew8Ynj8Ai" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.10/vfs_fonts.js"></script>
@@ -9521,193 +9521,249 @@ const SHEET_CFG = {
 const BRANCH_CFG = { Q2:{label:"📍 Q2",color:"#1A5276"}, Q5:{label:"📍 Q5",color:"#7D3C98"} };
 
 const DEFAULT_DATA = [
-["MT","CPU001","Intel Core i5-12400F","Intel",3500000,3,"CÒN HÀNG","","🧠  CPU — Bộ vi xử lý","",0],
-["MT","CPU002","Intel Core i7-12700F","Intel",6200000,1,"CÒN HÀNG","","🧠  CPU — Bộ vi xử lý","",0],
-["MT","CPU003","Intel Core i9-13900K","Intel",13500000,0,"HẾT HÀNG","","🧠  CPU — Bộ vi xử lý","",0],
-["MT","CPU004","AMD Ryzen 5 5600X","AMD",3200000,2,"CÒN HÀNG","","🧠  CPU — Bộ vi xử lý","",0],
-["MT","CPU005","AMD Ryzen 7 5800X","AMD",5500000,1,"CÒN HÀNG","","🧠  CPU — Bộ vi xử lý","",0],
-["MT","MB001","ASUS B660M-A D4","ASUS",3200000,2,"CÒN HÀNG","","🔌  Mainboard","",0],
-["MT","MB002","MSI B550M PRO-VDH","MSI",2800000,3,"CÒN HÀNG","","🔌  Mainboard","",0],
-["MT","MB003","Gigabyte H610M S2H","Gigabyte",1900000,1,"CÒN HÀNG","","🔌  Mainboard","",0],
-["MT","RAM001","Kingston 8GB DDR4 3200","Kingston",350000,8,"CÒN HÀNG","","💾  RAM — Bộ nhớ","",0],
-["MT","RAM002","Kingston 16GB DDR4 3200","Kingston",680000,5,"CÒN HÀNG","","💾  RAM — Bộ nhớ","",0],
-["MT","RAM003","Samsung 8GB DDR4 3200","Samsung",360000,6,"CÒN HÀNG","","💾  RAM — Bộ nhớ","",0],
-["MT","RAM004","Samsung 16GB DDR5 4800","Samsung",850000,2,"CÒN HÀNG","","💾  RAM — Bộ nhớ","",0],
-["MT","RAM005","Corsair 32GB DDR4 3200","Corsair",1350000,0,"HẾT HÀNG","","💾  RAM — Bộ nhớ","",0],
-["MT","SSD001","Samsung 870 EVO 500GB","Samsung",1200000,4,"CÒN HÀNG","","⚡  SSD — Ổ cứng thể rắn","",0],
-["MT","SSD002","Samsung 870 EVO 1TB","Samsung",2100000,2,"CÒN HÀNG","","⚡  SSD — Ổ cứng thể rắn","",0],
-["MT","SSD003","WD Blue SA510 500GB","WD",1100000,3,"CÒN HÀNG","","⚡  SSD — Ổ cứng thể rắn","",0],
-["MT","SSD004","WD Blue SA510 1TB","WD",1950000,1,"CÒN HÀNG","","⚡  SSD — Ổ cứng thể rắn","",0],
-["MT","SSD005","Kingston NV2 500GB M.2","Kingston",780000,5,"CÒN HÀNG","","⚡  SSD — Ổ cứng thể rắn","",0],
-["MT","HDD001","Seagate Barracuda 1TB","Seagate",950000,6,"CÒN HÀNG","","🗄️  HDD — Ổ cứng cơ","",0],
-["MT","HDD002","Seagate Barracuda 2TB","Seagate",1650000,3,"CÒN HÀNG","","🗄️  HDD — Ổ cứng cơ","",0],
-["MT","HDD003","WD Blue 1TB","WD",980000,4,"CÒN HÀNG","","🗄️  HDD — Ổ cứng cơ","",0],
-["MT","VGA001","NVIDIA GTX 1650 4GB","NVIDIA",3200000,1,"CÒN HÀNG","","🎮  VGA — Card màn hình","",0],
-["MT","VGA002","NVIDIA RTX 3060 12GB","NVIDIA",8500000,0,"HẾT HÀNG","","🎮  VGA — Card màn hình","",0],
-["MT","VGA003","AMD RX 6600 8GB","AMD",5800000,1,"CÒN HÀNG","","🎮  VGA — Card màn hình","",0],
-["MT","PSU001","Corsair CV550 550W","Corsair",1350000,3,"CÒN HÀNG","","🔋  Nguồn — PSU","",0],
-["MT","PSU002","CoolerMaster 650W","CoolerMaster",1500000,2,"CÒN HÀNG","","🔋  Nguồn — PSU","",0],
-["MT","PSU003","Seasonic Focus 750W","Seasonic",2800000,1,"CÒN HÀNG","","🔋  Nguồn — PSU","",0],
-["MT","CASE001","NZXT H510 Mid Tower","NZXT",2200000,2,"CÒN HÀNG","","🖥️  Case — Vỏ máy tính","",0],
-["MT","CASE002","Lian Li PC-O11","Lian Li",3500000,1,"CÒN HÀNG","","🖥️  Case — Vỏ máy tính","",0],
-["MT","CASE003","CoolerMaster Q300L","CoolerMaster",950000,4,"CÒN HÀNG","","🖥️  Case — Vỏ máy tính","",0],
-["MT","FAN001","CoolerMaster Hyper 212","CoolerMaster",450000,5,"CÒN HÀNG","","❄️  Tản nhiệt — Cooling","",0],
-["MT","FAN002","Noctua NH-D15","Noctua",1850000,1,"CÒN HÀNG","","❄️  Tản nhiệt — Cooling","",0],
-["MT","FAN003","ID-Cooling SE-224-XT","ID-Cooling",380000,3,"CÒN HÀNG","","❄️  Tản nhiệt — Cooling","",0],
-["MT","MBP001","Chuột Logitech M330 Silent","Logitech",285000,5,"CÒN HÀNG","","🖱️  Chuột & Bàn phím","",0],
-["MT","MBP002","Chuột Logitech M185 Wireless","Logitech",220000,8,"CÒN HÀNG","","🖱️  Chuột & Bàn phím","",0],
-["MT","MBP003","Chuột gaming Dare-U EM908","Dare-U",350000,4,"CÒN HÀNG","","🖱️  Chuột & Bàn phím","",0],
-["MT","MBP004","Chuột có dây Logitech B100","Logitech",85000,12,"CÒN HÀNG","","🖱️  Chuột & Bàn phím","",0],
-["MT","MBP005","Bàn phím Logitech K380 Wireless","Logitech",780000,3,"CÒN HÀNG","Bluetooth","🖱️  Chuột & Bàn phím","",0],
-["MT","MBP006","Bàn phím cơ AKKO 3087","AKKO",950000,2,"CÒN HÀNG","","🖱️  Chuột & Bàn phím","",0],
-["MT","MBP007","Bàn phím có dây Logitech K120","Logitech",165000,10,"CÒN HÀNG","","🖱️  Chuột & Bàn phím","",0],
-["MT","MBP008","Combo Logitech MK235 KB+Mouse","Logitech",420000,5,"CÒN HÀNG","Không dây","🖱️  Chuột & Bàn phím","",0],
-["MT","MBP009","Combo Rapoo X1800S KB+Mouse","Rapoo",320000,4,"CÒN HÀNG","Không dây","🖱️  Chuột & Bàn phím","",0],
-["MT","CAP001","Cáp HDMI 2.0 1.5m","Generic",45000,20,"CÒN HÀNG","","🔌  Dây cáp chuyển","",0],
-["MT","CAP002","Cáp HDMI 2.0 3m","Generic",65000,15,"CÒN HÀNG","","🔌  Dây cáp chuyển","",0],
-["MT","CAP003","Cáp DisplayPort 1.4 2m","Generic",75000,10,"CÒN HÀNG","","🔌  Dây cáp chuyển","",0],
-["MT","CAP004","Cáp VGA to HDMI","Generic",55000,8,"CÒN HÀNG","","🔌  Dây cáp chuyển","",0],
-["MT","CAP005","Cáp USB-C to HDMI","Generic",85000,6,"CÒN HÀNG","","🔌  Dây cáp chuyển","",0],
-["MT","CAP006","Cáp USB 3.0 Type-A 1m","Generic",35000,25,"CÒN HÀNG","","🔌  Dây cáp chuyển","",0],
-["MT","CAP007","Cáp SATA 3 dữ liệu","Generic",25000,30,"CÒN HÀNG","","🔌  Dây cáp chuyển","",0],
-["MT","LAP001","Pin Laptop HP 4 cell","HP",450000,4,"CÒN HÀNG","","💻  Laptop linh kiện","",0],
-["MT","LAP002","Pin Laptop Dell 6 cell","Dell",550000,2,"CÒN HÀNG","","💻  Laptop linh kiện","",0],
-["MT","LAP003","Bàn phím HP 15s","HP",280000,5,"CÒN HÀNG","","💻  Laptop linh kiện","",0],
-["MT","LAP004","Màn hình laptop 15.6 inch","Generic",1200000,1,"CÒN HÀNG","","💻  Laptop linh kiện","",0],
-["MT","MH001","Samsung 24\" FHD IPS","Samsung",2800000,2,"CÒN HÀNG","","🖥️  Màn hình","",0],
-["MT","MH002","Samsung 27\" QHD","Samsung",5500000,1,"CÒN HÀNG","","🖥️  Màn hình","",0],
-["MT","MH003","LG 24\" FHD IPS","LG",2600000,3,"CÒN HÀNG","","🖥️  Màn hình","",0],
-["MT","MH004","LG 27\" 4K","LG",8900000,1,"CÒN HÀNG","","🖥️  Màn hình","",0],
-["MT","MH005","AOC 24\" FHD","AOC",2200000,2,"CÒN HÀNG","","🖥️  Màn hình","",0],
-["MT","MH006","ASUS 24\" FHD 144Hz","ASUS",3800000,1,"CÒN HÀNG","","🖥️  Màn hình","",0],
-["MT","MH007","ViewSonic 27\" FHD","ViewSonic",3200000,0,"HẾT HÀNG","","🖥️  Màn hình","",0],
-["MT","LK001","Keo tản nhiệt Arctic MX-4","Arctic",85000,12,"CÒN HÀNG","","🛠️  Linh kiện khác","",0],
-["MT","LK002","Pin CMOS CR2032 (vỉ 5)","Generic",25000,15,"CÒN HÀNG","","🛠️  Linh kiện khác","",0],
-["MT","LK003","Hub USB 3.0 4 cổng","Generic",95000,8,"CÒN HÀNG","","🛠️  Linh kiện khác","",0],
-["MT","LK004","Vít máy tính M3 (bộ 50)","Generic",25000,20,"CÒN HÀNG","","🛠️  Linh kiện khác","",0],
-["MI","ML001","HP LaserJet Pro M15w","HP",2800000,2,"CÒN HÀNG","","⚫  Máy in đen trắng","",0],
-["MI","ML002","HP LaserJet Pro M404n","HP",6500000,1,"CÒN HÀNG","","⚫  Máy in đen trắng","",0],
-["MI","ML003","Canon LBP6030","Canon",2600000,3,"CÒN HÀNG","","⚫  Máy in đen trắng","",0],
-["MI","ML004","Canon LBP2900+","Canon",3200000,2,"CÒN HÀNG","","⚫  Máy in đen trắng","",0],
-["MI","ML005","Brother HL-1210W","Brother",2900000,1,"CÒN HÀNG","WiFi","⚫  Máy in đen trắng","",0],
-["MI","ML006","Ricoh SP210","Ricoh",3100000,0,"HẾT HÀNG","","⚫  Máy in đen trắng","",0],
-["MI","MC001","Epson L3150 Wifi","Epson",4200000,3,"CÒN HÀNG","In/Scan/Copy","🎨  Máy in màu","",0],
-["MI","MC002","Epson L5190 Wifi","Epson",5800000,2,"CÒN HÀNG","Fax","🎨  Máy in màu","",0],
-["MI","MC003","Canon G2010","Canon",3800000,4,"CÒN HÀNG","","🎨  Máy in màu","",0],
-["MI","MC004","Canon G3010 Wifi","Canon",4500000,1,"CÒN HÀNG","","🎨  Máy in màu","",0],
-["MI","MC005","HP DeskJet 2775","HP",2200000,2,"CÒN HÀNG","","🎨  Máy in màu","",0],
-["MI","MA001","Epson L6580 A3 Wifi","Epson",9500000,1,"CÒN HÀNG","","📐  Máy in A3","",0],
-["MI","MA002","Canon MAXIFY GX7070 A3","Canon",11000000,1,"CÒN HÀNG","","📐  Máy in A3","",0],
-["MI","MA003","HP OfficeJet Pro 7740 A3","HP",8500000,0,"HẾT HÀNG","","📐  Máy in A3","",0],
-["MI","PC001","Canon iR2520 25ppm","Canon",18000000,1,"CÒN HÀNG","","📠  Máy photocopy","",0],
-["MI","PC002","Canon iR2625 25ppm","Canon",22000000,1,"CÒN HÀNG","","📠  Máy photocopy","",0],
-["MI","PC003","Ricoh MP2014 20ppm","Ricoh",15000000,2,"CÒN HÀNG","","📠  Máy photocopy","",0],
-["MI","PC004","Toshiba e-STUDIO2523A","Toshiba",19000000,0,"HẾT HÀNG","","📠  Máy photocopy","",0],
-["MI","PC005","Xerox DC S2320","Xerox",17000000,1,"CÒN HÀNG","","📠  Máy photocopy","",0],
-["MI","MUC001","Mực HP 85A CE285A","HP",180000,0,"HẾT HÀNG","","📦  Hộp mực","",0],
-["MI","MUC002","Mực HP 26A CF226A","HP",320000,3,"CÒN HÀNG","","📦  Hộp mực","",0],
-["MI","MUC003","Mực Canon CRG325","Canon",190000,2,"CÒN HÀNG","","📦  Hộp mực","",0],
-["MI","MUC004","Mực Canon CRG056","Canon",580000,1,"CÒN HÀNG","","📦  Hộp mực","",0],
-["MI","MUC005","Mực Brother TN2385","Brother",210000,4,"CÒN HÀNG","","📦  Hộp mực","",0],
-["MI","MUC006","Mực Ricoh SP210","Ricoh",150000,5,"CÒN HÀNG","","📦  Hộp mực","",0],
-["MI","DRM001","Drum Canon iR2520","Canon",850000,2,"CÒN HÀNG","","🔧  Linh kiện","",0],
-["MI","DRM002","Drum HP M402","HP",920000,0,"HẾT HÀNG","","🔧  Linh kiện","",0],
-["MI","DRM003","Drum Brother DR2385","Brother",680000,3,"CÒN HÀNG","","🔧  Linh kiện","",0],
-["MI","DRM004","Drum Ricoh SP210","Ricoh",480000,1,"CÒN HÀNG","","🔧  Linh kiện","",0],
-["MI","GAT001","Gạt từ HP 1010/1020","HP",45000,8,"CÒN HÀNG","","🔧  Linh kiện","",0],
-["MI","GAT002","Gạt mực HP LJ 1010","HP",35000,10,"CÒN HÀNG","","🔧  Linh kiện","",0],
-["MI","GAT003","Gạt từ Canon LBP2900","Canon",48000,6,"CÒN HÀNG","","🔧  Linh kiện","",0],
-["MI","TRU001","Trục từ HP 1010","HP",120000,4,"CÒN HÀNG","","🔧  Linh kiện","",0],
-["MI","TRU002","Trục ép HP P1102","HP",180000,3,"CÒN HÀNG","","🔧  Linh kiện","",0],
-["MI","TRU003","Lô ép Canon MF3010","Canon",220000,2,"CÒN HÀNG","","🔧  Linh kiện","",0],
-["MI","BAO001","Bao lụa HP 1010/1020","HP",85000,6,"CÒN HÀNG","","🔧  Linh kiện","",0],
-["MI","BAO002","Bao lụa Canon LBP2900","Canon",90000,4,"CÒN HÀNG","","🔧  Linh kiện","",0],
-["MI","FMT001","Formatter HP M1005","HP",350000,2,"CÒN HÀNG","","🔧  Linh kiện","",0],
-["MI","MNP001","Main nguồn HP M1005","HP",480000,2,"CÒN HÀNG","","🔧  Linh kiện","",0],
-["MI","MNP002","Main nguồn Canon MF3010","Canon",520000,1,"CÒN HÀNG","","🔧  Linh kiện","",0],
-["MI","MOT001","Motor HP LJ 1010","HP",320000,3,"CÒN HÀNG","","🔧  Linh kiện","",0],
-["MI","MOT002","Motor Canon LBP2900","Canon",350000,2,"CÒN HÀNG","","🔧  Linh kiện","",0],
-["MI","SEN001","Sensor giấy HP P1102","HP",95000,5,"CÒN HÀNG","","🔧  Linh kiện","",0],
-["MI","SEN002","Sensor mực HP M402","HP",110000,3,"CÒN HÀNG","","🔧  Linh kiện","",0],
-["MI","KHC001","Cụm sấy HP M1005","HP",650000,1,"CÒN HÀNG","","🔧  Linh kiện","",0],
-["MI","KHC002","Bánh răng HP 1010","HP",45000,8,"CÒN HÀNG","","🔧  Linh kiện","",0],
-["MI","KHC003","Cáp nguồn máy in","Generic",35000,15,"CÒN HÀNG","","🔧  Linh kiện","",0],
-["MI","MNAP001","Mực nạp Canon 925/725/319 (chai 100ml)","Canon",65000,12,"CÒN HÀNG","","🧴  Mực nạp","",0],
-["MI","MNAP002","Mực nạp HP 12A/85A (chai 100ml)","HP",65000,10,"CÒN HÀNG","","🧴  Mực nạp","",0],
-["MI","MNAP003","Mực nạp máy in phun Epson (chai 70ml, đủ màu)","Epson",45000,18,"CÒN HÀNG","","🧴  Mực nạp","",0],
-["MI","BILL001","Máy in bill nhiệt Xprinter XP-58IIH 58mm","Xprinter",850000,5,"CÒN HÀNG","USB + Bluetooth","🧾  Máy in Bill","",0],
-["MI","BILL002","Máy in bill Epson TM-T82X 80mm","Epson",2200000,3,"CÒN HÀNG","USB + LAN","🧾  Máy in Bill","",0],
-["MI","SCAN001","Máy scan Epson DS-310 A4 tốc độ cao","Epson",4500000,2,"CÒN HÀNG","USB","🔍  Máy Scan","",0],
-["MI","SCAN002","Máy scan Canon DR-C225W A4 Wifi","Canon",6800000,1,"CÒN HÀNG","USB + Wifi","🔍  Máy Scan","",0],
-["CAM","CAM001","Hikvision DS-2CD1023G2 2MP","Hikvision",450000,6,"CÒN HÀNG","","📷  Camera IP","",0],
-["CAM","CAM002","Hikvision DS-2CD2143G2 4MP","Hikvision",780000,3,"CÒN HÀNG","","📷  Camera IP","",0],
-["CAM","CAM003","Dahua IPC-HDW2831T 8MP","Dahua",950000,2,"CÒN HÀNG","","📷  Camera IP","",0],
-["CAM","CAM004","Kbvision KX-C2012S2 2MP","Kbvision",380000,5,"CÒN HÀNG","","📹  Camera Analog","",0],
-["CAM","WIFI001","TP-Link Tapo C200 1080p","TP-Link",380000,5,"CÒN HÀNG","Xoay 360","📡  Camera Wifi","",0],
-["CAM","WIFI002","TP-Link Tapo C310 3MP Ngoài trời","TP-Link",520000,3,"CÒN HÀNG","","📡  Camera Wifi","",0],
-["CAM","WIFI003","Ezviz C6N 1080p Trong nhà","Ezviz",420000,4,"CÒN HÀNG","","📡  Camera Wifi","",0],
-["CAM","WIFI004","Ezviz H3C 2K Wifi","Ezviz",650000,2,"CÒN HÀNG","","📡  Camera Wifi","",0],
-["CAM","WIFI005","Hikvision DS-2CD2143G2 Wifi","Hikvision",980000,1,"CÒN HÀNG","","📡  Camera Wifi","",0],
-["CAM","WIFI006","Imou Ranger 2 1080p","Imou",350000,6,"CÒN HÀNG","","📡  Camera Wifi","",0],
-["CAM","WIFI007","Xiaomi Mi Outdoor 2K","Xiaomi",480000,3,"CÒN HÀNG","","📡  Camera Wifi","",0],
-["CAM","DOM001","Tên miền .com 1 năm","Generic",350000,10,"CÒN HÀNG","Đăng ký mới","🌐  Tên miền (Domain/DDNS)","",0],
-["CAM","DOM002","Tên miền .vn 1 năm","Generic",450000,8,"CÒN HÀNG","","🌐  Tên miền (Domain/DDNS)","",0],
-["CAM","DOM003","Tên miền .net 1 năm","Generic",320000,6,"CÒN HÀNG","","🌐  Tên miền (Domain/DDNS)","",0],
-["CAM","DOM004","DDNS Hikvision HiDDNS","Hikvision",0,99,"CÒN HÀNG","Miễn phí","🌐  Tên miền (Domain/DDNS)","",0],
-["CAM","DOM005","DDNS Dahua (dịch vụ)","Dahua",0,99,"CÒN HÀNG","Miễn phí","🌐  Tên miền (Domain/DDNS)","",0],
-["CAM","DOM006","No-IP DDNS 1 năm","Generic",180000,5,"CÒN HÀNG","","🌐  Tên miền (Domain/DDNS)","",0],
-["CAM","DOM007","DynDNS Pro 1 năm","Generic",450000,3,"CÒN HÀNG","","🌐  Tên miền (Domain/DDNS)","",0],
-["CAM","DOM008","Cloudflare DNS","Generic",0,99,"CÒN HÀNG","Miễn phí","🌐  Tên miền (Domain/DDNS)","",0],
-["CAM","DVR001","Hikvision DS-7208HQHI 8 kênh","Hikvision",1800000,2,"CÒN HÀNG","","📼  Đầu ghi hình","",0],
-["CAM","DVR002","Hikvision DS-7216HQHI 16 kênh","Hikvision",2800000,1,"CÒN HÀNG","","📼  Đầu ghi hình","",0],
-["CAM","NVR001","Dahua NVR2108HS 8 kênh","Dahua",1600000,3,"CÒN HÀNG","","📼  Đầu ghi hình","",0],
-["CAM","NVR002","Kbvision KX-8108H2 8 kênh","Kbvision",1200000,2,"CÒN HÀNG","","📼  Đầu ghi hình","",0],
-["CAM","HDD_C1","WD Purple 1TB WD10PURZ","WD",950000,5,"CÒN HÀNG","Chuyên camera","💿  Ổ cứng Camera","",0],
-["CAM","HDD_C2","WD Purple 2TB WD20PURZ","WD",1650000,3,"CÒN HÀNG","","💿  Ổ cứng Camera","",0],
-["CAM","HDD_C3","Seagate SkyHawk 1TB","Seagate",980000,4,"CÒN HÀNG","","💿  Ổ cứng Camera","",0],
-["CAM","HDD_C4","Seagate SkyHawk 2TB","Seagate",1700000,1,"CÒN HÀNG","","💿  Ổ cứng Camera","",0],
-["CAM","POE001","Ruijie RG-ES208GC-P 8 cổng","Ruijie",1200000,2,"CÒN HÀNG","","🔌  Switch PoE","",0],
-["CAM","POE002","TP-Link TL-SF1008P 8 cổng","TP-Link",850000,3,"CÒN HÀNG","","🔌  Switch PoE","",0],
-["CAM","POE003","Cisco SB SG110D-08HP","Cisco",2800000,0,"HẾT HÀNG","","🔌  Switch PoE","",0],
-["CAM","ADP001","Adapter 12V 2A","Generic",55000,15,"CÒN HÀNG","","🔋  Nguồn Camera","",0],
-["CAM","ADP002","Adapter 12V 3A","Generic",75000,10,"CÒN HÀNG","","🔋  Nguồn Camera","",0],
-["CAM","NGU001","UPS 650VA","APC",1200000,2,"CÒN HÀNG","","🔋  Nguồn Camera","",0],
-["CAM","JCK001","Jack BNC nén (bộ 100)","Generic",85000,12,"CÒN HÀNG","","🧰  Phụ kiện Camera","",0],
-["CAM","JCK002","Jack RJ45 Cat5e (bộ 100)","Generic",45000,20,"CÒN HÀNG","","🧰  Phụ kiện Camera","",0],
-["CAM","CPHK001","Dây cáp camera đồng trục RG59 (100m)","Generic",350000,5,"CÒN HÀNG","","🧰  Phụ kiện Camera","",0],
-["CAM","CPHK002","Ống luồn dây camera (100m)","Generic",120000,8,"CÒN HÀNG","","🧰  Phụ kiện Camera","",0],
-["INT","RT001","TP-Link Archer C6 AC1200","TP-Link",650000,5,"CÒN HÀNG","","📡  Router — Bộ định tuyến","",0],
-["INT","RT002","TP-Link Archer AX55 AX3000","TP-Link",1350000,2,"CÒN HÀNG","","📡  Router — Bộ định tuyến","",0],
-["INT","RT003","Mikrotik hAP ac2","Mikrotik",1850000,1,"CÒN HÀNG","","📡  Router — Bộ định tuyến","",0],
-["INT","RT004","Cisco RV340 Dual WAN","Cisco",4500000,0,"HẾT HÀNG","","📡  Router — Bộ định tuyến","",0],
-["INT","SW001","TP-Link TL-SG108 8 cổng","TP-Link",320000,8,"CÒN HÀNG","","🔀  Switch — Bộ chuyển mạch","",0],
-["INT","SW002","TP-Link TL-SG1016D 16 cổng","TP-Link",780000,3,"CÒN HÀNG","","🔀  Switch — Bộ chuyển mạch","",0],
-["INT","SW003","TP-Link TL-SG1024 24 cổng","TP-Link",2200000,0,"HẾT HÀNG","","🔀  Switch — Bộ chuyển mạch","",0],
-["INT","SW004","Cisco SG110-16","Cisco",3500000,1,"CÒN HÀNG","","🔀  Switch — Bộ chuyển mạch","",0],
-["INT","SW005","Ruijie RG-ES216GC 16 cổng","Ruijie",1200000,2,"CÒN HÀNG","","🔀  Switch — Bộ chuyển mạch","",0],
-["INT","MDM001","TP-Link TD-W8961N ADSL2","TP-Link",380000,4,"CÒN HÀNG","","📟  Modem","",0],
-["INT","MDM002","Draytek Vigor130 VDSL","Draytek",950000,2,"CÒN HÀNG","","📟  Modem","",0],
-["INT","AP001","TP-Link EAP245 AC1750","TP-Link",850000,3,"CÒN HÀNG","","📶  Access Point — Wifi","",0],
-["INT","AP002","TP-Link EAP670 AX5400","TP-Link",1950000,1,"CÒN HÀNG","","📶  Access Point — Wifi","",0],
-["INT","AP003","Ubiquiti UniFi U6 Lite","Ubiquiti",2200000,0,"HẾT HÀNG","","📶  Access Point — Wifi","",0],
-["INT","AP004","Reyee RG-RAP2260 AX1800","Ruijie",750000,4,"CÒN HÀNG","","📶  Access Point — Wifi","",0],
-["INT","CVQ001","D-Link DMC-1910T 1000Mbps","D-Link",380000,2,"CÒN HÀNG","","🔭  Converter quang","",0],
-["INT","CVQ002","TP-Link MC220L Gigabit","TP-Link",350000,3,"CÒN HÀNG","","🔭  Converter quang","",0],
-["INT","CVQ003","Kbvision KX-C1202S2 1G","Kbvision",290000,5,"CÒN HÀNG","","🔭  Converter quang","",0],
-["INT","SFP001","Module SFP 1G Single-mode","Generic",320000,6,"CÒN HÀNG","","💡  Module SFP / Quang","",0],
-["INT","SFP002","Module SFP 1G Multi-mode","Generic",280000,4,"CÒN HÀNG","","💡  Module SFP / Quang","",0],
-["INT","SFP003","Dây quang LC-LC 5m","Generic",120000,10,"CÒN HÀNG","","💡  Module SFP / Quang","",0],
-["INT","DAY001","Dây mạng Cat6 UTP (mét)","Commscope",5000,500,"CÒN HÀNG","Bán theo mét","🔗  Dây mạng & Đầu bấm","",0],
-["INT","DAY002","Dây mạng Cat6A UTP (mét)","Commscope",8000,200,"CÒN HÀNG","","🔗  Dây mạng & Đầu bấm","",0],
-["INT","DB001","Đầu bấm RJ45 Cat6 (bộ 100)","Generic",45000,20,"CÒN HÀNG","","🔗  Dây mạng & Đầu bấm","",0],
-["INT","BM001","Bộ bấm mạng RJ45","Generic",180000,5,"CÒN HÀNG","","🔗  Dây mạng & Đầu bấm","",0],
-["INT","NPHK001","Hộp nối mạng Cat6","Generic",35000,30,"CÒN HÀNG","","🧰  Phụ kiện mạng","",0],
-["INT","NPHK002","Patch Panel 24 cổng","Generic",850000,3,"CÒN HÀNG","","🧰  Phụ kiện mạng","",0],
-["INT","PHK003","Rack 6U treo tường","Generic",1200000,2,"CÒN HÀNG","","🧰  Phụ kiện mạng","",0],
-["INT","PHK004","Dây patch cord Cat6 0.5m","Ugreen",45000,25,"CÒN HÀNG","","🧰  Phụ kiện mạng","",0],
-["INT","USBWF001","USB Wifi TP-Link TL-WN823N 300Mbps","TP-Link",120000,5,"CÒN HÀNG","","📶  USB Wifi","",0],
-["INT","USBWF002","USB Wifi TP-Link Archer T3U 1300Mbps","TP-Link",280000,3,"CÒN HÀNG","","📶  USB Wifi","",0],
-["INT","USBWF003","USB Wifi Totolink N300UA 300Mbps","Totolink",95000,4,"CÒN HÀNG","","📶  USB Wifi","",0],
+["MT","SACLT030","Sạc Dell 65W 19.5V 3.34A ( đầu nhỏ 4.5x3.0mm ) (Mới)","",0,1,"SẮP HẾT","","💻 Laptop linh kiện","https://lh3.googleusercontent.com/d/1x5BF_c789tgorkXGXXj6fKnsBSdZSTfm",650000,"SẠC DELL",2,"Q2","","","","","","","",""],
+["MI","MUCNAP031","Mực nạp Laser 193-1 BK 65g (HP/Samsung/Panasonic) (Mới)","",0,8,"CÒN HÀNG","","🧴 Mực nạp","https://lh3.googleusercontent.com/d/1OqLgtUsojYhju6Uj8SrT3ZB7FTihDWZn",0,"HP/CANON | SAM SUNG | XEROX",2,"Q2","","","","","","","",""],
+["MI","HOPMUC017","Hộp mực CRG070 (ESTAR – No Chip) (Mới)","ESTAR",0,1,"SẮP HẾT","","📦 Hộp mực","https://lh3.googleusercontent.com/d/1FmBHMycBEefApS17G53Y9HJJNsAScpbM",0,"CRG070",2,"Q2","","","","","","","",""],
+["MI","DRUM005","Cụm Drum DR630/2300/2325/2315/2306 (Mới)","STAR INK",0,1,"SẮP HẾT","","DRUM","https://lh3.googleusercontent.com/d/1jyy5ITwQJR7yZweZArtXBvb5sKoE4KW2",0,"Brother",2,"Q2","","","","","","","",""],
+["MI","DRUM003","Cụm Drum DR-2385/2350 (Mới)","",0,1,"SẮP HẾT","","Drum","https://lh3.googleusercontent.com/d/1XAP4k8qz8mQMyib3uSfGS0m_zS6dkFir",0,"Brother",2,"Q2","","","","","","","",""],
+["MI","HOPMUC016","Hộp mực 2385/2325 (TN-2385/TN-2325) (Mới)","ESTAR",0,0,"HẾT HÀNG","","📦 Hộp mực","https://lh3.googleusercontent.com/d/1clW2ffxz1NCZowVU2p-JvdLIOpby2a1n",650000,"Brother",2,"Q2","","","","","","","",""],
+["MT","CPU003","CPU Intel Core i5-4590 (1150) (Cũ)","",0,0,"HẾT HÀNG","","🧠 CPU — Bộ vi xử lý","https://lh3.googleusercontent.com/d/1qGF12NKdAw1e047RNxr0HFriXk4BV_sW",0,"Ryzen 7",2,"Q2","","","","","","","",""],
+["MT","BANPHIM002","Bàn phím cơ N-J90 (Có dây + LED) (Mới)","SUNSONNY",0,3,"CÒN HÀNG","","🖱️ Chuột & Bàn phím","https://lh3.googleusercontent.com/d/1WmPrNw2Hn2NUeHHiQ8YwmOfBhjaQ2rSq",0,"Bàn phím cơ | Có dây",2,"Q2","","","","","","","",""],
+["MT","SACLT019","Sạc SURFACE 65W 15V 4A (Đầu Surface Connect) (Mới)","MICROSOFT",0,1,"SẮP HẾT","","💻 Laptop linh kiện","https://lh3.googleusercontent.com/d/1n1GcGtcYQJ2wFiGpm2dI__IwMFVjR-Km",0,"SẠC MACBOOK/SUFACE",2,"Q2","","","","","","","",""],
+["MT","SACLT018","Sạc APPLE 87W TYPE-C (20.2V 4.3A) (Mới)","APPLE",0,1,"SẮP HẾT","","💻 Laptop linh kiện","https://lh3.googleusercontent.com/d/1rFThbBoFf0bzhlnbqeWQ1nVX5eMXn8ft",0,"SẠC MACBOOK/SUFACE",2,"Q2","","","","","","","",""],
+["MT","SACLT017","Sạc APPLE 30W ( Type-C ) (Mới)","APPLE",0,1,"SẮP HẾT","","💻 Laptop linh kiện","https://lh3.googleusercontent.com/d/1WR9YIAh4geoi6KdCDaT9A8U2m0mfKWGM",0,"SẠC MACBOOK/SUFACE",2,"Q2","","","","","","","",""],
+["MT","SACLT016","Sạc APPLE 45W 14.85V 3.05A (MagSafe 2) (Cũ)","APPLE",0,0,"HẾT HÀNG","","💻 Laptop linh kiện","https://lh3.googleusercontent.com/d/1MkHlfvskwLvIRE5eYKLIUNNfhU_RwDo2",0,"SẠC MACBOOK/SUFACE",2,"Q2","","","","","","","",""],
+["MT","SACLT015","Sạc Lenovo 65W 20V - 3.25A (Type C) (Mới)","LENOVO",0,3,"CÒN HÀNG","","💻 Laptop linh kiện","https://lh3.googleusercontent.com/d/15X2zBjS-uHP9qB7ytBoIPrcRlLZ14Hro",0,"SẠC LENOVO",2,"Q2","","","","","","","",""],
+["MT","SACLT014","Sạc LENOVO 90W 20V 4.5A (Đầu Usb vuông vàng Slim Tip) (Mới)","LENOVO",0,3,"CÒN HÀNG","","💻 Laptop linh kiện","https://lh3.googleusercontent.com/d/1ou95Jgp2IrQDK2L3WQnv6AnA2JlE0X3r",0,"SẠC LENOVO",2,"Q2","","","","","","","",""],
+["MT","SACLT013","Sạc LENOVO 65W 19V 3.42A ( Đầu tròn lớn 7.9×5.5mm ) (Mới)","LENOVO",0,1,"SẮP HẾT","","💻 Laptop linh kiện","https://lh3.googleusercontent.com/d/1bxqlefNkwKuH_PZS9FYfzdq-iPX23BIl",0,"SẠC LENOVO",2,"Q2","","","","","","","",""],
+["MT","SACLT012","Sạc ACER 90W 19V 4.74A (đầu trung 5.5×1.7mm) (Mới)","ACER",0,3,"CÒN HÀNG","","💻 Laptop linh kiện","https://lh3.googleusercontent.com/d/1iz052mgT2vgfSbX8EvIBPDwgwHVnPBdu",0,"SẠC ACER",2,"Q2","","","","","","","",""],
+["MT","SACLT011","Sạc ACER 65W 19V 3.42A ( Đầu trung 5.5×1.7mm ) (Mới)","ACER",0,0,"HẾT HÀNG","","💻 Laptop linh kiện","https://lh3.googleusercontent.com/d/1EzZdSOVduKRU3noBa3bpxG_kCoXPzlpF",0,"SẠC ACER",2,"Q2","","","","","","","",""],
+["MT","SACLT009","Sạc ASUS 65W 19V 3.42A (đầu trung 5.5×2.5mm) (Mới)","ASUS",0,1,"SẮP HẾT","","💻 Laptop linh kiện","https://lh3.googleusercontent.com/d/1FbhZX8XuHadnVx7ukBS4aA6q7l2k-IRD",0,"SẠC ASUS",2,"Q2","","","","","","","",""],
+["MT","SACLT008","Sạc Dell 65W 19.5V - 3,25A  ( Type C ) (Mới)","DELL",0,2,"SẮP HẾT","","💻 Laptop linh kiện","https://lh3.googleusercontent.com/d/1sH1KFxT2L8xpPKEpCw-WrSSxmPFOTJsR",0,"SẠC DELL",2,"Q2","","","","","","","",""],
+["MT","SACLT007","Sạc HP 90W 19.5V - 4.74A ( ĐẦU TO 7.4 × 5.0mm) (Mới)","HP",0,4,"CÒN HÀNG","","💻 Laptop linh kiện","https://lh3.googleusercontent.com/d/1nAuIrONxNnfxqLS7yn0v73znzCGc1vhT",0,"SẠC HP",2,"Q2","","","","","","","",""],
+["MT","SACLT006","Sạc HP 90W 19V 4.74A ( đầu nhỏ xanh 4.5×3.0mm) (Mới)","HP",0,2,"SẮP HẾT","","💻 Laptop linh kiện","https://lh3.googleusercontent.com/d/1x8ViveCG4r0l-n5fVD48p540cPEwBoFF",0,"SẠC HP",2,"Q2","","","","","","","",""],
+["MT","SACLT003","Sạc Dell 65W 19.5V - 3.5A  ( Type C )","DELL",0,1,"SẮP HẾT","","💻 Laptop linh kiện","",0,"",2,"Q2","","","","","","","",""],
+["MT","SACLT002","Sạc Dell 65W 19.5V - 4.62A  - 3.5A ( ĐẦU TO ) (Mới)","DELL",0,4,"CÒN HÀNG","","💻 Laptop linh kiện","https://lh3.googleusercontent.com/d/1tuIaJbCBrJC7Gs4fP-xYX9ykUpt_nC_k",0,"SẠC DELL",2,"Q2","","","","","","","",""],
+["MT","SACLT001","Sạc Dell 90W 19.5V 4,62A ( ĐẦU TO ) (Mới)","DELL",0,5,"CÒN HÀNG","","💻 Laptop linh kiện","https://lh3.googleusercontent.com/d/1qRx7zLmQ2BX7_1cn8gRls7QVqjLr4NdW",0,"SẠC DELL",2,"Q2","","","","","","","",""],
+["MT","HDD004","HDD LT 500GB ( SATA III 2.5 inch ) (Cũ)","NHIỀU THƯƠNG HIỆU",0,10,"CÒN HÀNG","","🗄️ HDD — Ổ cứng cơ","https://lh3.googleusercontent.com/d/1KEidWkjS0SiJra9u40L9iD-k6o4lM2-a",0,"(2.5 inch) | 500GB",2,"Q2","","","","","","","",""],
+["MT","HDD003","HDD PC 2TB ( SATA III 3.5 inch ) (Cũ)","NHIỀU THƯƠNG HIỆU",0,1,"SẮP HẾT","","🗄️ HDD — Ổ cứng cơ","https://lh3.googleusercontent.com/d/1CXSCGju65L20ZUt3v5w3NGizNZHAOfkj",0,"(3.5 inch) | 2TB",2,"Q2","","","","","","","",""],
+["MT","HDD002","HDD PC 500GB ( SATA III 3.5 inch ) (Cũ)","NHIỀU THƯƠNG HIỆU",0,4,"CÒN HÀNG","","🗄️ HDD — Ổ cứng cơ","https://lh3.googleusercontent.com/d/1fH5jeejCpRRMwhRspueeyeEvowd20OFb",0,"(3.5 inch) | 500GB",2,"Q2","","","","","","","",""],
+["MT","HDD001","HDD PC 250GB ( SATA III 3.5 inch ) (Cũ)","NHIỀU THƯƠNG HIỆU",0,1,"SẮP HẾT","","🗄️ HDD — Ổ cứng cơ","https://lh3.googleusercontent.com/d/1Vfjqp_04kuB4Ngf6GdAq149euDEcn3pR",0,"(3.5 inch) | 250GB",2,"Q2","","","","","","","",""],
+["MT","MH005","Màn hình Gaming E-DRA 24 inch 120Hz (FULL HD) (Mới)","E-DRA",0,1,"SẮP HẾT","","🖵 Màn hình","https://lh3.googleusercontent.com/d/16_ZENCDzMtOj7m87MLuuqJjMENl3lMh6",1900000,"24\"",2,"Q2","","","","","","","",""],
+["MT","MH004","Màn hình VTECH 27inch 165Hz (FULL HD) (Mới)","VTECH",0,4,"CÒN HÀNG","","🖵 Màn hình","https://lh3.googleusercontent.com/d/1MqKnSuhb14Hwd4z2fciI-rkLV4LZztpl",0,"27\" | 165Hz",2,"Q2","","","","","","","",""],
+["MT","MH003","Màn hình VTECH 27inch 100Hz (FULL HD) (Mới)","VTECH",0,2,"SẮP HẾT","","🖵 Màn hình","https://lh3.googleusercontent.com/d/1f4gA7Y8_-FO5xqrGGZ3BF4j_9IQbYJ9R",0,"27\" | 100Hz",2,"Q2","","","","","","","",""],
+["MT","MH002","Màn hình VTECH 24inch 100Hz (FULL HD) (Mới)","VTECH",0,1,"SẮP HẾT","","🖵 Màn hình","https://lh3.googleusercontent.com/d/1A-EeXlV9HUwiKKW7CF6YXba7NyUQclgc",0,"24\" | 100Hz",2,"Q2","","","","","","","",""],
+["MT","MH001","Màn hình VTECH 24inch 75Hz (FULL HD) (Mới)","VTECH",0,8,"CÒN HÀNG","","🖵 Màn hình","https://lh3.googleusercontent.com/d/1L4oNmuCMKxHZllWW3SawiUN0ZOdlsJ5a",0,"24\" | 75Hz",2,"Q2","","","","","","","",""],
+["MT","RAM013","RAM PC DDR4 32GB (2x16GB) 3200MHz (LED RGB) (Mới)","GIGASTONE",0,1,"SẮP HẾT","","💾 RAM — Bộ nhớ","https://lh3.googleusercontent.com/d/1Wiq5Rn294q10MGDl-l3DWyDd2D4AStXc",0,"PC | PC DDR4",2,"Q2","","","","","","","",""],
+["MT","RAM012","RAM PC DDR4 16GB 3200MHz (Có Tản Nhiệt) (Mới)","KINGSPEC",0,1,"SẮP HẾT","","💾 RAM — Bộ nhớ","https://lh3.googleusercontent.com/d/1mFu05Atc9IgUSgXWviFcfrRTgiJIapXm",2650000,"PC | PC DDR4",2,"Q2","","","","","","","",""],
+["INT","KICHSONGWIFI001","Bộ kích sóng Wi-Fi tốc độ 300Mbps (TL-WA850RE) (Mới)","TP-LINK",0,1,"SẮP HẾT","","Bộ kích sóng (Repeater/Range Extender)","https://lh3.googleusercontent.com/d/1-SALHdYVxfgh3dFHeRR_gDrEo3MkIA6E",0,"2.4GHz",2,"Q2","","","","","","","",""],
+["INT","SWITCH004","Switch 8-Port Gigabit 1TB ( TL-SG1008D ) (Mới)","TP-LINK",0,1,"SẮP HẾT","","🔀 Switch — ( Bộ chia mạng )","https://lh3.googleusercontent.com/d/1Xtg8ijo7B0TKmCDjXxizqHqwdq-yjpM5",750000,"Switch thường (Unmanaged) | 8 PORT",2,"Q2","","","","","","","",""],
+["INT","SWITCH003","Switch 5-Port Gigabit 1GB ( 2 TL-SG105 - 2 TL-SG1005D) (Mới)","TP-LINK",0,4,"CÒN HÀNG","","🔀 Switch — ( Bộ chia mạng )","https://lh3.googleusercontent.com/d/14h4EmEKvhGPNOVurKSNL0dJqh6Sg6ZWx",590000,"Switch thường (Unmanaged) | 5 PORT",2,"Q2","","","","","","","",""],
+["INT","SWITCH002","Switch 8-Port 10/100Mbps ( LS1008/ TL-SF1008D ) (Mới)","TP-LINK",0,2,"SẮP HẾT","","🔀 Switch — ( Bộ chia mạng )","https://lh3.googleusercontent.com/d/1LOqFTxOYQL-GkCxq0dT_CkUaS6KrT-Hl",0,"Switch thường (Unmanaged) | 8 PORT",2,"Q2","","","","","","","",""],
+["INT","SWITCH001","Switch 5-Port 10/100Mbps ( 1 TL-SF1005 / 1 TL-SF1005D ) (Mới)","TP-LINK",0,1,"SẮP HẾT","","🔀 Switch — ( Bộ chia mạng )","https://lh3.googleusercontent.com/d/1sGzoXD6fuSbDqxlyqMAaLuTZOKXpuuXw",450000,"Switch thường (Unmanaged) | 5 PORT",2,"Q2","","","","","","","",""],
+["INT","USBWIFI001","USB Wifi 150Mbps ( TP-Link TL-WN725N ) (Mới)","TP-LINK",0,12,"CÒN HÀNG","","📶 USB Wifi","https://lh3.googleusercontent.com/d/1lgyJwoHX-QwwRn3-29fVs_ww_fChKXkz",0,"Chuẩn N (Wi-Fi 4)",2,"Q2","","","","","","","",""],
+["MT","RAM009","RAM LT DDR4 16GB 3200MHz (Cũ)","NHIỀU THƯƠNG HIỆU",0,5,"CÒN HÀNG","","💾 RAM — Bộ nhớ","https://lh3.googleusercontent.com/d/1UzyweOhPkT7dku91PZRu5QYF7TLeYVc-",0,"LT | LT DDR4",2,"Q2","","","","","","","",""],
+["MT","RAM008","RAM LT DDR4 8GB 3200MHz (Cũ)","NHIỀU THƯƠNG HIỆU",0,5,"CÒN HÀNG","","💾 RAM — Bộ nhớ","https://lh3.googleusercontent.com/d/1MCiB28ipDgnqbLce8SVOcG5YEbARVPv4",0,"LT | LT DDR4",2,"Q2","","","","","","","",""],
+["MT","RAM007","RAM LT DDR3 8GB 1600MHz (Cũ)","NHIỀU THƯƠNG HIỆU",0,5,"CÒN HÀNG","","💾 RAM — Bộ nhớ","https://lh3.googleusercontent.com/d/1L6FxuDMlMl1BLQ5Auh0WklbOrML3w4Sw",0,"LT | LT DDR3",2,"Q2","","","","","","","",""],
+["MT","RAM006","RAM LT DDR3 4GB 1600MHz (Cũ)","NHIỀU THƯƠNG HIỆU",0,2,"SẮP HẾT","","💾 RAM — Bộ nhớ","https://lh3.googleusercontent.com/d/1MiKFIbkO7oyNGG1B5pDA_hAdUrWy-dkr",0,"LT | LT DDR4",2,"Q2","","","","","","","",""],
+["MT","RAM005","RAM LT DDR3 2GB 1600MHz (Cũ)","NHIỀU THƯƠNG HIỆU",0,4,"CÒN HÀNG","","💾 RAM — Bộ nhớ","https://lh3.googleusercontent.com/d/11JeS6oi_xya6PyThUSIbSsozpxZCZ2f4",0,"LT | LT DDR3",2,"Q2","","","","","","","",""],
+["MT","RAM003","RAM PC DDR4 8GB 3200MHz (Có Tản Nhiệt) (Cũ)","KINGSTON",0,2,"SẮP HẾT","","💾 RAM — Bộ nhớ","https://lh3.googleusercontent.com/d/13Go2nNIEFvamrMY0O830mEJXsGQN_ISz",0,"PC | PC DDR4",2,"Q2","","","","","","","",""],
+["MT","RAM002","RAM PC DDR4 4GB 2133MHz (Cũ)","HYPERX",0,2,"SẮP HẾT","","💾 RAM — Bộ nhớ","https://lh3.googleusercontent.com/d/1aExELu3A7befud1fmx-woDBM239T99pp",0,"PC | PC DDR4",2,"Q2","","","","","","","",""],
+["MT","RAM001","RAM ECC DDR3 4GB 1333MHz (Cũ)","HYNIX",0,7,"CÒN HÀNG","","💾 RAM — Bộ nhớ","https://lh3.googleusercontent.com/d/1Sk3g6hPemLdamGsSUPH7vFXmEgGKgDZv",0,"PC | ECC",2,"Q2","","","","","","","",""],
+["MT","MB001","Z490 UD Rev 1.x (1200) (Cũ)","GIGABYTE",0,1,"SẮP HẾT","","🔌 Mainboard","https://lh3.googleusercontent.com/d/1DzhKHBbJfcP4yodzeBs93I94zls4Lg4H",0,"1200",2,"Q2","","","","","","","",""],
+["MT","MB002","H510H6-M2 Ver 4 (1200) (Cũ)","ECS",0,1,"SẮP HẾT","","🔌 Mainboard","https://lh3.googleusercontent.com/d/12_WpL43ZA-FP95vC-NRhOToCGtD3sy1X",0,"1200",2,"Q2","","","","","","","",""],
+["MT","MB003","H410M-A PRO (1200) (Cũ)","MSI",0,1,"SẮP HẾT","","🔌 Mainboard","https://lh3.googleusercontent.com/d/1wCqsVBfD5SwEh25YV8palfkF41QSsXhT",0,"1200",2,"Q2","","","","","","","",""],
+["MT","CPU001","I5-10400F (1200) (Cũ)","INTEL",0,1,"SẮP HẾT","","🧠 CPU — Bộ vi xử lý","https://lh3.googleusercontent.com/d/1pEw6vLvxZoZes4TyT-dFnvol1RdrltVi",0,"i5 | 1200 | 10th",2,"Q2","","","","","","","",""],
+["MT","CPU002","I5-11400F (1200) (Cũ)","INTEL",0,1,"SẮP HẾT","","🧠 CPU — Bộ vi xử lý","https://lh3.googleusercontent.com/d/1STYVP7j1k2RXouk-FJM_XWZy7xQt4DLx",0,"i5 | 1200 | 11th",2,"Q2","","","","","","","",""],
+["MT","MB004","H81M-DS2 REV.3.0 (1150) (Mới)","NHIỀU THƯƠNG HIỆU",0,2,"SẮP HẾT","","🔌 Mainboard","https://lh3.googleusercontent.com/d/1HXso40H0jDlVZ_L2LEE49EVUI66cZd74",0,"1150",2,"Q2","","","","","","","",""],
+["MT","PSU001","400W ( Star Power ATX 80 Plus ) (Mới)","STARPOWER",0,3,"CÒN HÀNG","","🔋 Nguồn — PSU","https://lh3.googleusercontent.com/d/1u4F9F5mZrAySF6utIGmeu9FrEBrjdr2U",850000,"400W",2,"Q2","","","","","","","",""],
+["MT","PSU002","450W ( Star Power ATX 80 Plus ) (Mới)","STARPOWER",0,0,"HẾT HÀNG","","🔋 Nguồn — PSU","https://lh3.googleusercontent.com/d/1xEGgz3_NPQG7bXCtIIRnczZQH5PzpuGK",930000,"450W",2,"Q2","","","","","","","",""],
+["MT","PSU003","650W ( MIK C650B ATX 85% ) (Mới)","MIK",0,1,"SẮP HẾT","","🔋 Nguồn — PSU","https://lh3.googleusercontent.com/d/18D57lfn-q2XgSymGe4v0OrINnAnRydvc",0,"650W",2,"Q2","","","","","","","",""],
+["MT","PSU004","750W ( Jetek ST750 ) (Mới)","JETEK",0,0,"HẾT HÀNG","","🔋 Nguồn — PSU","https://lh3.googleusercontent.com/d/1gSGIITMZgVcOQDip6CgBHqHNaZ4qbse1",0,"750W",2,"Q2","","","","","","","",""],
+["MT","PSU005","750W ( PC Power & Cooling FireStorm 80 Plus Gold ) (Mới)","PC POWER & COOLING",0,1,"SẮP HẾT","","🔋 Nguồn — PSU","https://lh3.googleusercontent.com/d/1Rh5dUIVaSiLsiOwOxdqYCI_Oef4tTG9i",0,"750W",2,"Q2","","","","","","","",""],
+["MT","PSU006","550W ( Star Power ATX 80 Plus ) (Mới)","STARPOWER",0,1,"SẮP HẾT","","🔋 Nguồn — PSU","https://lh3.googleusercontent.com/d/1u4F9F5mZrAySF6utIGmeu9FrEBrjdr2U",1050000,"550W",2,"Q2","","","","","","","",""],
+["MT","RAM004","RAM PC DDR4 8GB 3200MHz (Có Tản Nhiệt) (Mới)","KINGSPEC",0,1,"SẮP HẾT","","💾 RAM — Bộ nhớ","https://lh3.googleusercontent.com/d/1plZPXeu7I_EB8VGIp4ND5b2lIdGwFsp5",0,"PC | PC DDR4",2,"Q2","","","","","","","",""],
+["MT","SSD001","120GB (Ssd SATA III Kingbank) 100% (Cũ)","KINGBANK",0,0,"HẾT HÀNG","","⚡ SSD — Ổ cứng thể rắn","https://lh3.googleusercontent.com/d/1h_p7aZbodZPIwR38ef4PU7N-n26m9Qhw",0,"SATA III | 128GB",2,"Q2","","","","","","","",""],
+["MT","SSD002","128GB (Ssd SATA III Kingbank) (Mới)","KINGBANK",0,1,"SẮP HẾT","","⚡ SSD — Ổ cứng thể rắn","https://lh3.googleusercontent.com/d/1mdU2SbbCrtpDMS_gPjjVMvnsM8sj8kxR",1350000,"SATA III | 128GB",2,"Q2","","","","","","","",""],
+["MT","SSD003","128GB (Ssd SATA III KingSpec) (Mới)","KINGSPEC",0,2,"SẮP HẾT","","⚡ SSD — Ổ cứng thể rắn","https://lh3.googleusercontent.com/d/1__0X9uwiViiicZSXdLOkxnqAzmWLHyz-",0,"SATA III | 128GB",2,"Q2","","","","","","","",""],
+["MT","SSD004","256GB (Ssd SATA III Patriot) (Mới)","PATRIOT",0,5,"CÒN HÀNG","","⚡ SSD — Ổ cứng thể rắn","https://lh3.googleusercontent.com/d/1ufG7nXjJ7wqEptuBWYNpectTLha2R_xP",0,"SATA III | 256GB",2,"Q2","","","","","","","",""],
+["MT","SSD005","512GB (Ssd SATA III Patriot) (Mới)","PATRIOT",0,0,"HẾT HÀNG","","⚡ SSD — Ổ cứng thể rắn","https://lh3.googleusercontent.com/d/1AG528V3uhecmi4ZE3Qnte6FjHl9fNaBY",0,"SATA III | 512GB",2,"Q2","","","","","","","",""],
+["MT","SSD006","256GB (Ssd SATA III Dahua) (Mới)","DAHUA",0,1,"SẮP HẾT","","⚡ SSD — Ổ cứng thể rắn","https://lh3.googleusercontent.com/d/1OxnYJJA1_pi_CUSmyH8PVw9n-yAf3fWq",0,"SATA III | 256GB",2,"Q2","","","","","","","",""],
+["MT","SSD007","256GB (M.2 NVMe Patriot) (Mới)","PATRIOT",0,1,"SẮP HẾT","","⚡ SSD — Ổ cứng thể rắn","https://lh3.googleusercontent.com/d/1rGVac3RyEL9_NMEfYWS-QMrqqRILafrF",0,"M.2 NVMe | 256GB",2,"Q2","","","","","","","",""],
+["MT","SSD008","512GB (M.2 NVMe Intel) 90% (Cũ)","INTEL",0,2,"SẮP HẾT","","⚡ SSD — Ổ cứng thể rắn","https://lh3.googleusercontent.com/d/1awpbnUA2S_K6xrBANO_3YiVWZIlAng03",0,"M.2 NVMe | 512GB",2,"Q2","","","","","","","",""],
+["MT","SSD010","512GB (M.2 NVMe Patriot) (Mới)","PATRIOT",0,1,"SẮP HẾT","","⚡ SSD — Ổ cứng thể rắn","https://lh3.googleusercontent.com/d/1JFIqkmNBbR93YoAH-pTa1txCYJrGbPPi",0,"M.2 NVMe | 512GB",2,"Q2","","","","","","","",""],
+["MT","RAM010","RAM PC DDR3 8GB 1600MHz (Có tản nhiệt) (Cũ)","TEAMGROUP T-",0,1,"SẮP HẾT","","💾 RAM — Bộ nhớ","https://lh3.googleusercontent.com/d/1V8gBKG6xkQp1Ym2urIM-c1Z23pgyfPbE",0,"PC | PC DDR3",2,"Q2","","","","","","","",""],
+["MT","MB005","B660M-B DDR4 (1700) (Cũ)","",0,1,"SẮP HẾT","","🔌 Mainboard","https://lh3.googleusercontent.com/d/17dGPvYLUvxF669cgK6CXUWEK3vTuu0iE",2500000,"1700",2,"Q2","","","","","","","",""],
+["MT","CPU005","I5-12400 (1700) (Cũ)","INTEL",0,1,"SẮP HẾT","","🧠 CPU — Bộ vi xử lý","https://lh3.googleusercontent.com/d/1757npfzkcuJs9cV79nR1h5bCzAmU6jSo",0,"i5",2,"Q2","","","","","","","",""],
+["MT","PSU007","400W (Jetek NS400 ) (Mới)","JETEK",0,0,"HẾT HÀNG","","🔋 Nguồn — PSU","https://lh3.googleusercontent.com/d/14iXiNtF0LekvVz5EFRMwAUzVPmArTant",850000,"400W",2,"Q2","","","","","","","",""],
+["MT","PSU008","500W (Jetek NS500 ) (Mới)","",0,2,"SẮP HẾT","","🔋 Nguồn — PSU","https://lh3.googleusercontent.com/d/1NvcDRHtkguEVGrvKIikx5mz-cdsjmVKG",0,"500W",2,"Q2","","","","","","","",""],
+["MT","PSU009","650W ( Jetek ST650 ) (Mới)","JETEK",0,0,"HẾT HÀNG","","🔋 Nguồn — PSU","https://lh3.googleusercontent.com/d/1qmwdDXFp9U2ruNbUwOskLGpWZRINmaQq",0,"650W",2,"Q2","","","","","","","",""],
+["MT","TAINGHE001","Tai nghe Gaming (MAGIC HG-D1 LED RGB) (Mới)","MAGIC",0,1,"SẮP HẾT","","🛠️ Linh kiện khác","https://lh3.googleusercontent.com/d/1hKhNDnBv9ZJq9RYy8WjJVOCS-CbYfFS-",450000,"TAI NGHE",2,"Q2","","","","","","","",""],
+["MT","LOA001","Loa Vi Tính ( KISONLI V410 2.0 USB + 3.5mm ) (Mới)","KISONLI",0,0,"HẾT HÀNG","","🛠️ Linh kiện khác","https://lh3.googleusercontent.com/d/1swqMqoG0FAF2xUfjzaaacxxyR3irdfCl",0,"LOA VI TÍNH",2,"Q2","","","","","","","",""],
+["MT","WEBCAM001","Webcam PC ( USB Manual Focus ) (Mới)","TP-LINK",0,1,"SẮP HẾT","","🛠️ Linh kiện khác","https://lh3.googleusercontent.com/d/1fpCAOSxHE-1fR6m2RBAXYzcc_aG8m3vg",0,"WEBCAM",2,"Q2","","","","","","","",""],
+["MT","DAYCAP001","Dây HDMI 2.1 8K 2M ( VegGieg 48Gbps ) (Mới)","VEGGIEG",0,8,"CÒN HÀNG","","🛠️ Linh kiện khác","https://lh3.googleusercontent.com/d/1nyYHRh4DYve_TmrrvplnyE0200gH7sLJ",0,"DÂY CÁP",2,"Q2","","","","","","","",""],
+["MT","DAYCAP002","Dây HDMI 2.0 4K 1.5M ( VegGieg V-H301 ) (Mới)","VEGGIEG",0,5,"CÒN HÀNG","","🛠️ Linh kiện khác","https://lh3.googleusercontent.com/d/1-zkqGmmFf6Q92QGBgo7LvKbIJm5zMGxP",0,"DÂY CÁP",2,"Q2","","","","","","","",""],
+["MT","DAYCAP003","Dây Cáp HDMI 2.0 4K 2M ( Không Thương Hiệu ) (Mới)","KHÔNG THƯƠNG HIỆU",0,5,"CÒN HÀNG","","🛠️ Linh kiện khác","https://lh3.googleusercontent.com/d/1FOiaf_liOtCUSdasYsJ-TW9cQLh-M3gp",0,"DÂY CÁP",2,"Q2","","","","","","","",""],
+["MT","HOPBOX001","Box Ổ Cứng 2.5 ( SATA VegGieg V-GM02 Type-C 3.0 ) (Mới)","VEGGIEG",0,2,"SẮP HẾT","","🛠️ Linh kiện khác","https://lh3.googleusercontent.com/d/1WQgGBfYavLx4bjlml_2fG7du_7QOg-Pw",0,"HỘP BOX",2,"Q2","","","","","","","",""],
+["MT","HUB001","Hub Chuyển Đổi ( Type-C 5 In 1 VegGieg V-TC05R ) (Mới)","VEGGIEG",0,1,"SẮP HẾT","","🛠️ Linh kiện khác","https://lh3.googleusercontent.com/d/1UdgS05pd-aAORXeUFOKCz6LinwW1ud9e",0,"HUB CHUYỂN ĐỔI",2,"Q2","","","","","","","",""],
+["MT","D+CC008","Bộ Nối Dài HDMI Qua Dây Mạng RJ45 ( 1 cặp ) (Mới)","",0,2,"SẮP HẾT","","🔌 Dây + Cáp chuyển","https://lh3.googleusercontent.com/d/1AW9ecSLGeQcrBpa7_bvW5K_NWp5grk9Y",0,"HDMI → RJ45",2,"Q2","","","","","","","",""],
+["MT","D+CC007","Bộ Chuyển USB 3.0 Sang HDMI + VGA + Audio ( US523 1080P ) (Mới)","KHÔNG THƯƠNG HIỆU",0,1,"SẮP HẾT","","🔌 Dây + Cáp chuyển","https://lh3.googleusercontent.com/d/1CYu9EhyGKqfcxHOyExoaV7j9Be8MTDYz",0,"USB → HDMI+VGA",2,"Q2","","","","","","","",""],
+["MT","CAPTURE001","Bộ Thu Tín Hiệu HDMI Sang USB 1080P (HDMI Capture) (Mới)","KHÔNG THƯƠNG HIỆU",0,1,"SẮP HẾT","","🛠️ Linh kiện khác","https://lh3.googleusercontent.com/d/1NCKz4zoDaTq4cMgeWWZqnVLxW6fWi4Cq",0,"CAPTURE",2,"Q2","","","","","","","",""],
+["MT","HOPBOX002","Box ổ cứng M.2 SATA ( Type-C 2230/2242/2260/2280 ) (Mới)","KHÔNG THƯƠNG HIỆU",0,1,"SẮP HẾT","","🛠️ Linh kiện khác","https://lh3.googleusercontent.com/d/1zkhpAZLBpDqzfnPwaQzTJaPuuXY1dmcf",0,"HỘP BOX",2,"Q2","","","","","","","",""],
+["MT","D+CC006","Bộ chuyển HDMI sang VGA + Audio 3.5mm (Mới)","KHÔNG THƯƠNG HIỆU",0,1,"SẮP HẾT","","🔌 Dây + Cáp chuyển","https://lh3.googleusercontent.com/d/17ewuGJmSfXPX5oa2ZRP46v5W3lZ30A-g",0,"HDMI → VGA",2,"Q2","","","","","","","",""],
+["MT","MB006","H61M - EL (1155) (Mới)","ARKTEK",0,0,"HẾT HÀNG","","🔌 Mainboard","https://lh3.googleusercontent.com/d/1t4twmEQubl6T6wbMOF3gXry63MEfAFsd",0,"1155",2,"Q2","","","","","","","",""],
+["MT","MB007","H110 (1151) (Mới)","WOLF",0,5,"CÒN HÀNG","","🔌 Mainboard","https://lh3.googleusercontent.com/d/1UJbbuC4S4qeBXsOWmJFrxRc_utMYA4kD",0,"1151-v2",2,"Q2","","","","","","","",""],
+["MT","MB008","H310M V1.01 (1151) (Mới)","KHÔNG THƯƠNG HIỆU",0,3,"CÒN HÀNG","","🔌 Mainboard","https://lh3.googleusercontent.com/d/14pKjNEZzZ7z6uGvBgZHQpI_wsIgM1IhK",0,"1151-v2",2,"Q2","","","","","","","",""],
+["MT","CBCP001","Combo Chuột phím T15 ( VP Có dây ) (Mới)","LIMEIDE",0,12,"CÒN HÀNG","","🖱️ Chuột & Bàn phím","https://lh3.googleusercontent.com/d/1SJE7s08iiq6q66Gcx8x9LQLOCQce4xlo",0,"Combo Chuột & Phím VP | Có dây",2,"Q2","","","","","","","",""],
+["MT","BANPHIM003","Bàn phím cơ N-J9 PRO (Có dây + LED) (Mới)","SUNSONNY",0,3,"CÒN HÀNG","","🖱️ Chuột & Bàn phím","https://lh3.googleusercontent.com/d/1GTcU1giqaSMjlPHze_3J_Uc3f-2_JDEO",0,"Bàn phím cơ | Có dây",2,"Q2","","","","","","","",""],
+["MT","BANPHIM004","Bàn phím cơ N-J80 (Có dây + LED) (Mới)","SUNSONNY",0,2,"SẮP HẾT","","🖱️ Chuột & Bàn phím","https://lh3.googleusercontent.com/d/1URZsSv7EfzGdfmbODd_xVIrnB251Ddo3",0,"Bàn phím cơ | Có dây",2,"Q2","","","","","","","",""],
+["MT","BANPHIM005","Bàn phím cơ N-J20 PRO (Có dây + Không dây + LED) (Mới)","SUNSONNY",0,3,"CÒN HÀNG","","🖱️ Chuột & Bàn phím","https://lh3.googleusercontent.com/d/1xun6Ri_6uzoKcRO_W42whbtaz5ss5PF3",0,"Bàn phím cơ",2,"Q2","","","","","","","",""],
+["MT","BANPHIM006","Bàn phím cơ S-K70 (Có dây + LED) (Mới)","SUNSONNY",0,2,"SẮP HẾT","","🖱️ Chuột & Bàn phím","https://lh3.googleusercontent.com/d/13FTnfQgg-7QfNyaAIasJlKhNkCg-bs5m",0,"Bàn phím cơ | Có dây",2,"Q2","","","","","","","",""],
+["MT","CBCP002","Combo Chuột phím S-T08 ( VP Có dây ) (Mới)","SUNSONNY",0,2,"SẮP HẾT","","🖱️ Chuột & Bàn phím","https://lh3.googleusercontent.com/d/1ZuVn9OpFBS1yi4Wl0Oe441176qcLqLp0",0,"Combo Chuột & Phím VP | Có dây",2,"Q2","","","","","","","",""],
+["MT","CBCP003","Combo Chuột phím S-R1000 ( VP không dây ) (Mới)","SUNSONNY",0,1,"SẮP HẾT","","🖱️ Chuột & Bàn phím","https://lh3.googleusercontent.com/d/1A_kkZVotbmwGaIAuA1JlxVjfkd0Htuh-",0,"Combo Chuột & Phím VP | Không dây",2,"Q2","","","","","","","",""],
+["MT","CBCP004","Combo Chuột phím S-R2000 ( VP không dây ) (Mới)","SUNSONNY",0,1,"SẮP HẾT","","🖱️ Chuột & Bàn phím","https://lh3.googleusercontent.com/d/1Bip1F-NrGnC49Uy7EzPzBSQi5XkYuk8W",0,"Combo Chuột & Phím VP | Không dây",2,"Q2","","","","","","","",""],
+["MT","CBCP005","Combo Chuột phím S-T12 ( VP Có dây ) (Mới)","SUNSONNY",0,1,"SẮP HẾT","","🖱️ Chuột & Bàn phím","https://lh3.googleusercontent.com/d/1W7NEoD0ghNaqXHLmXgQyvlohrGJtVUI8",0,"Combo Chuột & Phím VP | Có dây",2,"Q2","","","","","","","",""],
+["MT","CHUOT001","Chuột Không dây USB ( M220 2.4GH ) (Mới)","LOGITECH",0,2,"SẮP HẾT","","🖱️ Chuột & Bàn phím","https://lh3.googleusercontent.com/d/1wcGi7tCxtQxTPzECe2p-_W8nL4u_72QJ",0,"Chuột | Không dây",2,"Q2","","","","","","","",""],
+["MT","TAINGHE002","Tai nghe Bluetooth ( KR-58 HIFI ) (Mới)","",0,1,"SẮP HẾT","","🛠️ Linh kiện khác","https://lh3.googleusercontent.com/d/11KTMaCO-2dTP5JjaePPQTMqzJEhMESkN",0,"TAI NGHE",2,"Q2","","","","","","","",""],
+["MT","D+CC005","Dây DisplayPort to HDMI 1.8M ( UNITEK Y-5118CA ) (Mới)","UNITEK",0,1,"SẮP HẾT","","🔌 Dây + Cáp chuyển","https://lh3.googleusercontent.com/d/1zW16X9A6hHfHX9jkJLzukwjSLAd8o4tG",0,"DP → HDMI",2,"Q2","","","","","","","",""],
+["MT","CHUOT002","Chuột Có dây USB ( Chuột Quang B2 ) (Mới)","INPHIC",0,1,"SẮP HẾT","","🖱️ Chuột & Bàn phím","https://lh3.googleusercontent.com/d/1b5zLHvxjTovxTxjt5Ddi3OavwxI1y0BJ",0,"Chuột | Có dây",2,"Q2","","","","","","","",""],
+["MT","CHUOT003","Chuột Không dây Bluetooth ( S-R4PRO ) (Mới)","SUNSONNY",0,9,"CÒN HÀNG","","🖱️ Chuột & Bàn phím","https://lh3.googleusercontent.com/d/1ezJPwpaEvVin6wgEO-VSrR3wqSpC6Q1q",280000,"Chuột | Không dây | Bluetooth",2,"Q2","","","","","","","",""],
+["MT","CHUOT004","Chuột Không dây Bluetooth ( SP1 V2 ) (Mới)","SUNSONNY",0,3,"CÒN HÀNG","","🖱️ Chuột & Bàn phím","https://lh3.googleusercontent.com/d/1SBZi3EEMykguAk8rD1V0-GmSjFdeNk7w",0,"Chuột | Không dây | Bluetooth",2,"Q2","","","","","","","",""],
+["MT","CHUOT005","Chuột Không dây USB ( iMICE G-1600 Plus ) (Mới)","",0,1,"SẮP HẾT","","🖱️ Chuột & Bàn phím","https://lh3.googleusercontent.com/d/1V747OzeKfZfJP5ilue5kqgja06qm_Nrf",0,"Chuột | Không dây",2,"Q2","","","","","","","",""],
+["MT","CHUOT006","Chuột Có dây USB ( S-M1d ) (Mới)","SUNSONNY",0,5,"CÒN HÀNG","","🖱️ Chuột & Bàn phím","https://lh3.googleusercontent.com/d/1OHwGZ-bgvdhtXlhFb4AGX6XAKI1GmR1f",180000,"Có dây",2,"Q2","","","","","","","",""],
+["MT","CHUOT007","Chuột Gaming Có dây USB ( S-M5 ) (Mới)","SUNSONNY",0,2,"SẮP HẾT","","🖱️ Chuột & Bàn phím","https://lh3.googleusercontent.com/d/1JnDYzqf5DtWRjHeUghTcIX3Mr8gvNfac",0,"Chuột gaming",2,"Q2","","","","","","","",""],
+["MT","CHUOT008","SUNSONNY (Mới)","",0,2,"SẮP HẾT","","🖱️ Chuột & Bàn phím","https://lh3.googleusercontent.com/d/1zIbbyVxEtNQE8TFoJFHVDB4v4-JmZF3G",0,"Chuột gaming",2,"Q2","","","","","","","",""],
+["MT","CHUOT009","Chuột Gaming Có dây USB ( S-M7 ) (Mới)","SUNSONNY",0,1,"SẮP HẾT","","🖱️ Chuột & Bàn phím","https://lh3.googleusercontent.com/d/1zTUm_t9BVu3dwluI_CRU_VCndEZEmlv0",0,"Chuột gaming",2,"Q2","","","","","","","",""],
+["MT","SSD011","480GB (Ssd SATA III Kington) 100% (Cũ)","KINGSTON",0,1,"SẮP HẾT","","⚡ SSD — Ổ cứng thể rắn","https://lh3.googleusercontent.com/d/1DvP3335zprMFh4iShRSZRgBuU6mY3MhM",0,"SATA III | 480GB",2,"Q2","","","","","","","",""],
+["MT","GPU001","GTX 960 4GB ( WindForce OC 2 Fan ) (Cũ)","GIGABYTE",0,0,"HẾT HÀNG","","🎮 VGA — Card màn hình","https://lh3.googleusercontent.com/d/1OuxAz1cu1CXlHh13b-tBwXtoxMkwSW0G",1950000,"GTX 960",2,"Q2","","","","","","","",""],
+["MT","GPU002","GTX 1660 Super 4GB ( Ventus XS OCV2 2 Fan ) (Cũ)","MSI",0,1,"SẮP HẾT","","🎮 VGA — Card màn hình","https://lh3.googleusercontent.com/d/1J6xAqcwELjOhX5jNAL7HRhJNuFkTdIX4",4200000,"GTX 1660 Super",2,"Q2","","","","","","","",""],
+["MT","GPU003","GTX 1650 SUPER 4GB ( Ventus XS OC 2 Fan ) (Cũ)","MSI",0,1,"SẮP HẾT","","🎮 VGA — Card màn hình","https://lh3.googleusercontent.com/d/1tuYRdPMQWZnbUcjc5jD8Eo6Jec5Rh4G7",3200000,"GTX 1650 Super",2,"Q2","","","","","","","",""],
+["MT","GPU004","GTX 1650 4GB ( TUF Gaming OC 2 Fan ) (Cũ)","",0,1,"SẮP HẾT","","🎮 VGA — Card màn hình","https://lh3.googleusercontent.com/d/1cWMYb2ujqqdZZ8AEqNsdZpBEFHktnAKb",3800000,"GTX 1650",2,"Q2","","","","","","","",""],
+["MT","GPU005","RTX 3060 Ti 8GB ( LHR  2 Fan ) (Cũ)","MHEE",0,1,"SẮP HẾT","","🎮 VGA — Card màn hình","https://lh3.googleusercontent.com/d/1i0AKr1MZXoqgpQaeQ5k94j-wF-an3NGB",5800000,"RTX 3060 Ti",2,"Q2","","","","","","","",""],
+["MT","GPU006","RTX 2060 6GB ( 1-Click OC 2 Fan ) (Cũ)","GALAX",0,1,"SẮP HẾT","","🎮 VGA — Card màn hình","https://lh3.googleusercontent.com/d/1p3Q4mc0apuxH-geNzIDgcHafRT5_nZ8-",3600000,"RTX 2060",2,"Q2","","","","","","","",""],
+["MT","SACLT020","Sạc Dell 180W 19.5V - 9.23A  ( ĐẦU TO ) (Cũ)","DELL",0,1,"SẮP HẾT","","💻 Laptop linh kiện","https://lh3.googleusercontent.com/d/1g8aaZui4o09qXh5kcWMP74twzPJRxNTn",0,"SẠC DELL",2,"Q2","","","","","","","",""],
+["MT","SACLT021","Sạc ASUS 180W 20V 9A ( ĐẦU TO 6.0×3.7mm ) (Cũ)","ASUS",0,1,"SẮP HẾT","","💻 Laptop linh kiện","https://lh3.googleusercontent.com/d/1d8pY84enzOKf5BLVGtoyEKciKpc7sz2e",0,"SẠC ASUS",2,"Q2","","","","","","","",""],
+["MT","SACLT022","Sạc ASUS 45W 19V 2.37A (đầu nhỏ 4.0×1.35mm) (Mới)","ASUS",0,2,"SẮP HẾT","","💻 Laptop linh kiện","https://lh3.googleusercontent.com/d/1YvLyFTN7jnyeRmnQzmptHnPxfBsul5SK",0,"SẠC ASUS",2,"Q2","","","","","","","",""],
+["MT","SACLT023","Sạc ACER 65W 19V 3.42A (Đầu nhỏ 3.0×1.1mm) (Mới)","ACER",0,4,"CÒN HÀNG","","💻 Laptop linh kiện","https://lh3.googleusercontent.com/d/1TkDg6ag9QRMn7yrx3UkHu3fNoNDjQfUv",0,"SẠC ACER",2,"Q2","","","","","","","",""],
+["MT","SACLT024","Sạc LENOVO 65W 20V 3.25A ( đầu tròn nhỏ 4.0×1.7mm Round Tip ) (Mới)","LENOVO",0,1,"SẮP HẾT","","💻 Laptop linh kiện","https://lh3.googleusercontent.com/d/1kRPAhjDK3Oi-tgah4SygUBzg0_R6iI7R",0,"SẠC LENOVO",2,"Q2","","","","","","","",""],
+["MT","SACLT025","Sạc APPLE 85W 18.5V 4.6A (MagSafe 1) (Mới)","APPLE",0,0,"HẾT HÀNG","","💻 Laptop linh kiện","https://lh3.googleusercontent.com/d/1DjN3PS_hYIXOf3msrJAA4uR3jbSUhHnI",0,"SẠC MACBOOK/SUFACE",2,"Q2","","","","","","","",""],
+["MT","SACLT026","Sạc APPLE 85W 20V 4.25A (MagSafe 2) (Mới)","APPLE",0,0,"HẾT HÀNG","","💻 Laptop linh kiện","https://lh3.googleusercontent.com/d/1-S17Hu6HpzxiEJAXX8fESle9mPxuq8ou",0,"SẠC MACBOOK/SUFACE",2,"Q2","","","","","","","",""],
+["MT","SACLT027","Sạc APPLE 96W Type-C 20.5V 4.7A (Mới)","",0,0,"HẾT HÀNG","","💻 Laptop linh kiện","https://lh3.googleusercontent.com/d/1YtG57NLSTxw34EOfV6lRPjy2dFwUqb0o",0,"SẠC MACBOOK/SUFACE",2,"Q2","","","","","","","",""],
+["MT","D+CC004","Bộ chuyển Type-C 3 in 1 (USB 3.0 + HDMI + Type-C) (Mới)","KHÔNG THƯƠNG HIỆU",0,1,"SẮP HẾT","","🔌 Dây + Cáp chuyển","https://lh3.googleusercontent.com/d/1bOvdwMKU72Q92sORxAGVxjDcGDqYZnQQ",0,"TYPE-C → HDMI",2,"Q2","","","","","","","",""],
+["MT","D+CC003","Dây HDMI to DVI 1.5M (Mới)","ARIGATO",0,8,"CÒN HÀNG","","🔌 Dây + Cáp chuyển","https://lh3.googleusercontent.com/d/1OG2yMibN8DimGm38JloJDN_DK0OZ32Pp",0,"HDMI → DVI",2,"Q2","","","","","","","",""],
+["MT","D+CC002","Bộ dây chuyển HDMI to VGA 1.7M (Mới)","",0,4,"CÒN HÀNG","","🔌 Dây + Cáp chuyển","https://lh3.googleusercontent.com/d/1TZxtVJXXm5I5tpyyS4yyXFJot98Swrvj",0,"HDMI → VGA",2,"Q2","","","","","","","",""],
+["MT","D+CC001","Bộ Chuyển Mini DisplayPort sang HDMI (Mới)","",0,2,"SẮP HẾT","","🔌 Dây + Cáp chuyển","https://lh3.googleusercontent.com/d/1CpQ4RI3Q12JJeFvoHxeKU_547G-HM1Wf",0,"DPMINI → HDMI",2,"Q2","","","","","","","",""],
+["MI","DCMI001","Dây cáp máy in 1.5M (USB A to USB B) (Mới)","",0,2,"SẮP HẾT","","🔧 Linh kiện+Phụ kiện","https://lh3.googleusercontent.com/d/1SfRJgruz50SjbKT9wAPMOkaGg27valxI",0,"Dây cáp",2,"Q2","","","","","","","",""],
+["MI","DCMI002","Dây cáp máy in 4M (USB A to USB B) (Mới)","",0,2,"SẮP HẾT","","🔧 Linh kiện+Phụ kiện","https://lh3.googleusercontent.com/d/1KxQILf6pX6wDZ8Wy7UKjZsUWpE3VVgjz",0,"Dây cáp",2,"Q2","","","","","","","",""],
+["MI","DCMI003","Cáp Nối Dài USB 1.5M (USB A Đực to USB A Cái) (Mới)","",0,2,"SẮP HẾT","","🔧 Linh kiện+Phụ kiện","https://lh3.googleusercontent.com/d/1zLMo1krblBUa6iQ0ioFIAbqb_7Y-z7mh",0,"Dây cáp",2,"Q2","","","","","","","",""],
+["MI","DCMI004","Cáp Nối Dài USB 3M (USB A Đực to USB A Cái) (Mới)","",0,1,"SẮP HẾT","","🔧 Linh kiện+Phụ kiện","https://lh3.googleusercontent.com/d/1wutsmtBcplgTuyedA0w1j64VR1JeSaUt",0,"Dây cáp",2,"Q2","","","","","","","",""],
+["MI","DCMI005","Cáp Nối Dài USB 7M (USB A Đực to USB A Cái) (Mới)","",0,1,"SẮP HẾT","","🔧 Linh kiện+Phụ kiện","https://lh3.googleusercontent.com/d/13lq_QkJiuusLsohWQiGnzlARtXg7da-z",0,"Dây cáp",2,"Q2","","","","","","","",""],
+["MI","HOPMUC001","Hộp mực 12A (Q2612A – ESTAR) (Mới)","ESTAR",0,4,"CÒN HÀNG","","📦 Hộp mực","https://lh3.googleusercontent.com/d/1TnWywAecdv6rf8jJRxDtKow2b28lU4tW",0,"12A",2,"Q2","","","","","","","",""],
+["MI","HOPMUC002","Hộp mực đa năng ( 35A/85A/78A ) (Mới)","ESTAR",0,0,"HẾT HÀNG","","📦 Hộp mực","https://lh3.googleusercontent.com/d/1AQQcA_BgovkvNkbqYIyn-y8qB8nOx7W3",0,"35A | 85A | 78A",2,"Q2","","","","","","","",""],
+["MI","HOPMUC003","Hộp mực 48A (CF248A – Star Ink) (Mới)","STAR INK",0,3,"CÒN HÀNG","","📦 Hộp mực","https://lh3.googleusercontent.com/d/1gRqC_4swmrUCb7B4MdbgAw6ksx0akJxg",0,"48A",2,"Q2","","","","","","","",""],
+["MI","HOPMUC004","Hộp mực 78A (CE278A – Star Ink) (Mới)","",0,1,"SẮP HẾT","","📦 Hộp mực","https://lh3.googleusercontent.com/d/1YFciHrasSIiK8-Ovm5-uLgfkImHneNs3",0,"78A",2,"Q2","","","","","","","",""],
+["MI","HOPMUC005","Hộp mực 79A (CF279A – Star Ink) (Mới)","STAR INK",0,1,"SẮP HẾT","","📦 Hộp mực","https://lh3.googleusercontent.com/d/15LjcgI6AMWlTNxToBCWrlhUbLGW3insN",0,"79A",2,"Q2","","","","","","","",""],
+["MI","HOPMUC006","Hộp mực 83A/CRG337 (CF283A – ESTAR) (Mới)","ESTAR",0,1,"SẮP HẾT","","📦 Hộp mực","https://lh3.googleusercontent.com/d/1-r4rOgx9NDllO4gu93PVXfe1aNEqUWn-",0,"83A | 337",2,"Q2","","","","","","","",""],
+["MI","HOPMUC008","Hộp mực 103A (W1103A – ESTAR) (Mới)","",0,6,"CÒN HÀNG","","📦 Hộp mực","https://lh3.googleusercontent.com/d/1gtwPwNYGuENvKNtjZGtYfRa9WTXLcbQW",0,"103A",2,"Q2","","","","","","","",""],
+["MI","HOPMUC009","Hộp mực 136X (W1360X – ESTAR) (Mới)","ESTAR",0,1,"SẮP HẾT","","📦 Hộp mực","https://lh3.googleusercontent.com/d/1-0dI5E11YoXLelACddZfz26S7oPBaW34",0,"136X",2,"Q2","","","","","","","",""],
+["MI","HOPMUC010","Hộp mực 107A (W1107A – HP) (Mới)","",0,3,"CÒN HÀNG","","📦 Hộp mực","https://lh3.googleusercontent.com/d/1YEuX4ub4Gla4p8zb_KKz2yM_N00Nl1OU",0,"107A",2,"Q2","","","","","","","",""],
+["MI","HOPMUC011","Hộp mực 49A/53A (ES-Q5949A/Q7553A) (Mới)","ESTAR",0,3,"CÒN HÀNG","","📦 Hộp mực","https://lh3.googleusercontent.com/d/1fVRQbOsH4qBflWKUVPaa5FIpsmBhfz1n",0,"49A | 53A",2,"Q2","","","","","","","",""],
+["MI","HOPMUC012","Hộp mực 17A/CRG047 (CF217A – ESTAR) (Mới)","ESTAR",0,1,"SẮP HẾT","","📦 Hộp mực","https://lh3.googleusercontent.com/d/1pmq01hE0QNCt9X5KaxelSwPMrHdXfFf0",0,"Mực in",2,"Q2","","","","","","","",""],
+["MI","DRUM001","Cụm Drum 19A (CF219A – ESTAR) (Mới)","",0,0,"HẾT HÀNG","","DRUM","https://lh3.googleusercontent.com/d/10mvL9Ws2cGnGNmHP4iawYeLrNpLq_T9S",0,"19A",2,"Q2","","","","","","","",""],
+["MI","HOPMUC013","Hộp mực 30A/CRG051 (CF230A – ESTAR) (Mới)","ESTAR",0,2,"SẮP HẾT","","📦 Hộp mực","https://lh3.googleusercontent.com/d/1qTvvUC5ZINEMT1p_LTUA7wowUl3M0obW",0,"Mực in",2,"Q2","","","","","","","",""],
+["MI","DRUM002","Cụm Drum 32A (CF232A – ESTAR) (Mới)","",0,1,"SẮP HẾT","","DRUM","https://lh3.googleusercontent.com/d/1DAE8NaLN_cDMl9PVazt4vxiP7A8jdhH4",0,"32A",2,"Q2","","","","","","","",""],
+["MI","HOPMUC014","Hộp mực Brother TN-B020/B021/B022/B023 (Mới)","STAR INK",0,3,"CÒN HÀNG","","📦 Hộp mực","https://lh3.googleusercontent.com/d/1MvnKGU_WPQ1IOLz_ve6-uC9gq4zPWw_P",0,"Brother",2,"Q2","","","","","","","",""],
+["MI","HOPMUC015","Hộp mực B022/B027 (TN-B022/TN-B027 – ESTAR) (Mới)","ESTAR",0,5,"CÒN HÀNG","","📦 Hộp mực","https://lh3.googleusercontent.com/d/1hXYLSr0o_9Pqykq7DRmapG5BaIlz10ZX",0,"Brother",2,"Q2","","","","","","","",""],
+["MI","HOPMUC018","Hộp mực TN-2130 (Mới)","ESTAR",0,2,"SẮP HẾT","","📦 Hộp mực","https://lh3.googleusercontent.com/d/1m8M5gEXre95Ges8lqV_Sq9FgkMiUfkep",0,"Brother",2,"Q2","","","","","","","",""],
+["MI","DRUM006","Cụm Drum DR-2255/DR-420 (Mới)","",0,1,"SẮP HẾT","","Drum","https://lh3.googleusercontent.com/d/1dQZmIKDDyC99oM4a38LVEj4e86jFsuY5",0,"Brother",2,"Q2","","","","","","","",""],
+["MI","HOPMUC019","Ruy Băng Máy In Kim ( Epson LQ310 ) (Mới)","",0,0,"HẾT HÀNG","","📦 Hộp mực","https://lh3.googleusercontent.com/d/1T1vOQmAdkuNOASkTZn-huttcLv3xx6jk",0,"Ruy băng",2,"Q2","","","","","","","",""],
+["CAM","CMRWIFI001","Camera Wi-Fi Imou (Ranger 2 3MP 2K) (Mới)","IMOU",0,2,"SẮP HẾT","","📡 Camera Wifi","https://lh3.googleusercontent.com/d/15pytrvpTmsBsaVXugmVEuKgMGcQFkffO",0,"IMOU",2,"Q2","","","","","","","",""],
+["INT","BPWIFI001","Bộ phát WiFi TP-Link Omada EAP115 (300Mbps 2.4GHz) (Mới)","TP-LINK",0,1,"SẮP HẾT","","Bộ phát WiFi (Access Point)","https://lh3.googleusercontent.com/d/1wBkK4m9nuZoo16HNtwyBzab7zW-UYaAS",0,"Gắn trần (Ceiling Mount) | Gắn tường (Wall Plate) | Trong nhà (Indoor)",2,"Q2","","","","","","","",""],
+["INT","ROUTER001","Router WiFi Băng Tần Kép ( AC750 Archer C24) (Mới)","TP-LINK",0,1,"SẮP HẾT","","📡 Router — ( Bộ định tuyến )","https://lh3.googleusercontent.com/d/1m3LPxwWcLGrJMDn0K8f56Kasl_XcP3bD",0,"Băng tần kép (Dual Band)",2,"Q2","","","","","","","",""],
+["MI","MITEM001","Máy in tem nhiệt ( E80BT USB + Bluetooth) (Mới)","HEBAR",0,1,"SẮP HẾT","","🧾 Máy in Bill&Tem","https://lh3.googleusercontent.com/d/1mC4LOeFqZKNxtAQyn-sBt-Wf_wuBkN4M",0,"Khác⤴",2,"Q2","","","","","","","",""],
+["CAM","DAUGHI001","Đầu ghi KBVISION 8 Kênh (KX-DAi8104H3) (Mới)","KBVISION",0,1,"SẮP HẾT","","📼 Đầu ghi hình","https://lh3.googleusercontent.com/d/1lG3YhGvLFgfdnPwryjJVRhgmDObKH3f-",0,"KBVISION | Analog",2,"Q2","","","","","","","",""],
+["MI","MUCNAP001","Mực nạp Laser M436 250g (HP CF256A/CF256X) (Mới)","",0,3,"CÒN HÀNG","","🧴 Mực nạp","https://lh3.googleusercontent.com/d/11-3JPEP2cDcN1cadD9C6scG9XdxKJQnD",0,"HP/CANON",2,"Q2","","","","","","","",""],
+["MI","MUCNAP002","Mực nạp Laser Samsung ( ML1710 / HP107 80g ) (Mới)","",0,7,"CÒN HÀNG","","🧴 Mực nạp","https://lh3.googleusercontent.com/d/1k4gbsMyOYX4sIN9_t8ad28iH5RKEgMor",0,"SAM SUNG",2,"Q2","","","","","","","",""],
+["MI","MUCNAP003","Mực nạp Laser HP M102 50g (HP CF217A/CF230A/CF233A) (Mới)","",0,6,"CÒN HÀNG","","🧴 Mực nạp","https://lh3.googleusercontent.com/d/1Rrz3hxc0f11YdFxqJ7XzS0NNqg1PGQAP",0,"HP/CANON",2,"Q2","","","","","","","",""],
+["MI","MUCNAP004","Mực nạp Brother ( TN2130/TN2220 80g ) (Mới)","",0,21,"CÒN HÀNG","","🧴 Mực nạp","https://lh3.googleusercontent.com/d/1B5wbbPJl4xOBZOglDjbwhgaGDCsM4ZhO",0,"BROTHER",2,"Q2","","","","","","","",""],
+["MI","MUCNAP005","Mực nạp HP/Canon Premium ( 140g ) (Mới)","",0,6,"CÒN HÀNG","","🧴 Mực nạp","https://lh3.googleusercontent.com/d/1SCfSM4sbOGnKMmPrgARaiC5_0irJvkUe",0,"HP/CANON",2,"Q2","","","","","","","",""],
+["MI","MUCNAP006","Mực nạp NGT6 ( 1505/1606 80g ) (Mới)","",0,45,"CÒN HÀNG","","🧴 Mực nạp","https://lh3.googleusercontent.com/d/1tQbKicpjiv9nEdXUsKtGzTaBHq3sHIcJ",0,"HP/CANON",2,"Q2","","","","","","","",""],
+["MT","CPU006","CPU Intel Core i3-2100 3.10GHz (1155) (Cũ)","INTEL",0,2,"SẮP HẾT","","🧠 CPU — Bộ vi xử lý","https://lh3.googleusercontent.com/d/1qdQX7Lnvk5tn93KQu7CEHF69wW0eRQdi",0,"i3",2,"Q2","","","","","","","",""],
+["MT","CPU007","CPU Intel Core i3-3240 3.40GHz (1155) (Cũ)","INTEL",0,1,"SẮP HẾT","","🧠 CPU — Bộ vi xử lý","https://lh3.googleusercontent.com/d/1vFjBODGg4WyQyYnyoV2o61dPuyPZMRg8",0,"i3",2,"Q2","","","","","","","",""],
+["MT","CPU008","CPU Intel Core i3-7350K 4.20GHz (1151) (Cũ)","INTEL",0,1,"SẮP HẾT","","🧠 CPU — Bộ vi xử lý","https://lh3.googleusercontent.com/d/1jW-fz9MzRtvIPR1x-5bg2rPjt0_QY3I6",0,"i3",2,"Q2","","","","","","","",""],
+["MT","CPU009","CPU Intel Core i3-9100F 3.60GHz (1151V2) (Cũ)","INTEL",0,1,"SẮP HẾT","","🧠 CPU — Bộ vi xử lý","https://lh3.googleusercontent.com/d/1B7o4uyNZNZCD5A9LkaprO3X1yrBH-y_z",0,"i3",2,"Q2","","","","","","","",""],
+["MT","CPU010","CPU Intel Core i5-3470 3.20GHz (1155) (Cũ)","INTEL",0,0,"HẾT HÀNG","","🧠 CPU — Bộ vi xử lý","https://lh3.googleusercontent.com/d/1kJuGnDh8kLlgJScWLYph4RI-kKJqhd_M",0,"i5",2,"Q2","","","","","","","",""],
+["MT","CPU011","CPU Intel Core i5-6400 2.70GHz (1151) (Cũ)","INTEL",0,1,"SẮP HẾT","","🧠 CPU — Bộ vi xử lý","https://lh3.googleusercontent.com/d/1uPokTJ4jFfJC_xX-xWDpeAoVn_qxBfox",0,"i5",2,"Q2","","","","","","","",""],
+["MT","CPU012","CPU Intel Core i5-9400F 2.90GHz (1151V2) (Cũ)","INTEL",0,1,"SẮP HẾT","","🧠 CPU — Bộ vi xử lý","https://lh3.googleusercontent.com/d/13YKn5rpa1vVd1XpWv8N1_PjV3w-dI1-i",0,"i5",2,"Q2","","","","","","","",""],
+["MT","CPU013","CPU Intel Core i7-4790 3.60GHz (1150) (Mới)","",0,3,"CÒN HÀNG","","🧠 CPU — Bộ vi xử lý","https://lh3.googleusercontent.com/d/1bNHBzgA_PHexaAciLxXvBEWLsokoubPq",0,"i7",2,"Q2","","","","","","","",""],
+["MT","CPU014","CPU Intel Core i7-6700K 4.00GHz (1151) (Mới)","",0,1,"SẮP HẾT","","🧠 CPU — Bộ vi xử lý","https://lh3.googleusercontent.com/d/1Zn35A27ByzsuT8BjfCdXek25j9Gw5-Ku",0,"i7",2,"Q2","","","","","","","",""],
+["MT","CPU015","CPU Intel Xeon X5650 2.66GHz (1366) (Cũ)","",0,4,"CÒN HÀNG","","🧠 CPU — Bộ vi xử lý","https://lh3.googleusercontent.com/d/1QCK8uC_QFco-NQoT4LPhONGKhQNwGLBk",0,"Xeon",2,"Q2","","","","","","","",""],
+["MT","CPU016","CPU Intel Xeon E3-1220 V3 3.10GHz (1150) (Cũ)","INTEL",0,1,"SẮP HẾT","","🧠 CPU — Bộ vi xử lý","https://lh3.googleusercontent.com/d/17L-OMfKsbMSv7vBTGnZDPPIk0e33mpyb",0,"Xeon",2,"Q2","","","","","","","",""],
+["MT","CPU017","CPU AMD Athlon 200GE 3.20GHz (AM4) (Cũ)","AMD",0,1,"SẮP HẾT","","🧠 CPU — Bộ vi xử lý","https://lh3.googleusercontent.com/d/1TDfkhGL3wtyER9bH2okXoFgtIyZyv15t",0,"AMD",2,"Q2","","","","","","","",""],
+["MT","CPU018","CPU AMD A8-5600K 3.60GHz (FM2) (Cũ)","AMD",0,1,"SẮP HẾT","","🧠 CPU — Bộ vi xử lý","https://lh3.googleusercontent.com/d/1Yfr03qtuQu1V66f_WdDGCHNrj4031MBQ",0,"AMD",2,"Q2","","","","","","","",""],
+["MT","CPU019","CPU Intel Pentium G3260 3.30GHz (1150) (Cũ)","INTEL",0,1,"SẮP HẾT","","🧠 CPU — Bộ vi xử lý","https://lh3.googleusercontent.com/d/1Gajv6SgzAurwqCEYih_yJSl1CVprnggP",0,"Pentium",2,"Q2","","","","","","","",""],
+["MT","CPU021","CPU Intel Pentium G4600 3.60GHz (1151) (Cũ)","INTEL",0,1,"SẮP HẾT","","🧠 CPU — Bộ vi xử lý","https://lh3.googleusercontent.com/d/1ux_x5ivk83BKJCy8CZSJIoGLeKB2I_bl",0,"Pentium",2,"Q2","","","","","","","",""],
+["MT","CPU022","CPU Intel Pentium Gold G5420 3.80GHz (1151V2) (Cũ)","INTEL",0,1,"SẮP HẾT","","🧠 CPU — Bộ vi xử lý","https://lh3.googleusercontent.com/d/1UDo7pQ4lGB7Z-JM1joiu8VILj0p0208z",0,"Pentium",2,"Q2","","","","","","","",""],
+["MT","CPU023","CPU Intel Pentium E6500 2.93GHz (775) (Cũ)","INTEL",0,1,"SẮP HẾT","","🧠 CPU — Bộ vi xử lý","https://lh3.googleusercontent.com/d/1KnSemHygpbcieSpLCcYLgD6EoabjVmRR",0,"Pentium",2,"Q2","","","","","","","",""],
+["MT","CPU024","CPU Intel Pentium E6600 3.06GHz (775) (Cũ)","INTEL",0,1,"SẮP HẾT","","🧠 CPU — Bộ vi xử lý","https://lh3.googleusercontent.com/d/1Bb16zGhPpIulcZjajFjb2_JeJWPZuaRY",0,"Pentium",2,"Q2","","","","","","","",""],
+["MT","CPU025","CPU Intel Core 2 Duo E8400 3.00GHz (775) (Cũ)","INTEL",0,1,"SẮP HẾT","","🧠 CPU — Bộ vi xử lý","https://lh3.googleusercontent.com/d/16vQpPeu0HPxEJZo6TykU2gG4UxRRqogS",0,"Pentium",2,"Q2","","","","","","","",""],
+["MI","MUCNAP007","⚫ Mực nạp Epson 664 BK (4 màu E6641 70ml ) (Mới)","STAR INK",0,4,"CÒN HÀNG","","🧴 Mực nạp","https://lh3.googleusercontent.com/d/1nVUH5pAPtV4T8OP1H2AWSxtnL_OUj8uY",0,"Mực màu CMYK",2,"Q2","","","","","","","",""],
+["MI","MUCNAP008","🔵 Mực nạp Epson 664 C (4 màu E6642 70ml) (Mới)","STAR INK",0,1,"SẮP HẾT","","🧴 Mực nạp","https://lh3.googleusercontent.com/d/10y_rSyjpqx4NyN29xSJtm9b5F11bivPl",0,"Mực màu CMYK",2,"Q2","","","","","","","",""],
+["MI","MUCNAP009","🩷 Mực nạp Epson 664 M (4 màu E6643 70ml) (Mới)","STAR INK",0,1,"SẮP HẾT","","🧴 Mực nạp","https://lh3.googleusercontent.com/d/1cL7RAEtgnsmc7-HFcM37uOpgO4hiLKlj",0,"Mực màu CMYK",2,"Q2","","","","","","","",""],
+["MI","MUCNAP010","🟡 Mực nạp Epson 664 Y (4 màu E6644 70ml) (Mới)","STAR INK",0,1,"SẮP HẾT","","🧴 Mực nạp","https://lh3.googleusercontent.com/d/1Eehgdk0eR5sB1hxuyaW6JGwsrRtcL50i",0,"Mực màu CMYK",2,"Q2","","","","","","","",""],
+["MI","MUCNAP011","⚫ Mực nạp Epson 001 BK (4 màu E0011 127ml) (Mới)","STAR INK",0,0,"HẾT HÀNG","","🧴 Mực nạp","https://lh3.googleusercontent.com/d/19BVYuzqRXwTCmi16oZkc3SIs9zxBU-6U",0,"Mực màu CMYK",2,"Q2","","","","","","","",""],
+["MI","MUCNAP012","🔵 Mực nạp Epson 001 C (4 màu E0012 70ml) (Mới)","STAR INK",0,0,"HẾT HÀNG","","🧴 Mực nạp","https://lh3.googleusercontent.com/d/1mjRrCWM-g33au2Qv9_RAxOeNZOUN1EQk",0,"Mực màu CMYK",2,"Q2","","","","","","","",""],
+["MI","MUCNAP013","🩷 Mực nạp Epson 001 M (4 màu E0013 70ml) (Mới)","STAR INK",0,0,"HẾT HÀNG","","🧴 Mực nạp","https://lh3.googleusercontent.com/d/1SgIys-sWaNeE1xf1YgM4knnp4irssd9w",0,"Mực màu CMYK",2,"Q2","","","","","","","",""],
+["MI","MUCNAP014","🟡 Mực nạp Epson 001 Y (4 màu E0014 70ml) (Mới)","STAR INK",0,0,"HẾT HÀNG","","🧴 Mực nạp","https://lh3.googleusercontent.com/d/1jtfAVrBkpviBoWdGuz0Z6WtMPgxYD_S_",0,"Mực màu CMYK",2,"Q2","","","","","","","",""],
+["MI","MUCNAP015","⚫ Mực nạp Epson 003 BK (4 màu E0031 65ml) (Mới)","STAR INK",0,0,"HẾT HÀNG","","🧴 Mực nạp","https://lh3.googleusercontent.com/d/1bpzmyD31TxvjcintGdl8JkQ5Z0oLPvmv",0,"Mực màu CMYK",2,"Q2","","","","","","","",""],
+["MI","MUCNAP016","🔵 Mực nạp Epson 003 C (4 màu E0032 65ml) (Mới)","STAR INK",0,0,"HẾT HÀNG","","🧴 Mực nạp","https://lh3.googleusercontent.com/d/127UslKUU8scQAWlK6YDlZhi2wAK_RaJP",0,"Mực màu CMYK",2,"Q2","","","","","","","",""],
+["MI","MUCNAP017","🩷 Mực nạp Epson 003 M (4 màu E0033 65ml) (Mới)","STAR INK",0,0,"HẾT HÀNG","","🧴 Mực nạp","https://lh3.googleusercontent.com/d/1ZoiMEVHiao0zp9szZRZ0F5xXuVWs85BF",0,"Mực màu CMYK",2,"Q2","","","","","","","",""],
+["MI","MUCNAP018","🟡 Mực nạp Epson 003 Y (4 màu E0034 65ml) (Mới)","STAR INK",0,0,"HẾT HÀNG","","🧴 Mực nạp","https://lh3.googleusercontent.com/d/13TY3GWu3mbC7eTibBeAXCRLIDBU_hbDc",0,"Mực màu CMYK",2,"Q2","","","","","","","",""],
+["MI","MUCNAP019","⚫ Mực nạp Epson 057 BK (6 màu T0571 70ml) (Mới)","STAR INK",0,0,"HẾT HÀNG","","🧴 Mực nạp","https://lh3.googleusercontent.com/d/1-Rm5JeCNCoBj_No19P8YPpKekwyrG0nN",0,"Mực màu CMYK",2,"Q2","","","","","","","",""],
+["MI","MUCNAP020","🔵 Mực nạp Epson 057 C (6 màu T0572 70ml) (Mới)","STAR INK",0,0,"HẾT HÀNG","","🧴 Mực nạp","https://lh3.googleusercontent.com/d/1iUsUjr8KpxXETV_8K7kh45mySntJqmQO",0,"Mực màu CMYK",2,"Q2","","","","","","","",""],
+["MI","MUCNAP021","🩷 Mực nạp Epson 057 M (6 màu T0573 70ml) (Mới)","",0,0,"HẾT HÀNG","","🧴 Mực nạp","https://lh3.googleusercontent.com/d/1OjXnEobt8dcsmJNvD7bV0vfGgXtNGhAl",0,"Mực màu CMYK",2,"Q2","","","","","","","",""],
+["MI","MUCNAP022","🟡 Mực nạp Epson 057 Y (6 màu T0574 70ml) (Mới)","STAR INK",0,0,"HẾT HÀNG","","🧴 Mực nạp","https://lh3.googleusercontent.com/d/1jeVnRUXTAH2zx7Rqg497FwumAI7RzO5i",0,"Mực màu CMYK",2,"Q2","","","","","","","",""],
+["MI","MUCNAP023","🩵 Mực nạp Epson 057 LC (6 màu T0575 70ml) (Mới)","STAR INK",0,0,"HẾT HÀNG","","🧴 Mực nạp","https://lh3.googleusercontent.com/d/1hgdB1ECtdQeDkqYW6ybL-GErgVhb07s1",0,"Mực màu CMYK",2,"Q2","","","","","","","",""],
+["MI","MUCNAP024","🌸 Mực nạp Epson 057 LM (6 màu T0576 70ml) (Mới)","STAR INK",0,0,"HẾT HÀNG","","🧴 Mực nạp","https://lh3.googleusercontent.com/d/1Z7SzK9rPVQMrznkn9sheS0gtx6WSoJLz",0,"Mực màu CMYK",2,"Q2","","","","","","","",""],
+["MI","MUCNAP025","⚫ Mực nạp Epson 673 BK (6 màu E6731 70ml) (Mới)","STAR INK",0,1,"SẮP HẾT","","🧴 Mực nạp","https://lh3.googleusercontent.com/d/1HDWqq5DSwttCXTcUTx5WjZrvR_JHXbfh",0,"Mực màu CMYK",2,"Q2","","","","","","","",""],
+["MI","MUCNAP026","🔵 Mực nạp Epson 673 C (6 màu E6732 70ml) (Mới)","STAR INK",0,0,"HẾT HÀNG","","🧴 Mực nạp","https://lh3.googleusercontent.com/d/1_6ocHhF7rkq1L207RlZhyjhvce8UOiXp",0,"Mực màu CMYK",2,"Q2","","","","","","","",""],
+["MI","MUCNAP027","🩷 Mực nạp Epson 673 M (6 màu E6733 70ml) (Mới)","STAR INK",0,0,"HẾT HÀNG","","🧴 Mực nạp","https://lh3.googleusercontent.com/d/1A-VD_2jO3RQzFVbEDPzau-td4NGy7CsI",0,"Mực màu CMYK",2,"Q2","","","","","","","",""],
+["MI","MUCNAP028","🟡 Mực nạp Epson 673 Y (6 màu E6734 70ml) (Mới)","STAR INK",0,0,"HẾT HÀNG","","🧴 Mực nạp","https://lh3.googleusercontent.com/d/16F6SGRtaJNz-clb5ANBx-tzT62Wv8o9w",0,"Mực màu CMYK",2,"Q2","","","","","","","",""],
+["MI","MUCNAP029","🩵 Mực nạp Epson 673 LC (6 màu E6735 70ml) (Mới)","",0,3,"CÒN HÀNG","","🧴 Mực nạp","https://lh3.googleusercontent.com/d/1ptyQUq8SWEH6L53MHj58pCqoMealUo3A",0,"Mực màu CMYK",2,"Q2","","","","","","","",""],
+["MI","MUCNAP030","🌸 Mực nạp Epson 673 LM (6 màu E6736 70ml) (Mới)","STAR INK",0,0,"HẾT HÀNG","","🧴 Mực nạp","https://lh3.googleusercontent.com/d/1iB_shYsnjlOBZZlZog4J2Rp2nRvFs6h2",0,"Mực màu CMYK",2,"Q2","","","","","","","",""],
+["MI","MIDT001","MÁY IN CANON LBP 3050 (85A) (Cũ)","CANON",0,0,"HẾT HÀNG","","⚫ Máy in đen trắng","https://lh3.googleusercontent.com/d/1iBsILYlYzQm_X2b5GrHGTCrYDP5BOqT_",0,"CANON",2,"Q2","","","","","","","",""],
+["MT","CPU026","CPU Intel Core i3-6100 3.70GHz (1151) (Cũ)","INTEL",0,1,"SẮP HẾT","","🧠 CPU — Bộ vi xử lý","https://lh3.googleusercontent.com/d/1BEyqHOtAnTetka3p4NwhYLr_6yQxvrxo",0,"i3",2,"Q2","","","","","","","",""],
+["MT","MB009","H110 (1151) (Cũ)","ECS",0,1,"SẮP HẾT","","🔌 Mainboard","https://lh3.googleusercontent.com/d/1_2LTfvzjx1YBmrczeY1qDwo-UH3ySxua",0,"1151-v2",2,"Q2","","","","","","","",""],
+["MT","PSU010","450W ( Nguồn Xigmatek ) (Cũ)","Xigmatek",0,1,"SẮP HẾT","","🔋 Nguồn — PSU","https://lh3.googleusercontent.com/d/1f6zxBIcDfS40VzjWmf_hmk10NLgmfd50",0,"450W",2,"Q2","","","","","","","",""],
+["MT","GPU007","GTX 1070 8GB ( ZOTAC Mini 2 Fan ) (Cũ)","ZOTAC",0,1,"SẮP HẾT","","🎮 VGA — Card màn hình","https://lh3.googleusercontent.com/d/1LlONjd57ohs5CN38hMBS9MwB2qlnQI2p",3600000,"GTX 1070",2,"Q2","","","","","","","",""],
+["MT","GPU008","GTX 1060 6GB ( AORUS 3 Fan ) (Cũ)","AORUS",0,1,"SẮP HẾT","","🎮 VGA — Card màn hình","https://lh3.googleusercontent.com/d/1xvqA0sQlzeKTocuDPxPXIH13K5aJAEiH",4000000,"GTX 1060",2,"Q2","","","","","","","",""],
+["MT","GPU009","GTX 1070 8GB ( ROG Strix Gaming OC 3 Fan ) (Cũ)","ROGSTRIX",0,0,"HẾT HÀNG","","🎮 VGA — Card màn hình","https://lh3.googleusercontent.com/d/1quLTTX7K7gXGi4xwRGblkOGQTyjob0ZF",4200000,"GTX 1070",2,"Q2","","","","","","","",""],
+["MT","PSU011","650W ( MIK C650B ATX ) (Cũ)","MIK",0,1,"SẮP HẾT","","🔋 Nguồn — PSU","https://lh3.googleusercontent.com/d/1Sl27sAYpoAL_8eRtJBMqRapUBUBJOnkK",1350000,"650W",2,"Q2","","","","","","","",""],
+["MT","SSD012","258GB (Ssd SATA III Lexar) 100% (Cũ)","LEXAR",0,1,"SẮP HẾT","","⚡ SSD — Ổ cứng thể rắn","https://lh3.googleusercontent.com/d/1cuhdOjBRzSJa4y2bmLV-FlvbQXcN_vjP",0,"SATA III | 256GB",2,"Q2","","","","","","","",""],
+["MT","CHUOT003","Chuột Không dây Bluetooth ( S-R4PRO ) (Mới)","SUNSONNY",0,2,"SẮP HẾT","","🖱️ Chuột & Bàn phím","https://lh3.googleusercontent.com/d/1ezJPwpaEvVin6wgEO-VSrR3wqSpC6Q1q",280000,"Chuột | Không dây | Bluetooth",2,"Q5","","","","","","","",""],
+["MT","CHUOT001","Chuột Không dây USB ( M220 2.4GH ) (Mới)","LOGITECH",0,2,"SẮP HẾT","","🖱️ Chuột & Bàn phím","https://lh3.googleusercontent.com/d/1wcGi7tCxtQxTPzECe2p-_W8nL4u_72QJ",0,"Chuột | Không dây",2,"Q5","","","","","","","",""],
+["MT","CHUOT006","Chuột Có dây USB ( S-M1d ) (Mới)","SUNSONNY",0,2,"SẮP HẾT","","🖱️ Chuột & Bàn phím","https://lh3.googleusercontent.com/d/1OHwGZ-bgvdhtXlhFb4AGX6XAKI1GmR1f",0,"Có dây",2,"Q5","","","","","","","",""],
+["MT","SSD013","256GB (Ssd SATA III SSTC) (Cũ)","SSTC",0,0,"HẾT HÀNG","","⚡ SSD — Ổ cứng thể rắn","https://lh3.googleusercontent.com/d/1gY1P5XBoGRop_-R6xZdmfGZRuWMll9KH",1250000,"256GB",2,"Q2","","","","","","","",""],
+["MT","SACLT028","Sạc HP 150W 19.5V - 7.7A ( đầu nhỏ 4.5mm x 3.0mm) (Mới)","HP",0,0,"HẾT HÀNG","","💻 Laptop linh kiện","https://lh3.googleusercontent.com/d/1JK9G5LmAR8kJLsSf7gM3thojZ6swTAGv",1350000,"SẠC HP",2,"Q2","","","","","","","",""],
+["MT","SSD014","128GB (M.2 NVMe Kingmax) (Cũ)","KINGMAX",0,0,"HẾT HÀNG","","⚡ SSD — Ổ cứng thể rắn","https://lh3.googleusercontent.com/d/1UMGK6tIx1eDGm3-UBns6-r53RcSOydBx",0,"M.2 NVMe | 128GB",2,"Q2","","","","","","","",""],
+["MI","MUCNAP032","⚫ Mực nạp Canon chai lùn BK ( 4 màu CD-K0100M ) (Mới)","ESTAR",0,2,"SẮP HẾT","","🧴 Mực nạp","https://lh3.googleusercontent.com/d/1F09WCaVLWVXtV1QMDIj4_7bexevXZmqP",150000,"Mực màu CMYK",2,"Q2","","","","","","","",""],
+["MT","RAM014","RAM LT DDR4 4GB 2400MHz (Cũ)","KHÔNG THƯƠNG HIỆU",0,1,"SẮP HẾT","","💾 RAM — Bộ nhớ","https://lh3.googleusercontent.com/d/140LSnQwhrmL6SbasnYEPqqmX-w5dN_g9",0,"LT | LT DDR4",2,"Q2","","","","","","","",""],
+["MT","GPU010","RTX 2060 Super 8GB ( 2 Fan ) (Cũ)","GIGABYTE",0,1,"SẮP HẾT","","🎮 VGA — Card màn hình","https://lh3.googleusercontent.com/d/1wfT6So6jfciqxWQxjbyn_fgfnmfeaSY0",4500000,"RTX 2060 SUPER",2,"Q2","","","","","","","",""],
+["MT","GPU011","RX 580 8GB ( OC 2 Fan ) (Cũ)","MSI",0,1,"SẮP HẾT","","🎮 VGA — Card màn hình","https://lh3.googleusercontent.com/d/1newAf9tdpLc5pEqMnZ3wG6BQMmvKyhpd",0,"RX 580",2,"Q2","","","","","","","",""],
+["MT","GPU012","GTX 1050 Ti 4GB (1 Fan) (Cũ)","MORO",0,0,"HẾT HÀNG","","🎮 VGA — Card màn hình","https://lh3.googleusercontent.com/d/1V1k7PlmHHMIFpfrbIaz8FkEpPIfjetvR",1750000,"GTX 1050 Ti",2,"Q2","","","","","","","",""],
+["CAM","THENHO001","Thẻ nhớ MicroSD 64GB V30 ( Class 10 92MB/s ) (Mới)","HIKSEMI",0,0,"HẾT HÀNG","","🧰 Phụ kiện Camera","https://lh3.googleusercontent.com/d/1k3pwwT-3z0YO9AT87Nd_WUs3eGQw85tI",450000,"Thẻ nhớ",2,"Q2","","","","","","","",""],
+["MT","SSD015","256GB (Ssd SATA III ) (Cũ)","",0,0,"HẾT HÀNG","","⚡ SSD — Ổ cứng thể rắn","https://lh3.googleusercontent.com/d/12CEfI5akTP7jDienQQeWGmurw0blgZ9z",0,"256GB",2,"Q2","","","","","","","",""],
+["MT","LOA002","Loa vi tính USB 2.0 Kisonli L-8080 - ( Black ) (Mới)","KISONLI",0,2,"SẮP HẾT","","🛠️ Linh kiện khác","https://lh3.googleusercontent.com/d/1FB2Q397NY612htrxT9708ErDpSAOl-cn",490000,"LOA VI TÍNH",2,"Q2","","","","","","","",""],
+["MT","LOA003","Loa Vi Tính ( R8 SP-07 USB 2.0 - Black ) (Mới)","KHÔNG THƯƠNG HIỆU",0,2,"SẮP HẾT","","🛠️ Linh kiện khác","https://lh3.googleusercontent.com/d/1xuCeWL7jdcZ1If747uA5wmO5GiRksF5_",349000,"LOA VI TÍNH",2,"Q2","","","","","","","",""],
+["MT","SACLT029","Sạc Dell 90W 19.5V 4.62A - 4,62A ( đầu nhỏ ) (Cũ)","",0,3,"CÒN HÀNG","","💻 Laptop linh kiện","https://lh3.googleusercontent.com/d/1i6Vmvi9RB35LnAk5zygAgx0xEnVytiZU",650000,"SẠC DELL",2,"Q2","","","","","","","",""],
+["MT","SACLT031","Sạc ASUS 90W 19V 4.74A (đầu trung 5.5×2.5mm) (Mới)","",0,2,"SẮP HẾT","","💻 Laptop linh kiện","https://lh3.googleusercontent.com/d/1xAuoAH5lxdg9ZMhZGk3ZUxMJu1Nzw5P9",0,"SẠC ASUS",2,"Q2","","","","","","","",""],
+["MT","SACLT032","Sạc ASUS 65W 19V 3A (Type-C) (Mới)","",0,1,"SẮP HẾT","","💻 Laptop linh kiện","https://lh3.googleusercontent.com/d/12_mWzXmAetzFoCeFQUKMfxXX-2ckRwpW",0,"SẠC ASUS",2,"Q2","","","","","","","",""],
+["MT","SACLT033","Sạc ASUS 65W 19V 3.42A (đầu nhỏ 4.5×3.0mm) (Mới)","",0,1,"SẮP HẾT","","💻 Laptop linh kiện","https://lh3.googleusercontent.com/d/1vROqD1lDavhumGxsIm5or784lUEVfnMh",0,"SẠC ASUS",2,"Q2","","","","","","","",""],
+["MT","SACLT034","Sạc HP 65W 19.5V - 3.25A ( Type-C) (Mới)","",0,1,"SẮP HẾT","","💻 Laptop linh kiện","https://lh3.googleusercontent.com/d/1MffNkuktZhj1k2-AC3BbW0i1NdhVTWnD",0,"SẠC HP",2,"Q2","","","","","","","",""],
+["MT","SSD016","128GB (Ssd SATA III Adata) (Cũ)","ADATA",0,0,"HẾT HÀNG","","⚡ SSD — Ổ cứng thể rắn","ả",0,"SATA III | 128GB",2,"Q2","","","","","","","",""],
+["MT","D+CC009","Dây DP to DP ( DisplayPort to DisplayPort – 1.5m ) (Mới)","",0,7,"CÒN HÀNG","","🔌 Dây + Cáp chuyển","https://lh3.googleusercontent.com/d/1di9Vngp8i9CBG0SM2bIq14cqhzp07pN2",0,"DP → DP",2,"Q2","","","","","","","",""],
+["MT","D+CC010","Dây VGA to VGA ( VGA to VGA – 1.5m ) (Mới)","",0,0,"HẾT HÀNG","","🔌 Dây + Cáp chuyển","https://lh3.googleusercontent.com/d/15fTY0YLxJaaE3-vD1qPZZbVHf3B6opv1",0,"VGA → VGA",2,"Q2","","","","","","","",""],
+["MT","D+CC011","Dây DVI to DVI ( DVI to DVI – 1.5m ) (Mới)","",0,2,"SẮP HẾT","","🔌 Dây + Cáp chuyển","https://lh3.googleusercontent.com/d/1tW80Z0VnC4UoDbxUaI8SUcDwKstj8Kj0",0,"DVI → DVI",2,"Q2","","","","","","","",""]
 ];
 
 let DATA = [];
@@ -10484,6 +10540,7 @@ let syncRetryTimer = null;
 let syncRetryTicker = null;
 let syncRetryAttempts = 0;
 let syncRetryRunning = false;
+let syncBadgeWatchdogTimer = null;
 /* Trạng thái Yahoo ở đầu trang phản ánh xác nhận thật từ máy chủ,
    không chỉ phản ánh việc thiết bị đang có Wi-Fi/4G. */
 let headerServerSyncState = "unconfirmed";
@@ -10528,16 +10585,39 @@ function scheduleSyncRetry(detail){
     syncRetryAttempts += 1;
     syncRetryRunning = true;
     try{
+      // Nếu một vòng nền cũ vẫn chạy, không đổi badge sang "Đang đồng bộ"
+      // rồi thoát sớm, vì đó chính là nguyên nhân làm trạng thái treo vô hạn.
+      if(backgroundSyncRunning){
+        setSyncBadge(Array.isArray(DATA)&&DATA.length ? "stale" : "error","Vòng đồng bộ trước vẫn đang chờ máy chủ");
+        return;
+      }
       setSyncBadge("syncing");
       await syncFromServerIfIdle(true);
+      if(headerServerSyncState==="syncing"){
+        setSyncBadge(Array.isArray(DATA)&&DATA.length ? "stale" : "error","Máy chủ chưa xác nhận xong; trang vẫn dùng dữ liệu gần nhất");
+      }
     }finally{
       syncRetryRunning = false;
     }
   },6000);
 }
 
+function armSyncBadgeWatchdog(state){
+  clearTimeout(syncBadgeWatchdogTimer);
+  syncBadgeWatchdogTimer=null;
+  if(!["loading","checking","syncing"].includes(state)) return;
+  syncBadgeWatchdogTimer=setTimeout(()=>{
+    if(!["loading","checking","syncing"].includes(headerServerSyncState)) return;
+    const hasVisibleData=Array.isArray(DATA)&&DATA.length>0;
+    setSyncBadge(hasVisibleData?"stale":"error",hasVisibleData
+      ?"Máy chủ phản hồi chậm; đang dùng dữ liệu kho gần nhất"
+      :"Máy chủ phản hồi quá lâu");
+  },22000);
+}
+
 function setSyncBadge(state, detail){
   updateHeaderNetworkStatus(state || "unconfirmed");
+  armSyncBadgeWatchdog(state);
   const el = document.getElementById("syncBadge");
   if(!el) return;
   el.setAttribute("role","status");
@@ -10572,6 +10652,11 @@ case "empty":
 
 case "pending":
     el.textContent = "⏳ Đang chờ đồng bộ";
+    break;
+
+case "stale":
+    el.textContent = "⚠️ Đang dùng dữ liệu gần nhất";
+    el.title = detail || "Máy chủ đang chậm; dữ liệu trên màn hình vẫn dùng được";
     break;
 
 case "error":
@@ -10870,7 +10955,9 @@ async function fetchSheetJson(url, options={}, timeoutMs=SHEET_TIMEOUT_MS){
   // Request đọc dữ liệu khởi động có thể chậm khi Apps Script vừa nguội. Chỉ thử
   // tối đa hai lần để không giữ giao diện ở "Đang tải" qua nhiều chu kỳ 45 giây.
   const startupReadTypes=new Set(["data","config","product_links","recent_activity"]);
-  const maxAttempts=context.method==="GET" ? (startupReadTypes.has(context.requestType)?2:3) : safeReadPost ? 2 : safeIdempotentWritePost ? 3 : 1;
+  // Các GET nền đã có snapshot và chu kỳ thử lại riêng. Chỉ gửi một lần để
+  // một lỗi redirect Google không nhân đôi số request rồi tự gây nghẽn thêm.
+  const maxAttempts=context.method==="GET" ? (startupReadTypes.has(context.requestType)?1:3) : safeReadPost ? 2 : safeIdempotentWritePost ? 3 : 1;
   let lastError;
   for(let attempt=1;attempt<=maxAttempts;attempt++){
     const ctrl=new AbortController();
@@ -10882,12 +10969,22 @@ async function fetchSheetJson(url, options={}, timeoutMs=SHEET_TIMEOUT_MS){
         retryUrl.searchParams.set("_retry",`${Date.now()}-${attempt}`);
         requestUrl=retryUrl.toString();
       }
-      const res=await fetch(requestUrl,{...options,cache:"no-store",signal:ctrl.signal});
+      // Google Apps Script thỉnh thoảng trả redirect ContentService với HTTP 404
+      // dù phần thân vẫn là JSON hợp lệ. GET đã có _ts/_retry nên không ép
+      // cache:"no-store"; tùy chọn đó làm redirect googleusercontent kém ổn định
+      // trên một số mạng/trình duyệt.
+      const requestOptions={...options,signal:ctrl.signal};
+      if(context.method!=="GET") requestOptions.cache="no-store";
+      const res=await fetch(requestUrl,requestOptions);
       const text=await res.text();
-      if(!res.ok) throw sheetHttpError(res.status,context,text);
       let json;
-      try{ json=JSON.parse(text); }
-      catch(_){ throw new Error(`Máy chủ trả dữ liệu không hợp lệ · ${context.method} ${context.label}`); }
+      try{ json=JSON.parse(text); }catch(_){ json=null; }
+      // Tin nội dung nghiệp vụ đã ký dạng {ok:true} trước mã HTTP của lớp
+      // redirect Google. Nếu Google thực sự trả trang HTML 404 thì json vẫn null
+      // và nhánh retry bên dưới xử lý như cũ.
+      if(json && json.ok===true) return json;
+      if(!res.ok) throw sheetHttpError(res.status,context,text);
+      if(!json) throw new Error(`Máy chủ trả dữ liệu không hợp lệ · ${context.method} ${context.label}`);
       if(!json || json.ok!==true){
         const rejected=new Error(`${(json&&json.error)||"Phản hồi máy chủ không hợp lệ"} · ${context.method} ${context.label}`);
         rejected.serverRejected=true;
@@ -11176,7 +11273,7 @@ async function loadData({forcePublic=false}={}){
       const privateData=requestedPrivateData;
       const json = privateData
         ? await privateSheet("private_products",{},35000)
-        : await fetchSheetJson(sheetUrl({type:"data", _ts: Date.now()}),{},70000);
+        : await fetchSheetJson(sheetUrl({type:"data", _ts: Date.now()}),{},15000);
       if(!Array.isArray(json.data)) throw new Error("Máy chủ không có dữ liệu sản phẩm hợp lệ");
       const validationIssues = validateInventoryRows(json.data);
       if(validationIssues.length) throw new Error(inventoryValidationMessage(validationIssues,"máy chủ"));
@@ -11215,7 +11312,13 @@ async function loadData({forcePublic=false}={}){
       console.error("Lỗi tải từ máy chủ:", e);
       DATA = localSnapshot;
       if(requestedPrivateData) PRIVATE_PRODUCT_DATA_READY=false;
-      setSyncBadge(readSyncOutbox().length ? "pending" : "error", String(e));
+      if(readSyncOutbox().length){
+        setSyncBadge("pending","Đang giữ thao tác cục bộ; máy chủ chưa phản hồi");
+      }else if(DATA.length){
+        setSyncBadge("stale","Máy chủ chưa phản hồi; trang đang dùng snapshot/cache kho gần nhất");
+      }else{
+        setSyncBadge("error",String(e));
+      }
       return;
     }
   }
@@ -11226,11 +11329,15 @@ function loadLocal(forcePublic=false){
     const privateData=!forcePublic&&hasPrivateProductDataAccess();
     let saved=privateData?sessionStorage.getItem(PRIVATE_PRODUCT_CACHE_KEY):localStorage.getItem(PUBLIC_PRODUCT_CACHE_KEY);
     if(!saved && !privateData){saved=localStorage.getItem("kho_cntt_data");try{localStorage.removeItem("kho_cntt_data");}catch(_){}} // chỉ migrate cache cũ sang public
-    const storedRows=saved ? JSON.parse(saved) : (SHEET_API_URL ? [] : JSON.parse(JSON.stringify(DEFAULT_DATA)));
-    DATA = privateData ? normalizeSheetRows(storedRows) : sanitizePublicProductRows(storedRows);
-    if(!privateData) persistProductCache(DATA,false);
+    const loadedPrivate=privateData&&!!saved;
+    // Lần mở đầu tiên cũng phải có kho để dùng ngay. DEFAULT_DATA là snapshot
+    // công khai đi kèm chính file HTML; máy chủ phản hồi sau sẽ thay bằng bản mới.
+    // Không dùng snapshot này làm dữ liệu private và tuyệt đối không tự đẩy ngược.
+    const storedRows=saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(DEFAULT_DATA));
+    DATA = loadedPrivate ? normalizeSheetRows(storedRows) : sanitizePublicProductRows(storedRows);
+    if(!loadedPrivate) persistProductCache(DATA,false);
   } catch(e){
-    DATA = SHEET_API_URL ? [] : sanitizePublicProductRows(JSON.parse(JSON.stringify(DEFAULT_DATA)));
+    DATA = sanitizePublicProductRows(JSON.parse(JSON.stringify(DEFAULT_DATA)));
   }
 }
 
@@ -12918,9 +13025,16 @@ try { ITEM_CREATED_AT = JSON.parse(localStorage.getItem(ITEM_CREATED_AT_KEY) || 
 function applyHeaderLogoUrl(){
   const image=document.getElementById("headerBrandLogo"), fallback=document.getElementById("headerBrandFallback");
   if(!image || !fallback) return;
+  const configuredLogoUrl=String(document.documentElement.dataset.brandLogo||"").trim();
+  if(!configuredLogoUrl){
+    image.removeAttribute("src");
+    image.hidden=true;
+    fallback.hidden=false;
+    return;
+  }
   image.onload=()=>{ image.hidden=false; fallback.hidden=true; };
   image.onerror=()=>{ image.hidden=true; fallback.hidden=false; };
-  image.src="./hg-logo.png";
+  image.src=configuredLogoUrl;
 }
 applyHeaderLogoUrl();
 try {
@@ -15964,7 +16078,7 @@ async function refreshRecentActivityLive(markSeenIfPanelOpen=false){
 }
 function startRecentActivityAutoRefresh(){
   clearInterval(recentActivityRefreshTimer);
-  recentActivityRefreshTimer=setInterval(()=>{ void refreshRecentActivityLive(false); },30000);
+  recentActivityRefreshTimer=setInterval(()=>{ void refreshRecentActivityLive(false); },90000);
   window.addEventListener("focus",()=>{ void refreshRecentActivityLive(false); });
   document.addEventListener("visibilitychange",()=>{
     if(!document.hidden) void refreshRecentActivityLive(false);
@@ -21170,10 +21284,13 @@ async function syncFromServerIfIdle(forceRetry=false){
     console.warn("Lỗi đồng bộ nền:", e);
   }finally{
     backgroundSyncRunning = false;
+    if(["loading","checking","syncing"].includes(headerServerSyncState)){
+      setSyncBadge(Array.isArray(DATA)&&DATA.length?"stale":"error","Vòng đồng bộ nền đã kết thúc nhưng máy chủ chưa xác nhận dữ liệu mới");
+    }
   }
 }
 function startBackgroundSync(){
-  setInterval(syncFromServerIfIdle, 60000);
+  setInterval(syncFromServerIfIdle, 120000);
   window.addEventListener("online", ()=>setTimeout(async()=>{if(sessionStorage.getItem("kho_admin_session_token")&&!isAdminMode()) await checkAdminSession();await syncFromServerIfIdle();},800));
   document.addEventListener("visibilitychange", ()=>{
     if(!document.hidden) setTimeout(syncFromServerIfIdle, 500);
@@ -21262,6 +21379,7 @@ function getHeaderServerPresenceDetail(syncState,online){
   if(!online) return "Thiết bị đang mất kết nối mạng, chưa thể xác nhận máy chủ";
   if(syncState==="synced") return "Máy chủ đã xác nhận dữ liệu được lưu thành công";
   if(syncState==="loading"||syncState==="syncing"||syncState==="checking") return "Đang chờ máy chủ xác nhận";
+  if(syncState==="stale") return "Máy chủ đang chậm; trang vẫn dùng dữ liệu kho gần nhất";
   if(syncState==="pending") return "Có thay đổi đang chờ lưu lên máy chủ";
   if(syncState==="error") return "Lần đồng bộ gần nhất chưa thành công";
   if(syncState==="empty") return "Máy chủ đã phản hồi nhưng chưa có dữ liệu để xác nhận lưu";
@@ -21494,6 +21612,9 @@ async function submitInventoryTransfer(){
     }catch(e){
       console.warn("Đồng bộ khởi động chạy nền chưa hoàn tất:",e);
     }finally{
+      if(["loading","checking","syncing"].includes(headerServerSyncState)){
+        setSyncBadge(Array.isArray(DATA)&&DATA.length?"stale":"error","Khởi động đã hoàn tất bằng dữ liệu gần nhất; máy chủ sẽ được thử lại ở nền");
+      }
       startRecentActivityAutoRefresh();
       startBackgroundSync();
     }
