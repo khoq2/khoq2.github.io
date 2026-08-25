@@ -10091,7 +10091,7 @@ async function validateRestoredEmployeeSession(){
 function requireActionPermission(permission,label="thao tác này"){
   const inventoryPermissions=new Set(["PRODUCT_ADD","PRODUCT_EDIT","PRODUCT_DELETE","SALE","RESTOCK","STOCK_ADJUST","TRANSFER","TRANSACTION_EDIT"]);
   if(inventoryPermissions.has(String(permission||"").toUpperCase()) && !PRIVATE_PRODUCT_DATA_READY){
-    showToast("⚠️ Chưa tải và xác minh dữ liệu kho private mới nhất. Hãy kết nối mạng và bấm Đồng bộ trước khi "+label+".",5000);
+    showToast("⚠️ Đang ở chế độ CHỈ XEM vì chưa xác minh tồn kho private mới nhất. Hãy có mạng và đồng bộ thành công trước khi "+label+" để tránh ghi trùng hoặc sai tồn.",6500);
     return false;
   }
   if(hasEmployeePermission(permission)) return true;
@@ -10655,8 +10655,8 @@ case "pending":
     break;
 
 case "stale":
-    el.textContent = "⚠️ Đang dùng dữ liệu gần nhất";
-    el.title = detail || "Máy chủ đang chậm; dữ liệu trên màn hình vẫn dùng được";
+    el.textContent = "⚠️ CHỈ XEM · Dữ liệu gần nhất";
+    el.title = detail || "Máy chủ đang chậm; chỉ xem dữ liệu, chưa cho phép ghi tồn kho";
     break;
 
 case "error":
@@ -11227,7 +11227,7 @@ async function saveProductRow(row, oldCode="", oldBranch="Q2", originalRow=null,
         console.warn("Chưa xác minh được kết quả lưu trên máy chủ:",verifyError);
       }
     }
-    setSyncBadge("error", String(e));
+    setSyncBadge(readSyncOutbox().length?"pending":"error",String(e));
     return false;
   }
 }
@@ -21244,6 +21244,12 @@ async function syncFromServerIfIdle(forceRetry=false){
   try{
     // Ưu tiên đẩy bản cục bộ đang chờ trước, tuyệt đối không kéo dữ liệu máy chủ
     // về đè lên thay đổi chưa gửi của thiết bị này.
+    // Nếu phiên vừa mất mạng, PRIVATE_PRODUCT_DATA_READY có thể false trong khi
+    // outbox lại đang chờ. Phải tải/đối chiếu private trước nhưng giữ nguyên bản
+    // cục bộ; nếu không hai điều kiện sẽ khóa lẫn nhau và hàng đợi không bao giờ chạy.
+    if(readSyncOutbox().length && !PRIVATE_PRODUCT_DATA_READY && hasPrivateProductDataAccess()){
+      await loadData();
+    }
     await drainSyncOutbox();
     if(hasAuxPendingSync(PENDING_TX_SYNC_KEY)) await saveTX();
     if(hasAuxPendingSync(PENDING_NV_SYNC_KEY)) await saveNV();
@@ -21379,7 +21385,7 @@ function getHeaderServerPresenceDetail(syncState,online){
   if(!online) return "Thiết bị đang mất kết nối mạng, chưa thể xác nhận máy chủ";
   if(syncState==="synced") return "Máy chủ đã xác nhận dữ liệu được lưu thành công";
   if(syncState==="loading"||syncState==="syncing"||syncState==="checking") return "Đang chờ máy chủ xác nhận";
-  if(syncState==="stale") return "Máy chủ đang chậm; trang vẫn dùng dữ liệu kho gần nhất";
+  if(syncState==="stale") return "Chế độ chỉ xem: máy chủ đang chậm, chưa cho phép ghi tồn kho";
   if(syncState==="pending") return "Có thay đổi đang chờ lưu lên máy chủ";
   if(syncState==="error") return "Lần đồng bộ gần nhất chưa thành công";
   if(syncState==="empty") return "Máy chủ đã phản hồi nhưng chưa có dữ liệu để xác nhận lưu";
