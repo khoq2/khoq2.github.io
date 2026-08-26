@@ -18,7 +18,7 @@
 <link rel="preconnect" href="https://script.google.com" crossorigin />
 <link rel="preconnect" href="https://lh3.googleusercontent.com" crossorigin />
 <link rel="dns-prefetch" href="https://drive.google.com" />
-<title>🏪 KHO Q2 (HOÀNG GIA COMPUTER) [v18]</title>
+<title>🏪 KHO Q2 (HOÀNG GIA COMPUTER) [v20]</title>
 <script defer crossorigin="anonymous" integrity="sha384-vtjasyidUo0kW94K5MXDXntzOJpQgBKXmE7e2Ga4LG0skTTLeBi97eFAXsqewJjw" src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script defer crossorigin="anonymous" integrity="sha384-vseuUuO/VRMn00lXYd5m/Pk4l/7RjMqhXGf6G0RALy+On0txYb39dQsUQDAd7q5L" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.10/pdfmake.min.js"></script>
 <script defer crossorigin="anonymous" integrity="sha384-1y8s2U/Jjn4/oeCEBcfYH3M6XeQtcg4LRmluN92FS69UgtLzoyhn3swew8Ynj8Ai" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.10/vfs_fonts.js"></script>
@@ -8596,6 +8596,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .kpi-ops-empty{padding:24px;text-align:center;color:#708392;font-size:11px}
 .kpi-ops-more{width:100%;min-height:40px;margin:0;border:0;border-top:1px solid #DCE6ED;background:#F5F9FC;color:#1A5276;font-size:10px;font-weight:950;cursor:pointer}
 .kpi-ops-more:hover,.kpi-ops-more:focus-visible{background:#EAF4FA;outline:none}
+.group-header-label-track{display:inline}
 @media(min-width:900px){.kpi-workbar,.kpi-ops-shell{width:calc(100% - 62px)}}
 @media(max-width:700px){
   .kpi-workbar{grid-template-columns:1fr;padding:10px 11px;gap:9px}
@@ -8604,6 +8605,55 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
   .kpi-work-metrics{display:flex;overflow-x:auto;gap:6px;padding-bottom:2px;scrollbar-width:thin}
   .kpi-work-metric{flex:0 0 140px}
   .kpi-ops-shell{overflow-x:auto}
+  .group-header-main{overflow:hidden}
+  .group-header-label{
+    display:block;
+    overflow:hidden!important;
+    overflow-wrap:normal!important;
+    white-space:nowrap!important;
+  }
+  .group-header-label-track{
+    display:inline-block;
+    min-width:max-content;
+    transform:translateX(0);
+    will-change:transform;
+  }
+  .group-header-label.is-overflowing .group-header-label-track{
+    animation:groupHeaderMarqueeMobile 5.6s ease-in-out .7s infinite alternate;
+  }
+  #groupDetailOverlay .simple-sticky-actions{
+    margin:7px -10px -10px!important;
+    padding:5px 10px max(6px,env(safe-area-inset-bottom))!important;
+  }
+  #groupDetailOverlay .simple-sticky-actions .edit-save-buttons{
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr) 78px!important;
+    gap:6px!important;
+  }
+  #groupDetailOverlay .simple-sticky-actions .edit-save-buttons>button{
+    width:auto!important;
+    min-width:0!important;
+    min-height:38px!important;
+    height:38px!important;
+    max-height:38px!important;
+    margin:0!important;
+    padding:5px 9px!important;
+    border-radius:9px!important;
+    font-size:10px!important;
+    line-height:1!important;
+    white-space:nowrap!important;
+  }
+  body.mobile-kpi-work-open #results{padding-top:6px!important;scroll-margin-top:64px}
+}
+@keyframes groupHeaderMarqueeMobile{
+  0%,14%{transform:translateX(0)}
+  86%,100%{transform:translateX(calc(-1 * var(--group-marquee-shift,0px)))}
+}
+@media(prefers-reduced-motion:reduce){
+  .group-header-label.is-overflowing .group-header-label-track{
+    animation-duration:5.6s!important;
+    animation-iteration-count:infinite!important;
+  }
 }
 </style>
 </head>
@@ -11929,10 +11979,20 @@ function syncKpiWorkButtons(){
   });
 }
 function scrollKpiWorkViewIntoPlace(){
-  requestAnimationFrame(()=>{
-    const target=document.getElementById("results"),sticky=document.querySelector(".sticky");
-    if(target) window.scrollTo({top:Math.max(0,target.offsetTop-(sticky?.offsetHeight||0)-10),left:0,behavior:"auto"});
-  });
+  const isMobile=window.matchMedia("(max-width:700px)").matches;
+  if(isMobile && activeKpiView){
+    document.body.classList.add("mobile-kpi-work-open");
+    setHeaderCollapsed(true,false,{instant:true,preserveAnchor:false});
+  }
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    const target=document.querySelector("#results .kpi-workbar")||document.getElementById("results");
+    const sticky=document.querySelector(".sticky");
+    if(!target) return;
+    const stickyHeight=sticky?.getBoundingClientRect().height||0;
+    const targetTop=target.getBoundingClientRect().top+window.scrollY;
+    try{headerAutoScrollGuardUntil=performance.now()+650;}catch(_err){}
+    window.scrollTo({top:Math.max(0,targetTop-stickyHeight-8),left:0,behavior:"auto"});
+  }));
 }
 function openKpiWorkView(mode){
   closeOverlay("kpiOverlay");
@@ -11949,11 +12009,13 @@ function openKpiWorkView(mode){
 }
 function clearKpiWorkView(){
   activeKpiView="";kpiWorkSubfilter="all";kpiWorkVisibleLimit=120;currentKpiWorkResults=[];
+  document.body.classList.remove("mobile-kpi-work-open");
   searchQ="";quickGroupFilter=null;restockOnly=false;totalStockView=false;
   currentTab="ALL";currentStatus="ALL";
   const search=document.getElementById("search"),clear=document.getElementById("clear-btn");
   if(search)search.value="";if(clear)clear.style.display="none";
   syncHomeStockFilters();syncRestockButton(false);syncStatusButtons("");render();
+  if(window.matchMedia("(max-width:700px)").matches) setHeaderCollapsed(false,false,{instant:true,preserveAnchor:false});
   window.scrollTo({top:0,left:0,behavior:"auto"});
 }
 function setKpiWorkSubfilter(value){
@@ -11986,10 +12048,10 @@ function renderKpiWorkbar(visibleResults){
   const inventorySale=visible.reduce((sum,item)=>sum+item.stock*(Number(item.r[10])||0),0);
   const idleCount=visible.filter(item=>item.sales30===0).length;
   const config={
-    all:{accent:"#2E86C1",title:`Tất cả mặt hàng · ${count} mã`,note:`Bảng kiểm kho gọn cho quy mô lớn. Gõ mã hoặc tên ở ô tìm kiếm để thu hẹp trong danh sách này.`},
-    ton:{accent:"#1E8449",title:`Đang còn hàng · ${count} mã`,note:`Tổng ${totalUnits.toLocaleString("vi-VN")} sản phẩm; xếp tồn nhiều trước để kiểm tra vốn và hàng chậm bán.`},
-    het:{accent:"#C0392B",title:`Hết hàng · ${count} mã`,note:Array.isArray(TX_DATA)&&TX_DATA.length?`Tách rõ mã cần nhập và mã chỉ chờ xác nhận. Chưa có liên kết mã hàng–đối tác nên chưa thể tự chọn nhà cung cấp.`:"Chưa tải lịch sử giao dịch nên chưa đề xuất mua; chỉ hiển thị để xác nhận nhu cầu."},
-    sap:{accent:"#B7950B",title:`Sắp hết · ${count} mã`,note:Array.isArray(TX_DATA)&&TX_DATA.length?`Ưu tiên theo sức bán và mức tồn; số lượng gợi ý đủ khoảng 15 ngày hoặc vượt ngưỡng.`:"Chưa tải lịch sử giao dịch nên chưa đề xuất mua; chỉ xếp theo mức tồn."}
+    all:{accent:"#2E86C1",title:`Tất cả mặt hàng · ${count} mã`,note:"Tra cứu theo mã, tên hàng hoặc thương hiệu."},
+    ton:{accent:"#1E8449",title:`Đang còn hàng · ${count} mã`,note:`Tổng tồn: ${totalUnits.toLocaleString("vi-VN")} sản phẩm.`},
+    het:{accent:"#C0392B",title:`Hết hàng · ${count} mã`,note:Array.isArray(TX_DATA)&&TX_DATA.length?"Kiểm tra nhu cầu và lập danh sách nhập hàng.":"Kiểm tra nhu cầu trước khi nhập hàng."},
+    sap:{accent:"#B7950B",title:`Sắp hết · ${count} mã`,note:Array.isArray(TX_DATA)&&TX_DATA.length?"Theo dõi mức tồn và chuẩn bị nhập hàng.":"Theo dõi hàng ít và chuẩn bị nhập hàng."}
   }[activeKpiView];
   let chips="";
   if(activeKpiView==="het"){
@@ -15039,7 +15101,7 @@ function render(){
       return `<section class="group-section" data-group-anchor="${escapeHtml(quickGroupLabelMatchKey(g))}" style="--group-strong: ${strongColor};">
         <div class="group-header" id="grp-${idx}" style="--group-bg: ${groupColor}; --group-strong: ${strongColor}; background: ${groupColor};">
           <div class="group-header-main">
-            <span class="group-header-label">${escapeHtml(g)}</span>
+            <span class="group-header-label"><span class="group-header-label-track">${escapeHtml(g)}</span></span>
           </div>
           <button type="button" class="group-header-count metric-tooltip-host" aria-label="Xem chi tiết ${groupSummary}" onclick="showGroupInventoryDetail('${detailKey}')"><span class="group-count-main">${itemCount} mục · ${groupStock.toLocaleString("vi-VN")} tồn</span><span class="group-count-alert is-low">${groupStats.low} sắp hết</span><span class="group-count-alert is-out">${groupStats.out} hết hàng</span><span class="inventory-metric-tooltip" aria-hidden="true">XEM CHI TIẾT TỒN KHO</span></button>
         </div>
@@ -15049,6 +15111,7 @@ function render(){
     }).join("");
     el.innerHTML = html;
     if(quickGroupFilter) focusFirstQuickMatch();
+    setupGroupHeaderMarquees();
     setupGroupChipsAutoScroll();
     setupQuickNavScrollIndicators();
     restoreGroupNavigationAnchor();
@@ -21328,6 +21391,37 @@ function setupHeaderAutoScroll(){
 setupHeaderAutoScroll();
 
 let groupChipsScrollTimers = [];
+let groupHeaderMarqueeResizeTimer = 0;
+function setupGroupHeaderMarquees(){
+  if(!setupGroupHeaderMarquees.resizeBound){
+    setupGroupHeaderMarquees.resizeBound=true;
+    window.addEventListener("resize",()=>{
+      clearTimeout(groupHeaderMarqueeResizeTimer);
+      groupHeaderMarqueeResizeTimer=setTimeout(setupGroupHeaderMarquees,120);
+    },{passive:true});
+  }
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    const isMobile=window.matchMedia("(max-width:700px)").matches;
+    document.querySelectorAll("#results .group-header-label").forEach(label=>{
+      const track=label.querySelector(".group-header-label-track");
+      label.classList.remove("is-overflowing");
+      label.style.removeProperty("--group-marquee-shift");
+      if(!track || !isMobile) return;
+      const style=getComputedStyle(label);
+      const fixedIcon=[...label.children].find(child=>child!==track&&child.classList.contains("ui-color-icon"));
+      const iconStyle=fixedIcon?getComputedStyle(fixedIcon):null;
+      const iconWidth=fixedIcon
+        ? fixedIcon.getBoundingClientRect().width+(parseFloat(iconStyle.marginLeft)||0)+(parseFloat(iconStyle.marginRight)||0)
+        : 0;
+      const available=Math.max(0,label.clientWidth-(parseFloat(style.paddingLeft)||0)-(parseFloat(style.paddingRight)||0)-iconWidth);
+      const shift=Math.ceil(track.scrollWidth-available);
+      if(shift>4){
+        label.style.setProperty("--group-marquee-shift",`${shift}px`);
+        label.classList.add("is-overflowing");
+      }
+    });
+  }));
+}
 function setupQuickNavScrollIndicators(){
   const isMobile = window.matchMedia("(max-width: 480px)").matches;
   document.querySelectorAll(".quick-nav-wrap").forEach(wrap=>{
