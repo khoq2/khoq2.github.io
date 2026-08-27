@@ -10439,7 +10439,7 @@ async function checkAdminSession(){
 
 // Dòng URL duy nhất
 const SHEET_API_URL = "https://script.google.com/macros/s/AKfycby6YH69F7sfO1ZoUJsDm4BeX6Luj2GrhUfYWWJWNvqjraAEhkBck16EphrPBBm1BT3YqA/exec";
-const REQUIRED_API_VERSION = "2026.08.24-startup-resilience-kpi-15";
+const REQUIRED_API_VERSION = "2026.08.27-sync-recovery-16";
 // Apps Script có thể phải chờ khóa ghi khi nhiều thao tác diễn ra gần nhau.
 // 45 giây dài hơn thời gian chờ khóa phía máy chủ, tránh báo lỗi giả trong khi Sheet vẫn đang ghi.
 const SHEET_TIMEOUT_MS = 45000;
@@ -10621,19 +10621,32 @@ async function verifySyncErrorPassword(){
 }
 let syncBadgeActivationCount = 0;
 let syncBadgeActivationTimer = null;
-function handleSyncBadgeActivation(){
-  syncBadgeActivationCount += 1;
-  clearTimeout(syncBadgeActivationTimer);
-  if(syncBadgeActivationCount >= 3){
-    syncBadgeActivationCount = 0;
-    syncBadgeActivationTimer = null;
-    openSyncErrorLog();
+async function handleSyncBadgeActivation(){
+  // Một lần bấm phải có tác dụng rõ ràng. Khi đang lỗi/chờ, thử phục hồi ngay;
+  // khi bình thường mới dùng ba lần bấm để mở nhật ký quản trị như bản cũ.
+  if(["error","stale","pending","unconfirmed"].includes(headerServerSyncState)){
+    if(syncRetryRunning) return;
+    clearSyncRetry(false);
+    syncRetryRunning=true;
+    setSyncBadge("checking","Người dùng yêu cầu kiểm tra lại kết nối");
+    try{
+      await syncFromServerIfIdle(true);
+      if(readSyncOutbox().length || hasAuxPendingSync(PENDING_TX_SYNC_KEY) || hasAuxPendingSync(PENDING_NV_SYNC_KEY) || hasAuxPendingSync(PENDING_CONFIG_SYNC_KEY)){
+        setSyncBadge("pending","Vẫn còn thay đổi chờ máy chủ xác nhận");
+        showToast("⏳ Máy chủ chưa xác nhận hết. Hệ thống sẽ tiếp tục tự thử lại.",4500);
+      }else if(!["synced","empty"].includes(headerServerSyncState)){
+        throw new Error("Máy chủ chưa xác nhận kết nối");
+      }
+    }catch(error){
+      setSyncBadge("error",String(error));
+      showToast("⚠️ Chưa kết nối được. Chạm 3 lần vào trạng thái để xem/sao chép báo cáo lỗi.",5500);
+    }finally{syncRetryRunning=false;}
     return;
   }
-  syncBadgeActivationTimer = setTimeout(()=>{
-    syncBadgeActivationCount = 0;
-    syncBadgeActivationTimer = null;
-  }, 6000);
+  syncBadgeActivationCount += 1;
+  clearTimeout(syncBadgeActivationTimer);
+  if(syncBadgeActivationCount >= 3){syncBadgeActivationCount=0;syncBadgeActivationTimer=null;openSyncErrorLog();return;}
+  syncBadgeActivationTimer=setTimeout(()=>{syncBadgeActivationCount=0;syncBadgeActivationTimer=null;},6000);
 }
 function closeSyncErrorLog(){ document.getElementById("syncErrorOverlay")?.classList.remove("open"); hideCapsLockHint("syncErrorCapsLock"); syncErrorAuthToken=""; serverSyncErrorLogs=[]; }
 async function copySyncErrorLog(){
@@ -10674,7 +10687,7 @@ let headerServerSyncState = "unconfirmed";
 let headerPresenceTimer = null;
 function isRetryableSyncError(detail){
   const text = String(detail || "").toLocaleLowerCase("vi");
-  return /phản hồi quá lâu|failed to fetch|network|kết nối|http\s*(404|408|429|5\d\d)|load failed|timeout|timed out|dữ liệu không hợp lệ/.test(text);
+  return /server_busy|máy chủ đang bận|phản hồi quá lâu|failed to fetch|network|kết nối|http\s*(404|408|409|423|429|5\d\d)|load failed|timeout|timed out|dữ liệu không hợp lệ/.test(text);
 }
 function clearSyncRetry(resetAttempts=false){
   clearTimeout(syncRetryTimer);
@@ -10691,13 +10704,13 @@ function paintSyncRetryCountdown(seconds){
 function scheduleSyncRetry(detail){
   if(!isRetryableSyncError(detail)) return;
   clearSyncRetry(false);
-  if(syncRetryAttempts >= 1){
+  if(syncRetryAttempts >= 8){
     const el = document.getElementById("syncBadge");
-    if(el) el.textContent = "❌ Lỗi kết nối máy chủ";
-    // Chỉ thử nhanh một lần; chu kỳ nền thông thường không khởi động thêm đếm ngược.
+    if(el){el.textContent="❌ Lỗi kết nối · Bấm để thử";el.title="Đã tự thử 8 lần. Bấm để thử ngay; chạm 3 lần sau khi kết nối lại để xem báo cáo.";}
     return;
   }
-  let seconds = 6;
+  // 6s, 12s, 24s, sau đó tối đa 60s; tránh dồn request làm Apps Script nghẽn.
+  let seconds = Math.min(60,6*Math.pow(2,syncRetryAttempts));
   paintSyncRetryCountdown(seconds);
   syncRetryTicker = setInterval(()=>{
     seconds -= 1;
@@ -10726,7 +10739,7 @@ function scheduleSyncRetry(detail){
     }finally{
       syncRetryRunning = false;
     }
-  },6000);
+  },seconds*1000);
 }
 
 function armSyncBadgeWatchdog(state){
@@ -10788,7 +10801,7 @@ case "stale":
 
 case "error":
     if(isRetryableSyncError(detail)) scheduleSyncRetry(detail);
-    else el.textContent = "❌ Lỗi kết nối máy chủ";
+    else el.textContent = "❌ Lỗi đồng bộ · Bấm xử lý";
     break;
 
 default:
@@ -11067,6 +11080,7 @@ function sheetHttpError(status, context, responseText=""){
 function isSafeSheetGetRetry(error){
   // API đã trả JSON hợp lệ nhưng từ chối nghiệp vụ (sai mật khẩu, thiếu quyền,
   // phiên hết hạn...) thì tuyệt đối không gửi lại, tránh tính hai lần đăng nhập sai.
+  if(error?.transientServerBusy) return true;
   if(error?.serverRejected) return false;
   const status=Number(error?.status||0);
   return !status || status===404 || status===408 || status===429 || status>=500;
@@ -11078,7 +11092,7 @@ async function fetchSheetJson(url, options={}, timeoutMs=SHEET_TIMEOUT_MS){
   const safeReadPost=new Set(["private_products","private_customers","private_customer_records","private_partners","private_partner_jobs","private_recent_activity","private_transaction_details","private_transaction_by_id","private_tx","private_nv","private_units","private_transfers","private_product_activity","validate_admin_session","validate_employee_session","get_error_logs"]).has(context.action);
   // replace_all có fingerprint và có thể đối chiếu noop sau khi phản hồi bị mất,
   // vì vậy retry 404/timeout an toàn hơn để người dùng không phải chờ chu kỳ hôm sau.
-  const safeIdempotentWritePost=new Set(["replace_all","upsert_product","delete_product","delete_products","delete_products_by_branch","create_units","restore_trash","delete_customer","delete_customer_record","delete_partner_job","delete_inventory_transaction"]).has(context.action);
+  const safeIdempotentWritePost=new Set(["replace_all","upsert_product","delete_product","delete_products","delete_products_by_branch","create_units","restore_trash","delete_customer","delete_customer_record","delete_partner_job","delete_inventory_transaction","commit_inventory_transaction","transfer_inventory","save_config","save_product_links","rename_group","rename_quick_tag"]).has(context.action);
   // Request đọc dữ liệu khởi động có thể chậm khi Apps Script vừa nguội. Chỉ thử
   // tối đa hai lần để không giữ giao diện ở "Đang tải" qua nhiều chu kỳ 45 giây.
   const startupReadTypes=new Set(["data","config","product_links","recent_activity"]);
@@ -11115,6 +11129,7 @@ async function fetchSheetJson(url, options={}, timeoutMs=SHEET_TIMEOUT_MS){
       if(!json || json.ok!==true){
         const rejected=new Error(`${(json&&json.error)||"Phản hồi máy chủ không hợp lệ"} · ${context.method} ${context.label}`);
         rejected.serverRejected=true;
+        rejected.transientServerBusy=/SERVER_BUSY|máy chủ đang bận/i.test(String(json&&json.error||""));
         rejected.requestContext=context;
         throw rejected;
       }
@@ -12634,7 +12649,21 @@ function saveDisplayConfig(){
   configSaveChain = configSaveChain.then(async ()=>{
     setSyncBadge("syncing");
     try{
-      const result = await postSheet("save_config", {config:snapshot,baseFingerprint:SERVER_CONFIG_FINGERPRINT}, 35000);
+      let result;
+      try{
+        result=await postSheet("save_config",{config:snapshot,baseFingerprint:SERVER_CONFIG_FINGERPRINT,requestId:makeSyncRequestId("save_config")},35000);
+      }catch(firstError){
+        if(!String(firstError).includes("SYNC_CONFLICT")) throw firstError;
+        const latest=await fetchSheetJson(sheetUrl({type:"config",_ts:Date.now()}),{},35000);
+        const serverConfig=latest.config&&typeof latest.config==="object"?latest.config:{};
+        const merged={...serverConfig};
+        ["quickOrder","groupOrder","customQuickTags","hiddenQuickTags","groupOptions"].forEach(key=>{
+          merged[key]={...(serverConfig[key]||{}),...(snapshot[key]||{})};
+        });
+        merged.itemCreatedAt={...(serverConfig.itemCreatedAt||{}),...(snapshot.itemCreatedAt||{})};
+        SERVER_CONFIG_FINGERPRINT=String(latest.fingerprint||"");
+        result=await postSheet("save_config",{config:merged,baseFingerprint:SERVER_CONFIG_FINGERPRINT,requestId:makeSyncRequestId("save_config_retry")},35000);
+      }
       if(result.fingerprint) SERVER_CONFIG_FINGERPRINT = result.fingerprint;
       if(seq === configSaveSeq) setAuxPendingSync(PENDING_CONFIG_SYNC_KEY, false);
       setSyncBadge("synced"); markLastSync();
@@ -17438,7 +17467,24 @@ function renderRelatedPickerPreview(){
   }).join("")}</div>`;
 }
 async function saveProductLinks(sourceBranch,sourceCode,targets,oldBranch,oldCode){
-  const result=await postSheet("save_product_links",{sourceBranch,sourceCode,targets,oldBranch,oldCode,baseFingerprint:SERVER_PRODUCT_LINKS_FINGERPRINT},35000);
+  const payload={sourceBranch,sourceCode,targets,oldBranch,oldCode,baseFingerprint:SERVER_PRODUCT_LINKS_FINGERPRINT,requestId:makeSyncRequestId("save_links")};
+  let result;
+  try{
+    result=await postSheet("save_product_links",payload,45000);
+  }catch(firstError){
+    if(!String(firstError).includes("SYNC_CONFLICT")&&!isRetryableSyncError(firstError)) throw firstError;
+    // Timeout có thể xảy ra sau khi server đã ghi. Đọc lại trước khi gửi lần hai;
+    // nếu chưa đủ liên kết thì API targeted sẽ ghép trên snapshot mới nhất.
+    const latest=await fetchSheetJson(sheetUrl({type:"product_links",_ts:Date.now()}),{},35000);
+    const latestLinks=Array.isArray(latest.links)?latest.links:[];
+    PRODUCT_LINKS=latestLinks;
+    SERVER_PRODUCT_LINKS_FINGERPRINT=String(latest.fingerprint||"");
+    const wanted=(targets||[]).map(item=>productLinkKey(item.branch,item.code)).sort();
+    const actual=latestLinks.filter(link=>productLinkKey(link.sourceBranch,link.sourceCode)===productLinkKey(sourceBranch,sourceCode))
+      .map(link=>productLinkKey(link.targetBranch,link.targetCode)).sort();
+    if(JSON.stringify(wanted)===JSON.stringify(actual)) return true;
+    result=await postSheet("save_product_links",{...payload,baseFingerprint:SERVER_PRODUCT_LINKS_FINGERPRINT},45000);
+  }
   PRODUCT_LINKS=Array.isArray(result.links)?result.links:PRODUCT_LINKS;
   SERVER_PRODUCT_LINKS_FINGERPRINT=String(result.fingerprint||SERVER_PRODUCT_LINKS_FINGERPRINT);
   return true;
@@ -18773,10 +18819,13 @@ if(isCreating && !pendingCreate){
 	editIndex.dataset.pendingRequestId=mutationRequestId;
 	const saved = await saveProductRow(row, oldCode, oldBranch, oldRow ? oldRow.slice() : null,mutationRequestId);
 	if(!saved){
-  if(savingExisting&&idxNum>=0&&oldRow){ DATA[idxNum]=oldRow; persistProductCache(DATA,true); }
+  // Timeout không có nghĩa Apps Script chưa ghi. Giữ bản vừa nhập và requestId
+  // để hàng đợi đối chiếu/ghi lại an toàn, tránh hoàn tác rồi xuất hiện lại bất ngờ.
+  persistProductCache(DATA,true);
   if(isCreating){ editIndex.value="0"; editIndex.dataset.pendingCreate="1"; }
   if(saveButton){ saveButton.disabled = false; saveButton.textContent = "🔄 Thử lưu lại"; }
-  showToast("⚠️ "+(saveProductRow.lastError?String(saveProductRow.lastError):"Chưa lưu được lên máy chủ")+". Biểu mẫu vẫn được giữ để bạn thử lại.", 6500);
+  setSyncBadge("pending","Thiết bị đã giữ thay đổi; đang chờ máy chủ xác nhận");
+  showToast("⏳ Đã giữ thay đổi trên thiết bị. Hệ thống sẽ tự thử lại; bạn cũng có thể bấm trạng thái đồng bộ để thử ngay.",6500);
 	  return;
 	}
 	if(savingExisting&&oldRow&&Number(oldRow[5])!==Number(row[5])) await loadTXFromSheet();
