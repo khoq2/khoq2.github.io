@@ -18,7 +18,7 @@
 <link rel="preconnect" href="https://script.google.com" crossorigin />
 <link rel="preconnect" href="https://lh3.googleusercontent.com" crossorigin />
 <link rel="dns-prefetch" href="https://drive.google.com" />
-<title>🏪 KHO Q2 (HOÀNG GIA COMPUTER) [v20]</title>
+<title>🏪 KHO Q2 (HOÀNG GIA COMPUTER) [v21]</title>
 <script defer crossorigin="anonymous" integrity="sha384-vtjasyidUo0kW94K5MXDXntzOJpQgBKXmE7e2Ga4LG0skTTLeBi97eFAXsqewJjw" src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script defer crossorigin="anonymous" integrity="sha384-vseuUuO/VRMn00lXYd5m/Pk4l/7RjMqhXGf6G0RALy+On0txYb39dQsUQDAd7q5L" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.10/pdfmake.min.js"></script>
 <script defer crossorigin="anonymous" integrity="sha384-1y8s2U/Jjn4/oeCEBcfYH3M6XeQtcg4LRmluN92FS69UgtLzoyhn3swew8Ynj8Ai" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.10/vfs_fonts.js"></script>
@@ -12147,8 +12147,8 @@ function renderKpiWorkbar(visibleResults){
       +(canSeeCost?renderKpiWorkMetric(`${formatVndNumber(inventoryCost)}đ`,"Vốn tồn đã khai báo"):renderKpiWorkMetric(`${formatVndNumber(inventorySale)}đ`,"Giá trị theo giá bán"))
       +renderKpiWorkMetric(Array.isArray(TX_DATA)&&TX_DATA.length?idleCount:"—","Chưa bán trong 30 ngày");
   }
-  const exportLabel=activeKpiView==="het"||activeKpiView==="sap"?"Xuất kế hoạch CSV":"Xuất danh sách CSV";
-  const exportButton=`<button type="button" class="kpi-work-plan" onclick="exportKpiWorkCsv()">${exportLabel}</button>`;
+  const exportLabel=activeKpiView==="het"||activeKpiView==="sap"?"Xuất kế hoạch Excel":"Xuất danh sách Excel";
+  const exportButton=`<button type="button" class="kpi-work-plan" onclick="exportKpiWorkExcel()">${exportLabel}</button>`;
   return `<section class="kpi-workbar" style="--work-accent:${config.accent}" aria-label="Bộ lọc tồn kho đang dùng"><span class="kpi-workbar-copy"><strong class="kpi-workbar-title">${escapeHtml(config.title)}</strong><span class="kpi-workbar-note">${escapeHtml(config.note)}</span></span><span class="kpi-workbar-actions">${chips}${exportButton}<button type="button" class="kpi-work-clear" onclick="clearKpiWorkView()">Bỏ lọc</button></span><span class="kpi-work-metrics">${metrics}</span></section>`;
 }
 function showMoreKpiWorkRows(){
@@ -12188,32 +12188,108 @@ function renderKpiOperationalList(results){
     return `<button type="button" class="kpi-ops-row" onclick="openSummaryInventoryItem(${item.i})" aria-label="Mở ${escapeHtml(r[2]||r[1]||"mặt hàng")}"><span class="kpi-ops-priority ${priorityClass}">${escapeHtml(action.shortLabel)}</span><span class="kpi-ops-product"><b>${escapeHtml(r[2]||"Chưa có tên")}</b><small>${escapeHtml(r[1]||"Chưa có mã")} · ${escapeHtml(r[3]||"Chưa rõ hãng")}</small></span><span class="kpi-ops-group"><b>${escapeHtml(group||"Chưa phân nhóm")}</b><small>Kho ${escapeHtml(r[13]||"Q2")}</small></span><span class="kpi-ops-number ${stockClass}">${item.stock}<small>Ngưỡng ${item.threshold}</small></span><span class="kpi-ops-number">${item.sales30.toLocaleString("vi-VN")}<small>Bán 30 ngày</small></span><span class="kpi-ops-number ${suggestion.suggested>0?"is-warn":""}">${suggestedText}<small>${escapeHtml(suggestedNote)}</small></span><span class="kpi-ops-number ${financeClass}">${escapeHtml(financeValue)}<small>${escapeHtml(financeNote)}</small></span></button>`;
   }).join("");
   const more=entries.length>shown.length?`<button type="button" class="kpi-ops-more" onclick="showMoreKpiWorkRows()">Hiện thêm 120 dòng · Còn ${(entries.length-shown.length).toLocaleString("vi-VN")}</button>`:"";
-  return `<section class="kpi-ops-shell"><div class="kpi-ops-toolbar"><span>Đang hiển thị ${shown.length.toLocaleString("vi-VN")}/${entries.length.toLocaleString("vi-VN")} mã · Bấm dòng để mở chi tiết</span><span>Không tải ảnh để danh sách lớn vẫn nhẹ</span></div><div class="kpi-ops-table"><div class="kpi-ops-head"><span>Quyết định</span><span>Mã / mặt hàng</span><span>Nhóm / kho</span><span>Tồn</span><span>Sức bán</span><span>Đề xuất nhập</span><span>${escapeHtml(financeHead)}</span></div>${rows||'<div class="kpi-ops-empty">Không có mặt hàng phù hợp.</div>'}</div>${more}</section>`;
+  return `<section class="kpi-ops-shell"><div class="kpi-ops-toolbar"><span>Đang hiển thị ${shown.length.toLocaleString("vi-VN")}/${entries.length.toLocaleString("vi-VN")} mã · Bấm dòng để mở chi tiết</span></div><div class="kpi-ops-table"><div class="kpi-ops-head"><span>Quyết định</span><span>Mã / mặt hàng</span><span>Nhóm / kho</span><span>Tồn</span><span>Sức bán</span><span>Đề xuất nhập</span><span>${escapeHtml(financeHead)}</span></div>${rows||'<div class="kpi-ops-empty">Không có mặt hàng phù hợp.</div>'}</div>${more}</section>`;
 }
 function kpiCsvCell(value){
   return `"${String(value??"").replace(/"/g,'""')}"`;
 }
-function exportKpiWorkCsv(){
+function getKpiWorkExportReason(item,action){
+  if(action.key==="URGENT") return "Hết hàng, có bán trong 30 ngày";
+  if(action.key==="PREPARE") return "Tồn thấp, có bán trong 30 ngày";
+  if(action.key==="VERIFY") return "Hết hàng, chưa có bán trong 30 ngày · Cần xác nhận";
+  if(action.key==="WATCH") return "Tồn thấp, chưa có bán trong 30 ngày · Theo dõi";
+  return "Tồn ổn định";
+}
+function exportKpiWorkCsvFallback(summaryRows,headers,detailRows,purchaseMode){
+  const csvRows=[...summaryRows,[],headers,...detailRows];
+  const csv="\uFEFF"+csvRows.map(row=>row.map(kpiCsvCell).join(",")).join("\r\n");
+  const blob=new Blob([csv],{type:"text/csv;charset=utf-8"});
+  const url=URL.createObjectURL(blob),link=document.createElement("a");
+  link.href=url;
+  link.download=`${purchaseMode?"Ke-hoach-nhap-hang":"Bao-cao-ton-kho"}-${currentBranch}-${quickInventoryFileStamp()}.csv`;
+  document.body.appendChild(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+function exportKpiWorkExcel(){
   if(!activeKpiView||!currentKpiWorkResults.length){ showToast("Không có dữ liệu để xuất."); return; }
+  showToast("⏳ Đang tạo file Excel...",6000);
+  try{
   const canSeeCost=hasPrivateProductDataAccess();
   const purchaseMode=activeKpiView==="het"||activeKpiView==="sap";
   const entries=getKpiEnrichedEntries(currentKpiWorkResults);
-  const headers=["Kho","Quyết định","Mã hàng","Tên mặt hàng","Nhóm","Tồn","Ngưỡng","Đã bán 30 ngày","Đề xuất nhập"];
-  if(canSeeCost) headers.push("Giá nhập","Ngân sách nhập dự kiến");
-  headers.push("Giá bán");
-  const rows=entries.map(item=>{
+  const reportTitle=purchaseMode?"KẾ HOẠCH NHẬP HÀNG":"BÁO CÁO TỒN KHO";
+  const scopeLabel={all:"Tất cả mặt hàng",ton:"Mặt hàng đang còn tồn",het:"Mặt hàng hết hàng",sap:"Mặt hàng sắp hết"}[activeKpiView]||"Danh sách kho";
+  const filterLabel={all:"Tất cả",selling:"Có bán trong 30 ngày","no-sales":"Chưa bán trong 30 ngày",one:"Chỉ còn 1",threshold:"Chạm ngưỡng"}[kpiWorkSubfilter]||"Tất cả";
+  const generatedAt=new Date().toLocaleString("vi-VN");
+  const actionable=entries.filter(isInventoryActionable);
+  const totalSuggested=actionable.reduce((sum,item)=>sum+getRestockMinimumSuggestion(item),0);
+  const missingCost=actionable.filter(item=>!(Number(item.r[4])>0)).length;
+  const purchaseBudget=actionable.reduce((sum,item)=>sum+getRestockMinimumSuggestion(item)*(Number(item.r[4])||0),0);
+  const totalStock=entries.reduce((sum,item)=>sum+item.stock,0);
+  const summaryRows=[
+    ["HOÀNG GIA COMPUTER",""],
+    [reportTitle,""],
+    ["Phạm vi",scopeLabel],
+    ["Kho",currentBranch==="ALL"?"Tất cả kho":currentBranch],
+    ["Bộ lọc",filterLabel],
+    ["Thời điểm xuất",generatedAt],
+    ["Số mã hàng",entries.length],
+    ["Tổng tồn hiện tại",totalStock]
+  ];
+  if(purchaseMode){
+    summaryRows.push(["Số mã đề nghị nhập",actionable.length],["Tổng số lượng đề nghị",totalSuggested]);
+    if(canSeeCost) summaryRows.push(["Ngân sách nhập dự kiến",purchaseBudget],["Mã còn thiếu giá nhập",missingCost]);
+    summaryRows.push(["Lưu ý","Duyệt lại số lượng và giá nhập trước khi đặt hàng."]);
+  }
+  const headers=["STT","Mức ưu tiên","Kho","Mã hàng","Tên mặt hàng","Thương hiệu","Nhóm hàng","Trạng thái","Tồn hiện tại","Ngưỡng cảnh báo","Bán 30 ngày","Mục tiêu tồn","SL đề nghị nhập"];
+  if(canSeeCost) headers.push("Giá nhập","Thành tiền dự kiến");
+  headers.push("Giá bán","Cập nhật gần nhất","Lý do / Ghi chú");
+  const detailRows=entries.map((item,index)=>{
     const suggestion=getRestockSuggestionDetails(item);
-    const row=[item.r[13]||"Q2",getInventoryAction(item).label,item.r[1]||"",item.r[2]||"",cleanKpiPathLabel(getSummaryHierarchyGroup(item.r)||NO_GROUP),item.stock,item.threshold,item.sales30,purchaseMode?suggestion.suggested:0];
-    if(canSeeCost){const cost=Number(item.r[4])||0;row.push(cost,purchaseMode?cost*suggestion.suggested:cost*item.stock);}
-    row.push(Number(item.r[10])||0);
+    const action=getInventoryAction(item);
+    const suggested=purchaseMode?suggestion.suggested:0;
+    const row=[index+1,action.label,item.r[13]||"Q2",item.r[1]||"",item.r[2]||"",item.r[3]||"",cleanKpiPathLabel(getSummaryHierarchyGroup(item.r)||NO_GROUP),kpiStatusLabel(item.state),item.stock,item.threshold,item.sales30,purchaseMode?suggestion.target:item.stock,suggested];
+    if(canSeeCost){const cost=Number(item.r[4])||0;row.push(cost,cost*suggested);}
+    row.push(Number(item.r[10])||0,item.activity.latestAt?new Date(item.activity.latestAt).toLocaleString("vi-VN"):"Chưa có",getKpiWorkExportReason(item,action));
     return row;
   });
-  const csv="\uFEFF"+[headers,...rows].map(row=>row.map(kpiCsvCell).join(",")).join("\r\n");
-  const blob=new Blob([csv],{type:"text/csv;charset=utf-8"});
-  const url=URL.createObjectURL(blob),link=document.createElement("a");
-  link.href=url;link.download=`${purchaseMode?"Ke-hoach-nhap":"Danh-sach-ton"}-${currentBranch}-${quickInventoryFileStamp()}.csv`;
-  document.body.appendChild(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
-  showToast(`Đã xuất ${entries.length} dòng CSV.`);
+  if(typeof XLSX==="undefined"){
+    exportKpiWorkCsvFallback(summaryRows,headers,detailRows,purchaseMode);
+    showToast(`Đã xuất ${entries.length} dòng CSV dự phòng vì công cụ Excel chưa tải được.`,4500);
+    return;
+  }
+  const workbook=XLSX.utils.book_new();
+  const summarySheet=XLSX.utils.aoa_to_sheet(summaryRows);
+  const detailSheet=XLSX.utils.aoa_to_sheet([headers,...detailRows]);
+  summarySheet["!cols"]=[{wch:28},{wch:58}];
+  summarySheet["!merges"]=[XLSX.utils.decode_range("A1:B1"),XLSX.utils.decode_range("A2:B2")];
+  detailSheet["!cols"]=[{wch:6},{wch:22},{wch:8},{wch:16},{wch:48},{wch:18},{wch:28},{wch:14},{wch:12},{wch:14},{wch:12},{wch:12},{wch:14}]
+    .concat(canSeeCost?[{wch:16},{wch:20}]:[])
+    .concat([{wch:16},{wch:20},{wch:44}]);
+  detailSheet["!autofilter"]={ref:`A1:${XLSX.utils.encode_col(headers.length-1)}${detailRows.length+1}`};
+  detailSheet["!views"]=[{state:"frozen",ySplit:1}];
+  const headerStyle={font:{bold:true,color:{rgb:"FFFFFF"}},fill:{fgColor:{rgb:"1E3A5F"}},alignment:{horizontal:"center",vertical:"center",wrapText:true}};
+  headers.forEach((_,column)=>{const cell=detailSheet[XLSX.utils.encode_cell({r:0,c:column})];if(cell)cell.s=headerStyle;});
+  ["A1","A2"].forEach(address=>{if(summarySheet[address])summarySheet[address].s={font:{bold:true,sz:address==="A1"?16:14,color:{rgb:"1E3A5F"}},alignment:{horizontal:"center"}};});
+  const moneyHeaders=["Giá nhập","Thành tiền dự kiến","Giá bán"];
+  moneyHeaders.forEach(label=>{
+    const column=headers.indexOf(label);
+    if(column<0)return;
+    for(let rowIndex=1;rowIndex<=detailRows.length;rowIndex++){
+      const cell=detailSheet[XLSX.utils.encode_cell({r:rowIndex,c:column})];
+      if(cell)cell.z='#,##0 "đ"';
+    }
+  });
+  const summaryBudgetRow=summaryRows.findIndex(row=>row[0]==="Ngân sách nhập dự kiến");
+  if(summaryBudgetRow>=0){const cell=summarySheet[`B${summaryBudgetRow+1}`];if(cell)cell.z='#,##0 "đ"';}
+  XLSX.utils.book_append_sheet(workbook,summarySheet,"Tổng hợp");
+  XLSX.utils.book_append_sheet(workbook,detailSheet,purchaseMode?"Kế hoạch nhập":"Danh sách tồn");
+  const filePrefix=purchaseMode?"Ke-hoach-nhap-hang":"Bao-cao-ton-kho";
+  XLSX.writeFile(workbook,`${filePrefix}-${currentBranch}-${quickInventoryFileStamp()}.xlsx`,{cellStyles:true,compression:true});
+  showToast(`✅ Đã xuất Excel: ${entries.length} mã hàng.`,3500);
+  }catch(error){
+    console.error("Không thể xuất kế hoạch Excel",error);
+    showToast(`⚠️ Không thể xuất Excel: ${error?.message||error}`,6000);
+  }
 }
 function renderKpiActionbar(type){
   const config={
@@ -21901,13 +21977,27 @@ function updateHeaderNetworkStatus(nextSyncState){
   const badge=document.getElementById("headerNetworkStatus");
   if(!badge) return;
   const hasNetwork=navigator.onLine;
-  const presence=hasNetwork?"online":"offline";
+  const serverConfirmed=hasNetwork&&headerServerSyncState==="synced";
+  const waitingState=["loading","checking","syncing","pending","unconfirmed"].includes(headerServerSyncState);
+  const presence=!hasNetwork?"offline":serverConfirmed?"online":"checking";
   const previous=badge.dataset.presence||"";
-  badge.className=`network-status ${hasNetwork?"online":"offline"}`;
-  const face=hasNetwork
+  badge.className=`network-status ${presence}`;
+  const face=serverConfirmed
     ? '<svg viewBox="0 0 24 24"><circle class="yahoo-eye" cx="8" cy="8" r="1.7"/><circle class="yahoo-eye" cx="16" cy="8" r="1.7"/><path class="yahoo-mouth" d="M6.5 13.5c1.4 4.2 9.6 4.2 11 0"/></svg>'
-    : '<svg viewBox="0 0 24 24"><circle class="yahoo-eye" cx="8" cy="8" r="1.7"/><circle class="yahoo-eye" cx="16" cy="8" r="1.7"/><path class="yahoo-mouth" d="M7 16h10"/></svg>';
-  const statusText=hasNetwork?"Online":"Offline";
+    : !hasNetwork
+      ? '<svg viewBox="0 0 24 24"><circle class="yahoo-eye" cx="8" cy="8" r="1.7"/><circle class="yahoo-eye" cx="16" cy="8" r="1.7"/><path class="yahoo-mouth" d="M7 16c2-2 8-2 10 0"/></svg>'
+      : '<svg viewBox="0 0 24 24"><circle class="yahoo-eye" cx="8" cy="8" r="1.7"/><circle class="yahoo-eye" cx="16" cy="8" r="1.7"/><path class="yahoo-mouth" d="M7 15h10"/></svg>';
+  const statusText=!hasNetwork
+    ? "Offline"
+    : serverConfirmed
+      ? "Online"
+      : headerServerSyncState==="empty"
+        ? "Đã kết nối"
+        : ["syncing","pending"].includes(headerServerSyncState)
+          ? "Chờ đồng bộ"
+          : waitingState
+            ? "Đang kiểm tra"
+            : "Chưa đồng bộ";
   badge.innerHTML=`<span class="yahoo-presence-icon" aria-hidden="true">${face}</span><span class="network-status-text">${statusText}</span>`;
   const detail=getHeaderServerPresenceDetail(headerServerSyncState,hasNetwork);
   badge.dataset.presence=presence;
@@ -21916,7 +22006,7 @@ function updateHeaderNetworkStatus(nextSyncState){
   badge.title=detail;
   if(previous && previous!==presence){
     clearTimeout(headerPresenceTimer);
-    badge.classList.add(hasNetwork?"presence-turn-on":"presence-turn-off");
+    badge.classList.add(presence==="online"?"presence-turn-on":"presence-turn-off");
     headerPresenceTimer=setTimeout(()=>{
       badge.classList.remove("presence-turn-on","presence-turn-off");
     },700);
