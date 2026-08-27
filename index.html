@@ -18,7 +18,7 @@
 <link rel="preconnect" href="https://script.google.com" crossorigin />
 <link rel="preconnect" href="https://lh3.googleusercontent.com" crossorigin />
 <link rel="dns-prefetch" href="https://drive.google.com" />
-<title>🏪 KHO Q2 (HOÀNG GIA COMPUTER) [v21]</title>
+<title>🏪 KHO Q2 (HOÀNG GIA COMPUTER) [v22]</title>
 <script defer crossorigin="anonymous" integrity="sha384-vtjasyidUo0kW94K5MXDXntzOJpQgBKXmE7e2Ga4LG0skTTLeBi97eFAXsqewJjw" src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script defer crossorigin="anonymous" integrity="sha384-vseuUuO/VRMn00lXYd5m/Pk4l/7RjMqhXGf6G0RALy+On0txYb39dQsUQDAd7q5L" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.10/pdfmake.min.js"></script>
 <script defer crossorigin="anonymous" integrity="sha384-1y8s2U/Jjn4/oeCEBcfYH3M6XeQtcg4LRmluN92FS69UgtLzoyhn3swew8Ynj8Ai" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.10/vfs_fonts.js"></script>
@@ -21978,26 +21978,13 @@ function updateHeaderNetworkStatus(nextSyncState){
   if(!badge) return;
   const hasNetwork=navigator.onLine;
   const serverConfirmed=hasNetwork&&headerServerSyncState==="synced";
-  const waitingState=["loading","checking","syncing","pending","unconfirmed"].includes(headerServerSyncState);
-  const presence=!hasNetwork?"offline":serverConfirmed?"online":"checking";
+  const presence=serverConfirmed?"online":"offline";
   const previous=badge.dataset.presence||"";
   badge.className=`network-status ${presence}`;
   const face=serverConfirmed
     ? '<svg viewBox="0 0 24 24"><circle class="yahoo-eye" cx="8" cy="8" r="1.7"/><circle class="yahoo-eye" cx="16" cy="8" r="1.7"/><path class="yahoo-mouth" d="M6.5 13.5c1.4 4.2 9.6 4.2 11 0"/></svg>'
-    : !hasNetwork
-      ? '<svg viewBox="0 0 24 24"><circle class="yahoo-eye" cx="8" cy="8" r="1.7"/><circle class="yahoo-eye" cx="16" cy="8" r="1.7"/><path class="yahoo-mouth" d="M7 16c2-2 8-2 10 0"/></svg>'
-      : '<svg viewBox="0 0 24 24"><circle class="yahoo-eye" cx="8" cy="8" r="1.7"/><circle class="yahoo-eye" cx="16" cy="8" r="1.7"/><path class="yahoo-mouth" d="M7 15h10"/></svg>';
-  const statusText=!hasNetwork
-    ? "Offline"
-    : serverConfirmed
-      ? "Online"
-      : headerServerSyncState==="empty"
-        ? "Đã kết nối"
-        : ["syncing","pending"].includes(headerServerSyncState)
-          ? "Chờ đồng bộ"
-          : waitingState
-            ? "Đang kiểm tra"
-            : "Chưa đồng bộ";
+    : '<svg viewBox="0 0 24 24"><circle class="yahoo-eye" cx="8" cy="8" r="1.7"/><circle class="yahoo-eye" cx="16" cy="8" r="1.7"/><path class="yahoo-mouth" d="M7 16c2-2 8-2 10 0"/></svg>';
+  const statusText=serverConfirmed?"Online":"Offline";
   badge.innerHTML=`<span class="yahoo-presence-icon" aria-hidden="true">${face}</span><span class="network-status-text">${statusText}</span>`;
   const detail=getHeaderServerPresenceDetail(headerServerSyncState,hasNetwork);
   badge.dataset.presence=presence;
