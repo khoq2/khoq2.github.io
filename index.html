@@ -10638,6 +10638,7 @@ async function handleSyncBadgeActivation(){
       return;
     }
     if(syncRetryRunning) return;
+    if(lastSyncBadgeDetail) showToast("Chi tiết: "+lastSyncBadgeDetail,5000);
     clearSyncRetry(false);
     syncRetryRunning=true;
     setSyncBadge("checking","Người dùng yêu cầu kiểm tra lại kết nối");
@@ -10694,6 +10695,7 @@ let syncRetryAttempts = 0;
 let syncRetryRunning = false;
 let syncBadgeWatchdogTimer = null;
 let pendingDrainTimer = null;
+let lastSyncBadgeDetail = "";
 /* Trạng thái Yahoo ở đầu trang phản ánh xác nhận thật từ máy chủ,
    không chỉ phản ánh việc thiết bị đang có Wi-Fi/4G. */
 let headerServerSyncState = "unconfirmed";
@@ -10727,7 +10729,7 @@ function schedulePendingDrain(){
 function paintSyncRetryCountdown(seconds){
   const el = document.getElementById("syncBadge");
   if(!el) return;
-  el.innerHTML = `<span>❌ Lỗi kết nối</span><span class="sync-retry-countdown">${seconds}s</span>`;
+  el.innerHTML = `<span>🔄 Kết nối lại</span><span class="sync-retry-countdown">${seconds}s</span>`;
 }
 function scheduleSyncRetry(detail){
   if(!isRetryableSyncError(detail)) return;
@@ -10784,6 +10786,8 @@ function armSyncBadgeWatchdog(state){
 }
 
 function setSyncBadge(state, detail){
+  if(detail) lastSyncBadgeDetail=String(detail);
+  if(state==="synced"||state==="empty") lastSyncBadgeDetail="";
   updateHeaderNetworkStatus(state || "unconfirmed");
   armSyncBadgeWatchdog(state);
   const el = document.getElementById("syncBadge");
@@ -10830,8 +10834,16 @@ case "stale":
     break;
 
 case "error":
-    if(isRetryableSyncError(detail)) scheduleSyncRetry(detail);
-    else el.textContent = "❌ Lỗi đồng bộ · Bấm xử lý";
+    if(/AUTH_REQUIRED|phiên (admin|nhân viên).*hết hạn|đăng nhập lại/i.test(String(detail||""))){
+      el.textContent="🔐 Cần đăng nhập lại";
+    }else if(/SYNC_CONFLICT|REQUEST_ID_CONFLICT|TRANSACTION_ID_CONFLICT|TRANSFER_ID_CONFLICT/i.test(String(detail||""))){
+      el.textContent="⚠️ Cần kiểm tra đồng bộ";
+    }else if(isRetryableSyncError(detail)){
+      el.textContent="🔄 Đang kết nối lại";
+      scheduleSyncRetry(detail);
+    }else{
+      el.textContent="⚠️ Đồng bộ chưa xong";
+    }
     break;
 
 default:
@@ -21889,15 +21901,13 @@ function updateHeaderNetworkStatus(nextSyncState){
   const badge=document.getElementById("headerNetworkStatus");
   if(!badge) return;
   const hasNetwork=navigator.onLine;
-  const serverOk=hasNetwork && ["synced","empty"].includes(headerServerSyncState);
-  const serverBusy=hasNetwork && ["loading","checking","syncing","pending"].includes(headerServerSyncState);
-  const presence=serverOk?"online":serverBusy?"checking":"offline";
+  const presence=hasNetwork?"online":"offline";
   const previous=badge.dataset.presence||"";
-  badge.className=`network-status ${serverOk?"online":serverBusy?"checking":"offline"}`;
-  const face=serverOk
+  badge.className=`network-status ${hasNetwork?"online":"offline"}`;
+  const face=hasNetwork
     ? '<svg viewBox="0 0 24 24"><circle class="yahoo-eye" cx="8" cy="8" r="1.7"/><circle class="yahoo-eye" cx="16" cy="8" r="1.7"/><path class="yahoo-mouth" d="M6.5 13.5c1.4 4.2 9.6 4.2 11 0"/></svg>'
     : '<svg viewBox="0 0 24 24"><circle class="yahoo-eye" cx="8" cy="8" r="1.7"/><circle class="yahoo-eye" cx="16" cy="8" r="1.7"/><path class="yahoo-mouth" d="M7 16h10"/></svg>';
-  const statusText=!hasNetwork?"Mất mạng":serverOk?"Máy chủ OK":serverBusy?"Đang xác nhận":"Máy chủ lỗi";
+  const statusText=hasNetwork?"Online":"Offline";
   badge.innerHTML=`<span class="yahoo-presence-icon" aria-hidden="true">${face}</span><span class="network-status-text">${statusText}</span>`;
   const detail=getHeaderServerPresenceDetail(headerServerSyncState,hasNetwork);
   badge.dataset.presence=presence;
@@ -21906,7 +21916,7 @@ function updateHeaderNetworkStatus(nextSyncState){
   badge.title=detail;
   if(previous && previous!==presence){
     clearTimeout(headerPresenceTimer);
-    badge.classList.add(serverOk?"presence-turn-on":"presence-turn-off");
+    badge.classList.add(hasNetwork?"presence-turn-on":"presence-turn-off");
     headerPresenceTimer=setTimeout(()=>{
       badge.classList.remove("presence-turn-on","presence-turn-off");
     },700);
