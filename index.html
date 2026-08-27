@@ -10625,6 +10625,16 @@ async function handleSyncBadgeActivation(){
   // Một lần bấm phải có tác dụng rõ ràng. Khi đang lỗi/chờ, thử phục hồi ngay;
   // khi bình thường mới dùng ba lần bấm để mở nhật ký quản trị như bản cũ.
   if(["error","stale","pending","unconfirmed"].includes(headerServerSyncState)){
+    syncBadgeActivationCount+=1;
+    clearTimeout(syncBadgeActivationTimer);
+    syncBadgeActivationTimer=setTimeout(()=>{syncBadgeActivationCount=0;syncBadgeActivationTimer=null;},6000);
+    if(syncBadgeActivationCount>=3){
+      syncBadgeActivationCount=0;
+      clearTimeout(syncBadgeActivationTimer);
+      syncBadgeActivationTimer=null;
+      openSyncErrorLog();
+      return;
+    }
     if(syncRetryRunning) return;
     clearSyncRetry(false);
     syncRetryRunning=true;
@@ -21715,7 +21725,14 @@ async function syncFromServerIfIdle(forceRetry=false){
       options:GROUP_OPTIONS,
     });
     await loadData();
-    await Promise.all([loadTXFromSheet(), loadTransfersFromSheet(), loadNVFromSheet(), loadPublicRecentActivityFromSheet(), loadDisplayConfig(), loadProductLinks()]);
+    const inventoryServerConfirmed=["synced","empty"].includes(headerServerSyncState);
+    const auxiliaryResults=await Promise.allSettled([loadTXFromSheet(), loadTransfersFromSheet(), loadNVFromSheet(), loadPublicRecentActivityFromSheet(), loadDisplayConfig(), loadProductLinks()]);
+    auxiliaryResults.forEach((result,index)=>{if(result.status==="rejected") console.warn("Dữ liệu phụ chưa tải được",index,result.reason);});
+    // Lỗi của lịch sử/nhân viên/liên kết không được biến kết nối Internet và kho
+    // chính thành Offline. Các phần phụ có nút thử lại riêng và vẫn được ghi log.
+    if(inventoryServerConfirmed && !readSyncOutbox().length && !hasAuxPendingSync(PENDING_TX_SYNC_KEY) && !hasAuxPendingSync(PENDING_NV_SYNC_KEY) && !hasAuxPendingSync(PENDING_CONFIG_SYNC_KEY)){
+      setSyncBadge("synced");
+    }
     const afterUiState=JSON.stringify({
       data:normalizeSheetRows(DATA),
       tx:normalizeTxList(TX_DATA),
@@ -21841,7 +21858,10 @@ function updateHeaderNetworkStatus(nextSyncState){
   if(typeof nextSyncState==="string" && nextSyncState) headerServerSyncState=nextSyncState;
   const badge=document.getElementById("headerNetworkStatus");
   if(!badge) return;
-  const online=navigator.onLine && headerServerSyncState==="synced";
+  // Online/Offline chỉ phản ánh kết nối mạng của thiết bị. Trạng thái xác nhận
+  // máy chủ đã có badge đồng bộ riêng; trộn hai khái niệm làm người dùng tưởng
+  // mất Internet khi chỉ một endpoint phụ phản hồi chậm.
+  const online=navigator.onLine;
   const presence=online?"online":"offline";
   const previous=badge.dataset.presence||"";
   badge.className=`network-status ${online?"online":"offline"}`;
@@ -22038,6 +22058,7 @@ async function submitInventoryTransfer(){
         syncStatusButtons(totalStockView ? currentStatus : "");
         render();
       }
+      const startupInventoryConfirmed=["synced","empty"].includes(headerServerSyncState);
       const auxiliaryLoads=[
         loadTXFromSheet,
         loadTransfersFromSheet,
@@ -22049,6 +22070,9 @@ async function submitInventoryTransfer(){
       for(const loadAuxiliary of auxiliaryLoads){
         try{ await loadAuxiliary(); }
         catch(error){ console.warn("Phần dữ liệu phụ chưa tải được:",error); }
+      }
+      if(startupInventoryConfirmed && !readSyncOutbox().length && !hasAuxPendingSync(PENDING_TX_SYNC_KEY) && !hasAuxPendingSync(PENDING_NV_SYNC_KEY) && !hasAuxPendingSync(PENDING_CONFIG_SYNC_KEY)){
+        setSyncBadge("synced");
       }
       refreshLatestItemsTicker();
       syncStatusButtons(totalStockView ? currentStatus : "");
