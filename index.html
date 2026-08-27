@@ -2760,6 +2760,7 @@ body.admin-entry-visible .sticky:not(.collapsed) .header .admin-bar {
 }
 .network-status::before { content:none; }
 .network-status.online { border-color:#A8E2BD; background:linear-gradient(#F0FFF5,#D8F6E3); color:#117A3E; }
+.network-status.checking { border-color:#F1CD74; background:linear-gradient(#FFFBEA,#FFF0B8); color:#8A5A00; }
 .network-status.offline { border-color:#D4D8DE; background:linear-gradient(#F7F8FA,#E7EAEE); color:#6B7280; }
 .yahoo-presence-icon{
   position:relative;
@@ -2777,6 +2778,7 @@ body.admin-entry-visible .sticky:not(.collapsed) .header .admin-bar {
 .yahoo-presence-icon .yahoo-eye{fill:#fff}
 .yahoo-presence-icon .yahoo-mouth{fill:none;stroke:#fff;stroke-width:2.25;stroke-linecap:round}
 .network-status.online .yahoo-presence-icon{background:radial-gradient(circle at 35% 25%,#A9FF9F 0,#2FD365 38%,#07923C 100%)}
+.network-status.checking .yahoo-presence-icon{background:radial-gradient(circle at 35% 25%,#FFF5A8 0,#F4B942 44%,#C47A00 100%)}
 .network-status.offline .yahoo-presence-icon{background:radial-gradient(circle at 35% 25%,#F4F5F7 0,#AAB0B8 44%,#6B7280 100%)}
 .network-status.offline .yahoo-mouth{stroke-width:2.5}
 .network-status.presence-turn-on{animation:yahooStatusTurnOn .62s cubic-bezier(.2,.9,.28,1.25) both}
@@ -10691,6 +10693,7 @@ let syncRetryTicker = null;
 let syncRetryAttempts = 0;
 let syncRetryRunning = false;
 let syncBadgeWatchdogTimer = null;
+let pendingDrainTimer = null;
 /* Trạng thái Yahoo ở đầu trang phản ánh xác nhận thật từ máy chủ,
    không chỉ phản ánh việc thiết bị đang có Wi-Fi/4G. */
 let headerServerSyncState = "unconfirmed";
@@ -10705,6 +10708,21 @@ function clearSyncRetry(resetAttempts=false){
   syncRetryTimer = null;
   syncRetryTicker = null;
   if(resetAttempts) syncRetryAttempts = 0;
+}
+function schedulePendingDrain(){
+  clearTimeout(pendingDrainTimer);
+  pendingDrainTimer=setTimeout(async()=>{
+    pendingDrainTimer=null;
+    const stillPending=readSyncOutbox().length || hasAuxPendingSync(PENDING_TX_SYNC_KEY) || hasAuxPendingSync(PENDING_NV_SYNC_KEY) || hasAuxPendingSync(PENDING_CONFIG_SYNC_KEY);
+    if(!stillPending) return;
+    if(document.hidden || !navigator.onLine || document.querySelector(".overlay.open") || document.body.classList.contains("fab-menu-open")){
+      schedulePendingDrain();
+      return;
+    }
+    await syncFromServerIfIdle(true);
+    const remains=readSyncOutbox().length || hasAuxPendingSync(PENDING_TX_SYNC_KEY) || hasAuxPendingSync(PENDING_NV_SYNC_KEY) || hasAuxPendingSync(PENDING_CONFIG_SYNC_KEY);
+    if(remains) schedulePendingDrain();
+  },8000);
 }
 function paintSyncRetryCountdown(seconds){
   const el = document.getElementById("syncBadge");
@@ -10775,6 +10793,8 @@ function setSyncBadge(state, detail){
   el.setAttribute("aria-busy",String(state==="loading"||state==="syncing"));
   if(state === "error") recordSyncError(detail);
   if(state !== "error") clearSyncRetry(state === "synced" || state === "empty");
+  if(state==="pending") schedulePendingDrain();
+  else if(state==="synced"||state==="empty") {clearTimeout(pendingDrainTimer);pendingDrainTimer=null;}
   el.title = state === "error" ? "Có lỗi đồng bộ" : "Trạng thái đồng bộ";
   if(!SHEET_API_URL){ el.textContent = "💾 Lưu trên máy này"; return; }
   switch(state){
@@ -10864,6 +10884,16 @@ function setAuxPendingSync(key, on){
 }
 function hasAuxPendingSync(key){ try{ return localStorage.getItem(key) !== null; }catch(e){ return false; } }
 function getAuxPendingBase(key){ try{ return localStorage.getItem(key+"_base") || ""; }catch(e){ return ""; } }
+function clearOrphanedPendingSync(){
+  // TX/NV private chỉ được giữ trong sessionStorage. Nếu trình duyệt đã đóng,
+  // payload không còn thì cờ localStorage cũ tuyệt đối không được treo “Đang chờ” mãi
+  // hoặc gửi một danh sách rỗng/không đầy đủ lên máy chủ.
+  try{
+    if(hasAuxPendingSync(PENDING_TX_SYNC_KEY) && !sessionStorage.getItem("kho_cntt_tx")) setAuxPendingSync(PENDING_TX_SYNC_KEY,false);
+    if(hasAuxPendingSync(PENDING_NV_SYNC_KEY) && !sessionStorage.getItem("kho_cntt_nv")) setAuxPendingSync(PENDING_NV_SYNC_KEY,false);
+  }catch(error){console.warn("Không dọn được cờ đồng bộ mồ côi",error);}
+}
+clearOrphanedPendingSync();
 
 // Lưu vào localStorage một cách an toàn: nếu bộ nhớ máy đầy (thường do ảnh base64
 // của sản phẩm/giao dịch/nhân viên chiếm dung lượng), báo cho người dùng biết thay vì
@@ -21858,25 +21888,25 @@ function updateHeaderNetworkStatus(nextSyncState){
   if(typeof nextSyncState==="string" && nextSyncState) headerServerSyncState=nextSyncState;
   const badge=document.getElementById("headerNetworkStatus");
   if(!badge) return;
-  // Online/Offline chỉ phản ánh kết nối mạng của thiết bị. Trạng thái xác nhận
-  // máy chủ đã có badge đồng bộ riêng; trộn hai khái niệm làm người dùng tưởng
-  // mất Internet khi chỉ một endpoint phụ phản hồi chậm.
-  const online=navigator.onLine;
-  const presence=online?"online":"offline";
+  const hasNetwork=navigator.onLine;
+  const serverOk=hasNetwork && ["synced","empty"].includes(headerServerSyncState);
+  const serverBusy=hasNetwork && ["loading","checking","syncing","pending"].includes(headerServerSyncState);
+  const presence=serverOk?"online":serverBusy?"checking":"offline";
   const previous=badge.dataset.presence||"";
-  badge.className=`network-status ${online?"online":"offline"}`;
-  const face=online
+  badge.className=`network-status ${serverOk?"online":serverBusy?"checking":"offline"}`;
+  const face=serverOk
     ? '<svg viewBox="0 0 24 24"><circle class="yahoo-eye" cx="8" cy="8" r="1.7"/><circle class="yahoo-eye" cx="16" cy="8" r="1.7"/><path class="yahoo-mouth" d="M6.5 13.5c1.4 4.2 9.6 4.2 11 0"/></svg>'
     : '<svg viewBox="0 0 24 24"><circle class="yahoo-eye" cx="8" cy="8" r="1.7"/><circle class="yahoo-eye" cx="16" cy="8" r="1.7"/><path class="yahoo-mouth" d="M7 16h10"/></svg>';
-  badge.innerHTML=`<span class="yahoo-presence-icon" aria-hidden="true">${face}</span><span class="network-status-text">${online?"Online":"Offline"}</span>`;
-  const detail=getHeaderServerPresenceDetail(headerServerSyncState,navigator.onLine);
+  const statusText=!hasNetwork?"Mất mạng":serverOk?"Máy chủ OK":serverBusy?"Đang xác nhận":"Máy chủ lỗi";
+  badge.innerHTML=`<span class="yahoo-presence-icon" aria-hidden="true">${face}</span><span class="network-status-text">${statusText}</span>`;
+  const detail=getHeaderServerPresenceDetail(headerServerSyncState,hasNetwork);
   badge.dataset.presence=presence;
   badge.dataset.syncState=headerServerSyncState;
-  badge.setAttribute("aria-label",`${online?"Online":"Offline"} - ${detail}`);
+  badge.setAttribute("aria-label",`${statusText} - ${detail}`);
   badge.title=detail;
   if(previous && previous!==presence){
     clearTimeout(headerPresenceTimer);
-    badge.classList.add(online?"presence-turn-on":"presence-turn-off");
+    badge.classList.add(serverOk?"presence-turn-on":"presence-turn-off");
     headerPresenceTimer=setTimeout(()=>{
       badge.classList.remove("presence-turn-on","presence-turn-off");
     },700);
