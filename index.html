@@ -14271,10 +14271,12 @@ function renderCard(r,i,displayNo){
     return `<button type="button" class="product-list-row${quickClass}" data-index="${i}" style="--list-color:${cfg.c}" title="Mở ${escapeHtml(ten)}" onclick="openProductFromList(${i})"><span class="product-list-main"><span class="product-list-title">${renderProductTitleWithCondition(ten,kwTokens)}</span><span class="product-list-meta">${highlightMatch(ma,kwTokens)} · ${escapeHtml(th||"Chưa rõ hãng")} · ${escapeHtml(branch||"Q2")}</span></span><span class="product-list-stock ${listStockClass}">${escapeHtml(stTxt)} · ${Number(ton)||0}</span></button>`;
   }
   const productTransactions = getTransactionsForProduct(r);
-  const latestTransaction = productTransactions[0];
+  // Dòng nhỏ trên thẻ sản phẩm dùng để cho biết người BÁN gần nhất. Không lấy
+  // giao dịch nhập hàng hoặc điều chỉnh tồn do Admin tạo khi sửa sản phẩm.
+  const latestTransaction = productTransactions.find(tx=>getTransactionKind(tx)==="SALE");
   const latestTransactionText = latestTransaction
     ? `${latestTransaction.nv || "Chưa rõ nhân viên"} · ${formatTxTime(latestTransaction.time) || "Chưa rõ thời gian"}`
-    : "Chưa có giao dịch";
+    : "Chưa có giao dịch bán";
   const latestEmployeeAvatarHtml = latestTransaction
     ? renderNVAvatar(latestTransaction.nv, "nv-avatar-latest")
     : "";
