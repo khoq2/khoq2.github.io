@@ -120,6 +120,9 @@ button:disabled,input:disabled,select:disabled,[aria-disabled="true"] { cursor:n
 .recent-activity-progress.tone-orange{--activity-progress-color:#F28C28}
 .recent-activity-progress.tone-red{--activity-progress-color:#ED4A54}
 @keyframes recentActivityProgressIn{from{transform:scaleX(0);opacity:.45}to{transform:scaleX(1);opacity:1}}
+.recent-activity-monthly { display:flex; align-items:center; justify-content:space-between; gap:7px; max-width:100%; margin-top:5px; color:#526B7E; font-size:8.5px; font-weight:800; line-height:1.25; }
+.recent-activity-monthly b { min-width:0; overflow:hidden; color:#C9343D; font-size:9px; font-weight:950; text-overflow:ellipsis; white-space:nowrap; }
+.recent-activity-monthly small { flex:0 0 auto; color:#788C9C; font-size:7.5px; font-weight:850; white-space:nowrap; }
 .recent-activity-route { display:inline-flex; align-items:center; margin-left:4px; padding:2px 6px; border:1px solid #E5BD71; border-radius:999px; background:#FFF0CE; color:#865505; font-size:9px; font-weight:950; white-space:nowrap; vertical-align:1px; }
 .recent-activity-daily { display:block; max-width:100%; margin-top:5px; padding:5px 7px; border-radius:7px; background:#FFF0CE; color:#78500E; font-size:9px; font-weight:750; line-height:1.35; white-space:normal; }
 .recent-activity-daily b { font-weight:950; }
@@ -16808,6 +16811,22 @@ function getEmployeeTransferDaySummary(tx,rows){
     products:new Set(matching.map(item=>normalizeProductCode(item.ma||"")).filter(Boolean)).size
   };
 }
+function getEmployeeMonthlySaleStats(rows){
+  const monthKey=String(parseTxDateKey(new Date())||"").slice(0,7);
+  const byEmployee=new Map();
+  rows.forEach(item=>{
+    if(getRecentActivityKind(item)!=="SALE"||String(parseTxDateKey(item.time)||"").slice(0,7)!==monthKey) return;
+    const name=String(item.nv||"Chưa rõ nhân viên").trim()||"Chưa rõ nhân viên";
+    const key=removeAccents(name).trim().toLowerCase();
+    const current=byEmployee.get(key)||{name,qty:0,orders:new Set()};
+    current.qty+=Math.abs(Number(item.qty)||0);
+    current.orders.add(String(item.id||`${item.time}|${item.ma||""}|${current.orders.size}`));
+    byEmployee.set(key,current);
+  });
+  const result=new Map();
+  byEmployee.forEach((value,key)=>result.set(key,{name:value.name,qty:value.qty,orders:value.orders.size}));
+  return result;
+}
 function renderRecentActivity(){
   const list=document.getElementById("recentActivityList");
   if(!list) return;
@@ -16828,6 +16847,8 @@ function renderRecentActivity(){
     return;
   }
   const maxShownQty=Math.max(1,...shown.map(item=>Math.abs(Number(item.qty)||0)));
+  const monthlySaleStats=getEmployeeMonthlySaleStats(rows);
+  const maxMonthlySaleQty=Math.max(1,...Array.from(monthlySaleStats.values()).map(item=>item.qty));
   const progressTones=["green","blue","violet","orange","red"];
   list.innerHTML=shown.map((tx,index)=>{
     const kind=getRecentActivityKind(tx);
@@ -16839,13 +16860,22 @@ function renderRecentActivity(){
     const to=String(tx.to||tx.branch||"Q2").toUpperCase()==="Q5" ? "Q5" : "Q2";
     const action=isTransfer ? "chuyển kho" : kind==="IMPORT" ? "nhập hàng" : kind==="ADJUST" ? "điều chỉnh kho" : "xuất hàng";
     const route=`<span class="recent-activity-route">${isTransfer?`${from} → ${to}`:to}</span>`;
-    const progressPercent=qty?Math.max(10,Math.min(100,Math.round(qty/maxShownQty*100))):0;
+    const employeeKey=removeAccents(String(tx.nv||"Chưa rõ nhân viên")).trim().toLowerCase();
+    const monthlySale=kind==="SALE" ? (monthlySaleStats.get(employeeKey)||{name:String(tx.nv||"Chưa rõ nhân viên"),qty,orders:qty?1:0}) : null;
+    const progressPercent=monthlySale
+      ? (monthlySale.qty?Math.max(10,Math.min(100,Math.round(monthlySale.qty/maxMonthlySaleQty*100))):0)
+      : (qty?Math.max(10,Math.min(100,Math.round(qty/maxShownQty*100))):0);
     const progressTone=progressTones[index%progressTones.length];
-    const progressTitle=qty ? `Số lượng ${qty}; bằng ${progressPercent}% giao dịch lớn nhất đang hiển thị` : "Chưa có số lượng";
+    const progressTitle=monthlySale
+      ? `${monthlySale.name} bán ${monthlySale.qty} sản phẩm trong ${monthlySale.orders} đơn tháng này; đạt ${progressPercent}% người bán cao nhất`
+      : (qty ? `Số lượng ${qty}; bằng ${progressPercent}% giao dịch lớn nhất đang hiển thị` : "Chưa có số lượng");
+    const monthlyLine=monthlySale
+      ? `<span class="recent-activity-monthly"><b>${escapeHtml(monthlySale.name)} bán ${Number(monthlySale.qty).toLocaleString("vi-VN")} SP / ${Number(monthlySale.orders).toLocaleString("vi-VN")} đơn</b><small>trong tháng</small></span>`
+      : "";
     const progress=`<span class="recent-activity-progress tone-${progressTone}" style="--activity-progress:${progressPercent}%;--activity-progress-delay:${Math.min(index,8)*45}ms" role="img" aria-label="${escapeHtml(progressTitle)}" title="${escapeHtml(progressTitle)}"><i></i></span>`;
     const employeeAvatar=renderNVAvatar(tx.nv||"Chưa rõ nhân viên","recent-activity-avatar");
     const fullTime=recentActivityTimeLabel(tx.time);
-    return `<button type="button" class="recent-activity-row kind-${kindClass}${isTransfer?" transfer":""}" data-code="${escapeHtml(tx.ma||"")}" data-branch="${escapeHtml(tx.branch||"Q2")}" title="Mở sản phẩm này tại ${escapeHtml(tx.branch||"Q2")}" onclick="openRecentActivityProduct(this,event)">${employeeAvatar}<span class="recent-activity-copy"><span class="recent-activity-action-line"><span class="recent-activity-kind-chip ${kindClass}">${recentActivityKindLabel(kind)}</span><span class="recent-activity-action">${escapeHtml(tx.nv||"Chưa rõ nhân viên")} ${action}</span>${route}</span><span class="recent-activity-product">${escapeHtml(info.currentName||tx.ma||"Sản phẩm")}${qty?` · ${qty} cái`:""}</span>${progress}</span><span class="recent-activity-time" title="${escapeHtml(fullTime)}">${escapeHtml(recentActivityRelativeTime(tx.time))}<small>${escapeHtml(fullTime)}</small></span></button>`;
+    return `<button type="button" class="recent-activity-row kind-${kindClass}${isTransfer?" transfer":""}" data-code="${escapeHtml(tx.ma||"")}" data-branch="${escapeHtml(tx.branch||"Q2")}" title="Mở sản phẩm này tại ${escapeHtml(tx.branch||"Q2")}" onclick="openRecentActivityProduct(this,event)">${employeeAvatar}<span class="recent-activity-copy"><span class="recent-activity-action-line"><span class="recent-activity-kind-chip ${kindClass}">${recentActivityKindLabel(kind)}</span><span class="recent-activity-action">${escapeHtml(tx.nv||"Chưa rõ nhân viên")} ${action}</span>${route}</span><span class="recent-activity-product">${escapeHtml(info.currentName||tx.ma||"Sản phẩm")}${qty?` · ${qty} cái`:""}</span>${monthlyLine}${progress}</span><span class="recent-activity-time" title="${escapeHtml(fullTime)}">${escapeHtml(recentActivityRelativeTime(tx.time))}<small>${escapeHtml(fullTime)}</small></span></button>`;
   }).join("");
 }
 function openRecentActivityProduct(button,event){
@@ -18947,13 +18977,37 @@ if(isCreating && !pendingCreate){
 	editIndex.dataset.pendingRequestId=mutationRequestId;
 	const saved = await saveProductRow(row, oldCode, oldBranch, oldRow ? oldRow.slice() : null,mutationRequestId);
 	if(!saved){
-  // Timeout không có nghĩa Apps Script chưa ghi. Giữ bản vừa nhập và requestId
-  // để hàng đợi đối chiếu/ghi lại an toàn, tránh hoàn tác rồi xuất hiện lại bất ngờ.
-  persistProductCache(DATA,true);
-  if(isCreating){ editIndex.value="0"; editIndex.dataset.pendingCreate="1"; }
-  if(saveButton){ saveButton.disabled = false; saveButton.textContent = "🔄 Thử lưu lại"; }
-  setSyncBadge("pending","Thiết bị đã giữ thay đổi; đang chờ máy chủ xác nhận");
-  showToast("⏳ Đã giữ thay đổi trên thiết bị. Hệ thống sẽ tự thử lại; bạn cũng có thể bấm trạng thái đồng bộ để thử ngay.",6500);
+  const saveError=saveProductRow.lastError;
+  const pendingOperation=readSyncOutbox().find(item=>item.requestId===mutationRequestId&&!item.requiresReview);
+  if(pendingOperation){
+    // Chỉ lỗi mạng/timeout/SERVER_BUSY mới được giữ trong outbox để tự thử lại.
+    // Timeout không có nghĩa Apps Script chưa ghi; giữ cùng requestId giúp máy chủ
+    // trả lại kết quả cũ mà không tạo sản phẩm hoặc giao dịch trùng.
+    persistProductCache(DATA,true);
+    if(isCreating){ editIndex.value="0"; editIndex.dataset.pendingCreate="1"; }
+    if(saveButton){ saveButton.disabled = false; saveButton.textContent = "🔄 Thử lưu lại"; }
+    setSyncBadge("pending","Thiết bị đã giữ thay đổi; đang chờ máy chủ xác nhận");
+    showToast("⏳ Mạng hoặc máy chủ chưa xác nhận. Dữ liệu đã được giữ trên thiết bị và hệ thống sẽ tự thử lại.",6500);
+  }else{
+    // Lỗi quyền, phiên đăng nhập, xung đột hoặc dữ liệu không hợp lệ không thể
+    // tự hết khi retry. Hoàn tác bản local để giao diện không báo tồn kho sai và
+    // hiện chính lỗi máy chủ thay vì đánh lạc hướng bằng trạng thái "đang chờ".
+    if(isCreating){
+      const insertedIndex=DATA.indexOf(row);
+      if(insertedIndex>=0) DATA.splice(insertedIndex,1);
+      editIndex.value="";
+    }else if(idxNum>=0&&oldRow){
+      DATA[idxNum]=oldRow;
+    }
+    delete editIndex.dataset.pendingRequestId;
+    delete editIndex.dataset.pendingCreate;
+    persistProductCache(DATA,true);
+    render();
+    const errorMessage=String(saveError?.message||saveError||"Máy chủ từ chối lưu thiết bị");
+    if(saveButton){ saveButton.disabled=false; saveButton.textContent="💾 Lưu sản phẩm"; }
+    setSyncBadge("error",errorMessage);
+    showToast("⚠️ Không lưu được: "+errorMessage,8000);
+  }
 	  return;
 	}
 	if(savingExisting&&oldRow&&Number(oldRow[5])!==Number(row[5])) await loadTXFromSheet();
