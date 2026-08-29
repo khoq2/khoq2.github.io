@@ -11333,6 +11333,28 @@ function productRowsEqual(left,right){
   if(!left || !right) return false;
   return JSON.stringify(normalizeSheetRows([left])[0])===JSON.stringify(normalizeSheetRows([right])[0]);
 }
+const PRODUCT_CONFLICT_FIELD_LABELS=["Danh mục","Mã hàng","Tên hàng","Thương hiệu","Giá nhập","Tồn kho","Tình trạng","Ghi chú/vị trí","Nhóm","Ảnh chính","Giá bán","Phân loại nhanh","Mức sắp hết","Chi nhánh","Ảnh 2","Ảnh 3","Tên ảnh 2","Tên ảnh 3","Ảnh 4","Ảnh 5","Tên ảnh 4","Tên ảnh 5"];
+function mergeProductRowChanges(originalRow,desiredRow,serverRow){
+  const original=normalizeSheetRows([originalRow])[0];
+  const desired=normalizeSheetRows([desiredRow])[0];
+  const server=normalizeSheetRows([serverRow])[0];
+  const merged=server.slice();
+  const conflicts=[];
+  for(let index=0;index<merged.length;index++){
+    if(index===6) continue; // Tình trạng được tính lại từ tồn kho và mức sắp hết.
+    const localChanged=JSON.stringify(desired[index])!==JSON.stringify(original[index]);
+    if(!localChanged) continue;
+    const serverChanged=JSON.stringify(server[index])!==JSON.stringify(original[index]);
+    const sameResult=JSON.stringify(server[index])===JSON.stringify(desired[index]);
+    if(serverChanged&&!sameResult){
+      conflicts.push({index,label:PRODUCT_CONFLICT_FIELD_LABELS[index]||`Cột ${index+1}`,server:server[index],local:desired[index]});
+    }else{
+      merged[index]=desired[index];
+    }
+  }
+  merged[6]=getStockStatusValue(merged[5],merged[12]);
+  return {row:normalizeSheetRows([merged])[0],conflicts};
+}
 async function reconcilePendingInventoryAfterTargetedWrite(){
   if(!hasPendingSync()) return false;
   try{
@@ -11385,8 +11407,22 @@ async function saveProductRow(row, oldCode="", oldBranch="Q2", originalRow=null,
         result={ok:true,noop:true,fingerprint:SERVER_DATA_FINGERPRINT};
       }else{
         const serverOldRow=latestRows.find(item=>normalizeProductCode(item[1])===oldCodeKey&&String(item[13]||"Q2")===oldBranchKey);
-        const safeToRetry=originalRow ? productRowsEqual(serverOldRow,originalRow) : !serverNewRow;
-        if(!safeToRetry) throw firstError;
+        if(originalRow&&serverOldRow){
+          const merge=mergeProductRowChanges(originalRow,safeRow,serverOldRow);
+          if(merge.conflicts.length){
+            const labels=merge.conflicts.map(item=>item.label).join(", ");
+            const conflictError=new Error(`SYNC_CONFLICT: Cùng sản phẩm đã bị sửa đồng thời tại: ${labels}. Hãy kiểm tra giá trị mới trên máy chủ trước khi lưu lại.`);
+            conflictError.serverRejected=true;
+            conflictError.productConflicts=merge.conflicts;
+            throw conflictError;
+          }
+          // Giữ thay đổi mới từ máy chủ ở các trường khác, chỉ phủ các trường
+          // người dùng vừa sửa rồi gửi lại với fingerprint mới nhất.
+          safeRow.splice(0,safeRow.length,...merge.row);
+          if(Array.isArray(row)) row.splice(0,row.length,...merge.row);
+        }else if(originalRow||serverNewRow){
+          throw firstError;
+        }
         result=await resilientMutationPost("upsert_product", {row:safeRow,oldCode,oldBranch,baseFingerprint:SERVER_DATA_FINGERPRINT,requestId:requestId||makeSyncRequestId("upsert_product")},45000);
       }
     }
