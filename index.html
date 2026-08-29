@@ -147,6 +147,10 @@ button:disabled,input:disabled,select:disabled,[aria-disabled="true"] { cursor:n
   .recent-activity-copy{grid-column:2;grid-row:1;width:100%}
   .recent-activity-action{font-size:10.5px;line-height:1.3}
   .recent-activity-product{font-size:9.5px;line-height:1.3}
+  .recent-activity-monthly{align-items:flex-start;justify-content:flex-start;flex-wrap:wrap;gap:2px 5px;margin-top:6px;line-height:1.35}
+  .recent-activity-monthly b{flex:1 1 180px;overflow:visible;font-size:9.5px;line-height:1.35;text-overflow:clip;white-space:normal;overflow-wrap:anywhere}
+  .recent-activity-monthly small{flex:0 0 auto;padding-top:1px;font-size:8px;line-height:1.3}
+  .recent-activity-monthly + .recent-activity-progress{height:5px;margin-top:5px}
   .recent-activity-time{grid-column:2;grid-row:2;justify-self:start;align-items:flex-start;margin-top:1px;padding:2px 5px;border-radius:999px;background:#EDF4F9;color:#587083;font-size:8px;line-height:1.2}
   .recent-activity-time small{display:none}
 }
@@ -10444,7 +10448,7 @@ async function checkAdminSession(){
 
 // Dòng URL duy nhất
 const SHEET_API_URL = "https://script.google.com/macros/s/AKfycby6YH69F7sfO1ZoUJsDm4BeX6Luj2GrhUfYWWJWNvqjraAEhkBck16EphrPBBm1BT3YqA/exec";
-const REQUIRED_API_VERSION = "2026.08.29-tx-time-18";
+const REQUIRED_API_VERSION = "2026.08.29-public-note-19";
 // Apps Script có thể phải chờ khóa ghi khi nhiều thao tác diễn ra gần nhau.
 // 45 giây dài hơn thời gian chờ khóa phía máy chủ, tránh báo lỗi giả trong khi Sheet vẫn đang ghi.
 const SHEET_TIMEOUT_MS = 45000;
@@ -10455,7 +10459,7 @@ const PENDING_NV_SYNC_KEY = "kho_cntt_pending_nv_sync";
 const PENDING_CONFIG_SYNC_KEY = "kho_cntt_pending_config_sync";
 const LAST_SYNC_ERROR_KEY = "kho_cntt_last_sync_error";
 const LOGIN_CLIENT_ID_KEY = "kho_cntt_login_client_id";
-const PUBLIC_PRODUCT_CACHE_KEY = "kho_cntt_public_data_v2";
+const PUBLIC_PRODUCT_CACHE_KEY = "kho_cntt_public_data_v3";
 const PRIVATE_PRODUCT_CACHE_KEY = "kho_cntt_private_data_v2";
 const SYNC_OUTBOX_KEY = "kho_cntt_sync_outbox_v2";
 let PRIVATE_PRODUCT_DATA_READY = false;
@@ -11477,7 +11481,7 @@ function sanitizePublicProductRows(rows){
   return normalizeSheetRows(rows).map(row=>{
     const safe=row.slice();
     safe[4]=0;
-    safe[7]="";
+    // Giữ ghi chú/vị trí để kỹ thuật viên xem kho không cần quyền Admin.
     for(let index=14;index<=21;index++) safe[index]="";
     return safe;
   });
