@@ -89,6 +89,7 @@ button:disabled,input:disabled,select:disabled,[aria-disabled="true"] { cursor:n
 .recent-activity-filter:hover { border-color:#78B8E0; background:#F1F8FD; color:#176DA8; }
 .recent-activity-filter.active { border-color:#167DBD; background:#167DBD; color:#fff; box-shadow:0 4px 10px rgba(22,125,189,.2); }
 .recent-activity-filter.active span { background:rgba(255,255,255,.2); color:#fff; }
+.recent-activity-filter[data-recent-filter="ADJUST"] { display:none!important; }
 .recent-activity-list { max-height:min(62vh,470px); overflow:auto; overscroll-behavior:contain; padding:7px 10px 10px; background:#F7FAFD; scrollbar-width:thin; }
 .recent-activity-row { width:100%; display:grid; grid-template-columns:38px minmax(0,1fr) auto; gap:10px; align-items:center; margin:5px 0; padding:10px; border:1px solid #E4EDF4; border-radius:12px; background:#fff; color:inherit; box-shadow:0 2px 7px rgba(22,62,92,.05); text-align:left; cursor:pointer; transition:border-color .16s ease,box-shadow .16s ease,background .16s ease; }
 .recent-activity-row.kind-import { border-left:3px solid #20A957; }
@@ -2602,6 +2603,8 @@ html::-webkit-scrollbar-corner { background: #EAF2F8; }
   #txOverlay .tx-history-modal { width:100%; max-height:96dvh; border-radius:18px; padding:12px; background:linear-gradient(145deg,#F4F9FF,#EEF5FC); }
   #txOverlay .tx-bill-card { width:100%; grid-template-columns:58px minmax(0,1fr) 28px; min-height:74px; }
   #txOverlay .tx-bill-thumb { width:58px; height:58px; }
+  #txOverlay .prod-media { width:100%; min-width:0; flex:1 1 100%; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
+  #txOverlay .prod-media .prod-extra-image { width:100%; min-width:0; min-height:44px; padding:8px 6px; overflow:hidden; text-overflow:ellipsis; white-space:normal; overflow-wrap:anywhere; }
   #txOverlay .modal-title {
     width:100%;
     min-height:38px;
@@ -2643,6 +2646,17 @@ html::-webkit-scrollbar-corner { background: #EAF2F8; }
   #txOverlay .tx-detail-grid > div { grid-template-columns:minmax(100px,.9fr) minmax(0,1.1fr); font-size:11px; }
   #txOverlay .simple-sticky-actions { position:sticky; bottom:-12px; padding:10px 0 2px; background:linear-gradient(transparent,#EEF5FC 28%); }
   #txOverlay .simple-sticky-actions .btn-submit { min-height:48px; border-radius:12px; background:#1976ED; font-size:15px; }
+}
+@media (max-width:380px) {
+  #txOverlay { padding:4px; }
+  #txOverlay .tx-history-modal { padding:9px; border-radius:14px; }
+  #txOverlay .tx-detail-grid { padding:7px 9px; }
+  #txOverlay .tx-detail-grid > div { grid-template-columns:minmax(0,1fr); gap:2px; align-items:start; padding:5px 0; }
+  #txOverlay .tx-detail-grid b { text-align:left; }
+  #txOverlay .tx-bill-card { grid-template-columns:52px minmax(0,1fr) 26px; gap:7px; padding:6px; }
+  #txOverlay .tx-bill-thumb { width:52px; height:52px; }
+  #txOverlay .tx-bill-copy b { white-space:normal; overflow-wrap:anywhere; }
+  #txOverlay .prod-media { grid-template-columns:minmax(0,1fr); }
 }
 
 /* Header compact: trạng thái máy chủ nằm dưới tên cửa hàng, không chiếm một hàng riêng. */
@@ -8865,17 +8879,120 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
   </section>
 </div>
 
+<style>
+/* Menu quản trị kiểu macOS: một hệ thống thị giác thống nhất thay cho các pill nhiều màu. */
+.fab-wrap{right:22px!important;bottom:max(20px,env(safe-area-inset-bottom))!important;gap:10px!important;align-items:flex-end!important;filter:none!important}
+#fabMenuItems{
+  position:relative;
+  width:min(390px,calc(100vw - 32px));
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:8px!important;
+  padding:0;
+  border:1px solid transparent;
+  border-radius:22px;
+  background:rgba(246,249,252,.82);
+  box-shadow:0 24px 70px rgba(15,32,52,.25),0 3px 12px rgba(15,32,52,.12),inset 0 1px 0 rgba(255,255,255,.92);
+  -webkit-backdrop-filter:blur(28px) saturate(1.45);
+  backdrop-filter:blur(28px) saturate(1.45);
+  transform:translateY(12px) scale(.97);
+  transform-origin:right bottom;
+  pointer-events:none;
+  overscroll-behavior:contain;
+  scrollbar-width:thin;
+}
+body.fab-menu-open #fabMenuItems{
+  max-height:min(76dvh,680px)!important;
+  padding:12px!important;
+  overflow-x:hidden!important;
+  overflow-y:auto!important;
+  border-color:rgba(255,255,255,.78);
+  opacity:1!important;
+  transform:none;
+  pointer-events:auto;
+}
+.mac-admin-head{grid-column:1/-1;display:flex;align-items:center;gap:12px;min-height:52px;padding:7px 9px 10px;border-bottom:1px solid rgba(96,116,136,.14)}
+.mac-admin-head>span:last-child{min-width:0;display:flex;flex-direction:column;gap:2px}
+.mac-admin-head b{color:#17283A;font-size:13px;font-weight:780;line-height:1.2;letter-spacing:-.01em}
+.mac-admin-head small{color:#748494;font-size:9px;font-weight:650;line-height:1.2}
+.mac-traffic{display:flex;flex:0 0 auto;align-items:center;gap:6px}
+.mac-traffic i{display:block;width:11px;height:11px;border-radius:50%;box-shadow:inset 0 0 0 1px rgba(0,0,0,.08)}
+.mac-traffic i:nth-child(1){background:#FF5F57}.mac-traffic i:nth-child(2){background:#FEBC2E}.mac-traffic i:nth-child(3){background:#28C840}
+.mac-admin-section-label{grid-column:1/-1;margin:3px 3px -1px;color:#7A8997;font-size:8px;font-weight:850;letter-spacing:.09em;text-transform:uppercase}
+#fabMenuItems .mac-admin-action{
+  --mac-accent:#0A84FF;
+  width:100%!important;
+  min-width:0!important;
+  min-height:64px!important;
+  display:grid!important;
+  grid-template-columns:38px minmax(0,1fr)!important;
+  align-items:center!important;
+  justify-content:stretch!important;
+  gap:9px!important;
+  margin:0!important;
+  padding:9px!important;
+  border:1px solid rgba(126,145,162,.17)!important;
+  border-radius:14px!important;
+  background:rgba(255,255,255,.74)!important;
+  color:#17283A!important;
+  text-align:left!important;
+  box-shadow:0 4px 12px rgba(21,48,73,.055),inset 0 1px 0 rgba(255,255,255,.94)!important;
+  transition:transform .18s ease,border-color .18s ease,background .18s ease,box-shadow .18s ease!important;
+  -webkit-tap-highlight-color:transparent;
+}
+#fabMenuItems .mac-admin-action:hover{transform:translateY(-2px)!important;border-color:color-mix(in srgb,var(--mac-accent) 42%,#D6E0E8)!important;background:#fff!important;box-shadow:0 10px 22px color-mix(in srgb,var(--mac-accent) 14%,transparent),inset 0 1px 0 #fff!important}
+#fabMenuItems .mac-admin-action:active{transform:scale(.975)!important}
+.mac-action-icon{display:grid;width:38px;height:38px;place-items:center;border-radius:11px;background:linear-gradient(145deg,color-mix(in srgb,var(--mac-accent) 82%,#fff),var(--mac-accent));color:#fff;font-size:19px;font-weight:850;line-height:1;text-shadow:0 1px 2px rgba(0,0,0,.16);box-shadow:0 6px 13px color-mix(in srgb,var(--mac-accent) 25%,transparent),inset 0 1px 0 rgba(255,255,255,.35)}
+.mac-action-copy{min-width:0;display:flex;flex-direction:column;align-items:flex-start;gap:2px}
+.mac-action-copy b{max-width:100%;overflow:hidden;color:#203142;font-size:11px;font-weight:780;line-height:1.22;text-overflow:ellipsis;white-space:nowrap}
+.mac-action-copy small{max-width:100%;overflow:hidden;color:#7B8996;font-size:8px;font-weight:600;line-height:1.22;text-overflow:ellipsis;white-space:nowrap}
+.tone-blue{--mac-accent:#087FF5}.tone-cyan{--mac-accent:#09A5C9}.tone-violet{--mac-accent:#6657D9}.tone-purple{--mac-accent:#9B51D0}.tone-sky{--mac-accent:#268DCA}.tone-pink{--mac-accent:#D64D91}.tone-green{--mac-accent:#22A866}.tone-red{--mac-accent:#E35050}.tone-orange{--mac-accent:#E5842E}
+#fabMenuItems .mac-admin-danger{background:rgba(255,248,246,.78)!important;border-color:rgba(229,132,76,.2)!important}
+#fabToggleBtn{
+  min-height:48px!important;
+  padding:10px 17px!important;
+  border:1px solid rgba(255,255,255,.48)!important;
+  border-radius:15px!important;
+  background:linear-gradient(145deg,rgba(37,53,72,.96),rgba(16,28,42,.98))!important;
+  color:#fff!important;
+  font-size:12px!important;
+  font-weight:780!important;
+  box-shadow:0 12px 28px rgba(14,31,49,.27),inset 0 1px 0 rgba(255,255,255,.18)!important;
+  -webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px)
+}
+body.fab-menu-open #fabToggleBtn{background:linear-gradient(145deg,#267FF0,#0B62CB)!important}
+@media(max-width:600px){
+  .fab-wrap{left:max(8px,env(safe-area-inset-left))!important;right:max(8px,env(safe-area-inset-right))!important;bottom:max(8px,calc(env(safe-area-inset-bottom) + 6px))!important;width:auto!important;align-items:stretch!important}
+  #fabMenuItems{width:100%;grid-template-columns:repeat(2,minmax(0,1fr));border-radius:22px 22px 17px 17px;transform:translateY(14px) scale(.98);transform-origin:center bottom}
+  body.fab-menu-open #fabMenuItems{max-height:min(74dvh,620px)!important;padding:11px!important}
+  #fabMenuItems .mac-admin-action{min-height:66px!important;grid-template-columns:36px minmax(0,1fr)!important;gap:8px!important;padding:8px!important}
+  .mac-action-icon{width:36px;height:36px;border-radius:10px;font-size:18px}
+  .mac-action-copy b{font-size:10.5px}.mac-action-copy small{font-size:7.5px}
+  #fabToggleBtn{align-self:stretch!important;justify-content:center!important;min-height:50px!important;border-radius:15px!important}
+}
+@media(max-width:360px){
+  #fabMenuItems{grid-template-columns:minmax(0,1fr)}
+  body.fab-menu-open #fabMenuItems{max-height:min(76dvh,650px)!important;padding:9px!important}
+  #fabMenuItems .mac-admin-action{min-height:58px!important;grid-template-columns:36px minmax(0,1fr)!important}
+  .mac-admin-head{min-height:46px;padding:5px 7px 8px}
+}
+@media(prefers-reduced-motion:reduce){#fabMenuItems,#fabMenuItems .mac-admin-action{transition:none!important}}
+</style>
 <div class="fab-wrap">
   <div id="fabMenuItems" style="display:flex;flex-direction:column;gap:10px;align-items:flex-end;overflow:hidden;max-height:0;opacity:0;transition:max-height .35s ease,opacity .3s ease;">
-    <button class="fab fab-add admin-only" data-permission="PRODUCT_ADD" onclick="openAddModal()">➕ Thêm thiết bị</button>
-    <button class="fab admin-only" style="background:#1A5276;color:#fff" onclick="openGroupOrderModal()">↕️ Sắp xếp nhóm</button>
-    <button class="fab admin-only" style="background:#5B2C6F;color:#fff" onclick="openQuickOrderModal()">↕️ Sắp xếp lọc</button>
-    <button class="fab admin-only" style="background:#8E44AD;color:#fff" onclick="openNVModal()">👥 Nhân viên</button>
-    <button class="fab admin-only" style="background:#21618C;color:#fff" onclick="requestPrivateAccess('customer')">👤 Khách hàng</button>
-    <button class="fab admin-only" style="background:#7D3C98;color:#fff" aria-haspopup="dialog" aria-controls="partnerOverlay" onclick="requestPrivateAccess('partner')">🤝 Đối tác</button>
-    <button class="fab admin-only" style="background:#1F618D;color:#fff" onclick="exportMonthlyAccountingExcel()">🧾 Xuất file Excel</button>
-    <button class="fab admin-only" style="background:#922B21;color:#fff" onclick="exportMonthlyAccountingPdf()">📄 Xuất file PDF</button>
-    <button class="fab admin-only" style="background:#A04000;color:#fff" onclick="openTrashModal()">♻️ Thùng rác</button>
+    <div class="mac-admin-head"><span class="mac-traffic" aria-hidden="true"><i></i><i></i><i></i></span><span><b>Trung tâm quản trị</b><small>Hoàng Gia Computer</small></span></div>
+    <div class="mac-admin-section-label">Kho &amp; hiển thị</div>
+    <button class="fab fab-add admin-only mac-admin-action tone-blue" data-permission="PRODUCT_ADD" onclick="openAddModal()"><span class="mac-action-icon">＋</span><span class="mac-action-copy"><b>Thêm thiết bị</b><small>Tạo mặt hàng mới</small></span></button>
+    <button class="fab admin-only mac-admin-action tone-cyan" onclick="openGroupOrderModal()"><span class="mac-action-icon">↕</span><span class="mac-action-copy"><b>Sắp xếp nhóm</b><small>Thứ tự danh mục</small></span></button>
+    <button class="fab admin-only mac-admin-action tone-violet" onclick="openQuickOrderModal()"><span class="mac-action-icon">≡</span><span class="mac-action-copy"><b>Sắp xếp lọc</b><small>Bộ lọc nhanh</small></span></button>
+    <div class="mac-admin-section-label">Dữ liệu vận hành</div>
+    <button class="fab admin-only mac-admin-action tone-purple" onclick="openNVModal()"><span class="mac-action-icon">♟</span><span class="mac-action-copy"><b>Nhân viên</b><small>Tài khoản &amp; quyền</small></span></button>
+    <button class="fab admin-only mac-admin-action tone-sky" onclick="requestPrivateAccess('customer')"><span class="mac-action-icon">◎</span><span class="mac-action-copy"><b>Khách hàng</b><small>Hồ sơ sửa chữa</small></span></button>
+    <button class="fab admin-only mac-admin-action tone-pink" aria-haspopup="dialog" aria-controls="partnerOverlay" onclick="requestPrivateAccess('partner')"><span class="mac-action-icon">◇</span><span class="mac-action-copy"><b>Đối tác</b><small>Công việc &amp; bill</small></span></button>
+    <div class="mac-admin-section-label">Báo cáo &amp; hệ thống</div>
+    <button class="fab admin-only mac-admin-action tone-green" onclick="exportMonthlyAccountingExcel()"><span class="mac-action-icon">X</span><span class="mac-action-copy"><b>Xuất Excel</b><small>Báo cáo tháng</small></span></button>
+    <button class="fab admin-only mac-admin-action tone-red" onclick="exportMonthlyAccountingPdf()"><span class="mac-action-icon">P</span><span class="mac-action-copy"><b>Xuất PDF</b><small>Bản in kế toán</small></span></button>
+    <button class="fab admin-only mac-admin-action tone-orange mac-admin-danger" onclick="openTrashModal()"><span class="mac-action-icon">♻</span><span class="mac-action-copy"><b>Thùng rác</b><small>Khôi phục dữ liệu</small></span></button>
   </div>
   <button class="fab admin-only" id="fabToggleBtn" data-permission="PRODUCT_ADD" style="background:#1E3A5F;color:#fff;" onclick="toggleFabMenu()">⚙️ Thao tác</button>
 </div>
@@ -10448,7 +10565,7 @@ async function checkAdminSession(){
 
 // Dòng URL duy nhất
 const SHEET_API_URL = "https://script.google.com/macros/s/AKfycby6YH69F7sfO1ZoUJsDm4BeX6Luj2GrhUfYWWJWNvqjraAEhkBck16EphrPBBm1BT3YqA/exec";
-const REQUIRED_API_VERSION = "2026.08.29-public-note-19";
+const REQUIRED_API_VERSION = "2026.08.29-public-transactions-20";
 // Apps Script có thể phải chờ khóa ghi khi nhiều thao tác diễn ra gần nhau.
 // 45 giây dài hơn thời gian chờ khóa phía máy chủ, tránh báo lỗi giả trong khi Sheet vẫn đang ghi.
 const SHEET_TIMEOUT_MS = 45000;
@@ -16464,7 +16581,7 @@ function clearAdminOperationalView(){
   updateAdminProfileButton(false);
 }
 const TRANSFER_CACHE_KEY = "kho_cntt_transfers";
-const PUBLIC_RECENT_ACTIVITY_CACHE_KEY = "kho_cntt_public_employee_visible_activity_v7";
+const PUBLIC_RECENT_ACTIVITY_CACHE_KEY = "kho_cntt_public_full_transaction_activity_v8";
 try{localStorage.removeItem("kho_cntt_public_full_activity_v5");}catch(_){}
 function publicInlineTransactionMedia(value){
   const text=String(value||"").trim();
@@ -16487,6 +16604,8 @@ function toPublicRecentTxItem(item){
     img:publicInlineTransactionMedia(tx.img),
     warranty1:publicInlineTransactionMedia(tx.warranty1),
     warranty2:publicInlineTransactionMedia(tx.warranty2),
+    unitIds:Array.isArray(tx.unitIds)?tx.unitIds.map(String):[],
+    unitDetails:Array.isArray(tx.unitDetails)?tx.unitDetails.map(item=>({id:String(item?.id||""),serial:String(item?.serial||"")})).filter(item=>item.id):[],
     time:tx.time,
     branch:tx.branch,
     kind:getTransactionKind(tx),version:tx.version
@@ -16567,7 +16686,6 @@ function publicTransactionDetailKey(row){
 async function loadPublicTransactionDetailsForProduct(index){
   if(isAdminMode()) return true;
   const canReadPrivate=employeeSessionValidated&&["SALE","RESTOCK","STOCK_ADJUST","TRANSACTION_EDIT"].some(hasEmployeePermission);
-  if(!canReadPrivate) return false;
   const row=DATA[index];
   if(!row) return false;
   const key=publicTransactionDetailKey(row);
@@ -16576,7 +16694,9 @@ async function loadPublicTransactionDetailsForProduct(index){
   PUBLIC_TX_DETAILS_ERRORS.delete(key);
   if(TX_HISTORY_STATE.idx===index) renderTxHistory();
   try{
-    const json=await privateSheet("private_transaction_details",{code:row[1],branch:row[13]||"Q2"},35000);
+    const json=canReadPrivate
+      ? await privateSheet("private_transaction_details",{code:row[1],branch:row[13]||"Q2"},35000)
+      : await fetchSheetJson(sheetUrl({type:"transaction_details",code:row[1],branch:row[13]||"Q2",limit:500,_ts:Date.now()}),{},35000);
     if(!Array.isArray(json.details)) throw new Error("API chưa được cập nhật chức năng ghi chú và hình ảnh giao dịch");
     const detailsById=new Map(json.details.map(detail=>[String(detail?.id||""),detail]));
     TX_DATA=TX_DATA.map(tx=>{
@@ -16749,7 +16869,9 @@ let recentActivityExpanded = false;
 let recentActivityFilter = "ALL";
 function recentTxSorted(){
   const rows=TX_DATA.slice().concat(TRANSFER_DATA.map(transferToRecentItem));
-  return rows.sort((a,b)=>{
+  // Chuông chỉ hiển thị nghiệp vụ thực tế; giao dịch ADMIN điều chỉnh tồn vẫn
+  // còn trong lịch sử sản phẩm/nhật ký để kiểm kê nhưng không làm phiền kỹ thuật.
+  return rows.filter(item=>getRecentActivityKind(item)!=="ADJUST").sort((a,b)=>{
     const timeDiff=txTimeSortValue(b)-txTimeSortValue(a);
     if(timeDiff) return timeDiff;
     return String(b.id||"").localeCompare(String(a.id||""),undefined,{numeric:true});
@@ -16812,7 +16934,7 @@ function recentActivityFilteredRows(rows){
 }
 function setRecentActivityFilter(filter,event){
   event?.stopPropagation();
-  const allowed=["ALL","IMPORT","SALE","TRANSFER","ADJUST"];
+  const allowed=["ALL","IMPORT","SALE","TRANSFER"];
   recentActivityFilter=allowed.includes(filter) ? filter : "ALL";
   recentActivityExpanded=false;
   renderRecentActivity();
