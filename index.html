@@ -1571,6 +1571,14 @@ body.employee-mode .admin-only.employee-permitted { display:flex!important; }
 .sync-action-active{cursor:wait!important;opacity:.78!important;filter:saturate(.82);pointer-events:none!important}
 .sync-action-success{background:#16844A!important;color:#fff!important;border-color:#16844A!important}
 .sync-action-error{background:#B42318!important;color:#fff!important;border-color:#B42318!important}
+.sync-five-step{display:inline-flex;align-items:center;justify-content:center;gap:4px;min-width:118px;white-space:nowrap}
+.sync-five-step-label{margin-right:3px;font-size:9px;font-weight:850;opacity:.88}
+.sync-five-step i{display:grid;width:20px;height:20px;place-items:center;border:1px solid rgba(255,255,255,.38);border-radius:50%;background:rgba(255,255,255,.15);color:rgba(255,255,255,.72);font-size:9px;font-style:normal;font-weight:950;line-height:1;transition:transform .18s ease,background .18s ease,color .18s ease}
+.sync-five-step i.done{background:rgba(255,255,255,.3);color:#fff}
+.sync-five-step i.active{background:#fff;color:#176CC0;transform:scale(1.14);box-shadow:0 0 0 3px rgba(255,255,255,.17)}
+.sync-action-error .sync-five-step i.active{color:#B42318}
+@media(max-width:480px){.sync-five-step{min-width:0;gap:3px}.sync-five-step-label{display:none}.sync-five-step i{width:19px;height:19px;font-size:8px}}
+@media(prefers-reduced-motion:reduce){.sync-five-step i{transition:none}.sync-five-step i.active{transform:none}}
 #adminBtn.admin-profile-btn{min-width:126px;min-height:44px;padding:5px 8px 5px 6px;gap:7px;border:1px solid rgba(120,190,255,.32);border-radius:12px;background:linear-gradient(135deg,#0A3566 0%,#082B55 55%,#061F40 100%);color:#fff;box-shadow:0 7px 18px rgba(3,20,42,.28),inset 0 1px 0 rgba(255,255,255,.13);text-align:left}
 #adminBtn .admin-profile-avatar{width:31px;height:31px;flex:0 0 31px;display:grid;place-items:center;overflow:hidden;border:2px solid #fff;border-radius:50%;background:linear-gradient(145deg,#D9EEFF,#78BCEC);color:#123D68;font-size:13px;font-weight:950;box-shadow:0 0 0 2px #2A8DE0,0 3px 9px rgba(0,0,0,.28)}
 #adminBtn .admin-profile-avatar img{width:100%;height:100%;display:block;object-fit:cover}
@@ -11352,9 +11360,11 @@ let syncActionCandidate=null;
 const SYNC_FEEDBACK_MANAGED_IDS=new Set(["saleSaveBtn","fSaveBtn","customerProfileSaveBtn","customerRecordSaveBtn","partnerSaveButton","partnerJobSaveButton","transferSubmitBtn"]);
 document.addEventListener("click",event=>{
   const btn=event.target.closest?.("button");
-  if(!btn || btn.disabled || SYNC_FEEDBACK_MANAGED_IDS.has(btn.id)) return;
+  if(!btn || btn.disabled) return;
   const handler=String(btn.getAttribute("onclick")||"");
   if(!/(save|submit|delete|restore|transfer|import|apply|clear|remove|commit|manualSync)/i.test(handler)) return;
+  if(!btn.dataset.syncOriginalHtml) btn.dataset.syncOriginalHtml=btn.innerHTML;
+  if(!btn.dataset.syncOriginalText) btn.dataset.syncOriginalText=btn.textContent.trim();
   syncActionCandidate={btn,time:Date.now()};
 },true);
 function claimSyncActionButton(){
@@ -11365,29 +11375,41 @@ function claimSyncActionButton(){
 }
 function beginSyncActionFeedback(btn){
   if(!btn) return;
+  if(!btn.dataset.syncOriginalHtml) btn.dataset.syncOriginalHtml=btn.innerHTML;
   if(!btn.dataset.syncOriginalText) btn.dataset.syncOriginalText=btn.textContent.trim();
   btn.dataset.syncPendingCount=String((Number(btn.dataset.syncPendingCount)||0)+1);
   btn.disabled=true;
   btn.classList.remove("sync-action-success","sync-action-error");
   btn.classList.add("sync-action-active");
-  btn.textContent="⏳ Đang đồng bộ...";
+  clearInterval(btn._syncStepTimer);
+  let step=1;
+  const paint=()=>{
+    btn.innerHTML=`<span class="sync-five-step" role="status" aria-label="Đang lưu bước ${step} trên 5"><span class="sync-five-step-label">ĐANG LƯU</span>${[1,2,3,4,5].map(number=>`<i class="${number<step?"done":number===step?"active":""}">${number}</i>`).join("")}</span>`;
+  };
+  paint();
+  btn._syncStepTimer=setInterval(()=>{if(step<5){step++;paint();}},650);
 }
 function finishSyncActionFeedback(btn,ok){
   if(!btn) return;
   const pending=Math.max(0,(Number(btn.dataset.syncPendingCount)||1)-1);
   btn.dataset.syncPendingCount=String(pending);
   if(pending) return;
+  clearInterval(btn._syncStepTimer);
   btn.classList.remove("sync-action-active");
   btn.classList.add(ok?"sync-action-success":"sync-action-error");
-  btn.textContent=ok?"✅ Đã đồng bộ":"⚠️ Thử lại";
+  btn.innerHTML=ok
+    ? `<span class="sync-five-step" role="status" aria-label="Đã lưu đủ 5 bước"><span class="sync-five-step-label">HOÀN TẤT</span>${[1,2,3,4,5].map(number=>`<i class="done">${number}</i>`).join("")}</span>`
+    : `<span class="sync-five-step" role="status" aria-label="Lưu chưa thành công"><span class="sync-five-step-label">THỬ LẠI</span>${[1,2,3,4,5].map((number,index)=>`<i class="${index===0?"active":""}">${number}</i>`).join("")}</span>`;
   btn.disabled=!!ok;
   clearTimeout(btn._syncFeedbackTimer);
   btn._syncFeedbackTimer=setTimeout(()=>{
     if(!btn.isConnected) return;
     btn.classList.remove("sync-action-success","sync-action-error");
-    btn.textContent=btn.dataset.syncOriginalText||btn.textContent;
+    btn.innerHTML=btn.dataset.syncOriginalHtml||btn.dataset.syncOriginalText||btn.textContent;
     btn.disabled=false;
     delete btn.dataset.syncPendingCount;
+    delete btn.dataset.syncOriginalHtml;
+    delete btn.dataset.syncOriginalText;
   },ok?900:1600);
 }
 async function postSheet(action, data, timeoutMs=SHEET_TIMEOUT_MS){
