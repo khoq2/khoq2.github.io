@@ -10391,7 +10391,9 @@ function confirmEmployeeLogout(){
 document.addEventListener("keydown",event=>{ if(event.key==="Escape"&&document.getElementById("employeeLogoutOverlay")?.classList.contains("open")) closeEmployeeLogoutConfirm(); });
 
 function isAdminMode(){
-  return document.body.classList.contains("admin-mode");
+  return document.body.classList.contains("admin-mode")
+    && sessionStorage.getItem("kho_cntt_admin")==="1"
+    && !!sessionStorage.getItem("kho_admin_session_token");
 }
 
 function requireAdmin(){
@@ -10424,6 +10426,9 @@ function setupAdminEntry(){
 }
 
 function setAdminMode(on){
+  // Không cho bất kỳ nhánh giao diện nào bật Admin chỉ bằng class/cờ local.
+  // Quyền chỉ được mở sau khi máy chủ cấp một token phiên hợp lệ.
+  if(on && !sessionStorage.getItem("kho_admin_session_token")) on=false;
   if(on){
     sessionStorage.setItem("kho_cntt_admin","1");
     document.body.classList.add("admin-entry-visible");
@@ -10526,9 +10531,10 @@ async function submitAdminPass(){
     closeOverlay("adminOverlay");
     showToast("✅ Đã mở quyền chỉnh sửa");
   }catch(e){
-    sessionStorage.removeItem("kho_admin_session_token");
-    sessionStorage.removeItem("kho_cntt_admin");
-    try{ localStorage.removeItem("kho_admin_session_token"); localStorage.removeItem("kho_cntt_admin"); }catch(_){}
+    // Xác thực thất bại phải đóng cả quyền lẫn trạng thái hiển thị. Trước đây
+    // chỉ xóa token nên nút hồ sơ vẫn có thể ghi sai "Admin · đang mở".
+    setAdminMode(false);
+    document.body.classList.add("admin-entry-visible");
     const message=String(e?.message||e);
     if(errorBox) errorBox.textContent=message.includes("ADMIN_LOGIN_FAILED") ? "Mật khẩu quản trị không chính xác." : message.includes("SETUP_REQUIRED")||message.includes("SECURITY_NOT_CONFIGURED")||message.includes("API đang chạy") ? message.replace(/^Error:\s*/,"").replace(/^SETUP_REQUIRED:\s*/,"") : message.includes("RATE_LIMIT") ? "Đăng nhập đang bị tạm khóa do thử sai quá nhiều. Vui lòng chờ một phút rồi thử lại." : "Không thể xác thực API. Vui lòng kiểm tra kết nối hoặc mục triển khai.";
     input.select();
@@ -16371,7 +16377,7 @@ function getAdminProfileNV(){
   const list=normalizeNVList(NV_LIST);
   return list.find(nv=>normalizeNVRole(nv.role)==="ADMIN") || list.find(nv=>normalizeNVRole(nv.role)==="CEO") || null;
 }
-function updateAdminProfileButton(open=document.body.classList.contains("admin-mode")){
+function updateAdminProfileButton(open=isAdminMode()){
   const btn=document.getElementById("adminBtn");
   if(!btn) return;
   const nv=getAdminProfileNV(), name=nv?.name||"Quản trị", avatar=nv?.avatar||"";
