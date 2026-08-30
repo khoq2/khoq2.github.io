@@ -3611,6 +3611,7 @@ body {
 }
 .reminder-edge-btn{position:fixed!important;z-index:326;left:max(3px,env(safe-area-inset-left));top:auto!important;bottom:max(18px,calc(env(safe-area-inset-bottom) + 10px))!important;display:flex;width:45px;min-height:112px;flex-direction:column;align-items:center;justify-content:center;gap:7px;padding:10px 5px;border:0!important;border-radius:0;background:transparent!important;color:#B56A00;box-shadow:none!important;transform:none!important;cursor:pointer;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
 .reminder-edge-btn[hidden]{display:none!important}
+.reminder-countdown-chip{display:inline-flex;align-items:center;padding:3px 6px;border-radius:999px;background:#E8F5FF;color:#0B6FAF;font-weight:900;font-variant-numeric:tabular-nums}.reminder-item.overdue .reminder-countdown-chip{background:#FFE7E5;color:#C62920}.reminder-item-actions button{display:grid;place-items:center}.reminder-item-actions button svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .reminder-edge-btn svg{width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.reminder-edge-label{font-size:9px;font-weight:950;letter-spacing:.5px;line-height:1;writing-mode:vertical-rl;transform:rotate(180deg)}
 .reminder-edge-count{position:absolute;right:-5px;top:-5px;display:none;min-width:20px;height:20px;place-items:center;padding:0 5px;border:2px solid #fff;border-radius:999px;background:#FF3B30;color:#fff;font-size:9px;font-weight:950}.reminder-edge-count.show{display:grid}
 .reminder-overlay{position:fixed;z-index:1200;inset:0;display:none;align-items:center;justify-content:flex-start;padding:14px;background:rgba(19,35,52,.38);-webkit-backdrop-filter:blur(5px);backdrop-filter:blur(5px)}.reminder-overlay.open{display:flex}
@@ -8853,7 +8854,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
       <label class="reminder-field"><span>Mức ưu tiên</span><select id="reminderPriority"><option value="NORMAL">Bình thường</option><option value="HIGH">Quan trọng</option><option value="LOW">Ít quan trọng</option></select></label>
       <div class="reminder-form-actions"><button class="reminder-cancel" type="button" onclick="closeReminderForm()">Hủy</button><button class="reminder-save" id="reminderSaveButton" type="submit">LƯU GHI CHÚ</button></div>
     </form>
-    <div class="reminder-toolbar" role="group" aria-label="Lọc ghi chú"><button class="reminder-filter active" type="button" data-reminder-filter="ACTIVE" onclick="setReminderFilter('ACTIVE',this)">Sắp tới</button><button class="reminder-filter" type="button" data-reminder-filter="OVERDUE" onclick="setReminderFilter('OVERDUE',this)">Quá hạn</button><button class="reminder-filter" type="button" data-reminder-filter="DONE" onclick="setReminderFilter('DONE',this)">Đã xong</button></div>
+    <div class="reminder-toolbar" role="group" aria-label="Lọc ghi chú"><button class="reminder-filter active" type="button" data-reminder-filter="ACTIVE" onclick="setReminderFilter('ACTIVE',this)">NHẮC HẸN</button><button class="reminder-filter" type="button" data-reminder-filter="OVERDUE" onclick="setReminderFilter('OVERDUE',this)">Quá hạn</button><button class="reminder-filter" type="button" data-reminder-filter="DONE" onclick="setReminderFilter('DONE',this)">Đã xong</button></div>
     <div class="reminder-list" id="reminderList"><div class="reminder-loading">Đang tải ghi chú…</div></div>
   </section>
 </div>
@@ -10627,7 +10628,7 @@ async function checkAdminSession(){
 
 // Dòng URL duy nhất
 const SHEET_API_URL = "https://script.google.com/macros/s/AKfycby6YH69F7sfO1ZoUJsDm4BeX6Luj2GrhUfYWWJWNvqjraAEhkBck16EphrPBBm1BT3YqA/exec";
-const REQUIRED_API_VERSION = "2026.08.30-public-read-admin-reminders-23";
+const REQUIRED_API_VERSION = "2026.08.30-reminder-timezone-countdown-24";
 // Apps Script có thể phải chờ khóa ghi khi nhiều thao tác diễn ra gần nhau.
 // 45 giây dài hơn thời gian chờ khóa phía máy chủ, tránh báo lỗi giả trong khi Sheet vẫn đang ghi.
 const SHEET_TIMEOUT_MS = 45000;
@@ -22805,7 +22806,22 @@ async function loadReminders(background=false){
   try{const result=await privateSheet("private_reminders",{},30000);REMINDER_DATA=Array.isArray(result.reminders)?result.reminders:[];renderReminders();updateReminderBadge();startReminderClock();checkDueReminders();}
   catch(error){if(!background&&list)list.innerHTML=`<div class="reminder-empty">Không tải được ghi chú.<br>${escapeHtml(privateErrorText(error))}</div>`;}
 }
-function startReminderClock(){if(reminderClock)return;reminderClock=setInterval(()=>{updateReminderBadge();checkDueReminders();},30000);}
+function reminderCountdownText(value,now=Date.now()){
+  const target=reminderDateValue(value);if(!Number.isFinite(target))return "KHÔNG XÁC ĐỊNH";
+  const overdue=target<=now,total=Math.floor(Math.abs(target-now)/1000),days=Math.floor(total/86400),hours=Math.floor(total%86400/3600),minutes=Math.floor(total%3600/60),seconds=total%60;
+  const clock=`${String(hours).padStart(2,"0")}:${String(minutes).padStart(2,"0")}:${String(seconds).padStart(2,"0")}`;
+  return `${overdue?"QUÁ":"CÒN"} ${days?days+" NGÀY ":""}${clock}`;
+}
+function updateReminderCountdowns(){
+  const now=Date.now();let crossedDeadline=false;
+  document.querySelectorAll("[data-reminder-countdown]").forEach(element=>{
+    element.textContent=reminderCountdownText(element.dataset.reminderCountdown,now);
+    const card=element.closest(".reminder-item"),shouldBeOverdue=reminderDateValue(element.dataset.reminderCountdown)<=now;
+    if(card&&card.classList.contains("overdue")!==shouldBeOverdue)crossedDeadline=true;
+  });
+  if(crossedDeadline)renderReminders();
+}
+function startReminderClock(){if(reminderClock)return;reminderClock=setInterval(()=>{updateReminderCountdowns();updateReminderBadge();checkDueReminders();},1000);}
 function checkDueReminders(){
   const due=REMINDER_DATA.filter(item=>item.status==="ACTIVE"&&reminderDateValue(item.remindAt)<=Date.now()&&!REMINDER_ALERTED.has(item.id));if(!due.length)return;
   due.forEach(item=>REMINDER_ALERTED.add(item.id));const first=due[0],message=due.length>1?`${due.length} ghi chú khách hàng đã đến giờ nhắc`:`${first.customerName}: ${first.content}`;
@@ -22816,7 +22832,9 @@ function setReminderFilter(value,button){reminderFilter=value;document.querySele
 function renderReminders(){
   const list=document.getElementById("reminderList");if(!list)return;const now=Date.now(),adminCanEdit=isReminderAdmin();
   const rows=REMINDER_DATA.filter(item=>reminderFilter==="DONE"?item.status==="DONE":reminderFilter==="OVERDUE"?item.status==="ACTIVE"&&reminderDateValue(item.remindAt)<=now:item.status==="ACTIVE"&&reminderDateValue(item.remindAt)>now);
-  list.innerHTML=rows.length?rows.map(item=>{const overdue=item.status==="ACTIVE"&&reminderDateValue(item.remindAt)<=now,done=item.status==="DONE",parts=reminderDateParts(item.remindAt),check=adminCanEdit?`<button class="reminder-check" type="button" aria-label="${done?"Mở lại":"Đánh dấu hoàn tất"}" onclick="toggleReminderDone('${escapeHtml(item.id)}')">${done?"✓":""}</button>`:`<span class="reminder-check" aria-hidden="true">${done?"✓":""}</span>`,actions=adminCanEdit?`<div class="reminder-item-actions"><button type="button" title="Sửa" aria-label="Sửa ghi chú" onclick="editReminder('${escapeHtml(item.id)}')">✎</button><button type="button" title="Xóa" aria-label="Xóa ghi chú" onclick="deleteReminder('${escapeHtml(item.id)}')">⌫</button></div>`:"";return `<article class="reminder-item${overdue?" overdue":""}${done?" done":""}">${check}<div class="reminder-item-copy"><div class="reminder-item-title"><i class="reminder-priority ${escapeHtml(item.priority)}"></i>${escapeHtml(item.customerName)}${item.phone?` · ${escapeHtml(item.phone)}`:""}</div><div class="reminder-item-note">${escapeHtml(item.content)}</div><div class="reminder-item-meta"><span class="reminder-state-chip">${overdue?"QUÁ HẠN":done?"ĐÃ HOÀN TẤT":"SẮP TỚI"}</span><span class="reminder-date-chip">📅 ${escapeHtml(parts.date)}</span><span class="reminder-time-chip">⏰ ${escapeHtml(parts.time)}</span>${item.createdBy?`<span>· ${escapeHtml(item.createdBy)}</span>`:""}</div></div>${actions}</article>`;}).join(""):`<div class="reminder-empty">${reminderFilter==="DONE"?"Chưa có ghi chú đã hoàn tất.":reminderFilter==="OVERDUE"?"Không có ghi chú quá hạn.":"Chưa có lịch nhắc sắp tới."}</div>`;
+  list.innerHTML=rows.length?rows.map(item=>{const overdue=item.status==="ACTIVE"&&reminderDateValue(item.remindAt)<=now,done=item.status==="DONE",parts=reminderDateParts(item.remindAt),check=adminCanEdit?`<button class="reminder-check" type="button" aria-label="${done?"Mở lại":"Đánh dấu hoàn tất"}" onclick="toggleReminderDone('${escapeHtml(item.id)}')">${done?"✓":""}</button>`:`<span class="reminder-check" aria-hidden="true">${done?"✓":""}</span>`,actions=adminCanEdit?`<div class="reminder-item-actions"><button type="button" title="Sửa" aria-label="Sửa ghi chú" onclick="editReminder('${escapeHtml(item.id)}')"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m4 20 4.3-1 10.9-10.9a2.1 2.1 0 0 0-3-3L5.3 16 4 20Z"></path><path d="m14.8 6.5 3 3"></path></svg></button><button type="button" title="Xóa" aria-label="Xóa ghi chú" onclick="deleteReminder('${escapeHtml(item.id)}')"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M7 7l1 14h8l1-14M10 11v6M14 11v6"></path></svg></button></div>`:"",countdown=!done?`<span class="reminder-countdown-chip" data-reminder-countdown="${escapeHtml(item.remindAt)}">${escapeHtml(reminderCountdownText(item.remindAt,now))}</span>`:"";return `<article class="reminder-item${overdue?" overdue":""}${done?" done":""}">${check}<div class="reminder-item-copy"><div class="reminder-item-title"><i class="reminder-priority ${escapeHtml(item.priority)}"></i>${escapeHtml(item.customerName)}${item.phone?` · ${escapeHtml(item.phone)}`:""}</div><div class="reminder-item-note">${escapeHtml(item.content)}</div><div class="reminder-item-meta"><span class="reminder-state-chip">${overdue?"QUÁ HẠN":done?"ĐÃ HOÀN TẤT":"SẮP TỚI"}</span><span class="reminder-date-chip">📅 ${escapeHtml(parts.date)}</span><span class="reminder-time-chip">⏰ ${escapeHtml(parts.time)}</span>${countdown}${item.createdBy?`<span>· ${escapeHtml(item.createdBy)}</span>`:""}</div></div>${actions}</article>`;}).join(""):`<div class="reminder-empty">${reminderFilter==="DONE"?"Chưa có ghi chú đã hoàn tất.":reminderFilter==="OVERDUE"?"Không có ghi chú quá hạn.":"Chưa có lịch nhắc sắp tới."}</div>`;
+  updateReminderCountdowns();
+  list.querySelectorAll(".reminder-state-chip").forEach(element=>{if(element.textContent==="SẮP TỚI")element.textContent="NHẮC HẸN";});
 }
 function defaultReminderTime(){const date=new Date(Date.now()+60*60*1000);date.setMinutes(Math.ceil(date.getMinutes()/5)*5,0,0);return new Date(date.getTime()-date.getTimezoneOffset()*60000).toISOString().slice(0,16);}
 function isReminderAdmin(){return isAdminMode()&&!!sessionStorage.getItem("kho_admin_session_token");}
