@@ -1870,8 +1870,10 @@ body.fab-menu-open .category-view-bar .view-mode-switch { pointer-events:none; }
 #nvOverlay .modal::after,
 #trashOverlay .modal::after,
 #groupOrderOverlay .modal::after,
-#quickOrderOverlay .modal::after {
-  content:"DESIGN BY \00B7  PHAM VAN CHUONG";
+#quickOrderOverlay .modal::after,
+#customerOverlay .customer-modal::after,
+#partnerOverlay .partner-modal::after {
+  content:"DESIGN BY : PHAM VAN CHUONG";
   position:absolute;
   top:7px;
   right:9px;
@@ -1906,14 +1908,21 @@ body.fab-menu-open .category-view-bar .view-mode-switch { pointer-events:none; }
 #nvOverlay .modal,
 #trashOverlay .modal,
 #groupOrderOverlay .modal,
-#quickOrderOverlay .modal { position:relative; padding-top:48px; }
+#quickOrderOverlay .modal,
+#customerOverlay .customer-modal,
+#partnerOverlay .partner-modal { position:relative; padding-top:48px!important; }
+.admin-window-traffic{position:absolute;z-index:5;top:15px;left:15px;display:flex;align-items:center;gap:7px;height:14px;pointer-events:none;user-select:none}
+.admin-window-traffic i{display:block;width:12px;height:12px;border-radius:50%;box-shadow:inset 0 0 0 1px rgba(0,0,0,.09),0 1px 2px rgba(26,43,58,.1)}
+.admin-window-traffic i:nth-child(1){background:#FF5F57}.admin-window-traffic i:nth-child(2){background:#FEBC2E}.admin-window-traffic i:nth-child(3){background:#28C840}
 @media (max-width:480px) {
   .designer-engraving,
   #importOverlay .modal::after,
   #nvOverlay .modal::after,
   #trashOverlay .modal::after,
   #groupOrderOverlay .modal::after,
-  #quickOrderOverlay .modal::after {
+  #quickOrderOverlay .modal::after,
+  #customerOverlay .customer-modal::after,
+  #partnerOverlay .partner-modal::after {
     top:6px;
     right:8px;
     min-height:26px;
@@ -1928,7 +1937,10 @@ body.fab-menu-open .category-view-bar .view-mode-switch { pointer-events:none; }
   #nvOverlay .modal,
   #trashOverlay .modal,
   #groupOrderOverlay .modal,
-  #quickOrderOverlay .modal { padding-top:44px; }
+  #quickOrderOverlay .modal,
+  #customerOverlay .customer-modal,
+  #partnerOverlay .partner-modal { padding-top:44px!important; }
+  .admin-window-traffic{top:13px;left:13px;gap:6px}.admin-window-traffic i{width:11px;height:11px}
 }
 @media (max-width:560px) {
   #editOverlay .modal { overflow-x:hidden; overscroll-behavior:contain; }
@@ -9190,7 +9202,7 @@ body.fab-menu-open #fabToggleBtn{background:linear-gradient(145deg,#267FF0,#0B62
     </div>
       </div>
     </details>
-    <div class="designer-engraving" aria-label="Design by Pham Van Chuong">DESIGN BY &middot; PHAM VAN CHUONG</div>
+    <div class="designer-engraving" aria-label="Design by Pham Van Chuong">DESIGN BY : PHAM VAN CHUONG</div>
     <div class="edit-sticky-actions">
       <div id="fSaveSummary" class="edit-save-summary">Q2 · Chưa có mã · Chưa nhập tồn</div>
       <div class="edit-save-buttons">
@@ -20118,7 +20130,7 @@ function backToCustomerList(){
 function renderCustomerSearch(showAll=customerSearchState.showAll,error=null){
   const box = document.getElementById("customerResults");
   const raw = String(document.getElementById("customerSearch")?.value || "").trim();
-  if(!raw&&!showAll){ box.innerHTML='<div class="customer-empty"><span><b>Tra cứu nhanh hàng nghìn hồ sơ</b><br>Nhập tên, số điện thoại, địa chỉ, model hoặc serial; bấm số hồ sơ để xem khách gần đây.</span></div>'; return; }
+  if(!raw&&!showAll){ box.innerHTML=""; return; }
   if(error){box.innerHTML=`<div class="customer-empty">⚠️ Không tải được khách hàng: ${escapeHtml(privateErrorText(error))}<br><button type="button" class="directory-retry" onclick="loadCustomers(true,{query:document.getElementById('customerSearch')?.value||'',showAll:true})">Thử lại</button></div>`;return;}
   if(customerSearchState.loading&&!CUSTOMER_DATA.length){box.innerHTML='<div class="customer-empty">⏳ Đang tìm khách hàng...</div>';return;}
   if(!CUSTOMER_DATA.length){
@@ -21447,6 +21459,23 @@ document.addEventListener("pointerdown", function(e){
 document.addEventListener("click", function(e){ if(!e.target.closest(".search-box")) closeSearchSuggestions(); });
 document.getElementById("adminPass").addEventListener("keydown", function(e){ if(e.key==="Enter") submitAdminPass(); });
 document.querySelector(".title").addEventListener("click", handleOwnerTap);
+function installAdminWindowTraffic(){
+  const selectors=[
+    "#editOverlay .modal","#groupOrderOverlay .modal","#quickOrderOverlay .modal",
+    "#nvOverlay .modal","#customerOverlay .customer-modal","#partnerOverlay .partner-modal",
+    "#trashOverlay .modal"
+  ];
+  selectors.forEach(selector=>{
+    const modal=document.querySelector(selector);
+    if(!modal||modal.querySelector(":scope > .admin-window-traffic")) return;
+    const traffic=document.createElement("div");
+    traffic.className="admin-window-traffic";
+    traffic.setAttribute("aria-hidden","true");
+    traffic.innerHTML="<i></i><i></i><i></i>";
+    modal.prepend(traffic);
+  });
+}
+installAdminWindowTraffic();
 setupVndInputs();
 setupAdminEntry();
 startSearchPlaceholderTyping();
