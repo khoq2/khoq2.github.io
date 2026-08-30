@@ -3609,6 +3609,18 @@ body {
   .ton-ctrl,.nguoi-ban-row { border-left:0; background:#f8fbfe; }
   .card-actions > button { min-height:44px; font-size:10.5px; }
 }
+.reminder-edge-btn{position:fixed;z-index:208;left:max(3px,env(safe-area-inset-left));top:50%;display:flex;width:45px;min-height:112px;flex-direction:column;align-items:center;justify-content:center;gap:7px;padding:10px 5px;border:0!important;border-radius:0;background:transparent!important;color:#B56A00;box-shadow:none!important;transform:translateY(-50%);cursor:pointer;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+.reminder-edge-btn[hidden]{display:none!important}
+.reminder-edge-btn svg{width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.reminder-edge-label{font-size:9px;font-weight:950;letter-spacing:.5px;line-height:1;writing-mode:vertical-rl;transform:rotate(180deg)}
+.reminder-edge-count{position:absolute;right:-5px;top:-5px;display:none;min-width:20px;height:20px;place-items:center;padding:0 5px;border:2px solid #fff;border-radius:999px;background:#FF3B30;color:#fff;font-size:9px;font-weight:950}.reminder-edge-count.show{display:grid}
+.reminder-overlay{position:fixed;z-index:1200;inset:0;display:none;align-items:center;justify-content:flex-start;padding:14px;background:rgba(19,35,52,.38);-webkit-backdrop-filter:blur(5px);backdrop-filter:blur(5px)}.reminder-overlay.open{display:flex}
+.reminder-dialog{width:min(470px,calc(100vw - 28px));max-height:min(780px,calc(100dvh - 28px));margin-left:max(40px,env(safe-area-inset-left));overflow:hidden;border:1px solid rgba(255,255,255,.85);border-radius:22px;background:#F5F5F7;box-shadow:0 28px 80px rgba(15,31,48,.34)}
+.reminder-head{display:flex;align-items:center;gap:10px;padding:14px 16px 11px;border-bottom:1px solid #D9D9DE;background:rgba(255,255,255,.86)}.reminder-head-copy{min-width:0;flex:1}.reminder-head h2{margin:0;color:#1C1C1E;font-size:18px}.reminder-head p{margin:3px 0 0;color:#74747A;font-size:10px}.reminder-close,.reminder-add{width:32px;height:32px;border:0;border-radius:50%;font-size:20px;font-weight:700;cursor:pointer}.reminder-close{background:#E5E5EA;color:#3A3A3C}.reminder-add{background:#FFB000;color:#fff}
+.reminder-form{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:12px 14px;border-bottom:1px solid #D9D9DE;background:#fff}.reminder-form[hidden]{display:none}.reminder-field{display:grid;gap:4px}.reminder-field.wide{grid-column:1/-1}.reminder-field span{color:#55545B;font-size:10px;font-weight:850}.reminder-field input,.reminder-field textarea,.reminder-field select{width:100%;min-height:40px;padding:9px 11px;border:1px solid #D1D1D6;border-radius:10px;background:#FAFAFC;color:#1C1C1E;font:inherit;font-size:13px;outline:none}.reminder-field textarea{min-height:72px;resize:vertical}.reminder-field input:focus,.reminder-field textarea:focus,.reminder-field select:focus{border-color:#FFB000;box-shadow:0 0 0 3px rgba(255,176,0,.16)}
+.reminder-form-actions{grid-column:1/-1;display:grid;grid-template-columns:1fr 2fr;gap:8px}.reminder-form-actions button{min-height:40px;border:0;border-radius:10px;font-size:12px;font-weight:900;cursor:pointer}.reminder-cancel{background:#E9E9ED;color:#555}.reminder-save{background:#FFB000;color:#fff}
+.reminder-toolbar{display:flex;gap:6px;padding:9px 12px;background:#F5F5F7}.reminder-filter{border:0;border-radius:999px;padding:7px 11px;background:#E5E5EA;color:#555;font-size:10px;font-weight:850;cursor:pointer}.reminder-filter.active{background:#1C1C1E;color:#fff}.reminder-list{display:grid;gap:8px;max-height:52dvh;padding:2px 12px 14px;overflow:auto;overscroll-behavior:contain}
+.reminder-empty{padding:44px 15px;color:#8E8E93;text-align:center;font-size:13px}.reminder-item{display:grid;grid-template-columns:27px minmax(0,1fr) auto;gap:8px;padding:11px;border:1px solid #E0E0E5;border-radius:14px;background:#fff;box-shadow:0 2px 7px rgba(30,58,95,.06)}.reminder-item.overdue{border-color:#FFAAA5;background:#FFF8F7}.reminder-item.done{opacity:.62}.reminder-check{width:23px;height:23px;margin-top:1px;border:2px solid #C7C7CC;border-radius:50%;background:#fff;color:#fff;cursor:pointer}.reminder-item.done .reminder-check{border-color:#34C759;background:#34C759}.reminder-item-copy{min-width:0}.reminder-item-title{display:flex;align-items:center;gap:5px;color:#1C1C1E;font-size:13px;font-weight:900}.reminder-priority{width:7px;height:7px;border-radius:50%;background:#8E8E93}.reminder-priority.HIGH{background:#FF3B30}.reminder-priority.LOW{background:#34C759}.reminder-item-note{margin-top:4px;color:#48484A;font-size:12px;line-height:1.35;white-space:pre-wrap;overflow-wrap:anywhere}.reminder-item-meta{display:flex;flex-wrap:wrap;align-items:center;gap:4px;margin-top:7px;color:#77777E;font-size:9px}.reminder-date-chip,.reminder-time-chip{display:inline-flex;align-items:center;padding:3px 6px;border-radius:999px;background:#EFEFF4;color:#505057;font-weight:900}.reminder-time-chip{background:#FFF1CC;color:#9A6200}.reminder-state-chip{font-weight:950}.reminder-item.overdue .reminder-state-chip{color:#D22E24}.reminder-item.done .reminder-state-chip{color:#248A3D}.reminder-item-actions{display:flex;flex-direction:column;gap:4px}.reminder-item-actions button{width:29px;height:29px;border:0;border-radius:8px;background:#EFEFF4;color:#5B5B60;cursor:pointer}.reminder-loading{padding:45px 15px;color:#777;text-align:center;font-size:12px}
+@media(max-width:600px){.reminder-edge-btn{left:3px;width:38px;min-height:88px;border-radius:0 12px 12px 0}.reminder-edge-label{font-size:8px}.reminder-dialog{width:calc(100vw - 18px);max-height:calc(100dvh - 18px);margin:0;border-radius:18px}.reminder-overlay{justify-content:center;padding:9px}.reminder-form{grid-template-columns:1fr}.reminder-field.wide,.reminder-form-actions{grid-column:1}.reminder-list{max-height:48dvh}}
 </style>
 <style id="mobile-typography">
 /* Font hệ thống rõ dấu tiếng Việt, nhẹ và ổn định trên Android/iPhone/Windows. */
@@ -8825,6 +8837,27 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
   </div>
 </aside>
 
+<button class="reminder-edge-btn" id="reminderEdgeButton" type="button" aria-label="Mở ghi chú nhắc khách hàng" aria-haspopup="dialog" onclick="openReminderPanel()">
+  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h9l3 3v15H6z"></path><path d="M15 3v4h4M9 11h6M9 15h6"></path></svg>
+  <span class="reminder-edge-label">GHI CHÚ</span><span class="reminder-edge-count" id="reminderEdgeCount">0</span>
+</button>
+<div class="reminder-overlay" id="reminderOverlay" aria-hidden="true" onclick="if(event.target===this)closeReminderPanel()">
+  <section class="reminder-dialog" role="dialog" aria-modal="true" aria-labelledby="reminderTitle">
+    <header class="reminder-head"><div class="reminder-head-copy"><h2 id="reminderTitle">GHI CHÚ KHÁCH HÀNG</h2></div><button class="reminder-add" type="button" aria-label="Thêm ghi chú" onclick="openReminderForm()">+</button><button class="reminder-close" type="button" aria-label="Đóng" onclick="closeReminderPanel()">×</button></header>
+    <form class="reminder-form" id="reminderForm" hidden onsubmit="saveReminder(event)">
+      <input type="hidden" id="reminderId"><input type="hidden" id="reminderVersion">
+      <label class="reminder-field"><span>Tên khách hàng *</span><input id="reminderCustomerName" maxlength="120" required autocomplete="name"></label>
+      <label class="reminder-field"><span>Số điện thoại</span><input id="reminderPhone" type="tel" inputmode="tel" maxlength="15" autocomplete="tel"></label>
+      <label class="reminder-field wide"><span>Nội dung ghi chú *</span><textarea id="reminderContent" maxlength="3000" required placeholder="VD: Gọi khách báo máy đã sửa xong"></textarea></label>
+      <label class="reminder-field"><span>Ngày giờ nhắc *</span><input id="reminderAt" type="datetime-local" required></label>
+      <label class="reminder-field"><span>Mức ưu tiên</span><select id="reminderPriority"><option value="NORMAL">Bình thường</option><option value="HIGH">Quan trọng</option><option value="LOW">Ít quan trọng</option></select></label>
+      <div class="reminder-form-actions"><button class="reminder-cancel" type="button" onclick="closeReminderForm()">Hủy</button><button class="reminder-save" id="reminderSaveButton" type="submit">LƯU GHI CHÚ</button></div>
+    </form>
+    <div class="reminder-toolbar" role="group" aria-label="Lọc ghi chú"><button class="reminder-filter active" type="button" data-reminder-filter="ACTIVE" onclick="setReminderFilter('ACTIVE',this)">Sắp tới</button><button class="reminder-filter" type="button" data-reminder-filter="OVERDUE" onclick="setReminderFilter('OVERDUE',this)">Quá hạn</button><button class="reminder-filter" type="button" data-reminder-filter="DONE" onclick="setReminderFilter('DONE',this)">Đã xong</button></div>
+    <div class="reminder-list" id="reminderList"><div class="reminder-loading">Đang tải ghi chú…</div></div>
+  </section>
+</div>
+
 <div class="latest-items-ticker" id="latestItemsTicker" aria-live="polite" aria-label="Thiết bị mới thêm, bấm để mở" role="button" tabindex="0" onclick="openLatestItemFromTicker()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openLatestItemFromTicker();}">
   <span class="latest-items-line"><span class="latest-items-label">Cập nhật mới:</span><span class="latest-items-title" id="latestItemsTitle"></span></span>
 </div>
@@ -10219,6 +10252,7 @@ function activateEmployeePrivateArea(area,token){
   employeePrivateAreaSessions[normalized]=String(token);
   saveEmployeePrivateAreaSessions();
   rememberEmployeePrivateArea(normalized);
+  if(normalized==="customer") setTimeout(()=>{if(typeof loadReminders==="function")loadReminders(true);},0);
   return true;
 }
 function getEmployeePrivateAreaToken(area){
@@ -10593,7 +10627,7 @@ async function checkAdminSession(){
 
 // Dòng URL duy nhất
 const SHEET_API_URL = "https://script.google.com/macros/s/AKfycby6YH69F7sfO1ZoUJsDm4BeX6Luj2GrhUfYWWJWNvqjraAEhkBck16EphrPBBm1BT3YqA/exec";
-const REQUIRED_API_VERSION = "2026.08.29-public-transactions-20";
+const REQUIRED_API_VERSION = "2026.08.30-public-reminders-22";
 // Apps Script có thể phải chờ khóa ghi khi nhiều thao tác diễn ra gần nhau.
 // 45 giây dài hơn thời gian chờ khóa phía máy chủ, tránh báo lỗi giả trong khi Sheet vẫn đang ghi.
 const SHEET_TIMEOUT_MS = 45000;
@@ -11293,7 +11327,7 @@ async function fetchSheetJson(url, options={}, timeoutMs=SHEET_TIMEOUT_MS){
   const context=sheetRequestContext(url,options);
   // Các action đọc dùng POST để kèm phiên đăng nhập nhưng không thay đổi dữ liệu.
   // Cho phép thử lại khi mạng chập chờn; mọi POST có ghi dữ liệu vẫn chỉ gửi đúng một lần.
-  const safeReadPost=new Set(["private_products","private_customers","private_customer_records","private_partners","private_partner_jobs","private_recent_activity","private_transaction_details","private_transaction_by_id","private_tx","private_nv","private_units","private_transfers","private_product_activity","validate_admin_session","validate_employee_session","get_error_logs"]).has(context.action);
+  const safeReadPost=new Set(["private_products","private_customers","private_customer_records","private_reminders","private_partners","private_partner_jobs","private_recent_activity","private_transaction_details","private_transaction_by_id","private_tx","private_nv","private_units","private_transfers","private_product_activity","validate_admin_session","validate_employee_session","get_error_logs"]).has(context.action);
   // replace_all có fingerprint và có thể đối chiếu noop sau khi phản hồi bị mất,
   // vì vậy retry 404/timeout an toàn hơn để người dùng không phải chờ chu kỳ hôm sau.
   const safeIdempotentWritePost=new Set(["replace_all","upsert_product","delete_product","delete_products","delete_products_by_branch","create_units","restore_trash","delete_customer","delete_customer_record","delete_partner_job","delete_inventory_transaction","commit_inventory_transaction","transfer_inventory","save_config","save_product_links","rename_group","rename_quick_tag"]).has(context.action);
@@ -15239,6 +15273,8 @@ function render(){
   const auditContext=currentStatus==="AUDIT"&&!kwTokens.length ? buildInventoryAuditContext() : null;
   const homeLandingMode = !bulkSelectMode && !kw && currentTab==="ALL" && currentStatus==="ALL" && !restockOnly && !totalStockView && !activeKpiView;
   document.body.classList.toggle("home-landing-mode", homeLandingMode);
+  const reminderEdgeButton=document.getElementById("reminderEdgeButton");
+  if(reminderEdgeButton) reminderEdgeButton.hidden=currentTab!=="ALL";
   const kpiActivityIndex=activeKpiView ? buildKpiActivityIndex() : null;
   const results = DATA.map((r,i)=>({r,i})).filter(({r})=>{
     const [sh,,ten,th,,,tt,ghi] = r;
@@ -19842,7 +19878,7 @@ function isPrivateAuthFailure(error){
 }
 async function privateSheet(action,data={},timeoutMs=SHEET_TIMEOUT_MS){
   const adminToken=sessionStorage.getItem("kho_admin_session_token") || "";
-  const customerActions=new Set(["private_customers","private_customer_records","upsert_customer","upsert_customer_record"]);
+  const customerActions=new Set(["private_customers","private_customer_records","upsert_customer","upsert_customer_record","private_reminders","upsert_reminder","complete_reminder","delete_reminder"]);
   const partnerActions=new Set(["private_partners","private_partner_jobs","upsert_partner","upsert_partner_job"]);
   const area=partnerActions.has(action)?"partner":customerActions.has(action)?"customer":"";
   const areaToken=area?getEmployeePrivateAreaToken(area):"";
@@ -22747,6 +22783,56 @@ document.addEventListener("keydown",event=>{
   if(focusView&&!focusView.hidden) resetQrShowcase(true);
   else closeQrShowcase();
 },true);
+
+let REMINDER_DATA=[];
+let reminderFilter="ACTIVE";
+const REMINDER_ALERTED=new Set();
+let reminderClock=0;
+function reminderDateValue(value){const time=new Date(String(value||"")).getTime();return Number.isFinite(time)?time:Infinity;}
+function reminderDateText(value){const date=new Date(String(value||""));return Number.isFinite(date.getTime())?date.toLocaleString("vi-VN",{hour:"2-digit",minute:"2-digit",day:"2-digit",month:"2-digit",year:"numeric"}):"Chưa đặt lịch";}
+function reminderDateParts(value){const date=new Date(String(value||""));if(!Number.isFinite(date.getTime()))return {date:"Chưa đặt ngày",time:"Chưa đặt giờ"};return {date:`Ngày ${String(date.getDate()).padStart(2,"0")}/${String(date.getMonth()+1).padStart(2,"0")}/${date.getFullYear()}`,time:`Giờ ${String(date.getHours()).padStart(2,"0")}:${String(date.getMinutes()).padStart(2,"0")}`};}
+function updateReminderBadge(){
+  const now=Date.now(),due=REMINDER_DATA.filter(item=>item.status==="ACTIVE"&&reminderDateValue(item.remindAt)<=now).length;
+  const badge=document.getElementById("reminderEdgeCount");if(!badge)return;badge.textContent=due>99?"99+":String(due);badge.classList.toggle("show",due>0);
+}
+async function openReminderPanel(){
+  const overlay=document.getElementById("reminderOverlay");overlay?.classList.add("open");overlay?.setAttribute("aria-hidden","false");document.body.classList.add("private-panel-open");
+  await loadReminders();
+}
+function closeReminderPanel(){document.getElementById("reminderOverlay")?.classList.remove("open");document.getElementById("reminderOverlay")?.setAttribute("aria-hidden","true");closeReminderForm();if(!document.querySelector(".overlay.open,.qr-showcase-overlay:not([hidden])"))document.body.classList.remove("private-panel-open");}
+async function loadReminders(background=false){
+  const list=document.getElementById("reminderList");if(list)list.innerHTML='<div class="reminder-loading">Đang tải ghi chú…</div>';
+  try{const result=await privateSheet("private_reminders",{},30000);REMINDER_DATA=Array.isArray(result.reminders)?result.reminders:[];renderReminders();updateReminderBadge();startReminderClock();checkDueReminders();}
+  catch(error){if(!background&&list)list.innerHTML=`<div class="reminder-empty">Không tải được ghi chú.<br>${escapeHtml(privateErrorText(error))}</div>`;}
+}
+function startReminderClock(){if(reminderClock)return;reminderClock=setInterval(()=>{updateReminderBadge();checkDueReminders();},30000);}
+function checkDueReminders(){
+  const due=REMINDER_DATA.filter(item=>item.status==="ACTIVE"&&reminderDateValue(item.remindAt)<=Date.now()&&!REMINDER_ALERTED.has(item.id));if(!due.length)return;
+  due.forEach(item=>REMINDER_ALERTED.add(item.id));const first=due[0],message=due.length>1?`${due.length} ghi chú khách hàng đã đến giờ nhắc`:`${first.customerName}: ${first.content}`;
+  showToast(`⏰ ${message}`,7000);
+  if("Notification" in window&&Notification.permission==="granted")try{new Notification("Ghi chú khách hàng đến hạn",{body:message,tag:`kho-reminder-${first.id}`});}catch(_){}
+}
+function setReminderFilter(value,button){reminderFilter=value;document.querySelectorAll(".reminder-filter").forEach(item=>item.classList.toggle("active",item===button));renderReminders();}
+function renderReminders(){
+  const list=document.getElementById("reminderList");if(!list)return;const now=Date.now();
+  const rows=REMINDER_DATA.filter(item=>reminderFilter==="DONE"?item.status==="DONE":reminderFilter==="OVERDUE"?item.status==="ACTIVE"&&reminderDateValue(item.remindAt)<=now:item.status==="ACTIVE"&&reminderDateValue(item.remindAt)>now);
+  list.innerHTML=rows.length?rows.map(item=>{const overdue=item.status==="ACTIVE"&&reminderDateValue(item.remindAt)<=now,done=item.status==="DONE",parts=reminderDateParts(item.remindAt);return `<article class="reminder-item${overdue?" overdue":""}${done?" done":""}"><button class="reminder-check" type="button" aria-label="${done?"Mở lại":"Đánh dấu hoàn tất"}" onclick="toggleReminderDone('${escapeHtml(item.id)}')">${done?"✓":""}</button><div class="reminder-item-copy"><div class="reminder-item-title"><i class="reminder-priority ${escapeHtml(item.priority)}"></i>${escapeHtml(item.customerName)}${item.phone?` · ${escapeHtml(item.phone)}`:""}</div><div class="reminder-item-note">${escapeHtml(item.content)}</div><div class="reminder-item-meta"><span class="reminder-state-chip">${overdue?"QUÁ HẠN":done?"ĐÃ HOÀN TẤT":"SẮP TỚI"}</span><span class="reminder-date-chip">📅 ${escapeHtml(parts.date)}</span><span class="reminder-time-chip">⏰ ${escapeHtml(parts.time)}</span>${item.createdBy?`<span>· ${escapeHtml(item.createdBy)}</span>`:""}</div></div><div class="reminder-item-actions"><button type="button" title="Sửa" aria-label="Sửa ghi chú" onclick="editReminder('${escapeHtml(item.id)}')">✎</button><button type="button" title="Xóa" aria-label="Xóa ghi chú" onclick="deleteReminder('${escapeHtml(item.id)}')">⌫</button></div></article>`;}).join(""):`<div class="reminder-empty">${reminderFilter==="DONE"?"Chưa có ghi chú đã hoàn tất.":reminderFilter==="OVERDUE"?"Không có ghi chú quá hạn.":"Chưa có lịch nhắc sắp tới."}</div>`;
+}
+function defaultReminderTime(){const date=new Date(Date.now()+60*60*1000);date.setMinutes(Math.ceil(date.getMinutes()/5)*5,0,0);return new Date(date.getTime()-date.getTimezoneOffset()*60000).toISOString().slice(0,16);}
+function openReminderForm(item=null){
+  const form=document.getElementById("reminderForm");form.hidden=false;
+  document.getElementById("reminderId").value=item?.id||"";document.getElementById("reminderVersion").value=item?.version||"";document.getElementById("reminderCustomerName").value=item?.customerName||"";document.getElementById("reminderPhone").value=item?.phone||"";document.getElementById("reminderContent").value=item?.content||"";document.getElementById("reminderAt").value=item?.remindAt||defaultReminderTime();document.getElementById("reminderPriority").value=item?.priority||"NORMAL";setTimeout(()=>document.getElementById("reminderCustomerName")?.focus(),30);
+}
+function closeReminderForm(){const form=document.getElementById("reminderForm");if(form){form.hidden=true;form.reset();}document.getElementById("reminderId").value="";document.getElementById("reminderVersion").value="";}
+function editReminder(id){const item=REMINDER_DATA.find(row=>row.id===id);if(item)openReminderForm(item);}
+async function saveReminder(event){
+  event.preventDefault();
+  const data={id:document.getElementById("reminderId").value,expectedVersion:document.getElementById("reminderVersion").value,customerName:document.getElementById("reminderCustomerName").value,phone:document.getElementById("reminderPhone").value,content:document.getElementById("reminderContent").value,remindAt:document.getElementById("reminderAt").value,priority:document.getElementById("reminderPriority").value};
+  try{const result=await privateSheet("upsert_reminder",data,35000);const index=REMINDER_DATA.findIndex(item=>item.id===result.reminder.id);if(index>=0)REMINDER_DATA[index]=result.reminder;else REMINDER_DATA.push(result.reminder);closeReminderForm();renderReminders();updateReminderBadge();showToast("✅ Đã lưu lịch nhắc riêng",3000);}catch(error){showToast("⚠️ Không lưu được ghi chú: "+privateErrorText(error),5500);}
+}
+async function toggleReminderDone(id){const item=REMINDER_DATA.find(row=>row.id===id);if(!item)return;try{const result=await privateSheet("complete_reminder",{id:item.id,expectedVersion:item.version,completed:item.status!=="DONE"},30000);REMINDER_DATA[REMINDER_DATA.indexOf(item)]=result.reminder;renderReminders();updateReminderBadge();}catch(error){showToast("⚠️ "+privateErrorText(error),4500);}}
+async function deleteReminder(id){const item=REMINDER_DATA.find(row=>row.id===id);if(!item)return;if(!confirm(`Xóa ghi chú của ${item.customerName}?`))return;try{await privateSheet("delete_reminder",{id:item.id,expectedVersion:item.version},30000);REMINDER_DATA=REMINDER_DATA.filter(row=>row.id!==id);renderReminders();updateReminderBadge();showToast("Đã xóa ghi chú");}catch(error){showToast("⚠️ "+privateErrorText(error),4500);}}
+document.addEventListener("keydown",event=>{if(event.key==="Escape"&&document.getElementById("reminderOverlay")?.classList.contains("open")){event.preventDefault();closeReminderPanel();}},true);
 
 // Cảnh báo trước khi đóng/tab reload nếu vẫn còn dữ liệu cục bộ chưa gửi xong.
 // Trình duyệt tự hiển thị nội dung cảnh báo chuẩn để tránh mất thao tác vừa làm.
