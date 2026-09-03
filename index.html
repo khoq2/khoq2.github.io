@@ -2100,7 +2100,7 @@ body.fab-menu-open .category-view-bar .view-mode-switch { pointer-events:none; }
 .header { transition: padding .34s cubic-bezier(.22,.61,.36,1), box-shadow .3s ease; }
 .sticky.collapsed .header { padding: 8px 10px; box-shadow: 0 2px 7px rgba(0,0,0,.18); }
 .sticky.collapsed .search-box { padding: 7px 8px; border-width: 2px; }
-.sticky.collapsed #headerToggleText { max-width: 0; opacity: 0; }
+.sticky.collapsed #headerToggleText { max-width: 112px; opacity: 1; }
 /* Auto hide/show changes the sticky height in one layout pass. This avoids
    animating max-height on every frame and keeps the product currently read in place. */
 .sticky.header-auto-changing .header-collapsible,
@@ -2118,7 +2118,7 @@ body.fab-menu-open .category-view-bar .view-mode-switch { pointer-events:none; }
 #headerToggleBtn:hover { background: #24476F; box-shadow: 0 5px 14px rgba(30,58,95,.26); transform: translateY(-1px); }
 #headerToggleBtn:active { transform: scale(.96); box-shadow: 0 2px 6px rgba(30,58,95,.18); }
 #headerToggleIcon { width: 21px; height: 21px; border-radius: 50%; background: #F39C12; color: #fff; display: inline-flex; align-items: center; justify-content: center; font-size: 10px; line-height: 1; box-shadow: inset 0 -1px 0 rgba(0,0,0,.16); flex-shrink: 0; }
-#headerToggleText { line-height: 1; max-width: 90px; overflow: hidden; opacity: 1; transition: max-width .28s cubic-bezier(.22,.61,.36,1), opacity .18s ease; }
+#headerToggleText { line-height: 1; max-width: 112px; overflow: hidden; opacity: 1; transition: max-width .28s cubic-bezier(.22,.61,.36,1), opacity .18s ease; }
 .sticky.collapsed #headerToggleBtn { background: #F39C12; color: #17202A; border-color: rgba(30,58,95,.14); box-shadow: 0 3px 10px rgba(243,156,18,.24); }
 .sticky.collapsed #headerToggleBtn:hover { background: #E8910F; }
 .sticky.collapsed #headerToggleIcon { background: #1E3A5F; color: #fff; }
@@ -8620,7 +8620,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .kpi-work-metric{min-width:0;display:grid;gap:2px;padding:8px 10px;border:1px solid #E0E8EF;border-radius:10px;background:rgba(255,255,255,.9)}
 .kpi-work-metric b{overflow:hidden;color:#193A59;font-size:13px;font-weight:950;text-overflow:ellipsis;white-space:nowrap}
 .kpi-work-metric span{overflow:hidden;color:#718395;font-size:9px;font-weight:800;text-overflow:ellipsis;white-space:nowrap}
-.kpi-work-chip,.kpi-work-clear,.kpi-work-plan,.kpi-work-collapse{
+.kpi-work-chip,.kpi-work-clear,.kpi-work-plan{
   min-height:32px;
   margin:0;
   padding:6px 10px;
@@ -8632,12 +8632,11 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
   white-space:nowrap;
   cursor:pointer;
 }
-.kpi-work-chip:hover,.kpi-work-chip:focus-visible,.kpi-work-clear:hover,.kpi-work-clear:focus-visible,.kpi-work-plan:hover,.kpi-work-plan:focus-visible,.kpi-work-collapse:hover,.kpi-work-collapse:focus-visible{border-color:var(--work-accent);outline:none}
+.kpi-work-chip:hover,.kpi-work-chip:focus-visible,.kpi-work-clear:hover,.kpi-work-clear:focus-visible,.kpi-work-plan:hover,.kpi-work-plan:focus-visible{border-color:var(--work-accent);outline:none}
 .kpi-work-chip.is-active{border-color:var(--work-accent);background:var(--work-accent);color:#fff;box-shadow:0 3px 9px color-mix(in srgb,var(--work-accent) 24%,transparent)}
 .kpi-work-chip span{opacity:.78}
 .kpi-work-plan{border-color:color-mix(in srgb,#1E8449 42%,#CAD9E5);color:#176D3C}
 .kpi-work-clear{color:#8A3340}
-.kpi-work-collapse{border-color:color-mix(in srgb,var(--work-accent) 48%,#CAD9E5);background:color-mix(in srgb,var(--work-accent) 8%,#fff);color:var(--work-accent)}
 .kpi-workbar.is-collapsed{grid-template-columns:minmax(0,1fr) auto;gap:8px;margin-bottom:8px;padding:8px 12px}
 .kpi-workbar.is-collapsed .kpi-workbar-note,.kpi-workbar.is-collapsed .kpi-work-metrics{display:none}
 .kpi-workbar.is-collapsed .kpi-workbar-actions{flex-wrap:nowrap}
@@ -8646,6 +8645,12 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .kpi-ops-table{min-width:940px}
 .kpi-ops-head,.kpi-ops-row{display:grid;grid-template-columns:92px minmax(260px,2.2fr) minmax(150px,1fr) 82px 90px 100px 128px;gap:9px;align-items:center;padding:8px 11px}
 .kpi-ops-head{position:sticky;top:0;z-index:2;border-bottom:1px solid #DCE6ED;background:#EDF4F8;color:#52697D;font-size:8px;font-weight:950;letter-spacing:.3px;text-transform:uppercase}
+.kpi-ops-category{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0;padding:10px 13px;border-top:3px solid var(--category-color);border-bottom:1px solid color-mix(in srgb,var(--category-color) 28%,#DCE6ED);background:linear-gradient(90deg,var(--category-light),#fff 72%);color:var(--category-color)}
+.kpi-ops-category strong{font-size:12px;font-weight:950;letter-spacing:.25px;text-transform:uppercase}
+.kpi-ops-category span{display:inline-flex;align-items:center;min-height:22px;padding:3px 8px;border:1px solid color-mix(in srgb,var(--category-color) 30%,#fff);border-radius:999px;background:#fff;font-size:9px;font-weight:900;white-space:nowrap}
+.kpi-ops-subcategory{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 13px 8px 27px;border-left:5px solid var(--category-color);border-bottom:1px solid #DCE6ED;background:color-mix(in srgb,var(--category-light) 48%,#fff);color:#294A65}
+.kpi-ops-subcategory strong{min-width:0;overflow:hidden;font-size:11px;font-weight:950;text-overflow:ellipsis;white-space:nowrap}
+.kpi-ops-subcategory span{flex:0 0 auto;color:#61788B;font-size:9px;font-weight:850;white-space:nowrap}
 .kpi-ops-row{width:100%;margin:0;border:0;border-bottom:1px solid #E8EEF3;background:#fff;color:#2C3E50;font:inherit;text-align:left;cursor:pointer;appearance:none}
 .kpi-ops-row:nth-child(odd){background:#FBFDFE}
 .kpi-ops-row:last-child{border-bottom:0}
@@ -8664,7 +8669,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 @media(max-width:700px){
   .kpi-workbar{grid-template-columns:1fr;padding:10px 11px;gap:9px}
   .kpi-workbar-actions{justify-content:flex-start;overflow-x:auto;flex-wrap:nowrap;padding-bottom:2px;scrollbar-width:thin}
-  .kpi-work-chip,.kpi-work-clear,.kpi-work-plan,.kpi-work-collapse{flex:0 0 auto}
+  .kpi-work-chip,.kpi-work-clear,.kpi-work-plan{flex:0 0 auto}
   .kpi-work-metrics{display:flex;overflow-x:auto;gap:6px;padding-bottom:2px;scrollbar-width:thin}
   .kpi-work-metric{flex:0 0 140px}
   .kpi-ops-shell{overflow-x:auto}
@@ -12295,22 +12300,38 @@ function scrollKpiWorkViewIntoPlace(){
     const targetTop=target.getBoundingClientRect().top+window.scrollY;
     try{headerAutoScrollGuardUntil=performance.now()+650;}catch(_err){}
     window.scrollTo({top:Math.max(0,targetTop-stickyHeight-8),left:0,behavior:"auto"});
+    // Chiều cao header có thể đổi thêm một nhịp sau khi KPI render. Đo lại để
+    // nút Thu gọn không bị lớp menu sticky phủ lên, khiến bấm nhưng không nhận.
+    requestAnimationFrame(()=>{
+      const refreshedTarget=document.querySelector("#results .kpi-workbar");
+      const refreshedSticky=document.querySelector(".sticky");
+      if(!refreshedTarget||!refreshedSticky)return;
+      const overlap=(refreshedSticky.getBoundingClientRect().bottom+8)-refreshedTarget.getBoundingClientRect().top;
+      if(overlap>0)window.scrollBy({top:-overlap,left:0,behavior:"auto"});
+    });
   }));
 }
 function openKpiWorkView(mode){
   closeOverlay("kpiOverlay");
   const next=["all","ton","het","sap"].includes(mode)?mode:"all";
-  activeKpiView=next;kpiWorkSubfilter="all";kpiWorkVisibleLimit=120;kpiWorkbarCollapsed=false;
+  // Bấm một ô KPI là mở danh sách và tự thu gọn ngay, không cần bấm thêm lần hai.
+  activeKpiView=next;kpiWorkSubfilter="all";kpiWorkVisibleLimit=120;kpiWorkbarCollapsed=true;
   searchQ="";quickGroupFilter=null;restockOnly=false;totalStockView=false;
   currentTab="ALL";
   currentStatus=next==="het"?"HET":next==="sap"?"SAP":"ALL";
   const search=document.getElementById("search"),clear=document.getElementById("clear-btn");
   if(search)search.value="";if(clear)clear.style.display="none";
   document.querySelectorAll(".tab-btn").forEach(button=>button.classList.toggle("active",button.dataset.tab==="ALL"));
-  syncHomeStockFilters();syncRestockButton(false);syncStatusButtons(currentStatus);render();
+  syncHomeStockFilters();syncRestockButton(false);syncStatusButtons(currentStatus);
+  // Đây là thu gọn tạm thời dành riêng cho ô KPI, không ghi thành tùy chọn
+  // chung để các màn Máy Tính/Máy In/Camera/Internet không bị ẩn menu.
+  headerManualLockUntil=Date.now()+900;
+  setHeaderCollapsed(true,false);
+  render();
   scrollKpiWorkViewIntoPlace();
 }
 function clearKpiWorkView(){
+  const expandHeader=kpiWorkbarCollapsed;
   activeKpiView="";kpiWorkSubfilter="all";kpiWorkVisibleLimit=120;kpiWorkbarCollapsed=false;currentKpiWorkResults=[];
   document.body.classList.remove("mobile-kpi-work-open");
   searchQ="";quickGroupFilter=null;restockOnly=false;totalStockView=false;
@@ -12318,13 +12339,11 @@ function clearKpiWorkView(){
   const search=document.getElementById("search"),clear=document.getElementById("clear-btn");
   if(search)search.value="";if(clear)clear.style.display="none";
   syncHomeStockFilters();syncRestockButton(false);syncStatusButtons("");render();
-  if(window.matchMedia("(max-width:700px)").matches) setHeaderCollapsed(false,false,{instant:true,preserveAnchor:false});
+  if(expandHeader||window.matchMedia("(max-width:700px)").matches){
+    headerManualLockUntil=Date.now()+1200;
+    setHeaderCollapsed(false,expandHeader,{instant:true,preserveAnchor:false});
+  }
   window.scrollTo({top:0,left:0,behavior:"auto"});
-}
-function toggleKpiWorkbarCollapsed(){
-  if(!activeKpiView) return;
-  kpiWorkbarCollapsed=!kpiWorkbarCollapsed;
-  render();
 }
 function setKpiWorkSubfilter(value){
   kpiWorkSubfilter=String(value||"all");
@@ -12390,10 +12409,9 @@ function renderKpiWorkbar(visibleResults){
   }
   const exportLabel=activeKpiView==="het"||activeKpiView==="sap"?"Xuất kế hoạch Excel":"Xuất danh sách Excel";
   const exportButton=`<button type="button" class="kpi-work-plan" onclick="exportKpiWorkExcel()">${exportLabel}</button>`;
-  const collapseButton=`<button type="button" class="kpi-work-collapse" aria-expanded="${String(!kpiWorkbarCollapsed)}" onclick="toggleKpiWorkbarCollapsed()">${kpiWorkbarCollapsed?"▾ Mở rộng":"▴ Thu gọn"}</button>`;
   const actionButtons=kpiWorkbarCollapsed
-    ? `${collapseButton}<button type="button" class="kpi-work-clear" onclick="clearKpiWorkView()">Bỏ lọc</button>`
-    : `${chips}${exportButton}${collapseButton}<button type="button" class="kpi-work-clear" onclick="clearKpiWorkView()">Bỏ lọc</button>`;
+    ? `<button type="button" class="kpi-work-clear" onclick="clearKpiWorkView()">Bỏ lọc</button>`
+    : `${chips}${exportButton}<button type="button" class="kpi-work-clear" onclick="clearKpiWorkView()">Bỏ lọc</button>`;
   return `<section class="kpi-workbar${kpiWorkbarCollapsed?" is-collapsed":""}" style="--work-accent:${config.accent}" aria-label="Bộ lọc tồn kho đang dùng"><span class="kpi-workbar-copy"><strong class="kpi-workbar-title">${escapeHtml(config.title)}</strong><span class="kpi-workbar-note">${escapeHtml(config.note)}</span></span><span class="kpi-workbar-actions">${actionButtons}</span><span class="kpi-work-metrics">${metrics}</span></section>`;
 }
 function showMoreKpiWorkRows(){
@@ -12406,7 +12424,7 @@ function renderKpiOperationalList(results){
   const purchaseMode=activeKpiView==="het"||activeKpiView==="sap";
   const financeHead=canSeeCost?(purchaseMode?"Ngân sách nhập":"Giá trị vốn"):"Giá bán";
   const shown=entries.slice(0,kpiWorkVisibleLimit);
-  const rows=shown.map(item=>{
+  const renderKpiOperationalRow=item=>{
     const r=item.r;
     const action=getInventoryAction(item);
     const suggestion=getRestockSuggestionDetails(item);
@@ -12431,6 +12449,36 @@ function renderKpiOperationalList(results){
     const suggestedNote=suggestion.suggested>0?`Mục tiêu ${suggestion.target}`:(item.state==="CON"?"Đủ tồn":"Chưa có sức bán");
     const financeClass=canSeeCost?(purchaseMode&&suggestion.suggested<=0?"":Number(r[4])>0?"is-money":"is-alert"):"";
     return `<button type="button" class="kpi-ops-row" onclick="openSummaryInventoryItem(${item.i})" aria-label="Mở ${escapeHtml(r[2]||r[1]||"mặt hàng")}"><span class="kpi-ops-priority ${priorityClass}">${escapeHtml(action.shortLabel)}</span><span class="kpi-ops-product"><b>${escapeHtml(r[2]||"Chưa có tên")}</b><small>${escapeHtml(r[1]||"Chưa có mã")} · ${escapeHtml(r[3]||"Chưa rõ hãng")}</small></span><span class="kpi-ops-group"><b>${escapeHtml(group||"Chưa phân nhóm")}</b><small>Kho ${escapeHtml(r[13]||"Q2")}</small></span><span class="kpi-ops-number ${stockClass}">${item.stock}<small>Ngưỡng ${item.threshold}</small></span><span class="kpi-ops-number">${item.sales30.toLocaleString("vi-VN")}<small>Bán 30 ngày</small></span><span class="kpi-ops-number ${suggestion.suggested>0?"is-warn":""}">${suggestedText}<small>${escapeHtml(suggestedNote)}</small></span><span class="kpi-ops-number ${financeClass}">${escapeHtml(financeValue)}<small>${escapeHtml(financeNote)}</small></span></button>`;
+  };
+  const categoryOrder=["MT","MI","CAM","INT"];
+  const categoryGroups=new Map();
+  shown.forEach(item=>{
+    const key=categoryOrder.includes(String(item.r?.[0]||""))?String(item.r[0]):"OTHER";
+    if(!categoryGroups.has(key))categoryGroups.set(key,[]);
+    categoryGroups.get(key).push(item);
+  });
+  const orderedCategories=[...categoryOrder.filter(key=>categoryGroups.has(key)),...categoryGroups.keys()].filter((key,index,list)=>list.indexOf(key)===index);
+  const rows=orderedCategories.map(key=>{
+    const items=categoryGroups.get(key)||[];
+    const config=SHEET_CFG[key]||{label:"📦 KHÁC",c:"#566573",light:"#EBEDEF"};
+    const divider=`<div class="kpi-ops-category" style="--category-color:${escapeHtml(config.c)};--category-light:${escapeHtml(config.light)}"><strong>${escapeHtml(config.label)}</strong><span>${items.length.toLocaleString("vi-VN")} mã</span></div>`;
+    const productGroups=new Map();
+    items.forEach(item=>{
+      const label=cleanKpiPathLabel(getSummaryHierarchyGroup(item.r)||NO_GROUP)||"Chưa phân nhóm";
+      if(!productGroups.has(label))productGroups.set(label,[]);
+      productGroups.get(label).push(item);
+    });
+    const groupBlocks=[...productGroups.entries()].map(([label,groupItems])=>{
+      const totalStock=groupItems.reduce((sum,item)=>sum+(Number(item.stock)||0),0);
+      const lowCount=groupItems.filter(item=>item.state==="SAP").length;
+      const outCount=groupItems.filter(item=>item.state==="HET").length;
+      const stats=[`${groupItems.length.toLocaleString("vi-VN")} mục`,`${totalStock.toLocaleString("vi-VN")} tồn`];
+      if(lowCount)stats.push(`${lowCount.toLocaleString("vi-VN")} sắp hết`);
+      if(outCount)stats.push(`${outCount.toLocaleString("vi-VN")} hết`);
+      const groupDivider=`<div class="kpi-ops-subcategory" style="--category-color:${escapeHtml(config.c)};--category-light:${escapeHtml(config.light)}"><strong>${escapeHtml(label)}</strong><span>${escapeHtml(stats.join(" · "))}</span></div>`;
+      return groupDivider+groupItems.map(renderKpiOperationalRow).join("");
+    }).join("");
+    return divider+groupBlocks;
   }).join("");
   const more=entries.length>shown.length?`<button type="button" class="kpi-ops-more" onclick="showMoreKpiWorkRows()">Hiện thêm 120 dòng · Còn ${(entries.length-shown.length).toLocaleString("vi-VN")}</button>`:"";
   return `<section class="kpi-ops-shell"><div class="kpi-ops-toolbar"><span>Đang hiển thị ${shown.length.toLocaleString("vi-VN")}/${entries.length.toLocaleString("vi-VN")} mã · Bấm dòng để mở chi tiết</span></div><div class="kpi-ops-table"><div class="kpi-ops-head"><span>Quyết định</span><span>Mã / mặt hàng</span><span>Nhóm / kho</span><span>Tồn</span><span>Sức bán</span><span>Đề xuất nhập</span><span>${escapeHtml(financeHead)}</span></div>${rows||'<div class="kpi-ops-empty">Không có mặt hàng phù hợp.</div>'}</div>${more}</section>`;
@@ -19403,6 +19451,10 @@ function goToTab(tabCode,{groupKey=""}={}){
   restockOnly = false;
   activeKpiView = "";
   kpiWorkSubfilter = "all";
+  kpiWorkbarCollapsed = false;
+  // Điều hướng danh mục luôn trả menu về trạng thái đầy đủ. Chỉ bốn ô KPI
+  // mới được phép tự thu gọn phần đầu.
+  expandHeaderForCatalogNavigation();
   syncRestockButton(false);
 
   const searchEl = document.getElementById("search");
@@ -21603,12 +21655,12 @@ function setHeaderCollapsed(collapsed, persist=false, options={}){
   if(instant) sticky.classList.add('header-auto-changing');
   sticky.classList.toggle('collapsed', isCollapsed);
   const btn = document.getElementById('headerToggleBtn');
-  const toggleLabel = isCollapsed ? 'Mở rộng' : 'Thu gọn';
+  const toggleLabel = isCollapsed ? 'M\u1EDF r\u1ED9ng Menu' : 'Thu gọn';
   document.getElementById('headerToggleIcon').textContent = isCollapsed ? '▼' : '▲';
   document.getElementById('headerToggleText').textContent = toggleLabel;
   btn.setAttribute('aria-expanded', String(!isCollapsed));
   btn.removeAttribute('title');
-  btn.setAttribute('aria-label',`${toggleLabel} menu`);
+  btn.setAttribute('aria-label',isCollapsed ? 'Mở rộng Menu' : 'Thu gọn menu');
   const toggleTooltip=document.getElementById('headerToggleTooltip');
   if(toggleTooltip) toggleTooltip.textContent=toggleLabel.toLocaleUpperCase('vi-VN');
   document.getElementById('results').style.paddingTop = isCollapsed ? '6px' : '';
@@ -21631,10 +21683,21 @@ function setHeaderCollapsed(collapsed, persist=false, options={}){
   if(instant) requestAnimationFrame(()=>sticky.classList.remove('header-auto-changing'));
   return true;
 }
+function setHeaderCollapsedFromManualControl(collapsed){
+  headerManualLockUntil = Date.now() + 900;
+  return setHeaderCollapsed(Boolean(collapsed), true);
+}
+function expandHeaderForCatalogNavigation(){
+  headerManualLockUntil = Date.now() + 1200;
+  try{ localStorage.setItem(HEADER_COLLAPSE_PREF_KEY,'0'); }catch(_err){}
+  return setHeaderCollapsed(false, false);
+}
 function toggleHeader(){
   const sticky = document.querySelector('.sticky');
-  headerManualLockUntil = Date.now() + 900;
-  setHeaderCollapsed(!sticky?.classList.contains('collapsed'), true);
+  const shouldCollapse=!sticky?.classList.contains('collapsed');
+  if(activeKpiView) kpiWorkbarCollapsed=shouldCollapse;
+  setHeaderCollapsedFromManualControl(shouldCollapse);
+  if(activeKpiView) render();
 }
 function openHeaderFilters(){
   setHeaderCollapsed(false, false);
