@@ -3621,6 +3621,7 @@ body {
 .reminder-form-actions{grid-column:1/-1;display:grid;grid-template-columns:1fr 2fr;gap:8px}.reminder-form-actions button{min-height:40px;border:0;border-radius:10px;font-size:12px;font-weight:900;cursor:pointer}.reminder-cancel{background:#E9E9ED;color:#555}.reminder-save{background:#FFB000;color:#fff}
 .reminder-toolbar{display:flex;gap:6px;padding:9px 12px;background:#F5F5F7}.reminder-filter{border:0;border-radius:999px;padding:7px 11px;background:#E5E5EA;color:#555;font-size:10px;font-weight:850;cursor:pointer}.reminder-filter.active{background:#1C1C1E;color:#fff}.reminder-list{display:grid;gap:8px;max-height:52dvh;padding:2px 12px 14px;overflow:auto;overscroll-behavior:contain}
 .reminder-empty{padding:44px 15px;color:#8E8E93;text-align:center;font-size:13px}.reminder-item{display:grid;grid-template-columns:27px minmax(0,1fr) auto;gap:8px;padding:11px;border:1px solid #E0E0E5;border-radius:14px;background:#fff;box-shadow:0 2px 7px rgba(30,58,95,.06)}.reminder-item.overdue{border-color:#FFAAA5;background:#FFF8F7}.reminder-item.done{opacity:.62}.reminder-check{width:23px;height:23px;margin-top:1px;border:2px solid #C7C7CC;border-radius:50%;background:#fff;color:#fff;cursor:pointer}.reminder-item.done .reminder-check{border-color:#34C759;background:#34C759}.reminder-item-copy{min-width:0}.reminder-item-title{display:flex;align-items:center;gap:5px;color:#1C1C1E;font-size:13px;font-weight:900}.reminder-priority{width:7px;height:7px;border-radius:50%;background:#8E8E93}.reminder-priority.HIGH{background:#FF3B30}.reminder-priority.LOW{background:#34C759}.reminder-item-note{margin-top:4px;color:#48484A;font-size:12px;line-height:1.35;white-space:pre-wrap;overflow-wrap:anywhere}.reminder-item-meta{display:flex;flex-wrap:wrap;align-items:center;gap:4px;margin-top:7px;color:#77777E;font-size:9px}.reminder-date-chip,.reminder-time-chip{display:inline-flex;align-items:center;padding:3px 6px;border-radius:999px;background:#EFEFF4;color:#505057;font-weight:900}.reminder-time-chip{background:#FFF1CC;color:#9A6200}.reminder-state-chip{font-weight:950}.reminder-item.overdue .reminder-state-chip{color:#D22E24}.reminder-item.done .reminder-state-chip{color:#248A3D}.reminder-item-actions{display:flex;flex-direction:column;gap:4px}.reminder-item-actions button{width:29px;height:29px;border:0;border-radius:8px;background:#EFEFF4;color:#5B5B60;cursor:pointer}.reminder-loading{padding:45px 15px;color:#777;text-align:center;font-size:12px}
+.reminder-item.cancelled{border-color:#D7D7DC;background:#F7F7F9;opacity:.72}.reminder-item.cancelled .reminder-check{display:grid;place-items:center;border-color:#8E8E93;background:#8E8E93;color:#fff;cursor:default}.reminder-item.cancelled .reminder-state-chip{color:#6E6E73}.reminder-item-actions .reminder-cancel-action{width:auto;min-width:44px;padding:0 8px;background:#FFF0EF;color:#C9342D;font-size:9px;font-weight:950;white-space:nowrap}.reminder-item-actions .reminder-cancel-action:hover,.reminder-item-actions .reminder-cancel-action:focus-visible{background:#FFDCD9;outline:2px solid #FF9D96;outline-offset:1px}
 @media(max-width:600px){.reminder-edge-btn{position:fixed!important;z-index:326;left:max(3px,env(safe-area-inset-left));top:auto!important;bottom:max(14px,calc(env(safe-area-inset-bottom) + 8px))!important;width:38px;min-height:88px;border-radius:0!important;transform:none!important}.reminder-edge-label{font-size:8px}.reminder-dialog{width:calc(100vw - 18px);max-height:calc(100dvh - 18px);margin:0;border-radius:18px}.reminder-overlay{justify-content:center;padding:9px}.reminder-form{grid-template-columns:1fr}.reminder-field.wide,.reminder-form-actions{grid-column:1}.reminder-list{max-height:48dvh}}
 </style>
 <style id="mobile-typography">
@@ -8619,7 +8620,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .kpi-work-metric{min-width:0;display:grid;gap:2px;padding:8px 10px;border:1px solid #E0E8EF;border-radius:10px;background:rgba(255,255,255,.9)}
 .kpi-work-metric b{overflow:hidden;color:#193A59;font-size:13px;font-weight:950;text-overflow:ellipsis;white-space:nowrap}
 .kpi-work-metric span{overflow:hidden;color:#718395;font-size:9px;font-weight:800;text-overflow:ellipsis;white-space:nowrap}
-.kpi-work-chip,.kpi-work-clear,.kpi-work-plan{
+.kpi-work-chip,.kpi-work-clear,.kpi-work-plan,.kpi-work-collapse{
   min-height:32px;
   margin:0;
   padding:6px 10px;
@@ -8631,11 +8632,15 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
   white-space:nowrap;
   cursor:pointer;
 }
-.kpi-work-chip:hover,.kpi-work-chip:focus-visible,.kpi-work-clear:hover,.kpi-work-clear:focus-visible,.kpi-work-plan:hover,.kpi-work-plan:focus-visible{border-color:var(--work-accent);outline:none}
+.kpi-work-chip:hover,.kpi-work-chip:focus-visible,.kpi-work-clear:hover,.kpi-work-clear:focus-visible,.kpi-work-plan:hover,.kpi-work-plan:focus-visible,.kpi-work-collapse:hover,.kpi-work-collapse:focus-visible{border-color:var(--work-accent);outline:none}
 .kpi-work-chip.is-active{border-color:var(--work-accent);background:var(--work-accent);color:#fff;box-shadow:0 3px 9px color-mix(in srgb,var(--work-accent) 24%,transparent)}
 .kpi-work-chip span{opacity:.78}
 .kpi-work-plan{border-color:color-mix(in srgb,#1E8449 42%,#CAD9E5);color:#176D3C}
 .kpi-work-clear{color:#8A3340}
+.kpi-work-collapse{border-color:color-mix(in srgb,var(--work-accent) 48%,#CAD9E5);background:color-mix(in srgb,var(--work-accent) 8%,#fff);color:var(--work-accent)}
+.kpi-workbar.is-collapsed{grid-template-columns:minmax(0,1fr) auto;gap:8px;margin-bottom:8px;padding:8px 12px}
+.kpi-workbar.is-collapsed .kpi-workbar-note,.kpi-workbar.is-collapsed .kpi-work-metrics{display:none}
+.kpi-workbar.is-collapsed .kpi-workbar-actions{flex-wrap:nowrap}
 .kpi-ops-shell{margin-top:0;border:1px solid #DCE6ED;border-radius:13px;background:#fff;box-shadow:0 5px 18px rgba(25,57,82,.07);overflow:hidden}
 .kpi-ops-toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 12px;border-bottom:1px solid #E3EBF1;background:#F7FAFC;color:#5D7283;font-size:10px;font-weight:800}
 .kpi-ops-table{min-width:940px}
@@ -8659,7 +8664,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 @media(max-width:700px){
   .kpi-workbar{grid-template-columns:1fr;padding:10px 11px;gap:9px}
   .kpi-workbar-actions{justify-content:flex-start;overflow-x:auto;flex-wrap:nowrap;padding-bottom:2px;scrollbar-width:thin}
-  .kpi-work-chip,.kpi-work-clear,.kpi-work-plan{flex:0 0 auto}
+  .kpi-work-chip,.kpi-work-clear,.kpi-work-plan,.kpi-work-collapse{flex:0 0 auto}
   .kpi-work-metrics{display:flex;overflow-x:auto;gap:6px;padding-bottom:2px;scrollbar-width:thin}
   .kpi-work-metric{flex:0 0 140px}
   .kpi-ops-shell{overflow-x:auto}
@@ -8854,7 +8859,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
       <label class="reminder-field"><span>Mức ưu tiên</span><select id="reminderPriority"><option value="NORMAL">Bình thường</option><option value="HIGH">Quan trọng</option><option value="LOW">Ít quan trọng</option></select></label>
       <div class="reminder-form-actions"><button class="reminder-cancel" type="button" onclick="closeReminderForm()">Hủy</button><button class="reminder-save" id="reminderSaveButton" type="submit">LƯU GHI CHÚ</button></div>
     </form>
-    <div class="reminder-toolbar" role="group" aria-label="Lọc ghi chú"><button class="reminder-filter active" type="button" data-reminder-filter="ACTIVE" onclick="setReminderFilter('ACTIVE',this)">NHẮC HẸN</button><button class="reminder-filter" type="button" data-reminder-filter="OVERDUE" onclick="setReminderFilter('OVERDUE',this)">Quá hạn</button><button class="reminder-filter" type="button" data-reminder-filter="DONE" onclick="setReminderFilter('DONE',this)">Đã xong</button></div>
+    <div class="reminder-toolbar" role="group" aria-label="Lọc ghi chú"><button class="reminder-filter active" type="button" data-reminder-filter="ACTIVE" onclick="setReminderFilter('ACTIVE',this)">NHẮC HẸN</button><button class="reminder-filter" type="button" data-reminder-filter="OVERDUE" onclick="setReminderFilter('OVERDUE',this)">Quá hạn</button><button class="reminder-filter" type="button" data-reminder-filter="DONE" onclick="setReminderFilter('DONE',this)">Đã xong</button><button class="reminder-filter" type="button" data-reminder-filter="CANCELLED" onclick="setReminderFilter('CANCELLED',this)">Đã hủy</button></div>
     <div class="reminder-list" id="reminderList"><div class="reminder-loading">Đang tải ghi chú…</div></div>
   </section>
 </div>
@@ -10139,6 +10144,7 @@ let totalStockView = false;
 let activeKpiView = "";
 let kpiWorkSubfilter = "all";
 let kpiWorkVisibleLimit = 120;
+let kpiWorkbarCollapsed = false;
 let currentKpiWorkResults = [];
 let searchQ = "";
 const SEARCH_KEYWORD_POOL = ["SSD","RAM","Nguồn","Mainboard","CPU","HP","Canon","Camera wifi","Laptop","Màn hình","Chuột","Bàn phím","Router","Switch","HDMI","Máy in"];
@@ -10628,7 +10634,7 @@ async function checkAdminSession(){
 
 // Dòng URL duy nhất
 const SHEET_API_URL = "https://script.google.com/macros/s/AKfycby6YH69F7sfO1ZoUJsDm4BeX6Luj2GrhUfYWWJWNvqjraAEhkBck16EphrPBBm1BT3YqA/exec";
-const REQUIRED_API_VERSION = "2026.08.30-reminder-timezone-countdown-24";
+const REQUIRED_API_VERSION = "2026.09.03-reminder-cancel-kpi-collapse-25";
 // Apps Script có thể phải chờ khóa ghi khi nhiều thao tác diễn ra gần nhau.
 // 45 giây dài hơn thời gian chờ khóa phía máy chủ, tránh báo lỗi giả trong khi Sheet vẫn đang ghi.
 const SHEET_TIMEOUT_MS = 45000;
@@ -11331,7 +11337,7 @@ async function fetchSheetJson(url, options={}, timeoutMs=SHEET_TIMEOUT_MS){
   const safeReadPost=new Set(["private_products","private_customers","private_customer_records","private_reminders","private_partners","private_partner_jobs","private_recent_activity","private_transaction_details","private_transaction_by_id","private_tx","private_nv","private_units","private_transfers","private_product_activity","validate_admin_session","validate_employee_session","get_error_logs"]).has(context.action);
   // replace_all có fingerprint và có thể đối chiếu noop sau khi phản hồi bị mất,
   // vì vậy retry 404/timeout an toàn hơn để người dùng không phải chờ chu kỳ hôm sau.
-  const safeIdempotentWritePost=new Set(["replace_all","upsert_product","delete_product","delete_products","delete_products_by_branch","create_units","restore_trash","delete_customer","delete_customer_record","delete_partner_job","delete_inventory_transaction","commit_inventory_transaction","transfer_inventory","save_config","save_product_links","rename_group","rename_quick_tag"]).has(context.action);
+  const safeIdempotentWritePost=new Set(["replace_all","upsert_product","delete_product","delete_products","delete_products_by_branch","create_units","restore_trash","delete_customer","delete_customer_record","delete_partner_job","delete_inventory_transaction","commit_inventory_transaction","transfer_inventory","save_config","save_product_links","rename_group","rename_quick_tag","cancel_reminder"]).has(context.action);
   // Request đọc dữ liệu khởi động có thể chậm khi Apps Script vừa nguội. Chỉ thử
   // tối đa hai lần để không giữ giao diện ở "Đang tải" qua nhiều chu kỳ 45 giây.
   const startupReadTypes=new Set(["data","config","product_links","recent_activity"]);
@@ -12294,7 +12300,7 @@ function scrollKpiWorkViewIntoPlace(){
 function openKpiWorkView(mode){
   closeOverlay("kpiOverlay");
   const next=["all","ton","het","sap"].includes(mode)?mode:"all";
-  activeKpiView=next;kpiWorkSubfilter="all";kpiWorkVisibleLimit=120;
+  activeKpiView=next;kpiWorkSubfilter="all";kpiWorkVisibleLimit=120;kpiWorkbarCollapsed=false;
   searchQ="";quickGroupFilter=null;restockOnly=false;totalStockView=false;
   currentTab="ALL";
   currentStatus=next==="het"?"HET":next==="sap"?"SAP":"ALL";
@@ -12305,7 +12311,7 @@ function openKpiWorkView(mode){
   scrollKpiWorkViewIntoPlace();
 }
 function clearKpiWorkView(){
-  activeKpiView="";kpiWorkSubfilter="all";kpiWorkVisibleLimit=120;currentKpiWorkResults=[];
+  activeKpiView="";kpiWorkSubfilter="all";kpiWorkVisibleLimit=120;kpiWorkbarCollapsed=false;currentKpiWorkResults=[];
   document.body.classList.remove("mobile-kpi-work-open");
   searchQ="";quickGroupFilter=null;restockOnly=false;totalStockView=false;
   currentTab="ALL";currentStatus="ALL";
@@ -12314,6 +12320,11 @@ function clearKpiWorkView(){
   syncHomeStockFilters();syncRestockButton(false);syncStatusButtons("");render();
   if(window.matchMedia("(max-width:700px)").matches) setHeaderCollapsed(false,false,{instant:true,preserveAnchor:false});
   window.scrollTo({top:0,left:0,behavior:"auto"});
+}
+function toggleKpiWorkbarCollapsed(){
+  if(!activeKpiView) return;
+  kpiWorkbarCollapsed=!kpiWorkbarCollapsed;
+  render();
 }
 function setKpiWorkSubfilter(value){
   kpiWorkSubfilter=String(value||"all");
@@ -12379,7 +12390,11 @@ function renderKpiWorkbar(visibleResults){
   }
   const exportLabel=activeKpiView==="het"||activeKpiView==="sap"?"Xuất kế hoạch Excel":"Xuất danh sách Excel";
   const exportButton=`<button type="button" class="kpi-work-plan" onclick="exportKpiWorkExcel()">${exportLabel}</button>`;
-  return `<section class="kpi-workbar" style="--work-accent:${config.accent}" aria-label="Bộ lọc tồn kho đang dùng"><span class="kpi-workbar-copy"><strong class="kpi-workbar-title">${escapeHtml(config.title)}</strong><span class="kpi-workbar-note">${escapeHtml(config.note)}</span></span><span class="kpi-workbar-actions">${chips}${exportButton}<button type="button" class="kpi-work-clear" onclick="clearKpiWorkView()">Bỏ lọc</button></span><span class="kpi-work-metrics">${metrics}</span></section>`;
+  const collapseButton=`<button type="button" class="kpi-work-collapse" aria-expanded="${String(!kpiWorkbarCollapsed)}" onclick="toggleKpiWorkbarCollapsed()">${kpiWorkbarCollapsed?"▾ Mở rộng":"▴ Thu gọn"}</button>`;
+  const actionButtons=kpiWorkbarCollapsed
+    ? `${collapseButton}<button type="button" class="kpi-work-clear" onclick="clearKpiWorkView()">Bỏ lọc</button>`
+    : `${chips}${exportButton}${collapseButton}<button type="button" class="kpi-work-clear" onclick="clearKpiWorkView()">Bỏ lọc</button>`;
+  return `<section class="kpi-workbar${kpiWorkbarCollapsed?" is-collapsed":""}" style="--work-accent:${config.accent}" aria-label="Bộ lọc tồn kho đang dùng"><span class="kpi-workbar-copy"><strong class="kpi-workbar-title">${escapeHtml(config.title)}</strong><span class="kpi-workbar-note">${escapeHtml(config.note)}</span></span><span class="kpi-workbar-actions">${actionButtons}</span><span class="kpi-work-metrics">${metrics}</span></section>`;
 }
 function showMoreKpiWorkRows(){
   kpiWorkVisibleLimit+=120;
@@ -18951,7 +18966,7 @@ function captureAddReturnState(){
   const row=idx>=0 ? DATA[idx] : null;
   return {
     tab:currentTab, status:currentStatus, totalStockView, restockOnly, searchQ,
-    activeKpiView, kpiWorkSubfilter,
+    activeKpiView, kpiWorkSubfilter, kpiWorkbarCollapsed,
     quickGroupFilter, branch:currentBranch, scrollY:window.scrollY,
     anchorCode:row ? String(row[1]||"") : "", anchorBranch:row ? String(row[13]||"Q2") : "",
     anchorTop:visible ? visible.getBoundingClientRect().top : null
@@ -19019,7 +19034,7 @@ function restoreAfterAdd(state){
   if(!state) return;
   currentTab=state.tab; currentStatus=state.status; totalStockView=state.totalStockView;
   restockOnly=state.restockOnly; searchQ=state.searchQ; quickGroupFilter=state.quickGroupFilter;
-  activeKpiView=state.activeKpiView||""; kpiWorkSubfilter=state.kpiWorkSubfilter||"all";
+  activeKpiView=state.activeKpiView||""; kpiWorkSubfilter=state.kpiWorkSubfilter||"all"; kpiWorkbarCollapsed=!!state.kpiWorkbarCollapsed;
   currentBranch=state.branch;
   const searchEl=document.getElementById("search"), clearBtn=document.getElementById("clear-btn");
   if(searchEl) searchEl.value=searchQ;
@@ -19036,7 +19051,7 @@ function restoreAfterEdit(state){
   if(!state) return;
   currentTab=state.tab; currentStatus=state.status; totalStockView=state.totalStockView;
   restockOnly=state.restockOnly; searchQ=state.searchQ; quickGroupFilter=state.quickGroupFilter;
-  activeKpiView=state.activeKpiView||""; kpiWorkSubfilter=state.kpiWorkSubfilter||"all";
+  activeKpiView=state.activeKpiView||""; kpiWorkSubfilter=state.kpiWorkSubfilter||"all"; kpiWorkbarCollapsed=!!state.kpiWorkbarCollapsed;
   currentBranch=state.branch;
   const syncView=()=>{
     const searchEl=document.getElementById("search"), clearBtn=document.getElementById("clear-btn");
@@ -19879,7 +19894,7 @@ function isPrivateAuthFailure(error){
 }
 async function privateSheet(action,data={},timeoutMs=SHEET_TIMEOUT_MS){
   const adminToken=sessionStorage.getItem("kho_admin_session_token") || "";
-  const customerActions=new Set(["private_customers","private_customer_records","upsert_customer","upsert_customer_record","private_reminders","upsert_reminder","complete_reminder","delete_reminder"]);
+  const customerActions=new Set(["private_customers","private_customer_records","upsert_customer","upsert_customer_record","private_reminders","upsert_reminder","complete_reminder","cancel_reminder","delete_reminder"]);
   const partnerActions=new Set(["private_partners","private_partner_jobs","upsert_partner","upsert_partner_job"]);
   const area=partnerActions.has(action)?"partner":customerActions.has(action)?"customer":"";
   const areaToken=area?getEmployeePrivateAreaToken(area):"";
@@ -22830,17 +22845,39 @@ function checkDueReminders(){
 }
 function setReminderFilter(value,button){reminderFilter=value;document.querySelectorAll(".reminder-filter").forEach(item=>item.classList.toggle("active",item===button));renderReminders();}
 function renderReminders(){
-  const list=document.getElementById("reminderList");if(!list)return;const now=Date.now(),adminCanEdit=isReminderAdmin();
-  const rows=REMINDER_DATA.filter(item=>reminderFilter==="DONE"?item.status==="DONE":reminderFilter==="OVERDUE"?item.status==="ACTIVE"&&reminderDateValue(item.remindAt)<=now:item.status==="ACTIVE"&&reminderDateValue(item.remindAt)>now);
-  list.innerHTML=rows.length?rows.map(item=>{const overdue=item.status==="ACTIVE"&&reminderDateValue(item.remindAt)<=now,done=item.status==="DONE",parts=reminderDateParts(item.remindAt),check=adminCanEdit?`<button class="reminder-check" type="button" aria-label="${done?"Mở lại":"Đánh dấu hoàn tất"}" onclick="toggleReminderDone('${escapeHtml(item.id)}')">${done?"✓":""}</button>`:`<span class="reminder-check" aria-hidden="true">${done?"✓":""}</span>`,actions=adminCanEdit?`<div class="reminder-item-actions"><button type="button" title="Sửa" aria-label="Sửa ghi chú" onclick="editReminder('${escapeHtml(item.id)}')"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m4 20 4.3-1 10.9-10.9a2.1 2.1 0 0 0-3-3L5.3 16 4 20Z"></path><path d="m14.8 6.5 3 3"></path></svg></button><button type="button" title="Xóa" aria-label="Xóa ghi chú" onclick="deleteReminder('${escapeHtml(item.id)}')"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M7 7l1 14h8l1-14M10 11v6M14 11v6"></path></svg></button></div>`:"",countdown=!done?`<span class="reminder-countdown-chip" data-reminder-countdown="${escapeHtml(item.remindAt)}">${escapeHtml(reminderCountdownText(item.remindAt,now))}</span>`:"";return `<article class="reminder-item${overdue?" overdue":""}${done?" done":""}">${check}<div class="reminder-item-copy"><div class="reminder-item-title"><i class="reminder-priority ${escapeHtml(item.priority)}"></i>${escapeHtml(item.customerName)}${item.phone?` · ${escapeHtml(item.phone)}`:""}</div><div class="reminder-item-note">${escapeHtml(item.content)}</div><div class="reminder-item-meta"><span class="reminder-state-chip">${overdue?"QUÁ HẠN":done?"ĐÃ HOÀN TẤT":"SẮP TỚI"}</span><span class="reminder-date-chip">📅 ${escapeHtml(parts.date)}</span><span class="reminder-time-chip">⏰ ${escapeHtml(parts.time)}</span>${countdown}${item.createdBy?`<span>· ${escapeHtml(item.createdBy)}</span>`:""}</div></div>${actions}</article>`;}).join(""):`<div class="reminder-empty">${reminderFilter==="DONE"?"Chưa có ghi chú đã hoàn tất.":reminderFilter==="OVERDUE"?"Không có ghi chú quá hạn.":"Chưa có lịch nhắc sắp tới."}</div>`;
+  const list=document.getElementById("reminderList");
+  if(!list)return;
+  const now=Date.now(),adminCanEdit=isReminderAdmin();
+  const rows=REMINDER_DATA.filter(item=>{
+    if(reminderFilter==="DONE")return item.status==="DONE";
+    if(reminderFilter==="CANCELLED")return item.status==="CANCELLED";
+    if(reminderFilter==="OVERDUE")return item.status==="ACTIVE"&&reminderDateValue(item.remindAt)<=now;
+    return item.status==="ACTIVE"&&reminderDateValue(item.remindAt)>now;
+  });
+  list.innerHTML=rows.length?rows.map(item=>{
+    const overdue=item.status==="ACTIVE"&&reminderDateValue(item.remindAt)<=now;
+    const done=item.status==="DONE",cancelled=item.status==="CANCELLED",active=item.status==="ACTIVE";
+    const parts=reminderDateParts(item.remindAt);
+    const check=cancelled
+      ? `<span class="reminder-check" aria-label="Đã hủy">×</span>`
+      : adminCanEdit
+        ? `<button class="reminder-check" type="button" aria-label="${done?"Mở lại":"Đánh dấu hoàn tất"}" onclick="toggleReminderDone('${escapeHtml(item.id)}')">${done?"✓":""}</button>`
+        : `<span class="reminder-check" aria-hidden="true">${done?"✓":""}</span>`;
+    const editButton=!cancelled?`<button type="button" title="Sửa" aria-label="Sửa ghi chú" onclick="editReminder('${escapeHtml(item.id)}')"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m4 20 4.3-1 10.9-10.9a2.1 2.1 0 0 0-3-3L5.3 16 4 20Z"></path><path d="m14.8 6.5 3 3"></path></svg></button>`:"";
+    const cancelButton=active?`<button class="reminder-cancel-action" type="button" title="Hủy lịch nhắc" aria-label="Hủy lịch nhắc" onclick="cancelReminder('${escapeHtml(item.id)}')">HỦY</button>`:"";
+    const deleteButton=`<button type="button" title="Xóa" aria-label="Xóa ghi chú" onclick="deleteReminder('${escapeHtml(item.id)}')"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M7 7l1 14h8l1-14M10 11v6M14 11v6"></path></svg></button>`;
+    const actions=adminCanEdit?`<div class="reminder-item-actions">${editButton}${cancelButton}${deleteButton}</div>`:"";
+    const countdown=active?`<span class="reminder-countdown-chip" data-reminder-countdown="${escapeHtml(item.remindAt)}">${escapeHtml(reminderCountdownText(item.remindAt,now))}</span>`:"";
+    const stateText=cancelled?"ĐÃ HỦY":overdue?"QUÁ HẠN":done?"ĐÃ HOÀN TẤT":"NHẮC HẸN";
+    return `<article class="reminder-item${overdue?" overdue":""}${done?" done":""}${cancelled?" cancelled":""}">${check}<div class="reminder-item-copy"><div class="reminder-item-title"><i class="reminder-priority ${escapeHtml(item.priority)}"></i>${escapeHtml(item.customerName)}${item.phone?` · ${escapeHtml(item.phone)}`:""}</div><div class="reminder-item-note">${escapeHtml(item.content)}</div><div class="reminder-item-meta"><span class="reminder-state-chip">${stateText}</span><span class="reminder-date-chip">📅 ${escapeHtml(parts.date)}</span><span class="reminder-time-chip">⏰ ${escapeHtml(parts.time)}</span>${countdown}${item.createdBy?`<span>· ${escapeHtml(item.createdBy)}</span>`:""}</div></div>${actions}</article>`;
+  }).join(""):`<div class="reminder-empty">${reminderFilter==="DONE"?"Chưa có ghi chú đã hoàn tất.":reminderFilter==="CANCELLED"?"Chưa có ghi chú đã hủy.":reminderFilter==="OVERDUE"?"Không có ghi chú quá hạn.":"Chưa có lịch nhắc sắp tới."}</div>`;
   updateReminderCountdowns();
-  list.querySelectorAll(".reminder-state-chip").forEach(element=>{if(element.textContent==="SẮP TỚI")element.textContent="NHẮC HẸN";});
 }
 function defaultReminderTime(){const date=new Date(Date.now()+60*60*1000);date.setMinutes(Math.ceil(date.getMinutes()/5)*5,0,0);return new Date(date.getTime()-date.getTimezoneOffset()*60000).toISOString().slice(0,16);}
 function isReminderAdmin(){return isAdminMode()&&!!sessionStorage.getItem("kho_admin_session_token");}
 function requireReminderAdmin(){
   if(isReminderAdmin())return true;
-  closeReminderPanel();showToast("Chỉ Admin được thêm, sửa hoặc xóa ghi chú.",4200);
+  closeReminderPanel();showToast("Chỉ Admin được thêm, sửa, hủy hoặc xóa ghi chú.",4200);
   setTimeout(()=>{revealAdminEntry(false);if(!document.getElementById("adminOverlay")?.classList.contains("open"))onAdminBtnClick();},80);
   return false;
 }
@@ -22857,6 +22894,18 @@ async function saveReminder(event){
   try{const result=await privateSheet("upsert_reminder",data,35000);const index=REMINDER_DATA.findIndex(item=>item.id===result.reminder.id);if(index>=0)REMINDER_DATA[index]=result.reminder;else REMINDER_DATA.push(result.reminder);finishSyncActionFeedback(feedbackButton,true);renderReminders();updateReminderBadge();showToast("✅ Đã lưu lịch nhắc",3000);setTimeout(()=>closeReminderForm(),780);}catch(error){finishSyncActionFeedback(feedbackButton,false);showToast("⚠️ Không lưu được ghi chú: "+privateErrorText(error),5500);}
 }
 async function toggleReminderDone(id){const item=REMINDER_DATA.find(row=>row.id===id);if(!item||!requireReminderAdmin())return;try{const result=await privateSheet("complete_reminder",{id:item.id,expectedVersion:item.version,completed:item.status!=="DONE"},30000);REMINDER_DATA[REMINDER_DATA.indexOf(item)]=result.reminder;renderReminders();updateReminderBadge();}catch(error){showToast("⚠️ "+privateErrorText(error),4500);}}
+async function cancelReminder(id){
+  const item=REMINDER_DATA.find(row=>row.id===id);
+  if(!item||item.status!=="ACTIVE"||!requireReminderAdmin())return;
+  if(!confirm(`Hủy lịch nhắc của ${item.customerName}?\n\nGhi chú vẫn được giữ trong mục Đã hủy.`))return;
+  try{
+    const result=await privateSheet("cancel_reminder",{id:item.id,expectedVersion:item.version},30000);
+    REMINDER_DATA[REMINDER_DATA.indexOf(item)]=result.reminder;
+    REMINDER_ALERTED.delete(item.id);
+    renderReminders();updateReminderBadge();
+    showToast("Đã hủy lịch nhắc",3000);
+  }catch(error){showToast("⚠️ Không hủy được lịch nhắc: "+privateErrorText(error),4500);}
+}
 async function deleteReminder(id){const item=REMINDER_DATA.find(row=>row.id===id);if(!item||!requireReminderAdmin())return;if(!confirm(`Xóa ghi chú của ${item.customerName}?`))return;try{await privateSheet("delete_reminder",{id:item.id,expectedVersion:item.version},30000);REMINDER_DATA=REMINDER_DATA.filter(row=>row.id!==id);renderReminders();updateReminderBadge();showToast("Đã xóa ghi chú");}catch(error){showToast("⚠️ "+privateErrorText(error),4500);}}
 document.addEventListener("keydown",event=>{if(event.key==="Escape"&&document.getElementById("reminderOverlay")?.classList.contains("open")){event.preventDefault();closeReminderPanel();}},true);
 
