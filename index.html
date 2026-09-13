@@ -1859,6 +1859,11 @@ body.fab-menu-open .category-view-bar .view-mode-switch { pointer-events:none; }
 .supplementary-image-preview span { flex:1; }
 .supplementary-image-preview button { padding:4px 8px; border:0; border-radius:7px; background:#FDEDEC; color:#A93226; font-size:10px; font-weight:900; cursor:pointer; }
 .edit-sticky-actions { position:sticky; bottom:0; z-index:20; margin:12px -14px -14px; padding:10px 14px calc(10px + env(safe-area-inset-bottom)); border-top:1px solid #D5DEE7; background:rgba(255,255,255,.97); box-shadow:0 -8px 20px rgba(30,58,95,.12); backdrop-filter:blur(8px); }
+.edit-save-progress { position:sticky; z-index:35; top:-14px; display:none; width:calc(100% + 28px); height:5px; margin:-14px -14px 9px; overflow:hidden; background:rgba(30,132,73,.14); pointer-events:none; }
+.edit-save-progress > i { display:block; width:38%; height:100%; border-radius:0 999px 999px 0; background:linear-gradient(90deg,#1E8449,#52BE80,#2E86C1); box-shadow:0 0 8px rgba(30,132,73,.35); animation:editSaveProgressMove .9s ease-in-out infinite; }
+#editOverlay.is-saving .edit-save-progress { display:block; }
+@keyframes editSaveProgressMove { from{transform:translateX(-105%)} to{transform:translateX(265%)} }
+@media (prefers-reduced-motion:reduce){.edit-save-progress > i{width:100%;animation:none}}
 .edit-save-summary { margin-bottom:7px; color:#52677A; font-size:11px; font-weight:900; text-align:center; }
 .edit-save-buttons { display:flex; gap:8px; }
 .edit-save-buttons .btn-cancel,.edit-save-buttons .btn-submit { flex:1; margin:0; }
@@ -9066,6 +9071,7 @@ body.fab-menu-open #fabToggleBtn{background:linear-gradient(145deg,#267FF0,#0B62
 
 <div class="overlay" id="editOverlay">
   <div class="modal" onclick="event.stopPropagation()">
+    <div class="edit-save-progress" id="editSaveProgress" role="progressbar" aria-label="Đang lưu thiết bị" aria-hidden="true"><i></i></div>
     <div class="modal-title" id="editTitle">➕ Thêm thiết bị mới</div>
     <input type="hidden" id="editIdx" value="">
     <input type="hidden" id="fCondition" value="">
@@ -19036,6 +19042,12 @@ function getSelectedQuickTags(){
 
 let addModalReturnState = null;
 let editModalReturnState = null;
+function setEditSaveLoading(active){
+  const overlay=document.getElementById("editOverlay");
+  const progress=document.getElementById("editSaveProgress");
+  overlay?.classList.toggle("is-saving",Boolean(active));
+  progress?.setAttribute("aria-hidden",active?"false":"true");
+}
 function captureAddReturnState(){
   const stickyBottom=document.querySelector(".sticky")?.getBoundingClientRect().bottom || 0;
   const visible=[...document.querySelectorAll("#results [data-index]")].find(el=>el.getBoundingClientRect().bottom>stickyBottom+4);
@@ -19170,6 +19182,7 @@ function restoreAfterEdit(state){
 }
 
 async function openAddModal(){ if(!requireActionPermission("PRODUCT_ADD","thêm sản phẩm")) return;
+  setEditSaveLoading(false);
   if(SHEET_API_URL&&!SERVER_PRODUCT_LINKS_FINGERPRINT) try{await loadProductLinks();}catch(e){showToast("⚠️ Chưa tải được liên kết sản phẩm: "+String(e),5000);return;}
   addModalReturnState = captureAddReturnState();
   const editIndex=document.getElementById("editIdx");
@@ -19187,6 +19200,7 @@ async function openAddModal(){ if(!requireActionPermission("PRODUCT_ADD","thêm 
   document.getElementById("editOverlay").classList.add("open");
 }
 async function openEditModal(idx,trigger){ if(!requireActionPermission("PRODUCT_EDIT","sửa sản phẩm")) return;
+  setEditSaveLoading(false);
   const returnState=captureEditReturnState(idx,trigger);
   if(SHEET_API_URL&&!SERVER_PRODUCT_LINKS_FINGERPRINT) try{await loadProductLinks();}catch(e){showToast("⚠️ Chưa tải được liên kết sản phẩm: "+String(e),5000);return;}
   const r = DATA[idx];
@@ -19282,6 +19296,8 @@ const row = normalizeSheetRows([[sh,ma,ten,th,gia,ton,getStockStatusValue(ton, s
 let shouldSaveDisplayConfig = formQuickConfigChanged;
 const saveButton = document.getElementById("fSaveBtn");
 if(saveButton){ saveButton.disabled = true; saveButton.textContent = "⏳ Đang lưu lên máy chủ..."; }
+setEditSaveLoading(true);
+try{
 if(isCreating && !pendingCreate){
   DATA.unshift(row);
   ITEM_CREATED_AT[getItemCreatedAtKey(row)] = Date.now();
@@ -19381,6 +19397,11 @@ if(isCreating){
     document.querySelectorAll('.filter-btn[data-branch]').forEach(b=>b.classList.toggle('active', b.dataset.branch===currentBranch));
     goToTab(sh);
   }
+}
+} finally {
+  // Dù lưu thành công, máy chủ báo lỗi, mất mạng hay hàm thoát sớm, thanh
+  // tiến trình cũng phải được dọn ngay; không để nó còn lại khi mở form lần sau.
+  setEditSaveLoading(false);
 }
 }
 function openImportModal(){ if(!requireAdmin()) return; document.getElementById("importPreview").innerHTML=""; document.getElementById("importInfo").textContent=""; document.getElementById("importMode").style.display="none"; document.getElementById("btnImport").style.display="none"; document.getElementById("fileInput").value=""; importRows=[]; document.getElementById("importOverlay").classList.add("open"); }
@@ -21078,6 +21099,7 @@ function closeOverlay(id){
   if(id==="partnerJobOverlay"){ closePartnerJobs(); return; }
   if(id==="privateAccessOverlay"){ closePrivateAccess(); return; }
   if(id==="saleOverlay"){saleUnitsRequestSeq++;saleUnitsLoading=false;saleSaving=false;}
+  if(id==="editOverlay") setEditSaveLoading(false);
   document.getElementById(id).classList.remove("open");
   if(id==="txOverlay"){
     document.documentElement.classList.remove("tx-overlay-open");
