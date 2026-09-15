@@ -10520,7 +10520,7 @@ function setAdminMode(on){
     if(!hasPrivateProductDataAccess()){sessionStorage.removeItem(PRIVATE_PRODUCT_CACHE_KEY);sessionStorage.removeItem(SYNC_OUTBOX_KEY);sessionStorage.removeItem("kho_cntt_tx");sessionStorage.removeItem("kho_cntt_nv");sessionStorage.removeItem("kho_cntt_transfers");}
     clearAdminOperationalView();
     stripPrivateProductFieldsFromLocalData();
-    setTimeout(async()=>{ await Promise.allSettled([loadData(),loadPublicRecentActivityFromSheet()]); render(); },0);
+    setTimeout(async()=>{ try{await loadData();}catch(_){} try{await loadPublicRecentActivityFromSheet();}catch(_){} render(); },0);
     bulkSelectMode = false;
     selectedItems.clear();
     buildQtyByIndex.clear(); buildPriceByIndex.clear(); buildTitleByIndex.clear(); buildWarrantyByIndex.clear(); buildCodeByIndex.clear(); buildUnitByIndex.clear();
@@ -10681,6 +10681,15 @@ function revokeServerSession(action,payload={}){
 let dataSaveChain = Promise.resolve();
 let dataSaveSeq = 0;
 let txSaveChain = Promise.resolve();
+// Mọi request nghiệp vụ tới Apps Script đi qua cùng một hàng đợi. Google
+// ContentService dễ trả trang HTML 404 khi nhiều GET/POST cùng chạm redirect;
+// tuần tự hóa ở tầng vận chuyển xử lý cả các điểm gọi hiện tại lẫn phát sinh sau.
+let sheetTransportChain = Promise.resolve();
+function queueSheetTransport(task){
+  const run=sheetTransportChain.then(task,task);
+  sheetTransportChain=run.catch(()=>{});
+  return run;
+}
 let nvSaveChain = Promise.resolve();
 let configSaveChain = Promise.resolve();
 let txSaveSeq = 0;
@@ -11370,8 +11379,6 @@ async function fetchSheetJson(url, options={}, timeoutMs=SHEET_TIMEOUT_MS){
   const maxAttempts=context.method==="GET" ? (startupReadTypes.has(context.requestType)?2:3) : safeReadPost ? 3 : safeIdempotentWritePost ? 3 : 1;
   let lastError;
   for(let attempt=1;attempt<=maxAttempts;attempt++){
-    const ctrl=new AbortController();
-    const timer=setTimeout(()=>ctrl.abort(),timeoutMs);
     try{
       let requestUrl=url;
       if((context.method==="GET"||safeReadPost) && attempt>1){
@@ -11383,10 +11390,20 @@ async function fetchSheetJson(url, options={}, timeoutMs=SHEET_TIMEOUT_MS){
       // dù phần thân vẫn là JSON hợp lệ. GET đã có _ts/_retry nên không ép
       // cache:"no-store"; tùy chọn đó làm redirect googleusercontent kém ổn định
       // trên một số mạng/trình duyệt.
-      const requestOptions={...options,signal:ctrl.signal};
-      if(context.method!=="GET") requestOptions.cache="no-store";
-      const res=await fetch(requestUrl,requestOptions);
-      const text=await res.text();
+      // Timeout chỉ bắt đầu khi request thật sự đến lượt chạy. Nếu tính cả thời
+      // gian đứng trong hàng đợi, request sau có thể bị abort trước khi được gửi.
+      const response=await queueSheetTransport(async()=>{
+        const ctrl=new AbortController();
+        const timer=setTimeout(()=>ctrl.abort(),timeoutMs);
+        try{
+          const requestOptions={...options,signal:ctrl.signal};
+          if(context.method!=="GET") requestOptions.cache="no-store";
+          const res=await fetch(requestUrl,requestOptions);
+          const text=await res.text();
+          return {res,text};
+        }finally{ clearTimeout(timer); }
+      });
+      const {res,text}=response;
       let json;
       try{ json=JSON.parse(text); }catch(_){ json=null; }
       // Tin nội dung nghiệp vụ đã ký dạng {ok:true} trước mã HTTP của lớp
@@ -11412,8 +11429,6 @@ async function fetchSheetJson(url, options={}, timeoutMs=SHEET_TIMEOUT_MS){
       if(attempt>=maxAttempts || !isSafeSheetGetRetry(error)) break;
       const retryBase=safeIdempotentWritePost?1200:safeReadPost?900:650;
       await new Promise(resolve=>setTimeout(resolve,retryBase*attempt+Math.floor(Math.random()*500)));
-    }finally{
-      clearTimeout(timer);
     }
   }
   throw lastError;
@@ -16878,7 +16893,7 @@ async function loadPublicTransactionDetailsForProduct(index){
 let recentActivityRefreshRunning=false;
 let recentActivityRefreshTimer=null;
 async function refreshRecentActivityLive(markSeenIfPanelOpen=false){
-  if(recentActivityRefreshRunning || !SHEET_API_URL || document.hidden || !navigator.onLine) return false;
+  if(recentActivityRefreshRunning || backgroundSyncRunning || !SHEET_API_URL || document.hidden || !navigator.onLine) return false;
   if(hasAuxPendingSync(PENDING_TX_SYNC_KEY)) return false;
   recentActivityRefreshRunning=true;
   try{
@@ -21087,7 +21102,7 @@ async function restoreTrashItem(id){
   if(!confirm("Khôi phục dữ liệu này?")) return;
   try{
     await resilientMutationPost("restore_trash",{id,requestId:`restore-${id}`},60000);
-    await Promise.all([loadData(),loadCustomers(true),loadTXFromSheet(),loadTransfersFromSheet(),loadNVFromSheet(),loadDisplayConfig(),loadProductLinks()]);
+    for(const loader of [loadData,()=>loadCustomers(true),loadTXFromSheet,loadTransfersFromSheet,loadNVFromSheet,loadDisplayConfig,loadProductLinks]) await loader();
     render();
     await openTrashModal();
     showToast("✅ Đã khôi phục dữ liệu");
@@ -22250,7 +22265,7 @@ function restoreViewportProductAnchor(anchor){
 }
 async function syncFromServerIfIdle(forceRetry=false){
   if(!forceRetry && syncRetryRunning) return;
-  if(backgroundSyncRunning || !SHEET_API_URL || document.hidden || !navigator.onLine) return;
+  if(backgroundSyncRunning || recentActivityRefreshRunning || !SHEET_API_URL || document.hidden || !navigator.onLine) return;
   if(document.querySelector(".overlay.open") || document.body.classList.contains("fab-menu-open")) return;
   backgroundSyncRunning = true;
   try{
@@ -22282,8 +22297,11 @@ async function syncFromServerIfIdle(forceRetry=false){
     });
     await loadData();
     const inventoryServerConfirmed=["synced","empty"].includes(headerServerSyncState);
-    const auxiliaryResults=await Promise.allSettled([loadTXFromSheet(), loadTransfersFromSheet(), loadNVFromSheet(), loadPublicRecentActivityFromSheet(), loadDisplayConfig(), loadProductLinks()]);
-    auxiliaryResults.forEach((result,index)=>{if(result.status==="rejected") console.warn("Dữ liệu phụ chưa tải được",index,result.reason);});
+    const auxiliaryLoads=[loadTXFromSheet,loadTransfersFromSheet,loadNVFromSheet,loadPublicRecentActivityFromSheet,loadDisplayConfig,loadProductLinks];
+    for(let index=0;index<auxiliaryLoads.length;index++){
+      try{ await auxiliaryLoads[index](); }
+      catch(error){ console.warn("Dữ liệu phụ chưa tải được",index,error); }
+    }
     // Lỗi của lịch sử/nhân viên/liên kết không được biến kết nối Internet và kho
     // chính thành Offline. Các phần phụ có nút thử lại riêng và vẫn được ghi log.
     if(inventoryServerConfirmed && !readSyncOutbox().length && !hasAuxPendingSync(PENDING_TX_SYNC_KEY) && !hasAuxPendingSync(PENDING_NV_SYNC_KEY) && !hasAuxPendingSync(PENDING_CONFIG_SYNC_KEY)){
@@ -22565,7 +22583,8 @@ async function submitInventoryTransfer(){
     transferRequestId="";
     closeOverlay("transferOverlay");
     showToast(`✓ Đã chuyển kho · ${result.id}`,5000);
-    await Promise.all([loadData(),loadTransfersFromSheet()]);
+    await loadData();
+    await loadTransfersFromSheet();
     syncWarehouseBranchUI();
     render();
   }
@@ -22573,7 +22592,14 @@ async function submitInventoryTransfer(){
 }
 
 (async function init(){
-  const sessionValidationPromise=Promise.allSettled([checkAdminSession(),validateRestoredEmployeeSession()]);
+  const sessionValidationPromise=(async()=>{
+    const results=[];
+    for(const validate of [checkAdminSession,validateRestoredEmployeeSession]){
+      try{results.push({status:"fulfilled",value:await validate()});}
+      catch(reason){results.push({status:"rejected",reason});}
+    }
+    return results;
+  })();
   void sessionValidationPromise.then(()=>{ refreshEmployeePermissionUI(); render(); });
   refreshEmployeePermissionUI();
   syncWarehouseBranchUI();
