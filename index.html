@@ -11454,6 +11454,10 @@ function claimSyncActionButton(){
   const ctx=syncActionCandidate;
   if(!ctx || !ctx.btn?.isConnected || Date.now()-ctx.time>15000) return null;
   syncActionCandidate=null;
+  // Các biểu mẫu chính tự quản lý loading cho TOÀN BỘ quy trình. Không để
+  // postSheet của request con đầu tiên báo “ĐÃ LƯU” trong khi form còn đang
+  // chờ xác minh, liên kết hoặc tải lại dữ liệu phụ.
+  if(SYNC_FEEDBACK_MANAGED_IDS.has(ctx.btn.id)) return null;
   return ctx.btn;
 }
 function beginSyncActionFeedback(btn){
@@ -19317,7 +19321,6 @@ if(isCreating && !pendingCreate){
   DATA.unshift(row);
   ITEM_CREATED_AT[getItemCreatedAtKey(row)] = Date.now();
   shouldSaveDisplayConfig = true;
-  showToast("Đã thêm: "+tenBase);
 } else {
   DATA[parseInt(idx)] = row;
   if(savingExisting){
@@ -19329,7 +19332,6 @@ if(isCreating && !pendingCreate){
       shouldSaveDisplayConfig = true;
     }
   }
-  showToast("Đã lưu: "+tenBase);
 }
 
 	const mutationRequestId=String(editIndex.dataset.pendingRequestId||makeSyncRequestId("upsert_product"));
@@ -19369,7 +19371,10 @@ if(isCreating && !pendingCreate){
   }
 	  return;
 	}
-	if(savingExisting&&oldRow&&Number(oldRow[5])!==Number(row[5])) await loadTXFromSheet();
+	let postSaveWarning="";
+	if(savingExisting&&oldRow&&Number(oldRow[5])!==Number(row[5])){
+	  try{await loadTXFromSheet();}catch(refreshError){postSaveWarning="Lịch sử sẽ tự tải lại sau";}
+	}
 	delete editIndex.dataset.pendingRequestId;
 	delete editIndex.dataset.pendingCreate;
 	if(savingExisting && idxNum>=0 && (normalizeProductCode(oldCode)!==normalizeProductCode(ma)||oldBranch!==newBranch)){
@@ -19383,14 +19388,15 @@ if(isCreating && !pendingCreate){
 	  try{
 	    await saveProductLinks(newBranch,ma,relatedTargets,oldBranch,oldCode||ma);
 	  }catch(linkError){
-	    if(saveButton){ saveButton.disabled=false; saveButton.textContent="🔄 Lưu lại liên kết"; }
-	    setSyncBadge("error",String(linkError));
-	    showToast("⚠️ Sản phẩm đã lưu nhưng liên kết chưa lưu: "+String(linkError),6000);
-	    return;
+	    postSaveWarning=postSaveWarning?postSaveWarning+"; liên kết sẽ thử lại sau":"Liên kết sẽ thử lại sau";
+	    console.warn("Sản phẩm đã lưu, chưa làm mới được liên kết:",linkError);
 	  }
 	}
 // Chỉ ghi cấu hình sau khi sản phẩm đã ghi xong để hai POST không tranh cùng khóa Apps Script.
-if(shouldSaveDisplayConfig && isAdminMode()) await saveDisplayConfig();
+if(shouldSaveDisplayConfig && isAdminMode()){
+  try{await saveDisplayConfig();}
+  catch(configError){postSaveWarning=postSaveWarning?postSaveWarning+"; cấu hình sẽ thử lại sau":"Cấu hình sẽ thử lại sau";console.warn("Sản phẩm đã lưu, cấu hình phụ chưa đồng bộ:",configError);}
+}
 if(saveButton){ saveButton.disabled = false; saveButton.textContent = "💾 Lưu thiết bị"; }
 if(pendingQuickTag) document.getElementById("fQuickTagNew").value = "";
 
@@ -19413,6 +19419,9 @@ if(isCreating){
     goToTab(sh);
   }
 }
+showToast(postSaveWarning
+  ? `✅ Máy chủ đã lưu ${isCreating?"thiết bị mới":"thay đổi"}. ${postSaveWarning}.`
+  : `✅ Máy chủ đã xác nhận ${isCreating?"đã thêm":"đã lưu"}: ${tenBase}`,postSaveWarning?4800:2600);
 } finally {
   // Dù lưu thành công, máy chủ báo lỗi, mất mạng hay hàm thoát sớm, thanh
   // tiến trình cũng phải được dọn ngay; không để nó còn lại khi mở form lần sau.
@@ -23035,7 +23044,7 @@ async function saveReminder(event){
   event.preventDefault();if(!requireReminderAdmin())return;
   const feedbackButton=document.getElementById("reminderSaveButton");syncActionCandidate=null;beginSyncActionFeedback(feedbackButton);
   const data={id:document.getElementById("reminderId").value,expectedVersion:document.getElementById("reminderVersion").value,customerName:document.getElementById("reminderCustomerName").value,phone:document.getElementById("reminderPhone").value,content:document.getElementById("reminderContent").value,remindAt:document.getElementById("reminderAt").value,priority:document.getElementById("reminderPriority").value};
-  try{const result=await privateSheet("upsert_reminder",data,35000);const index=REMINDER_DATA.findIndex(item=>item.id===result.reminder.id);if(index>=0)REMINDER_DATA[index]=result.reminder;else REMINDER_DATA.push(result.reminder);finishSyncActionFeedback(feedbackButton,true);renderReminders();updateReminderBadge();showToast("✅ Đã lưu lịch nhắc",3000);setTimeout(()=>closeReminderForm(),780);}catch(error){finishSyncActionFeedback(feedbackButton,false);showToast("⚠️ Không lưu được ghi chú: "+privateErrorText(error),5500);}
+  try{const result=await privateSheet("upsert_reminder",data,35000);const index=REMINDER_DATA.findIndex(item=>item.id===result.reminder.id);if(index>=0)REMINDER_DATA[index]=result.reminder;else REMINDER_DATA.push(result.reminder);renderReminders();updateReminderBadge();closeReminderForm();finishSyncActionFeedback(feedbackButton,true);showToast("✅ Máy chủ đã xác nhận lưu lịch nhắc",3000);}catch(error){finishSyncActionFeedback(feedbackButton,false);showToast("⚠️ Không lưu được ghi chú: "+privateErrorText(error),5500);}
 }
 async function toggleReminderDone(id){const item=REMINDER_DATA.find(row=>row.id===id);if(!item||!requireReminderAdmin())return;try{const result=await privateSheet("complete_reminder",{id:item.id,expectedVersion:item.version,completed:item.status!=="DONE"},30000);REMINDER_DATA[REMINDER_DATA.indexOf(item)]=result.reminder;renderReminders();updateReminderBadge();}catch(error){showToast("⚠️ "+privateErrorText(error),4500);}}
 async function cancelReminder(id){
