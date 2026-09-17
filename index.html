@@ -22,6 +22,7 @@
 <script defer crossorigin="anonymous" integrity="sha384-vtjasyidUo0kW94K5MXDXntzOJpQgBKXmE7e2Ga4LG0skTTLeBi97eFAXsqewJjw" src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script defer crossorigin="anonymous" integrity="sha384-vseuUuO/VRMn00lXYd5m/Pk4l/7RjMqhXGf6G0RALy+On0txYb39dQsUQDAd7q5L" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.10/pdfmake.min.js"></script>
 <script defer crossorigin="anonymous" integrity="sha384-1y8s2U/Jjn4/oeCEBcfYH3M6XeQtcg4LRmluN92FS69UgtLzoyhn3swew8Ynj8Ai" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.10/vfs_fonts.js"></script>
+<script defer crossorigin="anonymous" src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
 /* Base styles */
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -14915,7 +14916,108 @@ function groupInventoryExportName(report,extension){
   const slug=removeAccents(report?.title||"nhom-hang").replace(/[^a-z0-9]+/gi,"-").replace(/^-+|-+$/g,"").slice(0,55)||"nhom-hang";
   return `Ton-kho-${slug}-${groupInventoryExportStamp()}.${extension}`;
 }
+function groupDetailCaptureStyleText(){
+  // Không nhúng các data-URL khổng lồ của con trỏ/ảnh trang trí vào SVG chụp.
+  // Chúng không xuất hiện trong ảnh nhưng từng làm SVG quá lớn và khiến Chrome
+  // từ chối dựng, sau đó hàm phải rơi về mẫu Canvas cũ.
+  const inline=[...document.querySelectorAll("style")].map(style=>style.textContent||"").join("\n")
+    .replace(/url\((['"]?)data:image[\s\S]*?\1\)/gi,"none")
+    .replace(/cursor\s*:[^;}]+[;}]/gi,"cursor:auto!important;");
+  return `${inline}\n
+    html,body{margin:0!important;padding:0!important;background:#eef5fa!important;overflow:visible!important}
+    .group-detail-modal{position:relative!important;width:100%!important;max-width:none!important;max-height:none!important;height:auto!important;margin:0!important;overflow:visible!important;transform:none!important}
+    .group-detail-modal .simple-sticky-actions{position:static!important;margin-top:12px!important}
+    .group-detail-modal *{animation:none!important;transition:none!important;caret-color:transparent!important}
+    .group-detail-modal::-webkit-scrollbar,.group-detail-list::-webkit-scrollbar{display:none!important}`;
+}
+async function captureGroupDetailElementExact(element){
+  if(!element) throw new Error("Không tìm thấy khung danh sách");
+  if(typeof window.html2canvas!=="function") throw new Error("Chưa tải được công cụ chụp giao diện; hãy kiểm tra mạng và tải lại trang");
+  if(document.fonts?.ready) await document.fonts.ready;
+  await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
+  // Các huy hiệu Mới/Cũ là ảnh Google Drive. Chuyển chúng thành data URL trước
+  // khi sao chép DOM để ảnh xuất luôn có icon, kể cả khi tải từ file://.
+  const embeddedImages=new Map();
+  await Promise.all([...element.querySelectorAll("img")].map(async image=>{
+    const src=String(image.currentSrc||image.src||"");
+    if(!src || src.startsWith("data:") || embeddedImages.has(src))return;
+    try{
+      const response=await fetch(src,{mode:"cors",cache:"force-cache"});
+      if(!response.ok)throw new Error(`HTTP ${response.status}`);
+      const blob=await response.blob();
+      const dataUrl=await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(String(reader.result||""));reader.onerror=reject;reader.readAsDataURL(blob);});
+      if(dataUrl)embeddedImages.set(src,dataUrl);
+    }catch(error){ console.warn("Không nhúng được icon khi chụp:",src,error); }
+  }));
+  const width=Math.max(320,Math.ceil(element.getBoundingClientRect().width||element.clientWidth));
+  const height=Math.max(260,Math.ceil(element.scrollHeight));
+  const maxScaleByArea=Math.sqrt(72000000/(width*height));
+  const scale=Math.max(1,Math.min(3,16000/width,16000/height,maxScaleByArea));
+  // Chromium đổi color-mix() thành color(srgb ...). html2canvas 1.4.1 chưa
+  // đọc được cú pháp này, vì vậy chỉ trong lúc chụp ta đổi các giá trị đó về
+  // rgba() tương đương rồi khôi phục nguyên trạng ngay sau khi hoàn tất.
+  const restore=[];
+  const safeColorValue=value=>String(value||"").replace(/color\(\s*(?:srgb|display-p3)\s+([+-]?(?:\d*\.)?\d+%?)\s+([+-]?(?:\d*\.)?\d+%?)\s+([+-]?(?:\d*\.)?\d+%?)(?:\s*\/\s*([+-]?(?:\d*\.)?\d+%?))?\s*\)/gi,(_all,r,g,b,a)=>{
+    const channel=v=>Math.round(Math.max(0,Math.min(255,String(v).endsWith("%")?parseFloat(v)*2.55:parseFloat(v)*255)));
+    const alpha=a==null?1:Math.max(0,Math.min(1,String(a).endsWith("%")?parseFloat(a)/100:parseFloat(a)));
+    return `rgba(${channel(r)},${channel(g)},${channel(b)},${alpha})`;
+  });
+  [element,...element.querySelectorAll("*")].forEach(node=>{
+    const computed=getComputedStyle(node);
+    for(let i=0;i<computed.length;i++){
+      const property=computed[i],value=computed.getPropertyValue(property);
+      if(!/color\(/i.test(value))continue;
+      const safe=safeColorValue(value);
+      if(safe===value || /color\(/i.test(safe))continue;
+      restore.push([node,property,node.style.getPropertyValue(property),node.style.getPropertyPriority(property)]);
+      node.style.setProperty(property,safe,"important");
+    }
+  });
+  try{
+    const canvas=await window.html2canvas(element,{
+      backgroundColor:"#eef5fa",scale,useCORS:true,allowTaint:false,logging:false,
+      foreignObjectRendering:false,width,height,windowWidth:width,windowHeight:height,
+      scrollX:0,scrollY:0,
+      onclone:async clonedDocument=>{
+        const cloned=clonedDocument.querySelector("#groupDetailOverlay .group-detail-modal");
+        if(!cloned)return;
+        cloned.style.cssText+=`;position:relative!important;width:${width}px!important;max-width:none!important;max-height:none!important;height:${height}px!important;overflow:visible!important;margin:0!important;transform:none!important;`;
+        const clonedImages=[...cloned.querySelectorAll("img")];
+        clonedImages.forEach(image=>{
+          const dataUrl=embeddedImages.get(String(image.currentSrc||image.src||""));
+          if(dataUrl)image.src=dataUrl;
+          image.removeAttribute("srcset");
+        });
+        await Promise.all(clonedImages.map(image=>image.complete&&image.naturalWidth?Promise.resolve():new Promise(resolve=>{image.onload=resolve;image.onerror=resolve;setTimeout(resolve,2500);}))); 
+        const footer=cloned.querySelector(".simple-sticky-actions");
+        if(footer)footer.style.cssText+=";position:static!important;margin-top:12px!important";
+        cloned.querySelectorAll("*").forEach(node=>{node.style.animation="none";node.style.transition="none";node.style.caretColor="transparent";});
+      }
+    });
+    return canvas.toDataURL("image/png",1);
+  }finally{
+    restore.forEach(([node,property,value,priority])=>{
+      if(value)node.style.setProperty(property,value,priority);
+      else node.style.removeProperty(property);
+    });
+  }
+}
 async function captureGroupInventoryDetail(){
+  const report=getCurrentGroupDetailExport();
+  if(!report){showToast("⚠️ Chưa có danh sách nhóm để chụp.",3500);return;}
+  const modal=document.querySelector("#groupDetailOverlay .group-detail-modal");
+  try{
+    showToast("Bắt đầu chụp ảnh",2600);
+    const previewUrl=await captureGroupDetailElementExact(modal);
+    const filename=groupInventoryExportName(report,"png");
+    openImageViewer(previewUrl,filename.replace(/\.png$/i,""));showImageSaveButton();
+    showToast("✅ Đã chụp đúng giao diện — kiểm tra rồi bấm Lưu ảnh",4200);
+  }catch(error){
+    console.error("Không chụp trực tiếp được:",error);
+    showToast(`⚠️ Chưa chụp được đúng giao diện: ${error?.message||error}`,5200);
+  }
+}
+async function captureGroupInventoryDetailCanvas(){
   const report=getCurrentGroupDetailExport();
   if(!report){ showToast("⚠️ Chưa có danh sách nhóm để xuất.",3500); return; }
   try{
