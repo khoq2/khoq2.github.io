@@ -999,11 +999,14 @@ body.employee-mode .card-actions.admin-only.employee-permitted { display:grid!im
   .build-tray-view{width:min(270px,100%);min-height:40px;padding:8px 14px}
 }
 .build-summary-modal { width:min(1120px,calc(100vw - 24px)); max-width:1120px; max-height:90vh; max-height:90svh; }
-.build-summary-head { display:flex; align-items:flex-start; justify-content:space-between; gap:10px; margin-bottom:12px; }
+.build-summary-head { width:100%; min-height:38px; display:grid; grid-template-columns:74px minmax(0,1fr) 74px; align-items:center; margin-bottom:12px; padding:0; text-align:center; box-sizing:border-box; }
+.build-summary-head::before { content:""; grid-column:1; }
+.build-summary-head > div { grid-column:2; min-width:0; display:flex; justify-content:center; }
+.build-summary-head .modal-title { margin:0; text-align:center; }
 .build-summary-sub { color:#64748B; font-size:12px; margin-top:3px; }
-.build-summary-close { flex:0 0 auto; border:1px solid rgba(255,255,255,.7); border-radius:11px; padding:8px 13px; background:linear-gradient(135deg,#1E3A5F,#2E86C1); color:#fff; font-size:11px; font-weight:950; cursor:pointer; box-shadow:0 5px 14px rgba(30,58,95,.24),inset 0 1px 0 rgba(255,255,255,.25); transition:transform .16s ease,box-shadow .16s ease,filter .16s ease; }
+.build-summary-close { position:static; grid-column:3; justify-self:end; z-index:3; border:1px solid rgba(255,255,255,.7); border-radius:11px; padding:8px 13px; background:linear-gradient(135deg,#1E3A5F,#2E86C1); color:#fff; font-size:11px; font-weight:950; cursor:pointer; box-shadow:0 5px 14px rgba(30,58,95,.24),inset 0 1px 0 rgba(255,255,255,.25); transition:transform .16s ease,box-shadow .16s ease,filter .16s ease; }
 .build-summary-close:hover { transform:translateY(-1px); filter:brightness(1.08); box-shadow:0 8px 18px rgba(30,58,95,.3),0 0 0 3px rgba(46,134,193,.12); }
-.build-summary-close:active { transform:translateY(0) scale(.97); }
+.build-summary-close:active { transform:scale(.97); }
 .build-quote-details { margin-bottom:10px; padding:10px; display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:8px; border:1px solid #DCE6EE; border-radius:12px; background:#F8FBFD; }
 .build-quote-details label { min-width:0; display:grid; gap:4px; color:#64748B; font-size:10px; font-weight:900; }
 .build-quote-details label:first-child { grid-column:1/-1; }
@@ -9467,7 +9470,7 @@ body.fab-menu-open #fabToggleBtn{background:linear-gradient(145deg,#267FF0,#0B62
 <div class="overlay" id="buildSummaryOverlay" onclick="overlayClose(event,'buildSummaryOverlay')">
   <div class="modal build-summary-modal" onclick="event.stopPropagation()">
     <div class="build-summary-head">
-      <div><div class="modal-title">🖥️ Danh sách linh kiện đã chọn</div><div class="build-summary-sub">Chỉnh tên, số lượng, đơn giá và bảo hành trước khi xuất báo giá.</div></div>
+      <div><div class="modal-title">🖥️ Danh sách linh kiện đã chọn</div></div>
       <button type="button" class="build-summary-close" onclick="closeOverlay('buildSummaryOverlay')">✕ Đóng</button>
     </div>
     <div id="buildSummaryBody"></div>
@@ -10232,6 +10235,64 @@ let buildQuoteTitle = "BÁO GIÁ LINH KIỆN";
 let buildQuoteCustomer = "";
 let buildQuoteAddress = "";
 let buildQuoteHotline = "";
+const BUILD_DRAFT_STORAGE_KEY="kho_build_quote_draft_v1";
+let buildDraftRestoreAttempted=false;
+function getBuildDraftProductKey(row){
+  const code=normalizeProductCode(row?.[1]||"");
+  const identity=code||`NAME:${normalizeQuickText(row?.[2]||"")}`;
+  return `${String(row?.[13]||"Q2").trim().toUpperCase()}|${identity}`;
+}
+function saveBuildDraftToStorage(){
+  try{
+    if(!selectedItems.size){localStorage.removeItem(BUILD_DRAFT_STORAGE_KEY);return;}
+    const items=[...selectedItems].map(idx=>{
+      const custom=idx<0,row=custom?null:DATA[idx];
+      if(!custom&&!row)return null;
+      return {
+        custom,id:custom?idx:undefined,key:custom?"":getBuildDraftProductKey(row),
+        qty:Number(buildQtyByIndex.get(idx))||1,
+        price:Number(buildPriceByIndex.get(idx))||0,
+        title:String(buildTitleByIndex.get(idx)??row?.[2]??"Sản phẩm khác"),
+        warranty:String(buildWarrantyByIndex.get(idx)||""),
+        code:String(buildCodeByIndex.get(idx)??row?.[1]??""),
+        unit:String(buildUnitByIndex.get(idx)||getDefaultBuildUnit(buildTitleByIndex.get(idx)??row?.[2]??""))
+      };
+    }).filter(Boolean);
+    localStorage.setItem(BUILD_DRAFT_STORAGE_KEY,JSON.stringify({version:1,savedAt:Date.now(),quote:{title:buildQuoteTitle,customer:buildQuoteCustomer,address:buildQuoteAddress,hotline:buildQuoteHotline},items}));
+  }catch(error){console.warn("Không lưu được danh sách build tạm:",error);}
+}
+function restoreBuildDraftFromStorage(){
+  if(buildDraftRestoreAttempted)return;
+  let raw="";
+  try{raw=localStorage.getItem(BUILD_DRAFT_STORAGE_KEY)||"";}catch(_){buildDraftRestoreAttempted=true;return;}
+  if(!raw){buildDraftRestoreAttempted=true;return;}
+  if(!Array.isArray(DATA)||!DATA.length)return;
+  buildDraftRestoreAttempted=true;
+  try{
+    const draft=JSON.parse(raw),items=Array.isArray(draft?.items)?draft.items:[];
+    selectedItems.clear();
+    buildQtyByIndex.clear();buildPriceByIndex.clear();buildTitleByIndex.clear();buildWarrantyByIndex.clear();buildCodeByIndex.clear();buildUnitByIndex.clear();
+    items.forEach(item=>{
+      let idx;
+      if(item?.custom){idx=Math.min(-1,Number(item.id)||nextBuildCustomIndex);nextBuildCustomIndex=Math.min(nextBuildCustomIndex,idx-1);}
+      else idx=DATA.findIndex(row=>getBuildDraftProductKey(row)===String(item?.key||""));
+      if(idx==null||(!item?.custom&&idx<0)||idx>=DATA.length)return;
+      selectedItems.add(idx);
+      buildQtyByIndex.set(idx,Math.max(1,Number(item.qty)||1));
+      buildPriceByIndex.set(idx,Math.max(0,Number(item.price)||0));
+      buildTitleByIndex.set(idx,String(item.title||"Linh kiện"));
+      buildWarrantyByIndex.set(idx,String(item.warranty||""));
+      buildCodeByIndex.set(idx,String(item.code||""));
+      buildUnitByIndex.set(idx,String(item.unit||getDefaultBuildUnit(item.title)));
+    });
+    buildQuoteTitle=String(draft?.quote?.title||"BÁO GIÁ LINH KIỆN");
+    buildQuoteCustomer=String(draft?.quote?.customer||"");
+    buildQuoteAddress=String(draft?.quote?.address||"");
+    buildQuoteHotline=String(draft?.quote?.hotline||"");
+    if(selectedItems.size){bulkSelectMode=true;productViewMode="card";}
+    else localStorage.removeItem(BUILD_DRAFT_STORAGE_KEY);
+  }catch(error){console.warn("Không khôi phục được danh sách build tạm:",error);try{localStorage.removeItem(BUILD_DRAFT_STORAGE_KEY);}catch(_){}}
+}
 let currentGroupDetailSets = {};
 let currentGroupDetailKey = "";
 let ownerTapCount = 0;
@@ -14933,6 +14994,9 @@ function groupDetailCaptureStyleText(){
 async function captureGroupDetailElementExact(element){
   if(!element) throw new Error("Không tìm thấy khung danh sách");
   if(typeof window.html2canvas!=="function") throw new Error("Chưa tải được công cụ chụp giao diện; hãy kiểm tra mạng và tải lại trang");
+  const captureToken=`capture-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+  const previousCaptureToken=element.getAttribute("data-exact-capture");
+  element.setAttribute("data-exact-capture",captureToken);
   if(document.fonts?.ready) await document.fonts.ready;
   await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
   // Các huy hiệu Mới/Cũ là ảnh Google Drive. Chuyển chúng thành data URL trước
@@ -14979,7 +15043,7 @@ async function captureGroupDetailElementExact(element){
       foreignObjectRendering:false,width,height,windowWidth:width,windowHeight:height,
       scrollX:0,scrollY:0,
       onclone:async clonedDocument=>{
-        const cloned=clonedDocument.querySelector("#groupDetailOverlay .group-detail-modal");
+        const cloned=clonedDocument.querySelector(`[data-exact-capture="${captureToken}"]`);
         if(!cloned)return;
         cloned.style.cssText+=`;position:relative!important;width:${width}px!important;max-width:none!important;max-height:none!important;height:${height}px!important;overflow:visible!important;margin:0!important;transform:none!important;`;
         const clonedImages=[...cloned.querySelectorAll("img")];
@@ -15000,6 +15064,8 @@ async function captureGroupDetailElementExact(element){
       if(value)node.style.setProperty(property,value,priority);
       else node.style.removeProperty(property);
     });
+    if(previousCaptureToken==null)element.removeAttribute("data-exact-capture");
+    else element.setAttribute("data-exact-capture",previousCaptureToken);
   }
 }
 async function captureGroupInventoryDetail(){
@@ -15465,6 +15531,7 @@ function renderRestockOverview(el){
 }
 function render(){
   hideRelatedProductTooltip(true);
+  restoreBuildDraftFromStorage();
   document.body.classList.remove("loading-layout-mode");
   setTimeout(refreshEmployeePermissionUI,0);
   syncWarehouseBranchUI();
@@ -15764,6 +15831,7 @@ function toggleComponentSelectionMode(){
   bulkSelectMode = !bulkSelectMode;
   if(bulkSelectMode) productViewMode = "card";
   if(!bulkSelectMode){ selectedItems.clear(); buildQtyByIndex.clear(); buildPriceByIndex.clear(); buildTitleByIndex.clear(); buildWarrantyByIndex.clear(); buildCodeByIndex.clear(); buildUnitByIndex.clear(); buildQuoteTitle="BÁO GIÁ LINH KIỆN"; buildQuoteCustomer=""; buildQuoteAddress=""; buildQuoteHotline=""; }
+  saveBuildDraftToStorage();
   render();
   syncProductViewModeButton();
   updateBulkControls();
@@ -15774,6 +15842,7 @@ function toggleBulkSelectMode(){
   if(!requireAdmin()) return;
   bulkSelectMode = !bulkSelectMode;
   if(!bulkSelectMode){ selectedItems.clear(); buildQtyByIndex.clear(); buildPriceByIndex.clear(); buildTitleByIndex.clear(); buildWarrantyByIndex.clear(); buildCodeByIndex.clear(); buildUnitByIndex.clear(); buildQuoteTitle="BÁO GIÁ LINH KIỆN"; buildQuoteCustomer=""; buildQuoteAddress=""; buildQuoteHotline=""; }
+  saveBuildDraftToStorage();
   render();
 }
 
@@ -15788,6 +15857,7 @@ function toggleItemSelected(idx, checked){
     if(!buildUnitByIndex.has(idx)) buildUnitByIndex.set(idx,getDefaultBuildUnit(String(DATA[idx]?.[2]||"")));
   }
   else { selectedItems.delete(idx); buildQtyByIndex.delete(idx); buildPriceByIndex.delete(idx); buildTitleByIndex.delete(idx); buildWarrantyByIndex.delete(idx); buildCodeByIndex.delete(idx); buildUnitByIndex.delete(idx); }
+  saveBuildDraftToStorage();
   const card=document.querySelector(`#results .card[data-index="${idx}"]`);
   if(card) card.classList.toggle("bulk-selected",checked);
   updateBulkControls();
@@ -15911,7 +15981,6 @@ function openBuildSummary(){
   renderBuildSummary();
   document.getElementById("buildSummaryOverlay").classList.add("open");
   ensureBuildExcelJs().catch(()=>{});
-  getBuildExcelLogoData().catch(()=>{});
 }
 function setBuildItemQty(idx,value,input){
   const stock=idx<0?9999:Math.max(0,Number(DATA[idx]?.[5])||0);
@@ -15920,12 +15989,14 @@ function setBuildItemQty(idx,value,input){
   if(input) input.value=String(qty);
   updateBuildSummaryTotals();
   updateBulkControls();
+  saveBuildDraftToStorage();
 }
 function setBuildItemPrice(idx,value,input){
   const price=parseVndInput(value);
   buildPriceByIndex.set(idx,price);
   if(input) input.value=formatVndInputValue(price);
   updateBuildSummaryTotals();
+  saveBuildDraftToStorage();
 }
 function setBuildQuoteText(field,value){
   const text=String(value||"");
@@ -15933,6 +16004,7 @@ function setBuildQuoteText(field,value){
   if(field==="customer") buildQuoteCustomer=text.slice(0,120);
   if(field==="address") buildQuoteAddress=text.slice(0,200);
   if(field==="hotline") buildQuoteHotline=text.slice(0,50);
+  saveBuildDraftToStorage();
 }
 function setBuildItemText(idx,field,value){
   const text=String(value||"").slice(0,180);
@@ -15940,6 +16012,7 @@ function setBuildItemText(idx,field,value){
   if(field==="warranty") buildWarrantyByIndex.set(idx,text);
   if(field==="code") buildCodeByIndex.set(idx,text.slice(0,60));
   if(field==="unit") buildUnitByIndex.set(idx,text.slice(0,30));
+  saveBuildDraftToStorage();
 }
 function addBuildCustomItem(){
   const idx=nextBuildCustomIndex--;
@@ -15950,6 +16023,7 @@ function addBuildCustomItem(){
   buildWarrantyByIndex.set(idx,"");
   buildCodeByIndex.set(idx,"");
   buildUnitByIndex.set(idx,"Cái");
+  saveBuildDraftToStorage();
   renderBuildSummary();
   updateBulkControls();
   requestAnimationFrame(()=>{
@@ -15958,23 +16032,26 @@ function addBuildCustomItem(){
   });
 }
 function moveBuildItem(idx,direction){
-  const order=[...selectedItems].filter(item=>item>=0&&item<DATA.length);
+  const order=[...selectedItems].filter(item=>item<0||item<DATA.length);
   const current=order.indexOf(idx), next=current+(direction<0?-1:1);
   if(current<0||next<0||next>=order.length) return;
   [order[current],order[next]]=[order[next],order[current]];
   selectedItems.clear();
   order.forEach(item=>selectedItems.add(item));
+  saveBuildDraftToStorage();
   renderBuildSummary();
   updateBulkControls();
 }
 function removeBuildItem(idx){
   selectedItems.delete(idx); buildQtyByIndex.delete(idx); buildPriceByIndex.delete(idx); buildTitleByIndex.delete(idx); buildWarrantyByIndex.delete(idx); buildCodeByIndex.delete(idx); buildUnitByIndex.delete(idx);
+  saveBuildDraftToStorage();
   renderBuildSummary(); render(); updateBulkControls();
   if(!selectedItems.size) closeOverlay("buildSummaryOverlay");
 }
 function clearBuildSelection(){
   selectedItems.clear(); buildQtyByIndex.clear(); buildPriceByIndex.clear(); buildTitleByIndex.clear(); buildWarrantyByIndex.clear(); buildCodeByIndex.clear(); buildUnitByIndex.clear();
   buildQuoteTitle="BÁO GIÁ LINH KIỆN"; buildQuoteCustomer=""; buildQuoteAddress=""; buildQuoteHotline="";
+  saveBuildDraftToStorage();
   closeOverlay("buildSummaryOverlay"); render(); updateBulkControls();
 }
 function isAppleTouchDevice(){
@@ -16030,6 +16107,24 @@ function drawBuildCanvasText(ctx,text,x,y,maxWidth,lineHeight,maxLines=2){
   lines.slice(0,maxLines).forEach((part,i)=>ctx.fillText(part+(i===maxLines-1&&lines.length>maxLines?"…":""),x,y+i*lineHeight));
 }
 async function exportBuildSummaryImage(){
+  const rows=getBuildSelectedRows();
+  if(!rows.length){showToast("Chưa chọn linh kiện nào");return;}
+  const modal=document.querySelector("#buildSummaryOverlay .build-summary-modal");
+  if(!modal){showToast("⚠️ Không tìm thấy bảng linh kiện để chụp",3500);return;}
+  try{
+    if(document.activeElement instanceof HTMLElement)document.activeElement.blur();
+    showToast("Bắt đầu chụp ảnh",2600);
+    const previewUrl=await captureGroupDetailElementExact(modal);
+    const filename=`Bao-gia-linh-kien-${quickInventoryFileStamp()}.png`;
+    openImageViewer(previewUrl,filename.replace(/\.png$/i,""));
+    showImageSaveButton();
+    showToast("✅ Đã chụp đúng giao diện — kiểm tra rồi bấm Lưu ảnh",4200);
+  }catch(error){
+    console.error("Không chụp được bảng linh kiện:",error);
+    showToast(`⚠️ Chưa chụp được bảng linh kiện: ${error?.message||error}`,5200);
+  }
+}
+async function exportBuildSummaryImageCanvas(){
   const rows=getBuildSelectedRows();
   if(!rows.length) return;
   const width=1400,margin=40,tableY=266,tableHeadH=44,rowH=116,footerH=165;
@@ -16207,7 +16302,7 @@ function ensureBuildExcelJs(){
     let sourceIndex=0;
     const loadNext=()=>{
       if(window.ExcelJS){ resolve(window.ExcelJS); return; }
-      if(sourceIndex>=sources.length){ reject(new Error("Không tải được công cụ tạo Excel có logo")); return; }
+      if(sourceIndex>=sources.length){ reject(new Error("Không tải được công cụ tạo Excel")); return; }
       const script=document.createElement("script");
       script.src=sources[sourceIndex++];
       script.async=true;
@@ -16219,43 +16314,6 @@ function ensureBuildExcelJs(){
     loadNext();
   }).catch(error=>{buildExcelJsPromise=null;throw error;});
   return buildExcelJsPromise;
-}
-let buildExcelLogoPromise=null;
-async function getBuildExcelLogoData(){
-  if(buildExcelLogoPromise) return buildExcelLogoPromise;
-  buildExcelLogoPromise=(async()=>{
-  const direct=String(document.getElementById("headerBrandLogo")?.src||"");
-  if(/^data:image\/(?:png|jpe?g);base64,/i.test(direct)) return direct;
-  try{
-    const slot=document.querySelector(".title-logo-slot");
-    const bg=slot?getComputedStyle(slot).backgroundImage:"";
-    const match=String(bg).match(/url\(["']?(data:image\/(?:png|jpe?g);base64,[A-Za-z0-9+/=]+)["']?\)/i);
-    if(match?.[1]) return match[1];
-  }catch(e){}
-  try{
-    for(const style of document.querySelectorAll("style")){
-      const match=String(style.textContent||"").match(/\.title-logo-slot\s*\{[^}]*background-image\s*:\s*url\(["']?(data:image\/(?:png|jpe?g);base64,[A-Za-z0-9+/=]+)["']?\)/i);
-      if(match?.[1]) return match[1];
-    }
-  }catch(e){}
-  const driveLogoUrl="https://lh3.googleusercontent.com/d/1m31teW-YSLlh8IbKLxqDS2TnJja8hheC";
-  try{
-    const response=await fetch(driveLogoUrl,{cache:"force-cache"});
-    if(!response.ok) throw new Error(`HTTP ${response.status}`);
-    const blob=await response.blob();
-    if(!/^image\/(?:png|jpe?g)$/i.test(blob.type)) throw new Error("Logo không đúng định dạng ảnh");
-    return await new Promise((resolve,reject)=>{
-      const reader=new FileReader();
-      reader.onload=()=>resolve(String(reader.result||""));
-      reader.onerror=()=>reject(reader.error||new Error("Không đọc được logo"));
-      reader.readAsDataURL(blob);
-    });
-  }catch(error){
-    console.warn("Không tải được logo Excel từ Google Drive.",error);
-    return "";
-  }
-  })().catch(error=>{buildExcelLogoPromise=null;throw error;});
-  return buildExcelLogoPromise;
 }
 function applyBuildExcelStyle(sheet,r1,c1,r2,c2,style){
   for(let row=r1;row<=r2;row++){
@@ -16317,12 +16375,6 @@ async function exportBuildSummaryExcel(button){
     sheet.getCell("A6").value=`Khách hàng: ${customer||"........................"}\nSĐT / Hotline: ${customerHotline||"........................"}`;
     sheet.getCell("D6").value=`Địa chỉ: ${customerAddress||"........................................"}\nKho lập báo giá: ${currentBranch||"Q2"}`;
     sheet.getCell("A1").value="HOÀNG GIA\nCOMPUTER";
-    const logoData=await getBuildExcelLogoData();
-    if(logoData){
-      const extension=/image\/png/i.test(logoData)?"png":"jpeg";
-      const logoId=workbook.addImage({base64:logoData,extension});
-      sheet.addImage(logoId,{tl:{col:.38,row:.42},ext:{width:250,height:76},editAs:"oneCell"});
-    }
     [27,20,20,24,28,34,26].forEach((height,index)=>{sheet.getRow(index+1).height=height;});
     const green="FF0B6B3A", green2="FF158447", yellow="FFF5C84C", pale="FFF4F8F6", white="FFFFFFFF", ink="FF23313D", red="FFD92828", line="FFB7C5BE";
     const solid=color=>({type:"pattern",pattern:"solid",fgColor:{argb:color}});
@@ -16383,7 +16435,7 @@ async function exportBuildSummaryExcel(button){
     });
   }catch(e){
     console.error("Lỗi tạo Excel báo giá nâng cao:",e);
-    if(isMobileExportDevice()) showToast("⚠️ Chưa tạo được Excel có logo. Hãy kiểm tra mạng rồi bấm Xuất Excel lại.",5200);
+    if(isMobileExportDevice()) showToast("⚠️ Chưa tạo được file Excel. Hãy kiểm tra mạng rồi bấm Xuất Excel lại.",5200);
     else{
       showToast("⚠️ Không tạo được mẫu Excel nâng cao; đang xuất bản cơ bản.",4200);
       exportBuildSummaryExcelBasic();
