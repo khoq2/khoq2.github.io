@@ -8591,6 +8591,25 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
   animation:none!important;
   will-change:auto!important;
 }
+/* Ngoại lệ cố định: mọi huy hiệu vai trò trong giao dịch phải luôn quét sáng.
+   Đặt sau lớp tối ưu danh sách để những lần chỉnh CSS khác không vô tình tắt. */
+body #results .card .nguoi-ban-row.has-transaction .nv-role-badge{
+  animation:nvRoleNeon 1.7s ease-in-out infinite alternate!important;
+  will-change:box-shadow!important;
+}
+body #results .card .nguoi-ban-row.has-transaction .nv-role-badge::after{
+  animation:nvRoleShine 2.35s ease-in-out infinite!important;
+  will-change:left,opacity!important;
+}
+body #results .card .nguoi-ban-row.has-transaction .nv-role-badge::before{
+  animation:nvRoleSparkle 1.45s linear infinite!important;
+  will-change:left,top,opacity,transform!important;
+}
+body #results .card .nguoi-ban-row.has-transaction .nv-role-badge>span:first-child,
+body #results .card .nguoi-ban-row.has-transaction .nv-role-badge .nv-role-icon{
+  animation:nvRoleIconTwinkle 1.05s ease-in-out infinite alternate!important;
+  will-change:filter,transform!important;
+}
 @media(min-width:900px){
   /* Desktop đủ sức dựng danh mục một lần. Bỏ kích thước ước lượng 250px để
      chiều cao các nhóm không đổi liên tục khi cuộn, nguyên nhân gây giật. */
@@ -8776,10 +8795,10 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
   </div>
   <div class="tabs" id="tabs">
     <button class="tab-btn active" style="--c:#1E3A5F" data-tab="ALL" title="Trang chủ" onclick="setTab(this)"><span class="tab-icon" aria-hidden="true">🏠</span><span class="tab-label-viewport"><span class="tab-label-track"><span class="tab-label-copy">Trang chủ</span><span class="tab-label-copy" aria-hidden="true">Trang chủ</span></span></span></button>
-    <button class="tab-btn" style="--c:#1A5276" data-tab="MT" title="Máy Tính" onclick="setTab(this)"><span class="tab-icon" aria-hidden="true">💻</span><span class="tab-label-viewport"><span class="tab-label-track"><span class="tab-label-copy">Máy Tính</span><span class="tab-label-copy" aria-hidden="true">Máy Tính</span></span></span></button>
-    <button class="tab-btn" style="--c:#784212" data-tab="MI" title="Máy In" onclick="setTab(this)"><span class="tab-icon" aria-hidden="true">🖨️</span><span class="tab-label-viewport"><span class="tab-label-track"><span class="tab-label-copy">Máy In</span><span class="tab-label-copy" aria-hidden="true">Máy In</span></span></span></button>
-    <button class="tab-btn" style="--c:#641E16" data-tab="CAM" title="Camera" onclick="setTab(this)"><span class="tab-icon" aria-hidden="true">📷</span><span class="tab-label-viewport"><span class="tab-label-track"><span class="tab-label-copy">Camera</span><span class="tab-label-copy" aria-hidden="true">Camera</span></span></span></button>
-    <button class="tab-btn" style="--c:#0B5345" data-tab="INT" title="Internet" onclick="setTab(this)"><span class="tab-icon" aria-hidden="true">🌐</span><span class="tab-label-viewport"><span class="tab-label-track"><span class="tab-label-copy">Internet</span><span class="tab-label-copy" aria-hidden="true">Internet</span></span></span></button>
+    <button class="tab-btn" style="--c:#1A5276" data-tab="MT" title="MÁY TÍNH" onclick="setTab(this)"><span class="tab-icon" aria-hidden="true">💻</span><span class="tab-label-viewport"><span class="tab-label-track"><span class="tab-label-copy">MÁY TÍNH</span><span class="tab-label-copy" aria-hidden="true">MÁY TÍNH</span></span></span></button>
+    <button class="tab-btn" style="--c:#784212" data-tab="MI" title="MÁY IN" onclick="setTab(this)"><span class="tab-icon" aria-hidden="true">🖨️</span><span class="tab-label-viewport"><span class="tab-label-track"><span class="tab-label-copy">MÁY IN</span><span class="tab-label-copy" aria-hidden="true">MÁY IN</span></span></span></button>
+    <button class="tab-btn" style="--c:#641E16" data-tab="CAM" title="CAMERA" onclick="setTab(this)"><span class="tab-icon" aria-hidden="true">📷</span><span class="tab-label-viewport"><span class="tab-label-track"><span class="tab-label-copy">CAMERA</span><span class="tab-label-copy" aria-hidden="true">CAMERA</span></span></span></button>
+    <button class="tab-btn" style="--c:#0B5345" data-tab="INT" title="INTERNET" onclick="setTab(this)"><span class="tab-icon" aria-hidden="true">🌐</span><span class="tab-label-viewport"><span class="tab-label-track"><span class="tab-label-copy">INTERNET</span><span class="tab-label-copy" aria-hidden="true">INTERNET</span></span></span></button>
   </div>
   <div class="tab-dropdown" id="tabDropdown" aria-label="Danh mục con"></div>
   <div class="filters" id="homeInventoryBar">
@@ -12785,7 +12804,7 @@ function initKPI(){
   const setInsight=(id,text)=>{ const element=document.getElementById(id); if(element) element.textContent=text; };
   const average=active?totalStock/active:0;
   setInsight("kpi-insight-all",`${active} còn · ${out} hết`);
-  setInsight("kpi-insight-ton",`${active} mã · TB ${average.toLocaleString("vi-VN",{maximumFractionDigits:1})}/mã`);
+  setInsight("kpi-insight-ton",`${active} mặt hàng còn tồn · Trung bình ${average.toLocaleString("vi-VN",{maximumFractionDigits:1})} sản phẩm mỗi mặt hàng`);
   setInsight("kpi-insight-het",`${out} mã cần kiểm tra nhập`);
   setInsight("kpi-insight-sap",`${oneLeft} chỉ còn 1 · ${atThreshold} chạm ngưỡng`);
 }
@@ -14134,6 +14153,36 @@ function getConfiguredGroupLabel(tab, label){
   const key = groupOrderKey(label);
   return (GROUP_OPTIONS[tab] || []).find(value=>groupOrderKey(value) === key) || label;
 }
+// Tên/ngôi thứ dưới đây chỉ dùng để HIỂN THỊ ở trang Máy tính.
+// Không đổi nhãn nhóm đang lưu trên Sheet, nên không tác động API hoặc đồng bộ kho.
+const MT_PUBLIC_GROUPS = [
+  {label:"LAPTOP", test:key=>key.includes("laptop")},
+  {label:"PSU", test:key=>key.includes("nguon") || /\bpsu\b/.test(key)},
+  {label:"MAINBOARD", test:key=>key.includes("mainboard")},
+  {label:"CPU", test:key=>/\bcpu\b/.test(key)},
+  {label:"RAM", test:key=>/\bram\b/.test(key) || key.includes("bo nho")},
+  {label:"SSD", test:key=>/\bssd\b/.test(key)},
+  {label:"HDD", test:key=>/\bhdd\b/.test(key)},
+  {label:"VGA", test:key=>/\bvga\b/.test(key) || key.includes("card man hinh")},
+  {label:"MÀN HÌNH", test:key=>key.includes("man hinh")},
+  {label:"CHUỘT & BÀN PHÍM", test:key=>key.includes("chuot") && key.includes("ban phim")},
+  {label:"DÂY + CÁP CHUYỂN", test:key=>key.includes("day") && key.includes("cap") && key.includes("chuyen")},
+  {label:"LINH KIỆN KHÁC", test:key=>key.includes("linh kien khac")}
+];
+function getPublicGroupMeta(tab,label){
+  if(tab!=="MT") return null;
+  const key=groupOrderKey(label);
+  const index=MT_PUBLIC_GROUPS.findIndex(item=>item.test(key));
+  return index<0 ? null : {label:MT_PUBLIC_GROUPS[index].label,rank:index};
+}
+function getPublicGroupLabel(tab,label){
+  // Chỉ in hoa bản hiển thị; giá trị `label` gốc vẫn được dùng cho lọc/lưu dữ liệu.
+  return String(getPublicGroupMeta(tab,label)?.label || label || "").toLocaleUpperCase("vi-VN");
+}
+function applyPublicGroupOrder(tab,groups){
+  if(tab!=="MT") return groups;
+  return [...groups].sort((a,b)=>(getPublicGroupMeta(tab,a)?.rank??9999)-(getPublicGroupMeta(tab,b)?.rank??9999));
+}
 function applyGroupOrder(tab, groups){
   const order = GROUP_ORDER[tab] || [];
   if(!order.length) return groups;
@@ -15040,7 +15089,7 @@ async function captureGroupDetailElementExact(element){
   try{
     const canvas=await window.html2canvas(element,{
       backgroundColor:"#eef5fa",scale,useCORS:true,allowTaint:false,logging:false,
-      foreignObjectRendering:false,width,height,windowWidth:width,windowHeight:height,
+      foreignObjectRendering:false,width,height,windowWidth:window.innerWidth,windowHeight:window.innerHeight,
       scrollX:0,scrollY:0,
       onclone:async clonedDocument=>{
         const cloned=clonedDocument.querySelector(`[data-exact-capture="${captureToken}"]`);
@@ -15055,6 +15104,45 @@ async function captureGroupDetailElementExact(element){
         await Promise.all(clonedImages.map(image=>image.complete&&image.naturalWidth?Promise.resolve():new Promise(resolve=>{image.onload=resolve;image.onerror=resolve;setTimeout(resolve,2500);}))); 
         const footer=cloned.querySelector(".simple-sticky-actions");
         if(footer)footer.style.cssText+=";position:static!important;margin-top:12px!important";
+        if(cloned.classList.contains("build-summary-modal")){
+          // html2canvas tính lại min-content của input trong CSS Grid, khiến riêng
+          // những tên dài đẩy SL/giá/bảo hành xuống hàng khác. Khóa đúng kích
+          // thước grid đang hiển thị và đổi input thành ô tĩnh trước khi vẽ.
+          const freezeGrid=selector=>{
+            const originals=[...element.querySelectorAll(selector)],copies=[...cloned.querySelectorAll(selector)];
+            originals.forEach((original,index)=>{
+              const copy=copies[index];if(!copy)return;
+              const children=[...original.children],widths=children.map(child=>`${child.getBoundingClientRect().width.toFixed(2)}px`);
+              if(widths.length)copy.style.setProperty("grid-template-columns",widths.join(" "),"important");
+              const rect=original.getBoundingClientRect();
+              copy.style.setProperty("width",`${rect.width.toFixed(2)}px`,"important");
+              if(selector===".build-summary-row")copy.style.setProperty("min-height",`${rect.height.toFixed(2)}px`,"important");
+            });
+          };
+          freezeGrid(".build-summary-table-head");
+          freezeGrid(".build-summary-table-controls");
+          freezeGrid(".build-summary-row");
+          freezeGrid(".build-summary-controls");
+          const originalInputs=[...element.querySelectorAll("input")],clonedInputs=[...cloned.querySelectorAll("input")];
+          clonedInputs.forEach((input,index)=>{
+            const original=originalInputs[index];if(!original)return;
+            const computed=getComputedStyle(original),rect=original.getBoundingClientRect();
+            const value=String(original.value||original.placeholder||"");
+            const replacement=clonedDocument.createElement("span");
+            replacement.className=`${input.className||""} build-capture-static-value`;
+            replacement.textContent=value;
+            replacement.style.cssText=`display:flex!important;align-items:center!important;justify-content:${computed.textAlign==="right"?"flex-end":computed.textAlign==="center"?"center":"flex-start"}!important;width:${rect.width.toFixed(2)}px!important;min-width:0!important;height:${rect.height.toFixed(2)}px!important;box-sizing:border-box!important;overflow:hidden!important;padding:${computed.padding}!important;border:${computed.border}!important;border-radius:${computed.borderRadius}!important;background:${computed.backgroundColor}!important;color:${original.value?computed.color:"#777"}!important;font:${computed.font}!important;font-weight:${computed.fontWeight}!important;letter-spacing:${computed.letterSpacing}!important;line-height:${computed.lineHeight}!important;white-space:nowrap!important;text-overflow:clip!important;box-shadow:${computed.boxShadow}!important;`;
+            input.replaceWith(replacement);
+          });
+          const originalIcons=[...element.querySelectorAll(".ui-color-icon")],clonedIcons=[...cloned.querySelectorAll(".ui-color-icon")];
+          clonedIcons.forEach((icon,index)=>{
+            const svg=originalIcons[index]?.querySelector("svg");
+            if(!svg)return;
+            const data=`data:image/svg+xml;charset=utf-8,${encodeURIComponent(new XMLSerializer().serializeToString(svg))}`;
+            icon.innerHTML=`<img alt="" src="${data}" style="display:block;width:72%;height:72%">`;
+          });
+          await Promise.all([...cloned.querySelectorAll("img")].map(image=>image.complete&&image.naturalWidth?Promise.resolve():new Promise(resolve=>{image.onload=resolve;image.onerror=resolve;setTimeout(resolve,1800);}))); 
+        }
         cloned.querySelectorAll("*").forEach(node=>{node.style.animation="none";node.style.transition="none";node.style.caretColor="transparent";});
       }
     });
@@ -15656,8 +15744,8 @@ function render(){
   if(currentTab!=="ALL" && !kw){
     const FIXED_ORDER = {
       MT: [
-        "🔋  Nguồn — PSU", "🔌  Mainboard", "🧠  CPU — Bộ vi xử lý", "💾  RAM — Bộ nhớ", "⚡  SSD — Ổ cứng thể rắn",
-        "🗄️  HDD — Ổ cứng cơ", "🖵  Màn hình", "🖱️  Chuột & Bàn phím", "💻  Laptop linh kiện", "🎮  VGA — Card màn hình",
+        "💻  Laptop linh kiện", "🔋  Nguồn — PSU", "🔌  Mainboard", "🧠  CPU — Bộ vi xử lý", "💾  RAM — Bộ nhớ",
+        "⚡  SSD — Ổ cứng thể rắn", "🗄️  HDD — Ổ cứng cơ", "🎮  VGA — Card màn hình", "🖵  Màn hình", "🖱️  Chuột & Bàn phím",
         "🖥️  Case — Vỏ máy tính", "❄️  Tản nhiệt — Cooling", "🔌  Dây cáp chuyển", "🛠️  Linh kiện khác"
       ],
       MI: [
@@ -15713,7 +15801,7 @@ function render(){
         }
       });
     }
-    order = applyGroupOrder(currentTab, order);
+    order = applyPublicGroupOrder(currentTab, applyGroupOrder(currentTab, order));
     // Loại trùng sau khi thay nhãn cấu hình (ví dụ DRUM/Drum).
     order = order.filter((g,index,list)=>list.findIndex(x=>groupCompareKey(x)===groupCompareKey(g))===index);
     order.push(NO_GROUP);
@@ -15748,7 +15836,8 @@ function render(){
         const groupStock = sumQuickStock(buckets[g]||[]);
         const groupMetric = `${groupCount} mục · ${groupStock.toLocaleString("vi-VN")} tồn`;
         const isEmpty = groupCount === 0;
-        return `<button type="button" class="quick-nav-btn${isEmpty?' quick-nav-empty':''}" style="--c:${GROUP_COLORS[idx%GROUP_COLORS.length]};${isEmpty?'opacity:0.38;pointer-events:none;':''}" aria-label="${escapeHtml(g)} · ${groupMetric}" onclick="jumpToGroup('grp-${idx}')">${escapeHtml(g)} (${groupCount})</button>`;
+        const publicGroupLabel = getPublicGroupLabel(currentTab,g);
+        return `<button type="button" class="quick-nav-btn${isEmpty?' quick-nav-empty':''}" style="--c:${GROUP_COLORS[idx%GROUP_COLORS.length]};${isEmpty?'opacity:0.38;pointer-events:none;':''}" aria-label="${escapeHtml(publicGroupLabel)} · ${groupMetric}" onclick="jumpToGroup('grp-${idx}')">${escapeHtml(publicGroupLabel)} (${groupCount})</button>`;
       }).join("") + `</div><div class="quick-nav-scroll" aria-label="Kéo để xem thêm menu"><div class="quick-nav-scroll-track"><div class="quick-nav-scroll-thumb"></div></div></div></div>`;
     }
     currentGroupDetailSets = {};
@@ -15761,11 +15850,12 @@ function render(){
       const groupStats = getGroupInventoryStats(buckets[g]);
       const groupSummary = `${itemCount} mục · ${groupStock.toLocaleString("vi-VN")} tồn · ${groupStats.low} sắp hết · ${groupStats.out} hết hàng`;
       const detailKey = `group-${idx}`;
+      const publicGroupLabel = getPublicGroupLabel(currentTab,g);
       currentGroupDetailSets[detailKey] = {label:g,items:buckets[g].slice()};
       return `<section class="group-section" data-group-anchor="${escapeHtml(quickGroupLabelMatchKey(g))}" style="--group-strong: ${strongColor};">
         <div class="group-header" id="grp-${idx}" style="--group-bg: ${groupColor}; --group-strong: ${strongColor}; background: ${groupColor};">
           <div class="group-header-main">
-            <span class="group-header-label"><span class="group-header-label-track">${escapeHtml(g)}</span></span>
+            <span class="group-header-label"><span class="group-header-label-track">${escapeHtml(publicGroupLabel)}</span></span>
           </div>
           <button type="button" class="group-header-count metric-tooltip-host" aria-label="Xem chi tiết ${groupSummary}" onclick="showGroupInventoryDetail('${detailKey}')"><span class="group-count-main">${itemCount} mục · ${groupStock.toLocaleString("vi-VN")} tồn</span><span class="group-count-alert is-low">${groupStats.low} sắp hết</span><span class="group-count-alert is-out">${groupStats.out} hết hàng</span><span class="inventory-metric-tooltip" aria-hidden="true">XEM CHI TIẾT TỒN KHO</span></button>
         </div>
@@ -19801,8 +19891,8 @@ function showTabDropdown(button){
   document.querySelectorAll(".tab-btn.dropdown-open").forEach(btn=>btn.classList.remove("dropdown-open"));
   button.classList.add("dropdown-open");
   const color=(SHEET_CFG[tabCode]||SHEET_CFG.MT).c;
-  box.innerHTML=`<button type="button" class="tab-dropdown-item tab-dropdown-all" style="--c:${color}" data-tab="${escapeHtml(tabCode)}" onclick="event.stopPropagation();goToTab(this.dataset.tab);closeTabDropdown()">Xem tất cả ${(SHEET_CFG[tabCode]||SHEET_CFG.MT).label}</button>`+
-    groups.map(item=>`<button type="button" class="tab-dropdown-item" style="--c:${color}" data-tab="${escapeHtml(tabCode)}" data-group="${escapeHtml(item.label)}" onclick="event.stopPropagation();openProductGroupPath(this);closeTabDropdown()">${escapeHtml(cleanKpiPathLabel(item.label))}</button>`).join("");
+  box.innerHTML=`<button type="button" class="tab-dropdown-item tab-dropdown-all" style="--c:${color}" data-tab="${escapeHtml(tabCode)}" onclick="event.stopPropagation();goToTab(this.dataset.tab);closeTabDropdown()">XEM TẤT CẢ ${(SHEET_CFG[tabCode]||SHEET_CFG.MT).label}</button>`+
+    groups.map(item=>`<button type="button" class="tab-dropdown-item" style="--c:${color}" data-tab="${escapeHtml(tabCode)}" data-group="${escapeHtml(item.label)}" onclick="event.stopPropagation();openProductGroupPath(this);closeTabDropdown()">${escapeHtml(cleanKpiPathLabel(getPublicGroupLabel(tabCode,item.label)))}</button>`).join("");
   box.classList.add("open");
   positionTabDropdown(button);
 }
