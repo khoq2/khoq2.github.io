@@ -23,6 +23,7 @@
 <script defer crossorigin="anonymous" integrity="sha384-vseuUuO/VRMn00lXYd5m/Pk4l/7RjMqhXGf6G0RALy+On0txYb39dQsUQDAd7q5L" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.10/pdfmake.min.js"></script>
 <script defer crossorigin="anonymous" integrity="sha384-1y8s2U/Jjn4/oeCEBcfYH3M6XeQtcg4LRmluN92FS69UgtLzoyhn3swew8Ynj8Ai" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.10/vfs_fonts.js"></script>
 <script defer crossorigin="anonymous" src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script defer crossorigin="anonymous" src="https://cdnjs.cloudflare.com/ajax/libs/jsbarcode/3.11.6/JsBarcode.all.min.js"></script>
 <style>
 /* Base styles */
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -1337,7 +1338,7 @@ body.employee-mode .card-actions.admin-only.employee-permitted { display:grid!im
 @media(max-width:480px){ #adminOverlay{padding:14px}.admin-login-modal{padding:31px 18px 20px!important}.admin-login-actions .btn-cancel,.admin-login-actions .btn-submit{min-height:48px} }
 @media(max-width:600px){ #txOverlay,#customerOverlay,#syncErrorOverlay{padding:10px}#txOverlay .tx-history-modal,#customerOverlay .customer-modal{width:100%;max-height:calc(100dvh - 20px);border-radius:18px;padding-bottom:max(18px,env(safe-area-inset-bottom))}#syncErrorOverlay .sync-error-modal{width:min(400px,calc(100vw - 20px));padding:24px 18px max(20px,env(safe-area-inset-bottom))} }
 @media(max-width:600px){ #customerOverlay .customer-modal{padding:12px 10px max(14px,env(safe-area-inset-bottom))}#customerOverlay .customer-head{margin-bottom:9px}#customerOverlay .customer-title{font-size:15px}#customerOverlay .customer-search{min-height:48px}#customerOverlay .customer-results:not(:empty),#customerOverlay .customer-detail:not(:empty),#customerOverlay .customer-editor.open{padding:6px;border-radius:12px}#customerOverlay .customer-result{padding:9px 10px 9px 13px} }
-.image-lightbox { display:none; position:fixed; inset:0; z-index:1000; align-items:center; justify-content:center; padding:18px; background:rgba(0,0,0,.88); cursor:zoom-out; }
+.image-lightbox { display:none; position:fixed; inset:0; z-index:1800; align-items:center; justify-content:center; padding:18px; background:rgba(0,0,0,.88); cursor:zoom-out; }
 .image-lightbox.open { display:flex; }
 .image-lightbox img { display:block; max-width:100%; max-height:calc(100dvh - 36px); object-fit:contain; border-radius:10px; box-shadow:0 12px 42px rgba(0,0,0,.5); cursor:grab; touch-action:none; transform-origin:center center; will-change:transform; }
 .image-lightbox img:active { cursor:grabbing; }
@@ -3631,7 +3632,24 @@ body {
 .reminder-toolbar{display:flex;gap:6px;padding:9px 12px;background:#F5F5F7}.reminder-filter{border:0;border-radius:999px;padding:7px 11px;background:#E5E5EA;color:#555;font-size:10px;font-weight:850;cursor:pointer}.reminder-filter.active{background:#1C1C1E;color:#fff}.reminder-list{display:grid;gap:8px;max-height:52dvh;padding:2px 12px 14px;overflow:auto;overscroll-behavior:contain}
 .reminder-empty{padding:44px 15px;color:#8E8E93;text-align:center;font-size:13px}.reminder-item{display:grid;grid-template-columns:27px minmax(0,1fr) auto;gap:8px;padding:11px;border:1px solid #E0E0E5;border-radius:14px;background:#fff;box-shadow:0 2px 7px rgba(30,58,95,.06)}.reminder-item.overdue{border-color:#FFAAA5;background:#FFF8F7}.reminder-item.done{opacity:.62}.reminder-check{width:23px;height:23px;margin-top:1px;border:2px solid #C7C7CC;border-radius:50%;background:#fff;color:#fff;cursor:pointer}.reminder-item.done .reminder-check{border-color:#34C759;background:#34C759}.reminder-item-copy{min-width:0}.reminder-item-title{display:flex;align-items:center;gap:5px;color:#1C1C1E;font-size:13px;font-weight:900}.reminder-priority{width:7px;height:7px;border-radius:50%;background:#8E8E93}.reminder-priority.HIGH{background:#FF3B30}.reminder-priority.LOW{background:#34C759}.reminder-item-note{margin-top:4px;color:#48484A;font-size:12px;line-height:1.35;white-space:pre-wrap;overflow-wrap:anywhere}.reminder-item-meta{display:flex;flex-wrap:wrap;align-items:center;gap:4px;margin-top:7px;color:#77777E;font-size:9px}.reminder-date-chip,.reminder-time-chip{display:inline-flex;align-items:center;padding:3px 6px;border-radius:999px;background:#EFEFF4;color:#505057;font-weight:900}.reminder-time-chip{background:#FFF1CC;color:#9A6200}.reminder-state-chip{font-weight:950}.reminder-item.overdue .reminder-state-chip{color:#D22E24}.reminder-item.done .reminder-state-chip{color:#248A3D}.reminder-item-actions{display:flex;flex-direction:column;gap:4px}.reminder-item-actions button{width:29px;height:29px;border:0;border-radius:8px;background:#EFEFF4;color:#5B5B60;cursor:pointer}.reminder-loading{padding:45px 15px;color:#777;text-align:center;font-size:12px}
 .reminder-item.cancelled{border-color:#D7D7DC;background:#F7F7F9;opacity:.72}.reminder-item.cancelled .reminder-check{display:grid;place-items:center;border-color:#8E8E93;background:#8E8E93;color:#fff;cursor:default}.reminder-item.cancelled .reminder-state-chip{color:#6E6E73}.reminder-item-actions .reminder-cancel-action{width:auto;min-width:44px;padding:0 8px;background:#FFF0EF;color:#C9342D;font-size:9px;font-weight:950;white-space:nowrap}.reminder-item-actions .reminder-cancel-action:hover,.reminder-item-actions .reminder-cancel-action:focus-visible{background:#FFDCD9;outline:2px solid #FF9D96;outline-offset:1px}
+.receipt-edge-btn{position:fixed!important;z-index:326;left:max(3px,env(safe-area-inset-left));bottom:max(140px,calc(env(safe-area-inset-bottom) + 132px))!important;display:flex;width:45px;min-height:112px;flex-direction:column;align-items:center;justify-content:center;gap:7px;padding:10px 5px;border:0!important;border-radius:0;background:transparent!important;color:#087F5B;box-shadow:none!important;cursor:pointer}.receipt-edge-btn[hidden]{display:none!important}.receipt-edge-btn svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.receipt-edge-label{font-size:9px;font-weight:950;letter-spacing:.5px;line-height:1;writing-mode:vertical-rl;transform:rotate(180deg)}
+.receipt-overlay{position:fixed;z-index:1300;inset:0;display:none;align-items:center;justify-content:center;padding:12px;background:rgba(19,35,52,.55);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}.receipt-overlay.open{display:flex}.receipt-dialog{width:min(1180px,calc(100vw - 24px));max-height:calc(100dvh - 24px);overflow:auto;border:1px solid rgba(255,255,255,.82);border-radius:22px;background:#F5F7FA;box-shadow:0 28px 90px rgba(15,31,48,.4)}.receipt-dialog-head{position:sticky;z-index:3;top:0;display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid #D9E2EA;background:rgba(255,255,255,.94);backdrop-filter:blur(10px)}.receipt-dialog-head h2{flex:1;margin:0;color:#132A43;font-size:18px;text-align:center}.receipt-close{width:34px;height:34px;border:0;border-radius:50%;background:#E5E9EE;color:#394B5F;font-size:20px;font-weight:900}.receipt-workspace{display:grid;grid-template-columns:minmax(300px,360px) minmax(0,1fr);gap:12px;padding:12px}.receipt-editor{align-self:start;display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:12px;border:1px solid #D8E4ED;border-radius:16px;background:#fff}.receipt-editor-title{grid-column:1/-1;color:#174D6E;font-size:12px;font-weight:950}.receipt-field{display:grid;gap:4px;min-width:0}.receipt-field.wide{grid-column:1/-1}.receipt-field span{color:#455B6E;font-size:10px;font-weight:900}.receipt-field input,.receipt-field textarea,.receipt-field select{width:100%;min-height:38px;padding:8px 10px;border:1px solid #C7D7E5;border-radius:9px;background:#FBFDFF;color:#172B3D;font:inherit;font-size:12px;outline:none}.receipt-field textarea{min-height:62px;resize:vertical}.receipt-field input:focus,.receipt-field textarea:focus,.receipt-field select:focus{border-color:#1496C7;box-shadow:0 0 0 3px rgba(20,150,199,.13)}.receipt-editor-actions{grid-column:1/-1;display:grid;grid-template-columns:1fr 2fr;gap:8px}.receipt-editor-actions button{min-height:42px;border:0;border-radius:10px;font-size:11px;font-weight:950}.receipt-reset{background:#FFF0EF;color:#B52B24}.receipt-capture{background:linear-gradient(135deg,#087F5B,#15966F);color:#fff}.receipt-capture:disabled{opacity:.65;cursor:wait}
+.receipt-preview-wrap{min-width:0;overflow:auto;padding:3px}.receipt-paper{box-sizing:border-box;width:100%;min-width:620px;padding:24px 28px;background:#fff;color:#142018;font-family:Arial,"Segoe UI",Tahoma,sans-serif!important;font-synthesis:none;box-shadow:0 6px 24px rgba(22,47,69,.15)}.receipt-paper *{font-family:Arial,"Segoe UI",Tahoma,sans-serif!important}.receipt-top{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(260px,.65fr);gap:24px}.receipt-brand{display:flex;align-items:center;gap:12px}.receipt-brand-mark{display:grid;flex:0 0 102px;width:102px;height:60px;place-items:center;overflow:visible}.receipt-brand-mark img{display:block;width:auto;height:auto;max-width:96px;max-height:56px;object-fit:contain;object-position:center}.receipt-brand-fallback{display:none;color:#147D4B;font-size:19px;font-weight:900}.receipt-company{color:#147D4B;font-size:18px;font-weight:900}.receipt-company-lines{margin-top:6px;color:#263B2E;font-size:10px;line-height:1.35}.receipt-company-hotline{display:block;width:100%;margin-top:3px;color:#12633E;font-size:12px;font-weight:900;text-align:center;transform:translateX(9px)}.receipt-code{text-align:right}.receipt-barcode{height:35px;margin-left:auto;background:repeating-linear-gradient(90deg,#173D29 0 2px,transparent 2px 4px,#173D29 4px 5px,transparent 5px 8px,#173D29 8px 11px,transparent 11px 13px);max-width:270px}.receipt-barcode-text{margin:4px 0 10px;font-size:10px;text-align:center}.receipt-code-line{font-size:12px;line-height:1.55}.receipt-title{margin:10px 0 5px;padding-top:7px;border-top:2px solid #147D4B;color:#147D4B;font-size:24px;font-weight:900;text-align:center}.receipt-service{margin-bottom:5px;font-size:12px}.receipt-info-grid{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid #345442;border-left:1px solid #345442}.receipt-info-col{border-right:1px solid #345442}.receipt-section-title{padding:5px 6px;border-bottom:1px solid #345442;background:#EAF5EE;color:#12633E;font-size:13px;font-weight:900}.receipt-line{display:grid;grid-template-columns:105px minmax(0,1fr);min-height:28px;border-bottom:1px solid #345442}.receipt-line b,.receipt-line span{padding:5px 6px;font-size:12px}.receipt-line b{font-weight:700}.receipt-wide-line{display:grid;grid-template-columns:155px minmax(0,1fr);min-height:32px;border-right:1px solid #345442;border-bottom:1px solid #345442;border-left:1px solid #345442}.receipt-wide-line b,.receipt-wide-line span{padding:6px;font-size:12px;white-space:pre-wrap;overflow-wrap:anywhere}.receipt-warning-note{padding:6px 8px;border-right:1px solid #345442;border-bottom:1px solid #D7A20B;border-left:1px solid #345442;background:#FFFCED;color:#635115;font-size:9px;font-weight:700;line-height:1.35}.receipt-signatures{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;min-height:118px;padding-top:15px;text-align:center}.receipt-signatures b{color:#12633E;font-size:12px}.receipt-signatures span{display:block;margin-top:58px;font-size:11px}.receipt-footer{border-top:1px dashed #8A9C91;padding-top:8px;font-size:10px;font-style:italic;line-height:1.45}.receipt-print-time{margin-top:5px;color:#12633E;font-style:normal;font-weight:700;text-align:center}.receipt-empty{color:#777}
+.receipt-brand{gap:5px}.receipt-brand-mark{flex-basis:92px;width:92px;height:72px}.receipt-brand-mark img{max-width:86px;max-height:68px;transform:scale(1.14)}.receipt-title{margin-top:6px;padding-top:5px}.receipt-section-title{display:flex;align-items:center;gap:6px}.receipt-section-icon{width:15px;height:15px;flex:0 0 15px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}.receipt-warning-note{font-size:10px;line-height:1.42}.receipt-top{align-items:start}.receipt-code-line{line-height:1.45}
+.receipt-footer-meta{display:grid;grid-template-columns:1fr 1fr;align-items:center;gap:10px;margin-top:7px}.receipt-footer-meta .receipt-print-time{margin:0;text-align:center}.receipt-price-notice{color:#C92A2A;font-size:10px;font-style:normal;font-weight:700;line-height:1.45;text-align:center}.receipt-price-notice span{font-size:10px;font-weight:700}
+.receipt-signatures{min-height:58px;padding-top:8px}.receipt-signature-line{display:block!important;width:72%;height:1px;margin:14px auto 3px!important;border-top:1px solid #8A9C91}.receipt-signature-name{display:block!important;margin:0!important;min-height:11px;font-size:10px!important;line-height:1.1}.receipt-barcode{display:block;width:270px;max-width:100%;height:42px;margin-left:auto;background:repeating-linear-gradient(90deg,#173D29 0 2px,transparent 2px 4px,#173D29 4px 5px,transparent 5px 8px,#173D29 8px 11px,transparent 11px 13px)}
 @media(max-width:600px){.reminder-edge-btn{position:fixed!important;z-index:326;left:max(3px,env(safe-area-inset-left));top:auto!important;bottom:max(14px,calc(env(safe-area-inset-bottom) + 8px))!important;width:38px;min-height:88px;border-radius:0!important;transform:none!important}.reminder-edge-label{font-size:8px}.reminder-dialog{width:calc(100vw - 18px);max-height:calc(100dvh - 18px);margin:0;border-radius:18px}.reminder-overlay{justify-content:center;padding:9px}.reminder-form{grid-template-columns:1fr}.reminder-field.wide,.reminder-form-actions{grid-column:1}.reminder-list{max-height:48dvh}}
+@media(max-width:600px){
+  .receipt-edge-btn{left:max(3px,env(safe-area-inset-left));bottom:max(108px,calc(env(safe-area-inset-bottom) + 102px))!important;width:38px;min-height:88px}.receipt-edge-label{font-size:8px}
+  .receipt-overlay{align-items:stretch;padding:0;background:#F5F7FA}.receipt-dialog{width:100vw;max-height:100dvh;border:0;border-radius:0;box-shadow:none;overscroll-behavior:contain}.receipt-dialog-head{min-height:54px;padding:8px 10px;padding-top:max(8px,env(safe-area-inset-top));box-shadow:0 2px 12px rgba(19,42,67,.08)}.receipt-dialog-head h2{font-size:16px}.receipt-close{width:40px;height:40px;flex:0 0 40px}
+  .receipt-workspace{grid-template-columns:1fr;gap:10px;padding:8px 8px calc(92px + env(safe-area-inset-bottom))}.receipt-editor{grid-template-columns:1fr 1fr;gap:9px;padding:11px 10px;border-radius:14px}.receipt-editor-title{grid-column:1/-1;font-size:13px;text-align:center}.receipt-field.wide,.receipt-editor-actions{grid-column:1/-1}.receipt-field span{font-size:11px}.receipt-field input,.receipt-field textarea,.receipt-field select{min-height:46px;padding:10px 11px;border-radius:10px;font-size:16px}.receipt-field textarea{min-height:78px}.receipt-editor-actions{position:fixed;z-index:8;right:0;bottom:0;left:0;grid-template-columns:72px 96px minmax(0,1fr);gap:7px;padding:9px max(8px,env(safe-area-inset-right)) calc(9px + env(safe-area-inset-bottom)) max(8px,env(safe-area-inset-left));border-top:1px solid #D7E2EA;background:rgba(255,255,255,.96);box-shadow:0 -8px 24px rgba(19,42,67,.14);backdrop-filter:blur(12px)}.receipt-editor-actions button{min-height:48px;border-radius:12px;font-size:11px}.receipt-preview-btn{background:#E9F4FA;color:#17658E}
+  .receipt-preview-wrap{scroll-margin-top:64px;overflow:auto;padding:0;border:1px solid #D8E4ED;border-radius:14px;background:#DDE5EB;-webkit-overflow-scrolling:touch}.receipt-preview-wrap::before{content:"XEM TRƯỚC BILL · vuốt ngang để kiểm tra";position:sticky;z-index:2;left:0;display:block;width:calc(100vw - 38px);padding:8px 10px;background:#EEF5F8;color:#53697B;font-size:10px;font-weight:900;text-align:center}
+  /* Giữ nguyên khổ phiếu chuẩn khi xem/chụp trên điện thoại để ảnh gửi Zalo không bị vỡ bố cục. */
+  .receipt-paper{width:760px;min-width:760px;padding:24px 28px}.receipt-top{grid-template-columns:minmax(0,1.35fr) minmax(260px,.65fr);gap:24px}.receipt-code{text-align:right}.receipt-barcode{margin-left:auto;max-width:270px}.receipt-info-grid{grid-template-columns:1fr 1fr}.receipt-title{font-size:24px}.receipt-line{grid-template-columns:105px minmax(0,1fr)}.receipt-wide-line{grid-template-columns:155px minmax(0,1fr)}.receipt-signatures{gap:20px}.receipt-company{font-size:18px}.receipt-company-lines{font-size:10px}.receipt-company-hotline{font-size:12px}.receipt-footer-meta{grid-template-columns:1fr 1fr;gap:10px}.receipt-price-notice{font-size:10px}
+}
+@media(min-width:601px){.receipt-editor-actions{grid-template-columns:1fr 1fr 2fr}.receipt-preview-btn{background:#E9F4FA;color:#17658E}}
+@media(max-width:600px){.receipt-date-field{grid-column:1/-1}.receipt-field input,.receipt-field textarea,.receipt-field select{min-width:0}}
+@media(max-width:380px){.receipt-editor{grid-template-columns:1fr}.receipt-editor-title,.receipt-field.wide,.receipt-editor-actions{grid-column:1}.receipt-editor-actions{grid-template-columns:68px 90px minmax(0,1fr)}}
 </style>
 <style id="mobile-typography">
 /* Font hệ thống rõ dấu tiếng Việt, nhẹ và ổn định trên Android/iPhone/Windows. */
@@ -8876,6 +8894,52 @@ body #results .card .nguoi-ban-row.has-transaction .nv-role-badge .nv-role-icon{
   </div>
 </aside>
 
+<button class="receipt-edge-btn" id="receiptEdgeButton" type="button" aria-label="Tạo phiếu nhận máy" aria-haspopup="dialog" onclick="openReceiptPanel()">
+  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2V3Z"></path><path d="M9 8h6M9 12h6M9 16h4"></path></svg>
+  <span class="receipt-edge-label">TẠO BILL</span>
+</button>
+<div class="receipt-overlay" id="receiptOverlay" aria-hidden="true" onclick="if(event.target===this)closeReceiptPanel()">
+  <section class="receipt-dialog" role="dialog" aria-modal="true" aria-labelledby="receiptDialogTitle">
+    <header class="receipt-dialog-head"><h2 id="receiptDialogTitle">TẠO PHIẾU NHẬN MÁY</h2><button class="receipt-close" type="button" aria-label="Đóng" onclick="closeReceiptPanel()">×</button></header>
+    <div class="receipt-workspace">
+      <form class="receipt-editor" id="receiptEditor" onsubmit="event.preventDefault();captureReceiptImage(this.querySelector('.receipt-capture'))">
+        <div class="receipt-editor-title">NHẬP THÔNG TIN PHIẾU</div>
+        <label class="receipt-field"><span>Số phiếu</span><input id="receiptNumber" data-receipt-input="number" maxlength="40"></label>
+        <label class="receipt-field"><span>Số tham khảo</span><input id="receiptReference" data-receipt-input="reference" maxlength="30"></label>
+        <label class="receipt-field receipt-date-field"><span>Ngày nhận</span><input id="receiptReceivedAt" data-receipt-input="receivedAt" type="datetime-local" min="2000-01-01T00:00" max="2100-12-31T23:59"></label>
+        <label class="receipt-field receipt-date-field"><span>Ngày hẹn</span><input id="receiptAppointmentAt" data-receipt-input="appointmentAt" type="datetime-local" min="2000-01-01T00:00" max="2100-12-31T23:59"></label>
+        <label class="receipt-field wide"><span>Giá đã được tạm tính và báo trước (VNĐ)</span><input id="receiptEstimatedPrice" data-receipt-input="estimatedPrice" type="text" inputmode="numeric" maxlength="18" placeholder="VD: 500.000"></label>
+        <label class="receipt-field"><span>Họ tên khách hàng</span><input id="receiptCustomer" data-receipt-input="customer" maxlength="120" autocomplete="name"></label>
+        <label class="receipt-field"><span>Điện thoại</span><input id="receiptPhone" data-receipt-input="phone" maxlength="20" inputmode="tel" autocomplete="tel"></label>
+        <label class="receipt-field wide"><span>Địa chỉ</span><input id="receiptAddress" data-receipt-input="address" maxlength="220" autocomplete="street-address"></label>
+        <label class="receipt-field"><span>Model thiết bị</span><input id="receiptModel" data-receipt-input="model" maxlength="160"></label>
+        <label class="receipt-field"><span>Số serial</span><input id="receiptSerial" data-receipt-input="serial" maxlength="120"></label>
+        <label class="receipt-field wide"><span>Hư hỏng / yêu cầu sửa chữa</span><textarea id="receiptIssue" data-receipt-input="issue" maxlength="1800"></textarea></label>
+        <label class="receipt-field wide"><span>Tình trạng lúc tiếp nhận</span><textarea id="receiptCondition" data-receipt-input="condition" maxlength="1000"></textarea></label>
+        <label class="receipt-field wide"><span>Phụ kiện kèm theo</span><textarea id="receiptAccessories" data-receipt-input="accessories" maxlength="800"></textarea></label>
+        <label class="receipt-field wide"><span>Ghi chú</span><textarea id="receiptNote" data-receipt-input="note" maxlength="1200"></textarea></label>
+        <label class="receipt-field wide"><span>Mẫu thời gian sửa chữa</span><select id="receiptRepairOption" data-receipt-input="repairOption"><option value="STANDARD">Sửa thường · 4–5 ngày làm việc</option><option value="URGENT">Dịch vụ sửa chữa ưu tiên · trong vòng 2 ngày làm việc</option></select></label>
+        <label class="receipt-field"><span>Kỹ thuật</span><input id="receiptTechnician" data-receipt-input="technician" maxlength="100"></label>
+        <label class="receipt-field"><span>Người nhận máy</span><input id="receiptReceiver" data-receipt-input="receiver" maxlength="100"></label>
+        <div class="receipt-editor-actions"><button class="receipt-reset" type="button" onclick="resetReceiptDraft()">LÀM MỚI</button><button class="receipt-preview-btn" type="button" onclick="showReceiptPreview()">XEM BILL</button><button class="receipt-capture" type="submit">📷 CHỤP BILL</button></div>
+      </form>
+      <div class="receipt-preview-wrap">
+        <article class="receipt-paper" id="receiptPaper">
+          <div class="receipt-top">
+            <div class="receipt-brand"><div class="receipt-brand-mark"><img src="https://lh3.googleusercontent.com/d/1Nloe5X9aOGwERrk3jK_rb-LHXo-WSjL4" alt="Logo Hoàng Gia Computer" crossorigin="anonymous" referrerpolicy="no-referrer" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"><span class="receipt-brand-fallback">HGC</span></div><div><div class="receipt-company">HOÀNG GIA COMPUTER</div><div class="receipt-company-lines">CN1: 200 Nguyễn Hoàng, P. An Phú, TP. Thủ Đức<br>CN2: 334 An Dương Vương, P. Chợ Quán, TP.HCM<span class="receipt-company-hotline">Hotline: 0375 111 112</span></div></div></div>
+            <div class="receipt-code"><svg class="receipt-barcode" id="receiptBarcode" role="img" aria-label="Mã vạch số phiếu"></svg><div class="receipt-barcode-text" data-receipt-output="number"></div><div class="receipt-code-line">Số phiếu: <b data-receipt-output="number"></b></div><div class="receipt-code-line">Số tham khảo: <b data-receipt-output="reference"></b></div><div class="receipt-code-line">Ngày nhận: <b data-receipt-output="receivedAt"></b></div><div class="receipt-code-line">Ngày hẹn: <b data-receipt-output="appointmentAt"></b></div></div>
+          </div>
+          <div class="receipt-title">PHIẾU NHẬN MÁY</div>
+          <div class="receipt-info-grid"><div class="receipt-info-col"><div class="receipt-section-title"><svg class="receipt-section-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.5"></circle><path d="M5.5 20c.6-4 2.8-6 6.5-6s5.9 2 6.5 6"></path></svg>THÔNG TIN KHÁCH HÀNG</div><div class="receipt-line"><b>Họ tên:</b><span data-receipt-output="customer"></span></div><div class="receipt-line"><b>Địa chỉ:</b><span data-receipt-output="address"></span></div><div class="receipt-line"><b>Điện thoại:</b><span data-receipt-output="phone"></span></div></div><div class="receipt-info-col"><div class="receipt-section-title"><svg class="receipt-section-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="11" rx="1.5"></rect><path d="M2.5 19h19M9 19l.8-3h4.4l.8 3"></path></svg>THÔNG TIN SẢN PHẨM</div><div class="receipt-line"><b>Model:</b><span data-receipt-output="model"></span></div><div class="receipt-line"><b>Số serial:</b><span data-receipt-output="serial"></span></div><div class="receipt-line"><b>Ngày nhận:</b><span data-receipt-output="purchaseDate"></span></div></div></div>
+          <div class="receipt-wide-line"><b>Hư hỏng:</b><span data-receipt-output="issue"></span></div><div class="receipt-wide-line"><b>Tình trạng tiếp nhận:</b><span data-receipt-output="condition"></span></div><div class="receipt-wide-line"><b>Phụ kiện kèm:</b><span data-receipt-output="accessories"></span></div><div class="receipt-wide-line"><b>Ghi chú:</b><span data-receipt-output="note"></span></div><div class="receipt-warning-note" data-receipt-output="repairOption"></div>
+          <div class="receipt-signatures"><div><b>KHÁCH HÀNG</b><i class="receipt-signature-line"></i><span class="receipt-signature-name"></span></div><div><b>KỸ THUẬT</b><i class="receipt-signature-line"></i><span class="receipt-signature-name" data-receipt-output="technician"></span></div><div><b>NHẬN MÁY</b><i class="receipt-signature-line"></i><span class="receipt-signature-name" data-receipt-output="receiver"></span></div></div>
+          <div class="receipt-footer"><b>LƯU Ý:</b> Khách hàng vui lòng giữ phiếu để đối chiếu khi nhận máy. Hoàng Gia Computer không chịu trách nhiệm với dữ liệu lưu trong thiết bị nếu không có thỏa thuận sao lưu riêng.<div class="receipt-footer-meta"><div class="receipt-print-time">Thời gian lập phiếu: <span id="receiptPrintTime"></span></div><div class="receipt-price-notice">GIÁ TẠM TÍNH ĐÃ BÁO TRƯỚC: <span data-receipt-output="estimatedPrice"></span></div></div></div>
+        </article>
+      </div>
+    </div>
+  </section>
+</div>
+
 <button class="reminder-edge-btn" id="reminderEdgeButton" type="button" aria-label="Mở ghi chú nhắc khách hàng" aria-haspopup="dialog" onclick="openReminderPanel()">
   <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h9l3 3v15H6z"></path><path d="M15 3v4h4M9 11h6M9 15h6"></path></svg>
   <span class="reminder-edge-label">GHI CHÚ</span><span class="reminder-edge-count" id="reminderEdgeCount">0</span>
@@ -9815,8 +9879,8 @@ body.fab-menu-open #fabToggleBtn{background:linear-gradient(145deg,#267FF0,#0B62
   // recentActivityPanel được chuyển thành con trực tiếp của body khi mở; nếu
   // không có trong danh sách này, cleanup() sẽ nhận nhầm là popup do hosting
   // chèn vào và xóa nó ngay sau khi người dùng bấm chuông thông báo.
-  const APP_IDS = new Set(["results","editOverlay","importOverlay","adminOverlay","toast","imageLightbox","recentActivityPanel","reminderEdgeButton","reminderOverlay"]);
-  const APP_CLASSES = ["sticky","fab-wrap","overlay","toast","image-lightbox","cursor-halo","cursor-dot","cursor-click-wave","footer-credit","build-selection-tray","category-view-bar","latest-items-ticker","scroll-btns","recent-activity-panel","reminder-edge-btn","reminder-overlay"];
+  const APP_IDS = new Set(["results","editOverlay","importOverlay","adminOverlay","toast","imageLightbox","recentActivityPanel","receiptEdgeButton","receiptOverlay","reminderEdgeButton","reminderOverlay"]);
+  const APP_CLASSES = ["sticky","fab-wrap","overlay","toast","image-lightbox","cursor-halo","cursor-dot","cursor-click-wave","footer-credit","build-selection-tray","category-view-bar","latest-items-ticker","scroll-btns","recent-activity-panel","receipt-edge-btn","receipt-overlay","reminder-edge-btn","reminder-overlay"];
   function isAppEl(el){
     if(el.id && APP_IDS.has(el.id)) return true;
     if(el.classList){
@@ -15636,7 +15700,9 @@ function render(){
   const homeLandingMode = !bulkSelectMode && !kw && currentTab==="ALL" && currentStatus==="ALL" && !restockOnly && !totalStockView && !activeKpiView;
   document.body.classList.toggle("home-landing-mode", homeLandingMode);
   const reminderEdgeButton=document.getElementById("reminderEdgeButton");
-  if(reminderEdgeButton) reminderEdgeButton.hidden=currentTab!=="ALL";
+  const receiptEdgeButton=document.getElementById("receiptEdgeButton");
+  if(reminderEdgeButton) reminderEdgeButton.hidden=!homeLandingMode;
+  if(receiptEdgeButton) receiptEdgeButton.hidden=!homeLandingMode;
   const kpiActivityIndex=activeKpiView ? buildKpiActivityIndex() : null;
   const results = DATA.map((r,i)=>({r,i})).filter(({r})=>{
     const [sh,,ten,th,,,tt,ghi] = r;
@@ -23197,6 +23263,112 @@ document.addEventListener("keydown",event=>{
   else closeQrShowcase();
 },true);
 
+const RECEIPT_DRAFT_KEY="kho_cntt_receipt_draft_v1";
+const RECEIPT_FIELDS=["number","reference","receivedAt","appointmentAt","serviceType","estimatedPrice","customer","phone","address","model","serial","purchaseDate","issue","condition","accessories","note","repairOption","technician","receiver"];
+function receiptLocalDateTime(date=new Date()){
+  const pad=value=>String(value).padStart(2,"0");
+  return `${date.getFullYear()}-${pad(date.getMonth()+1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+}
+function createReceiptIdentity(){
+  const now=new Date(),pad=value=>String(value).padStart(2,"0");
+  const stamp=`${now.getFullYear()}${pad(now.getMonth()+1)}${pad(now.getDate())}-${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
+  return {number:`HGC-${stamp}`,reference:`${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`,receivedAt:receiptLocalDateTime(now),serviceType:"Sửa dịch vụ",repairOption:"STANDARD"};
+}
+function formatReceiptValue(key,value){
+  const text=String(value||"").trim();
+  if(!text)return "—";
+  if(key==="estimatedPrice"){
+    const digits=text.replace(/\D/g,"");
+    return digits?`${Number(digits).toLocaleString("vi-VN")} VNĐ`:"—";
+  }
+  if(key==="repairOption"){
+    return text==="URGENT"
+      ? "— Trường hợp sửa chữa không thành công, thiết bị có thể được trả lại trong tình trạng mất nguồn; các phát sinh khác sẽ được báo lại sau. Dịch vụ sửa chữa ưu tiên: trả kết quả trong vòng 2 ngày làm việc."
+      : "— Trường hợp sửa chữa không thành công, thiết bị có thể được trả lại trong tình trạng mất nguồn; các phát sinh khác sẽ được thông báo lại sau. Thời gian xử lý dự kiến: 4–5 ngày làm việc.";
+  }
+  if(key==="purchaseDate"){
+    const match=text.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    return match&&Number(match[1])>=2000&&Number(match[1])<=2100?`${match[3]}/${match[2]}/${match[1]}`:"—";
+  }
+  if(key==="receivedAt"||key==="appointmentAt"){
+    const match=text.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/);
+    return match&&Number(match[1])>=2000&&Number(match[1])<=2100?`${match[3]}/${match[2]}/${match[1]} ${match[4]}:${match[5]}`:"—";
+  }
+  return text;
+}
+function readReceiptForm(){
+  const data={};
+  RECEIPT_FIELDS.forEach(key=>{data[key]=document.querySelector(`[data-receipt-input="${key}"]`)?.value||"";});
+  data.purchaseDate=String(data.receivedAt||"").slice(0,10);
+  return data;
+}
+function saveReceiptDraft(){
+  try{localStorage.setItem(RECEIPT_DRAFT_KEY,JSON.stringify(readReceiptForm()));}catch(_error){}
+}
+function updateReceiptPreview(save=true){
+  const data=readReceiptForm();
+  RECEIPT_FIELDS.forEach(key=>document.querySelectorAll(`[data-receipt-output="${key}"]`).forEach(node=>{
+    const value=formatReceiptValue(key,data[key]);node.textContent=value;node.classList.toggle("receipt-empty",value==="—");
+  }));
+  const time=document.getElementById("receiptPrintTime");if(time)time.textContent=new Date().toLocaleString("vi-VN");
+  renderReceiptBarcode(data.number);
+  if(save)saveReceiptDraft();
+}
+let receiptBarcodeRetryTimer=0,receiptBarcodeRetryCount=0;
+function renderReceiptBarcode(value){
+  const svg=document.getElementById("receiptBarcode"),code=String(value||"").trim();if(!svg||!code)return;
+  if(typeof window.JsBarcode!=="function"){
+    if(receiptBarcodeRetryCount>=20)return;
+    receiptBarcodeRetryCount++;clearTimeout(receiptBarcodeRetryTimer);receiptBarcodeRetryTimer=setTimeout(()=>renderReceiptBarcode(code),300);return;
+  }
+  try{receiptBarcodeRetryCount=0;window.JsBarcode(svg,code,{format:"CODE128",lineColor:"#173D29",background:"#FFFFFF",width:1.35,height:36,margin:0,displayValue:false});}
+  catch(error){console.warn("Không tạo được barcode phiếu:",error);}
+}
+function fillReceiptForm(data){
+  RECEIPT_FIELDS.forEach(key=>{const input=document.querySelector(`[data-receipt-input="${key}"]`);if(input)input.value=String(data?.[key]||"");});
+  updateReceiptPreview(false);
+}
+function initReceiptDraft(){
+  let draft=null;
+  try{draft=JSON.parse(localStorage.getItem(RECEIPT_DRAFT_KEY)||"null");}catch(_error){}
+  fillReceiptForm(draft&&typeof draft==="object"?{...createReceiptIdentity(),...draft}:createReceiptIdentity());
+  document.getElementById("receiptEditor")?.addEventListener("input",()=>updateReceiptPreview(true));
+  document.getElementById("receiptEditor")?.addEventListener("change",()=>updateReceiptPreview(true));
+}
+function openReceiptPanel(){
+  const overlay=document.getElementById("receiptOverlay");if(!overlay)return;
+  updateReceiptPreview(false);overlay.classList.add("open");overlay.setAttribute("aria-hidden","false");document.body.classList.add("private-panel-open");
+  setTimeout(()=>document.getElementById("receiptCustomer")?.focus(),80);
+}
+function closeReceiptPanel(){
+  const overlay=document.getElementById("receiptOverlay");overlay?.classList.remove("open");overlay?.setAttribute("aria-hidden","true");
+  if(!document.querySelector(".overlay.open,.qr-showcase-overlay:not([hidden]),.reminder-overlay.open,.receipt-overlay.open"))document.body.classList.remove("private-panel-open");
+}
+function resetReceiptDraft(){
+  if(!confirm("Làm mới toàn bộ nội dung phiếu đang nhập?"))return;
+  try{localStorage.removeItem(RECEIPT_DRAFT_KEY);}catch(_error){}
+  fillReceiptForm(createReceiptIdentity());saveReceiptDraft();document.getElementById("receiptCustomer")?.focus();
+}
+function showReceiptPreview(){
+  updateReceiptPreview(true);
+  document.querySelector(".receipt-preview-wrap")?.scrollIntoView({behavior:"smooth",block:"start"});
+}
+async function captureReceiptImage(button){
+  const paper=document.getElementById("receiptPaper");if(!paper)return;
+  const oldText=button?.textContent||"📷 CHỤP BILL";
+  try{
+    if(button){button.disabled=true;button.textContent="ĐANG CHỤP…";}
+    updateReceiptPreview(true);showToast("Bắt đầu chụp phiếu nhận máy",2200);
+    const imageUrl=await captureGroupDetailElementExact(paper);
+    const number=readReceiptForm().number||"phieu-nhan-may";
+    const safeName=removeAccents(number).replace(/[^a-z0-9_-]+/gi,"-").replace(/^-+|-+$/g,"")||"phieu-nhan-may";
+    openImageViewer(imageUrl,safeName);showImageSaveButton();showToast("✅ Đã chụp bill — kiểm tra rồi bấm Lưu ảnh",4200);
+  }catch(error){console.error("Không chụp được bill:",error);showToast(`⚠️ Không chụp được bill: ${error?.message||error}`,5200);}
+  finally{if(button){button.disabled=false;button.textContent=oldText;}}
+}
+document.addEventListener("keydown",event=>{if(event.key==="Escape"&&document.getElementById("receiptOverlay")?.classList.contains("open")){event.preventDefault();closeReceiptPanel();}},true);
+initReceiptDraft();
+
 let REMINDER_DATA=[];
 let reminderFilter="ACTIVE";
 const REMINDER_ALERTED=new Set();
@@ -23212,7 +23384,7 @@ async function openReminderPanel(){
   const overlay=document.getElementById("reminderOverlay");overlay?.classList.add("open");overlay?.setAttribute("aria-hidden","false");document.body.classList.add("private-panel-open");
   await loadReminders();
 }
-function closeReminderPanel(){document.getElementById("reminderOverlay")?.classList.remove("open");document.getElementById("reminderOverlay")?.setAttribute("aria-hidden","true");closeReminderForm();if(!document.querySelector(".overlay.open,.qr-showcase-overlay:not([hidden])"))document.body.classList.remove("private-panel-open");}
+function closeReminderPanel(){document.getElementById("reminderOverlay")?.classList.remove("open");document.getElementById("reminderOverlay")?.setAttribute("aria-hidden","true");closeReminderForm();if(!document.querySelector(".overlay.open,.qr-showcase-overlay:not([hidden]),.receipt-overlay.open"))document.body.classList.remove("private-panel-open");}
 async function loadReminders(background=false){
   const list=document.getElementById("reminderList");if(list)list.innerHTML='<div class="reminder-loading">Đang tải ghi chú…</div>';
   try{const result=await privateSheet("private_reminders",{},30000);REMINDER_DATA=Array.isArray(result.reminders)?result.reminders:[];renderReminders();updateReminderBadge();startReminderClock();checkDueReminders();}
