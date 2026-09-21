@@ -8911,7 +8911,8 @@ body #results .card .nguoi-ban-row.has-transaction .nv-role-badge .nv-role-icon{
         <label class="receipt-field"><span>Số tham khảo</span><input id="receiptReference" data-receipt-input="reference" maxlength="30"></label>
         <label class="receipt-field receipt-date-field"><span>Ngày nhận</span><input id="receiptReceivedAt" data-receipt-input="receivedAt" type="datetime-local" min="2000-01-01T00:00" max="2100-12-31T23:59"></label>
         <label class="receipt-field receipt-date-field"><span>Ngày hẹn</span><input id="receiptAppointmentAt" data-receipt-input="appointmentAt" type="datetime-local" min="2000-01-01T00:00" max="2100-12-31T23:59"></label>
-        <label class="receipt-field wide"><span>Giá đã được tạm tính và báo trước (VNĐ)</span><input id="receiptEstimatedPrice" data-receipt-input="estimatedPrice" type="text" inputmode="numeric" maxlength="18" placeholder="VD: 500.000"></label>
+        <label class="receipt-field"><span>Giá từ (VNĐ)</span><input id="receiptEstimatedPriceFrom" data-receipt-input="estimatedPriceFrom" type="text" inputmode="numeric" maxlength="18" placeholder="VD: 1.250.000"></label>
+        <label class="receipt-field"><span>Giá đến (VNĐ)</span><input id="receiptEstimatedPriceTo" data-receipt-input="estimatedPriceTo" type="text" inputmode="numeric" maxlength="18" placeholder="VD: 1.500.000"></label>
         <label class="receipt-field"><span>Họ tên khách hàng</span><input id="receiptCustomer" data-receipt-input="customer" maxlength="120" autocomplete="name"></label>
         <label class="receipt-field"><span>Điện thoại</span><input id="receiptPhone" data-receipt-input="phone" maxlength="20" inputmode="tel" autocomplete="tel"></label>
         <label class="receipt-field wide"><span>Địa chỉ</span><input id="receiptAddress" data-receipt-input="address" maxlength="220" autocomplete="street-address"></label>
@@ -23269,7 +23270,7 @@ document.addEventListener("keydown",event=>{
 },true);
 
 const RECEIPT_DRAFT_KEY="kho_cntt_receipt_draft_v1";
-const RECEIPT_FIELDS=["number","reference","receivedAt","appointmentAt","serviceType","estimatedPrice","customer","phone","address","model","serial","purchaseDate","issue","condition","accessories","note","repairOption","technician","receiver"];
+const RECEIPT_FIELDS=["number","reference","receivedAt","appointmentAt","serviceType","estimatedPrice","estimatedPriceFrom","estimatedPriceTo","customer","phone","address","model","serial","purchaseDate","issue","condition","accessories","note","repairOption","technician","receiver"];
 function receiptLocalDateTime(date=new Date()){
   const pad=value=>String(value).padStart(2,"0");
   return `${date.getFullYear()}-${pad(date.getMonth()+1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
@@ -23301,6 +23302,17 @@ function formatReceiptValue(key,value){
   }
   return text;
 }
+function formatReceiptMoney(value){
+  const digits=String(value||"").replace(/\D/g,"");
+  return digits?Number(digits).toLocaleString("vi-VN"):"";
+}
+function formatReceiptPriceRange(data){
+  const from=formatReceiptMoney(data?.estimatedPriceFrom||data?.estimatedPrice),to=formatReceiptMoney(data?.estimatedPriceTo);
+  if(from&&to)return `${from} ➧ ${to} VNĐ`;
+  if(from)return `${from} VNĐ`;
+  if(to)return `Đến ${to} VNĐ`;
+  return "—";
+}
 function readReceiptForm(){
   const data={};
   RECEIPT_FIELDS.forEach(key=>{data[key]=document.querySelector(`[data-receipt-input="${key}"]`)?.value||"";});
@@ -23315,6 +23327,9 @@ function updateReceiptPreview(save=true){
   RECEIPT_FIELDS.forEach(key=>document.querySelectorAll(`[data-receipt-output="${key}"]`).forEach(node=>{
     const value=formatReceiptValue(key,data[key]);node.textContent=value;node.classList.toggle("receipt-empty",value==="—");
   }));
+  document.querySelectorAll('[data-receipt-output="estimatedPrice"]').forEach(node=>{
+    const value=formatReceiptPriceRange(data);node.textContent=value;node.classList.toggle("receipt-empty",value==="—");
+  });
   const time=document.getElementById("receiptPrintTime");if(time)time.textContent=new Date().toLocaleString("vi-VN");
   renderReceiptBarcode(data.number);
   if(save)saveReceiptDraft();
@@ -23337,6 +23352,7 @@ function initReceiptDraft(){
   let draft=null;
   try{draft=JSON.parse(localStorage.getItem(RECEIPT_DRAFT_KEY)||"null");}catch(_error){}
   const initial=draft&&typeof draft==="object"?{...createReceiptIdentity(),...draft}:createReceiptIdentity();
+  if(!String(initial.estimatedPriceFrom||"").trim()&&String(initial.estimatedPrice||"").trim())initial.estimatedPriceFrom=initial.estimatedPrice;
   if(!String(initial.receiver||"").trim())initial.receiver="HOÀNG GIA COMPUTER";
   fillReceiptForm(initial);
   document.getElementById("receiptEditor")?.addEventListener("input",()=>updateReceiptPreview(true));
