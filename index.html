@@ -23270,14 +23270,18 @@ document.addEventListener("keydown",event=>{
 
 const RECEIPT_DRAFT_KEY="kho_cntt_receipt_draft_v1";
 const RECEIPT_FIELDS=["number","reference","receivedAt","appointmentAt","serviceType","estimatedPrice","estimatedPriceFrom","estimatedPriceTo","customer","phone","address","model","serial","purchaseDate","issue","condition","accessories","note","repairOption","technician","receiver"];
+function receiptVietnamParts(date=new Date()){
+  const parts=new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Ho_Chi_Minh",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",second:"2-digit",hourCycle:"h23"}).formatToParts(date);
+  return Object.fromEntries(parts.filter(part=>part.type!=="literal").map(part=>[part.type,part.value]));
+}
 function receiptLocalDateTime(date=new Date()){
-  const pad=value=>String(value).padStart(2,"0");
-  return `${date.getFullYear()}-${pad(date.getMonth()+1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+  const part=receiptVietnamParts(date);
+  return `${part.year}-${part.month}-${part.day}T${part.hour}:${part.minute}`;
 }
 function createReceiptIdentity(){
-  const now=new Date(),pad=value=>String(value).padStart(2,"0");
-  const stamp=`${now.getFullYear()}${pad(now.getMonth()+1)}${pad(now.getDate())}-${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
-  return {number:`HGC-${stamp}`,reference:`${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`,receivedAt:receiptLocalDateTime(now),serviceType:"Sửa dịch vụ",repairOption:"STANDARD",receiver:"HOÀNG GIA COMPUTER"};
+  const now=new Date(),part=receiptVietnamParts(now);
+  const stamp=`${part.year}${part.month}${part.day}-${part.hour}${part.minute}${part.second}`;
+  return {number:`HGC-${stamp}`,reference:`${part.hour}${part.minute}${part.second}`,receivedAt:receiptLocalDateTime(now),serviceType:"Sửa dịch vụ",repairOption:"STANDARD",receiver:"HOÀNG GIA COMPUTER"};
 }
 function formatReceiptValue(key,value){
   const text=String(value||"").trim();
@@ -23333,7 +23337,7 @@ function updateReceiptPreview(save=true){
     const key=node.getAttribute("data-receipt-optional")||"";
     node.hidden=!String(data[key]||"").trim();
   });
-  const time=document.getElementById("receiptPrintTime");if(time)time.textContent=new Date().toLocaleString("vi-VN");
+  const time=document.getElementById("receiptPrintTime");if(time){const part=receiptVietnamParts();time.textContent=`${part.hour}:${part.minute}:${part.second} ${part.day}/${part.month}/${part.year}`;}
   renderReceiptBarcode(data.number);
   if(save)saveReceiptDraft();
 }
@@ -23354,7 +23358,9 @@ function fillReceiptForm(data){
 function initReceiptDraft(){
   let draft=null;
   try{draft=JSON.parse(localStorage.getItem(RECEIPT_DRAFT_KEY)||"null");}catch(_error){}
-  const initial=draft&&typeof draft==="object"?{...createReceiptIdentity(),...draft}:createReceiptIdentity();
+  let initial=draft&&typeof draft==="object"?{...createReceiptIdentity(),...draft}:createReceiptIdentity();
+  const hasEnteredContent=["customer","phone","model","serial","issue","condition","accessories","note","estimatedPriceFrom","estimatedPriceTo","technician"].some(key=>String(initial[key]||"").trim());
+  if(!hasEnteredContent)initial={...initial,...createReceiptIdentity()};
   if(!String(initial.estimatedPriceFrom||"").trim()&&String(initial.estimatedPrice||"").trim())initial.estimatedPriceFrom=initial.estimatedPrice;
   if(!String(initial.receiver||"").trim())initial.receiver="HOÀNG GIA COMPUTER";
   fillReceiptForm(initial);
