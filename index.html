@@ -3653,6 +3653,26 @@ body {
 /* Phiếu A5 ngang gọn: giữ một bố cục thống nhất khi xem và chụp trên mọi thiết bị. */
 .receipt-paper{width:760px;min-width:760px;padding:16px 22px 13px}.receipt-top{grid-template-columns:minmax(0,1.35fr) minmax(250px,.65fr);gap:18px}.receipt-brand{gap:5px}.receipt-brand-mark{flex-basis:94px;width:94px;height:58px}.receipt-brand-mark img{max-width:90px;max-height:56px;transform:translateX(12px) scale(1.14)}.receipt-company{font-size:16px}.receipt-company-lines{margin-top:3px;font-size:9px;line-height:1.28}.receipt-company-hotline{margin-top:2px;font-size:11px;transform:translateX(32px)}.receipt-barcode{width:250px;height:34px}.receipt-barcode-text{margin:2px 0 5px;font-size:9px}.receipt-code-line{font-size:10px;line-height:1.35}.receipt-title{margin:5px 0 4px;padding-top:4px;font-size:21px}.receipt-section-title{padding:4px 6px;font-size:11px}.receipt-section-icon{width:13px;height:13px;flex-basis:13px}.receipt-line{min-height:24px}.receipt-line b,.receipt-line span{padding:4px 6px;font-size:10px}.receipt-wide-line{min-height:27px}.receipt-wide-line b,.receipt-wide-line span{padding:5px 6px;font-size:10px}.receipt-warning-note{padding:5px 7px;font-size:8.5px;line-height:1.3}.receipt-signatures{min-height:50px;padding-top:7px}.receipt-signatures b{font-size:10px}.receipt-signature-line{margin:11px auto 2px!important}.receipt-signature-name{min-height:10px;font-size:9px!important}.receipt-footer{padding-top:6px;font-size:8.5px;line-height:1.3}.receipt-footer-meta{gap:8px;margin-top:4px}.receipt-print-time{font-size:8.5px}.receipt-price-notice,.receipt-price-notice span{font-size:7.5px}
 .receipt-brand-mark img{transform:translateX(18px) scale(1.14)}.receipt-company{text-align:center;font-size:21px}.receipt-title{font-size:16px;color:#147D4B}.receipt-company-hotline{transform:none;text-align:center;font-family:"Segoe UI",Arial,sans-serif!important;font-size:11px;font-weight:800;letter-spacing:.45px}.receipt-paper [hidden]{display:none!important}.receipt-code-line{display:grid;grid-template-columns:96px minmax(0,1fr);column-gap:6px;align-items:baseline;width:100%;text-align:left}.receipt-code-label{text-align:left;white-space:nowrap}.receipt-code-line b{text-align:left;white-space:nowrap}.receipt-config-row{display:flex;border-right:1px solid #345442;border-bottom:1px solid #345442;border-left:1px solid #345442}.receipt-config-item{display:grid;flex:1 1 0;min-width:0;gap:2px;padding:4px 5px;border-right:1px solid #A8B9AF;text-align:center}.receipt-config-item:last-child{border-right:0}.receipt-config-item b{color:#12633E;font-size:8px;line-height:1}.receipt-config-item span{font-size:9px;font-weight:700;line-height:1.2;overflow-wrap:anywhere}.receipt-config-editor-title{grid-column:1/-1;margin-top:2px;padding-top:7px;border-top:1px dashed #D1DEE7;color:#174D6E;font-size:11px;font-weight:950;text-align:center}.receipt-price-notice{display:grid;gap:2px;text-align:left}.receipt-price-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:5px;align-items:baseline}.receipt-price-row span{text-align:right;white-space:nowrap}.receipt-price-total{padding-top:2px;border-top:1px solid rgba(201,42,42,.35);font-weight:900}
+/* Khối thương hiệu cân giữa; hotline chỉ có viền xanh mảnh để bill nhẹ và thanh lịch. */
+.receipt-brand-heading{display:flex;align-items:center;justify-content:center;gap:5px;width:100%}
+.receipt-brand .receipt-company,.receipt-brand .receipt-company-lines{text-align:center}
+.receipt-company-lines .receipt-company-hotline{display:flex;width:max-content;min-height:25px;margin:6px auto 0;padding:3px 11px;align-items:center;justify-content:center;gap:7px;border:1px solid #147D4B;border-radius:999px;background:transparent;color:#12633E;box-shadow:none;font-family:"Segoe UI",Arial,sans-serif!important;line-height:1;letter-spacing:0;transform:none}
+.receipt-hotline-label{padding-right:7px;border-right:1px solid rgba(20,125,75,.34);color:#147D4B;font-size:9px;font-weight:900;letter-spacing:.85px}
+.receipt-hotline-number{color:#12633E;font-size:12px;font-weight:950;letter-spacing:1px;text-shadow:none;white-space:nowrap}
+/* Khung chuẩn A5 ngang ở 96dpi: 210 x 148 mm ~= 794 x 560 px. */
+.receipt-paper{width:794px;min-width:794px;min-height:560px;padding:14px 18px 11px}
+.receipt-top{grid-template-columns:minmax(0,1fr) 250px;gap:14px;align-items:start}
+.receipt-brand{display:grid;grid-template-columns:minmax(0,1fr);justify-items:center;gap:1px;align-items:start}
+.receipt-brand-mark{display:grid;flex:0 0 40px;width:40px;height:34px;place-items:center}
+.receipt-brand-mark img{max-width:38px;max-height:32px;transform:none}
+.receipt-company{font-size:19px;line-height:1.08}
+.receipt-company-lines{margin-top:1px;font-size:8.7px;line-height:1.28}
+.receipt-company-lines .receipt-company-hotline{min-height:22px;margin-top:4px;padding:3px 10px}
+.receipt-barcode{width:238px;height:32px}
+.receipt-barcode-text{margin:2px 0 4px}
+.receipt-code-line{font-size:9.5px;line-height:1.28}
+.receipt-title{margin:4px 0 3px;padding-top:4px;font-size:16px}
+.receipt-paper.receipt-a5-overflow{outline:3px solid #C0392B;outline-offset:-3px}
 </style>
 <style id="mobile-typography">
 /* Font hệ thống rõ dấu tiếng Việt, nhẹ và ổn định trên Android/iPhone/Windows. */
@@ -8936,7 +8956,7 @@ body #results .card .nguoi-ban-row.has-transaction .nv-role-badge .nv-role-icon{
       <div class="receipt-preview-wrap">
         <article class="receipt-paper" id="receiptPaper">
           <div class="receipt-top">
-            <div class="receipt-brand"><div class="receipt-brand-mark"><img src="https://lh3.googleusercontent.com/d/1Nloe5X9aOGwERrk3jK_rb-LHXo-WSjL4" alt="Logo Hoàng Gia Computer" crossorigin="anonymous" referrerpolicy="no-referrer" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"><span class="receipt-brand-fallback">HGC</span></div><div><div class="receipt-company">HOÀNG GIA COMPUTER</div><div class="receipt-company-lines">CN1: 200 Nguyễn Hoàng, Khu đô thị An Phú An Khánh, Bình Trưng, Hồ Chí Minh<br>CN2: 334 An Dương Vương, Phường Chợ Quán, Thành phố Hồ Chí Minh<span class="receipt-company-hotline">Hotline: 0375 111 112</span></div></div></div>
+            <div class="receipt-brand"><div class="receipt-brand-heading"><div class="receipt-brand-mark"><img src="https://lh3.googleusercontent.com/d/1Nloe5X9aOGwERrk3jK_rb-LHXo-WSjL4" alt="Logo Hoàng Gia Computer" crossorigin="anonymous" referrerpolicy="no-referrer" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"><span class="receipt-brand-fallback">HGC</span></div><div class="receipt-company">HOÀNG GIA COMPUTER</div></div><div class="receipt-company-lines">CN1: 200 Nguyễn Hoàng, Khu đô thị An Phú An Khánh, Bình Trưng, Hồ Chí Minh<br>CN2: 334 An Dương Vương, Phường Chợ Quán, Thành phố Hồ Chí Minh<span class="receipt-company-hotline"><span class="receipt-hotline-label">HOTLINE:</span><span class="receipt-hotline-number">0375 111 112</span></span></div></div>
             <div class="receipt-code"><svg class="receipt-barcode" id="receiptBarcode" role="img" aria-label="Mã vạch số phiếu"></svg><div class="receipt-barcode-text" data-receipt-output="number"></div><div class="receipt-code-line"><span class="receipt-code-label">Số phiếu:</span><b data-receipt-output="number"></b></div><div class="receipt-code-line"><span class="receipt-code-label">Số tham khảo:</span><b data-receipt-output="reference"></b></div><div class="receipt-code-line"><span class="receipt-code-label">Ngày nhận:</span><b data-receipt-output="receivedAt"></b></div><div class="receipt-code-line" data-receipt-optional="appointmentAt" hidden><span class="receipt-code-label">Ngày hẹn:</span><b data-receipt-output="appointmentAt"></b></div></div>
           </div>
           <div class="receipt-title">PHIẾU NHẬN MÁY</div>
@@ -23361,7 +23381,18 @@ function updateReceiptPreview(save=true){
   const configRow=document.getElementById("receiptConfigRow");if(configRow)configRow.hidden=!hasConfig;
   const time=document.getElementById("receiptPrintTime");if(time){const part=receiptVietnamParts();time.textContent=`${part.hour}:${part.minute}:${part.second} ${part.day}/${part.month}/${part.year}`;}
   renderReceiptBarcode(data.number);
+  requestAnimationFrame(updateReceiptA5FitState);
   if(save)saveReceiptDraft();
+}
+function updateReceiptA5FitState(){
+  const paper=document.getElementById("receiptPaper");
+  if(!paper)return {overflow:false,height:0,maxHeight:0};
+  const width=paper.getBoundingClientRect().width||794;
+  const maxHeight=Math.ceil(width*148/210);
+  const height=Math.ceil(paper.scrollHeight);
+  const overflow=height>maxHeight+2;
+  paper.classList.toggle("receipt-a5-overflow",overflow);
+  return {overflow,height,maxHeight};
 }
 let receiptBarcodeRetryTimer=0,receiptBarcodeRetryCount=0;
 function renderReceiptBarcode(value){
@@ -23414,7 +23445,15 @@ async function captureReceiptImage(button){
   const oldText=button?.textContent||"📷 CHỤP BILL";
   try{
     if(button){button.disabled=true;button.textContent="ĐANG CHỤP…";}
-    updateReceiptPreview(true);showToast("Bắt đầu chụp phiếu nhận máy",2200);
+    updateReceiptPreview(true);
+    await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
+    const fit=updateReceiptA5FitState();
+    if(fit.overflow){
+      document.querySelector(".receipt-preview-wrap")?.scrollIntoView({behavior:"smooth",block:"start"});
+      showToast(`⚠️ Bill đang vượt khổ A5 (${fit.height}px/${fit.maxHeight}px). Hãy rút gọn phần ghi chú hoặc nội dung dài trước khi chụp.`,7000);
+      return;
+    }
+    showToast("Bắt đầu chụp phiếu nhận máy chuẩn A5 ngang",2200);
     // Bill giữ nguyên tỷ lệ A5 ngang; 3x chỉ tăng số pixel để chữ, mã vạch và đường kẻ sắc nét hơn.
     const imageUrl=await captureGroupDetailElementExact(paper,{scale:3});
     const number=readReceiptForm().number||"phieu-nhan-may";
