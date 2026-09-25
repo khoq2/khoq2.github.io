@@ -3652,7 +3652,7 @@ body {
 @media(max-width:380px){.receipt-editor{grid-template-columns:1fr}.receipt-editor-title,.receipt-field.wide,.receipt-editor-actions{grid-column:1}.receipt-editor-actions{grid-template-columns:68px 90px minmax(0,1fr)}}
 /* Phiếu A5 ngang gọn: giữ một bố cục thống nhất khi xem và chụp trên mọi thiết bị. */
 .receipt-paper{width:760px;min-width:760px;padding:16px 22px 13px}.receipt-top{grid-template-columns:minmax(0,1.35fr) minmax(250px,.65fr);gap:18px}.receipt-brand{gap:5px}.receipt-brand-mark{flex-basis:94px;width:94px;height:58px}.receipt-brand-mark img{max-width:90px;max-height:56px;transform:translateX(12px) scale(1.14)}.receipt-company{font-size:16px}.receipt-company-lines{margin-top:3px;font-size:9px;line-height:1.28}.receipt-company-hotline{margin-top:2px;font-size:11px;transform:translateX(32px)}.receipt-barcode{width:250px;height:34px}.receipt-barcode-text{margin:2px 0 5px;font-size:9px}.receipt-code-line{font-size:10px;line-height:1.35}.receipt-title{margin:5px 0 4px;padding-top:4px;font-size:21px}.receipt-section-title{padding:4px 6px;font-size:11px}.receipt-section-icon{width:13px;height:13px;flex-basis:13px}.receipt-line{min-height:24px}.receipt-line b,.receipt-line span{padding:4px 6px;font-size:10px}.receipt-wide-line{min-height:27px}.receipt-wide-line b,.receipt-wide-line span{padding:5px 6px;font-size:10px}.receipt-warning-note{padding:5px 7px;font-size:8.5px;line-height:1.3}.receipt-signatures{min-height:50px;padding-top:7px}.receipt-signatures b{font-size:10px}.receipt-signature-line{margin:11px auto 2px!important}.receipt-signature-name{min-height:10px;font-size:9px!important}.receipt-footer{padding-top:6px;font-size:8.5px;line-height:1.3}.receipt-footer-meta{gap:8px;margin-top:4px}.receipt-print-time{font-size:8.5px}.receipt-price-notice,.receipt-price-notice span{font-size:7.5px}
-.receipt-brand-mark img{transform:translateX(18px) scale(1.14)}.receipt-company-hotline{transform:translateX(68px)}.receipt-paper [data-receipt-optional][hidden]{display:none!important}.receipt-code-line{display:grid;grid-template-columns:96px minmax(0,1fr);column-gap:6px;align-items:baseline;width:100%;text-align:left}.receipt-code-label{text-align:left;white-space:nowrap}.receipt-code-line b{text-align:left;white-space:nowrap}
+.receipt-brand-mark img{transform:translateX(18px) scale(1.14)}.receipt-company-hotline{transform:translateX(68px)}.receipt-paper [data-receipt-optional][hidden]{display:none!important}.receipt-code-line{display:grid;grid-template-columns:96px minmax(0,1fr);column-gap:6px;align-items:baseline;width:100%;text-align:left}.receipt-code-label{text-align:left;white-space:nowrap}.receipt-code-line b{text-align:left;white-space:nowrap}.receipt-price-notice{display:grid;gap:2px;text-align:left}.receipt-price-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:5px;align-items:baseline}.receipt-price-row span{text-align:right;white-space:nowrap}.receipt-price-total{padding-top:2px;border-top:1px solid rgba(201,42,42,.35);font-weight:900}
 </style>
 <style id="mobile-typography">
 /* Font hệ thống rõ dấu tiếng Việt, nhẹ và ổn định trên Android/iPhone/Windows. */
@@ -8901,7 +8901,7 @@ body #results .card .nguoi-ban-row.has-transaction .nv-role-badge .nv-role-icon{
   <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2V3Z"></path><path d="M9 8h6M9 12h6M9 16h4"></path></svg>
   <span class="receipt-edge-label">TẠO BILL</span>
 </button>
-<div class="receipt-overlay" id="receiptOverlay" aria-hidden="true" onclick="if(event.target===this)closeReceiptPanel()">
+<div class="receipt-overlay" id="receiptOverlay" aria-hidden="true">
   <section class="receipt-dialog" role="dialog" aria-modal="true" aria-labelledby="receiptDialogTitle">
     <header class="receipt-dialog-head"><h2 id="receiptDialogTitle">TẠO PHIẾU NHẬN MÁY</h2><button class="receipt-close" type="button" aria-label="Đóng" onclick="closeReceiptPanel()">×</button></header>
     <div class="receipt-workspace">
@@ -8936,7 +8936,7 @@ body #results .card .nguoi-ban-row.has-transaction .nv-role-badge .nv-role-icon{
           <div class="receipt-info-grid"><div class="receipt-info-col"><div class="receipt-section-title"><svg class="receipt-section-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.5"></circle><path d="M5.5 20c.6-4 2.8-6 6.5-6s5.9 2 6.5 6"></path></svg>THÔNG TIN KHÁCH HÀNG</div><div class="receipt-line"><b>Họ tên:</b><span data-receipt-output="customer"></span></div><div class="receipt-line"><b>Điện thoại:</b><span data-receipt-output="phone"></span></div></div><div class="receipt-info-col"><div class="receipt-section-title"><svg class="receipt-section-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="11" rx="1.5"></rect><path d="M2.5 19h19M9 19l.8-3h4.4l.8 3"></path></svg>THÔNG TIN SẢN PHẨM</div><div class="receipt-line"><b>Model:</b><span data-receipt-output="model"></span></div><div class="receipt-line"><b>Số serial:</b><span data-receipt-output="serial"></span></div></div></div>
           <div class="receipt-wide-line" data-receipt-optional="issue" hidden><b>Hư hỏng:</b><span data-receipt-output="issue"></span></div><div class="receipt-wide-line"><b>Tình trạng tiếp nhận:</b><span data-receipt-output="condition"></span></div><div class="receipt-wide-line"><b>Phụ kiện kèm:</b><span data-receipt-output="accessories"></span></div><div class="receipt-wide-line"><b>Ghi chú:</b><span data-receipt-output="note"></span></div><div class="receipt-warning-note" data-receipt-output="repairOption"></div>
           <div class="receipt-signatures"><div><b>KHÁCH HÀNG</b><i class="receipt-signature-line"></i><span class="receipt-signature-name"></span></div><div><b>KỸ THUẬT</b><i class="receipt-signature-line"></i><span class="receipt-signature-name" data-receipt-output="technician"></span></div><div><b>NHẬN MÁY</b><i class="receipt-signature-line"></i><span class="receipt-signature-name" data-receipt-output="receiver"></span></div></div>
-          <div class="receipt-footer"><b>LƯU Ý:</b> Khách hàng vui lòng giữ phiếu để đối chiếu khi nhận máy. Hoàng Gia Computer không chịu trách nhiệm với dữ liệu lưu trong thiết bị nếu không có thỏa thuận sao lưu riêng.<div class="receipt-footer-meta"><div class="receipt-print-time">Thời gian lập phiếu: <span id="receiptPrintTime"></span></div><div class="receipt-price-notice">GIÁ TẠM TÍNH ĐÃ BÁO TRƯỚC: <span data-receipt-output="estimatedPrice"></span></div></div></div>
+          <div class="receipt-footer"><b>LƯU Ý:</b> Khách hàng vui lòng giữ phiếu để đối chiếu khi nhận máy. Hoàng Gia Computer không chịu trách nhiệm với dữ liệu lưu trong thiết bị nếu không có thỏa thuận sao lưu riêng.<div class="receipt-footer-meta"><div class="receipt-print-time">Thời gian lập phiếu: <span id="receiptPrintTime"></span></div><div class="receipt-price-notice"><div class="receipt-price-row">GIÁ TẠM TÍNH ĐÃ BÁO TRƯỚC:<span data-receipt-output="estimatedPrice"></span></div><div class="receipt-price-row">THUẾ GIÁ TRỊ GIA TĂNG (VAT 8%):<span id="receiptVatAmount">—</span></div><div class="receipt-price-row receipt-price-total">TỔNG SAU VAT:<span id="receiptTotalWithVat">—</span></div></div></div></div>
         </article>
       </div>
     </div>
@@ -23310,10 +23310,15 @@ function formatReceiptMoney(value){
   return digits?Number(digits).toLocaleString("vi-VN"):"";
 }
 function formatReceiptPriceRange(data){
-  const from=formatReceiptMoney(data?.estimatedPriceFrom||data?.estimatedPrice),to=formatReceiptMoney(data?.estimatedPriceTo);
-  if(from&&to)return `${from} ➧ ${to} VNĐ`;
-  if(from)return `${from} VNĐ`;
-  if(to)return `Đến ${to} VNĐ`;
+  return formatReceiptCalculatedRange(data,1);
+}
+function formatReceiptCalculatedRange(data,multiplier=1){
+  const parse=value=>{const digits=String(value||"").replace(/\D/g,"");return digits?Number(digits):null;};
+  const format=value=>Math.round(value*multiplier).toLocaleString("vi-VN");
+  const from=parse(data?.estimatedPriceFrom||data?.estimatedPrice),to=parse(data?.estimatedPriceTo);
+  if(from!==null&&to!==null)return `${format(from)} ➧ ${format(to)} VNĐ`;
+  if(from!==null)return `${format(from)} VNĐ`;
+  if(to!==null)return `Đến ${format(to)} VNĐ`;
   return "—";
 }
 function readReceiptForm(){
@@ -23333,6 +23338,9 @@ function updateReceiptPreview(save=true){
   document.querySelectorAll('[data-receipt-output="estimatedPrice"]').forEach(node=>{
     const value=formatReceiptPriceRange(data);node.textContent=value;node.classList.toggle("receipt-empty",value==="—");
   });
+  const vat=document.getElementById("receiptVatAmount"),total=document.getElementById("receiptTotalWithVat");
+  if(vat)vat.textContent=formatReceiptCalculatedRange(data,.08);
+  if(total)total.textContent=formatReceiptCalculatedRange(data,1.08);
   document.querySelectorAll("[data-receipt-optional]").forEach(node=>{
     const key=node.getAttribute("data-receipt-optional")||"";
     node.hidden=!String(data[key]||"").trim();
@@ -23369,7 +23377,9 @@ function initReceiptDraft(){
 }
 function openReceiptPanel(){
   const overlay=document.getElementById("receiptOverlay");if(!overlay)return;
-  updateReceiptPreview(false);overlay.classList.add("open");overlay.setAttribute("aria-hidden","false");document.body.classList.add("private-panel-open");
+  const identity=createReceiptIdentity();
+  [["number",identity.number],["reference",identity.reference],["receivedAt",identity.receivedAt]].forEach(([key,value])=>{const input=document.querySelector(`[data-receipt-input="${key}"]`);if(input)input.value=value;});
+  updateReceiptPreview(true);overlay.classList.add("open");overlay.setAttribute("aria-hidden","false");document.body.classList.add("private-panel-open");
   setTimeout(()=>document.getElementById("receiptCustomer")?.focus(),80);
 }
 function closeReceiptPanel(){
