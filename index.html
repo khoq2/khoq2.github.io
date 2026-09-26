@@ -3664,15 +3664,28 @@ body {
 .receipt-top{grid-template-columns:minmax(0,1fr) 250px;gap:14px;align-items:start}
 .receipt-brand{display:grid;grid-template-columns:minmax(0,1fr);justify-items:center;gap:1px;align-items:start}
 .receipt-brand-mark{display:grid;flex:0 0 40px;width:40px;height:34px;place-items:center}
-.receipt-brand-mark img{max-width:38px;max-height:32px;transform:none}
+.receipt-brand-mark img{max-width:38px;max-height:32px;transform:translateX(4px)}
 .receipt-company{font-size:19px;line-height:1.08}
-.receipt-company-lines{margin-top:1px;font-size:8.7px;line-height:1.28}
+.receipt-company-lines{margin-top:-1px;font-size:8.7px;line-height:1.28}
 .receipt-company-lines .receipt-company-hotline{min-height:22px;margin-top:4px;padding:3px 10px}
 .receipt-barcode{width:238px;height:32px}
 .receipt-barcode-text{margin:2px 0 4px}
 .receipt-code-line{font-size:9.5px;line-height:1.28}
 .receipt-title{margin:4px 0 3px;padding-top:4px;font-size:16px}
 .receipt-paper.receipt-a5-overflow{outline:3px solid #C0392B;outline-offset:-3px}
+.receipt-paper,.receipt-paper *{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif!important}.receipt-company-lines{font-size:9px;line-height:1.3}.receipt-code-line{font-size:10px;line-height:1.3}.receipt-section-title{font-size:11px}.receipt-line b,.receipt-line span{font-size:10px}.receipt-line span,.receipt-wide-line span{font-weight:500}.receipt-wide-line b,.receipt-wide-line span{font-size:10px;line-height:1.3}.receipt-warning-note{font-size:9px;line-height:1.35}.receipt-footer{font-size:9px;line-height:1.35}.receipt-print-time{font-size:9px}.receipt-price-notice,.receipt-price-notice span{font-size:8px}.receipt-config-item b{font-size:8px}.receipt-config-item span{font-size:9px}
+.receipt-editor-title,.receipt-config-editor-title{grid-column:1/-1;text-align:center}.receipt-editor-title{margin-bottom:2px;padding:5px 8px 8px;border-bottom:2px solid #1596C5}.receipt-config-editor-title{margin:4px 0 2px;padding:7px 8px 6px;border-top:0;border-bottom:2px solid #1596C5;color:#174D6E;font-size:11px;font-weight:950;letter-spacing:.3px}
+@media(max-width:600px){.receipt-workspace{padding-bottom:8px}.receipt-editor-actions{position:sticky;z-index:7;top:calc(54px + env(safe-area-inset-top));right:auto;bottom:auto;left:auto;padding:7px;border:1px solid #D7E2EA;border-radius:12px;background:rgba(255,255,255,.97);box-shadow:0 6px 18px rgba(19,42,67,.12)}}
+/* Thanh thao tác Bill 2026: rõ chức năng, phản hồi tốt bằng chuột lẫn cảm ứng. */
+.receipt-editor-actions{grid-template-columns:1fr 1.15fr 1.55fr;gap:9px;padding:7px;border:1px solid rgba(197,214,226,.8);border-radius:16px;background:linear-gradient(145deg,rgba(255,255,255,.98),rgba(239,246,250,.94));box-shadow:0 8px 24px rgba(26,66,94,.1),inset 0 1px 0 #fff}
+.receipt-editor-actions button{position:relative;display:flex;min-width:0;min-height:44px;align-items:center;justify-content:center;gap:7px;overflow:hidden;border:1px solid transparent;border-radius:12px;font-size:11px;font-weight:900;letter-spacing:.25px;box-shadow:0 4px 12px rgba(24,57,80,.12);transition:transform .18s ease,box-shadow .18s ease,filter .18s ease}
+.receipt-editor-actions button::after{position:absolute;inset:0;background:linear-gradient(115deg,transparent 20%,rgba(255,255,255,.42) 48%,transparent 72%);content:"";transform:translateX(-120%);transition:transform .55s ease;pointer-events:none}
+.receipt-editor-actions button:hover{transform:translateY(-2px);box-shadow:0 8px 18px rgba(24,57,80,.18);filter:saturate(1.05)}.receipt-editor-actions button:hover::after{transform:translateX(120%)}.receipt-editor-actions button:active{transform:translateY(0) scale(.98)}.receipt-editor-actions button:focus-visible{outline:3px solid rgba(21,150,197,.3);outline-offset:2px}
+.receipt-action-icon{display:grid;width:23px;height:23px;flex:0 0 23px;place-items:center;border-radius:8px;background:rgba(255,255,255,.7);font-size:16px;font-weight:900;line-height:1;box-shadow:inset 0 0 0 1px rgba(255,255,255,.55)}
+.receipt-reset{border-color:#FFD4D0!important;background:linear-gradient(145deg,#FFF7F6,#FFE9E7)!important;color:#AC302A}.receipt-save-draft{border-color:#BFDDEA!important;background:linear-gradient(145deg,#F2FBFF,#DDF1FA);color:#12658C}.receipt-capture{border-color:#08734F!important;background:linear-gradient(135deg,#087F5B,#18A477)!important;color:#fff;box-shadow:0 7px 18px rgba(8,127,91,.24)!important}
+.receipt-close{display:grid;place-items:center;border:1px solid rgba(189,206,219,.86);background:linear-gradient(145deg,#fff,#E8EFF4);color:#314B60;box-shadow:0 5px 15px rgba(31,61,83,.14);cursor:pointer;transition:transform .18s ease,background .18s ease,color .18s ease,box-shadow .18s ease}.receipt-close svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:2.25;stroke-linecap:round}.receipt-close:hover{background:linear-gradient(145deg,#FFF7F6,#FFE3E0);color:#B52B24;box-shadow:0 7px 18px rgba(181,43,36,.16);transform:rotate(5deg) scale(1.05)}.receipt-close:active{transform:scale(.94)}.receipt-close:focus-visible{outline:3px solid rgba(21,150,197,.3);outline-offset:2px}
+@media(max-width:600px){.receipt-editor-actions{grid-template-columns:.9fr 1.05fr 1.35fr;gap:6px;padding:6px}.receipt-editor-actions button{min-height:48px;gap:5px;border-radius:11px;font-size:10px;letter-spacing:0}.receipt-action-icon{width:21px;height:21px;flex-basis:21px;border-radius:7px;font-size:14px}.receipt-close{width:42px;height:42px;flex-basis:42px}}
+@media(max-width:360px){.receipt-editor-actions button{font-size:9px}.receipt-action-icon{display:none}}
 </style>
 <style id="mobile-typography">
 /* Font hệ thống rõ dấu tiếng Việt, nhẹ và ổn định trên Android/iPhone/Windows. */
@@ -8923,9 +8936,10 @@ body #results .card .nguoi-ban-row.has-transaction .nv-role-badge .nv-role-icon{
 </button>
 <div class="receipt-overlay" id="receiptOverlay" aria-hidden="true">
   <section class="receipt-dialog" role="dialog" aria-modal="true" aria-labelledby="receiptDialogTitle">
-    <header class="receipt-dialog-head"><h2 id="receiptDialogTitle">TẠO PHIẾU NHẬN MÁY</h2><button class="receipt-close" type="button" aria-label="Đóng" onclick="closeReceiptPanel()">×</button></header>
+    <header class="receipt-dialog-head"><h2 id="receiptDialogTitle">TẠO PHIẾU NHẬN MÁY</h2><button class="receipt-close" type="button" aria-label="Đóng" title="Đóng" onclick="closeReceiptPanel()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></header>
     <div class="receipt-workspace">
       <form class="receipt-editor" id="receiptEditor" onsubmit="event.preventDefault();captureReceiptImage(this.querySelector('.receipt-capture'))">
+        <div class="receipt-editor-actions"><button class="receipt-reset" type="button" onclick="resetReceiptDraft()"><span class="receipt-action-icon" aria-hidden="true">↻</span><span>LÀM MỚI</span></button><button class="receipt-save-draft" type="button" onclick="saveReceiptDraftExplicitly(this)"><span class="receipt-action-icon" aria-hidden="true">✓</span><span>LƯU NHÁP</span></button><button class="receipt-capture" type="submit"><span class="receipt-action-icon" aria-hidden="true">⌾</span><span>CHỤP BILL</span></button></div>
         <div class="receipt-editor-title">NHẬP THÔNG TIN PHIẾU</div>
         <label class="receipt-field"><span>Số phiếu</span><input id="receiptNumber" data-receipt-input="number" maxlength="40"></label>
         <label class="receipt-field"><span>Số tham khảo</span><input id="receiptReference" data-receipt-input="reference" maxlength="30"></label>
@@ -8933,8 +8947,10 @@ body #results .card .nguoi-ban-row.has-transaction .nv-role-badge .nv-role-icon{
         <label class="receipt-field receipt-date-field"><span>Ngày hẹn</span><input id="receiptAppointmentAt" data-receipt-input="appointmentAt" type="datetime-local" min="2000-01-01T00:00" max="2100-12-31T23:59"></label>
         <label class="receipt-field"><span>Giá từ (VNĐ)</span><input id="receiptEstimatedPriceFrom" data-receipt-input="estimatedPriceFrom" type="text" inputmode="numeric" maxlength="18" placeholder="VD: 1.250.000"></label>
         <label class="receipt-field"><span>Giá đến (VNĐ)</span><input id="receiptEstimatedPriceTo" data-receipt-input="estimatedPriceTo" type="text" inputmode="numeric" maxlength="18" placeholder="VD: 1.500.000"></label>
+        <div class="receipt-config-editor-title">THÔNG TIN KHÁCH HÀNG</div>
         <label class="receipt-field"><span>Họ tên khách hàng</span><input id="receiptCustomer" data-receipt-input="customer" maxlength="120" autocomplete="name"></label>
         <label class="receipt-field"><span>Điện thoại</span><input id="receiptPhone" data-receipt-input="phone" maxlength="20" inputmode="tel" autocomplete="tel"></label>
+        <div class="receipt-config-editor-title">THÔNG TIN SẢN PHẨM</div>
         <label class="receipt-field"><span>Model thiết bị</span><input id="receiptModel" data-receipt-input="model" maxlength="160"></label>
         <label class="receipt-field"><span>Số Serial (S/N)</span><input id="receiptSerial" data-receipt-input="serial" maxlength="120"></label>
         <div class="receipt-config-editor-title">CẤU HÌNH THIẾT BỊ</div>
@@ -8944,14 +8960,15 @@ body #results .card .nguoi-ban-row.has-transaction .nv-role-badge .nv-role-icon{
         <label class="receipt-field"><span>SSD</span><input data-receipt-input="configSsd" maxlength="100"></label>
         <label class="receipt-field"><span>HDD</span><input data-receipt-input="configHdd" maxlength="100"></label>
         <label class="receipt-field"><span>VGA</span><input data-receipt-input="configVga" maxlength="100"></label>
+        <div class="receipt-config-editor-title">THÔNG TIN TIẾP NHẬN</div>
         <label class="receipt-field wide"><span>Hư hỏng / yêu cầu sửa chữa</span><textarea id="receiptIssue" data-receipt-input="issue" maxlength="1800"></textarea></label>
         <label class="receipt-field wide"><span>Tình trạng lúc tiếp nhận</span><textarea id="receiptCondition" data-receipt-input="condition" maxlength="1000"></textarea></label>
         <label class="receipt-field wide"><span>Phụ kiện kèm theo</span><textarea id="receiptAccessories" data-receipt-input="accessories" maxlength="800"></textarea></label>
         <label class="receipt-field wide"><span>Ghi chú</span><textarea id="receiptNote" data-receipt-input="note" maxlength="1200"></textarea></label>
-        <label class="receipt-field wide"><span>Mẫu thời gian sửa chữa</span><select id="receiptRepairOption" data-receipt-input="repairOption"><option value="STANDARD">Sửa thường · 4–5 ngày làm việc</option><option value="URGENT">Dịch vụ sửa chữa ưu tiên · trong vòng 2 ngày làm việc</option></select></label>
+        <div class="receipt-config-editor-title">XỬ LÝ &amp; NHÂN SỰ</div>
+        <label class="receipt-field wide"><span>Thời gian sửa chữa</span><select id="receiptRepairOption" data-receipt-input="repairOption"><option value="">Không có</option><option value="STANDARD">Sửa thường · 4–5 ngày làm việc</option><option value="URGENT">Dịch vụ sửa chữa ưu tiên · trong vòng 2 ngày làm việc</option></select></label>
         <label class="receipt-field"><span>Kỹ thuật</span><input id="receiptTechnician" data-receipt-input="technician" maxlength="100"></label>
         <label class="receipt-field"><span>Người nhận máy</span><input id="receiptReceiver" data-receipt-input="receiver" maxlength="100"></label>
-        <div class="receipt-editor-actions"><button class="receipt-reset" type="button" onclick="resetReceiptDraft()">LÀM MỚI</button><button class="receipt-preview-btn" type="button" onclick="showReceiptPreview()">XEM BILL</button><button class="receipt-capture" type="submit">📷 CHỤP BILL</button></div>
       </form>
       <div class="receipt-preview-wrap">
         <article class="receipt-paper" id="receiptPaper">
@@ -8962,7 +8979,7 @@ body #results .card .nguoi-ban-row.has-transaction .nv-role-badge .nv-role-icon{
           <div class="receipt-title">PHIẾU NHẬN MÁY</div>
           <div class="receipt-info-grid"><div class="receipt-info-col"><div class="receipt-section-title"><svg class="receipt-section-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.5"></circle><path d="M5.5 20c.6-4 2.8-6 6.5-6s5.9 2 6.5 6"></path></svg>THÔNG TIN KHÁCH HÀNG</div><div class="receipt-line"><b>Họ tên:</b><span data-receipt-output="customer"></span></div><div class="receipt-line"><b>Điện thoại:</b><span data-receipt-output="phone"></span></div></div><div class="receipt-info-col"><div class="receipt-section-title"><svg class="receipt-section-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="11" rx="1.5"></rect><path d="M2.5 19h19M9 19l.8-3h4.4l.8 3"></path></svg>THÔNG TIN SẢN PHẨM</div><div class="receipt-line"><b>Model:</b><span data-receipt-output="model"></span></div><div class="receipt-line"><b>Số Serial (S/N):</b><span data-receipt-output="serial"></span></div></div></div>
           <div class="receipt-config-row" id="receiptConfigRow" hidden><div class="receipt-config-item" data-receipt-config-item="configMainboard" hidden><b>MAINBOARD</b><span data-receipt-output="configMainboard"></span></div><div class="receipt-config-item" data-receipt-config-item="configCpu" hidden><b>CPU</b><span data-receipt-output="configCpu"></span></div><div class="receipt-config-item" data-receipt-config-item="configRam" hidden><b>RAM</b><span data-receipt-output="configRam"></span></div><div class="receipt-config-item" data-receipt-config-item="configSsd" hidden><b>SSD</b><span data-receipt-output="configSsd"></span></div><div class="receipt-config-item" data-receipt-config-item="configHdd" hidden><b>HDD</b><span data-receipt-output="configHdd"></span></div><div class="receipt-config-item" data-receipt-config-item="configVga" hidden><b>VGA</b><span data-receipt-output="configVga"></span></div></div>
-          <div class="receipt-wide-line" data-receipt-optional="issue" hidden><b>Hư hỏng:</b><span data-receipt-output="issue"></span></div><div class="receipt-wide-line"><b>Tình trạng tiếp nhận:</b><span data-receipt-output="condition"></span></div><div class="receipt-wide-line"><b>Phụ kiện kèm:</b><span data-receipt-output="accessories"></span></div><div class="receipt-wide-line"><b>Ghi chú:</b><span data-receipt-output="note"></span></div><div class="receipt-warning-note" data-receipt-output="repairOption"></div>
+          <div class="receipt-wide-line" data-receipt-optional="issue" hidden><b>Hư hỏng:</b><span data-receipt-output="issue"></span></div><div class="receipt-wide-line"><b>Tình trạng tiếp nhận:</b><span data-receipt-output="condition"></span></div><div class="receipt-wide-line"><b>Phụ kiện kèm:</b><span data-receipt-output="accessories"></span></div><div class="receipt-wide-line"><b>Ghi chú:</b><span data-receipt-output="note"></span></div><div class="receipt-warning-note" data-receipt-output="repairOption" data-receipt-optional="repairOption"></div>
           <div class="receipt-signatures"><div><b>KHÁCH HÀNG</b><i class="receipt-signature-line"></i><span class="receipt-signature-name"></span></div><div><b>KỸ THUẬT</b><i class="receipt-signature-line"></i><span class="receipt-signature-name" data-receipt-output="technician"></span></div><div><b>NHẬN MÁY</b><i class="receipt-signature-line"></i><span class="receipt-signature-name" data-receipt-output="receiver"></span></div></div>
           <div class="receipt-footer"><b>LƯU Ý:</b> Khách hàng vui lòng giữ phiếu để đối chiếu khi nhận máy. Hoàng Gia Computer không chịu trách nhiệm với dữ liệu lưu trong thiết bị nếu không có thỏa thuận sao lưu riêng.<div class="receipt-footer-meta"><div class="receipt-print-time">Thời gian lập phiếu: <span id="receiptPrintTime"></span></div><div class="receipt-price-notice"><div class="receipt-price-row">GIÁ TẠM TÍNH ĐÃ BÁO TRƯỚC:<span data-receipt-output="estimatedPrice"></span></div><div class="receipt-price-row">THUẾ GIÁ TRỊ GIA TĂNG (VAT 8%):<span id="receiptVatAmount">—</span></div><div class="receipt-price-row receipt-price-total">TỔNG SAU VAT:<span id="receiptTotalWithVat">—</span></div></div></div></div>
         </article>
@@ -23357,6 +23374,19 @@ function readReceiptForm(){
 }
 function saveReceiptDraft(){
   try{localStorage.setItem(RECEIPT_DRAFT_KEY,JSON.stringify(readReceiptForm()));}catch(_error){}
+}
+function saveReceiptDraftExplicitly(button){
+  const oldHtml=button?.innerHTML||"";
+  try{
+    updateReceiptPreview(true);
+    if(button){button.disabled=true;button.innerHTML='<span class="receipt-action-icon" aria-hidden="true">✓</span><span>ĐÃ LƯU</span>';}
+    showToast("✅ Đã lưu nháp phiếu trên thiết bị này",2600);
+  }catch(error){
+    console.error("Không lưu được nháp phiếu:",error);
+    showToast("⚠️ Không lưu được bản nháp",3200);
+  }finally{
+    if(button)setTimeout(()=>{button.disabled=false;button.innerHTML=oldHtml;},1200);
+  }
 }
 function updateReceiptPreview(save=true){
   const data=readReceiptForm();
