@@ -3681,10 +3681,11 @@ body {
 .receipt-editor-actions button{position:relative;display:flex;min-width:0;min-height:44px;align-items:center;justify-content:center;gap:7px;overflow:hidden;border:1px solid transparent;border-radius:12px;font-size:11px;font-weight:900;letter-spacing:.25px;box-shadow:0 4px 12px rgba(24,57,80,.12);transition:transform .18s ease,box-shadow .18s ease,filter .18s ease}
 .receipt-editor-actions button::after{position:absolute;inset:0;background:linear-gradient(115deg,transparent 20%,rgba(255,255,255,.42) 48%,transparent 72%);content:"";transform:translateX(-120%);transition:transform .55s ease;pointer-events:none}
 .receipt-editor-actions button:hover{transform:translateY(-2px);box-shadow:0 8px 18px rgba(24,57,80,.18);filter:saturate(1.05)}.receipt-editor-actions button:hover::after{transform:translateX(120%)}.receipt-editor-actions button:active{transform:translateY(0) scale(.98)}.receipt-editor-actions button:focus-visible{outline:3px solid rgba(21,150,197,.3);outline-offset:2px}
-.receipt-action-icon{display:grid;width:23px;height:23px;flex:0 0 23px;place-items:center;border-radius:8px;background:rgba(255,255,255,.7);font-size:16px;font-weight:900;line-height:1;box-shadow:inset 0 0 0 1px rgba(255,255,255,.55)}
-.receipt-reset{border-color:#FFD4D0!important;background:linear-gradient(145deg,#FFF7F6,#FFE9E7)!important;color:#AC302A}.receipt-save-draft{border-color:#BFDDEA!important;background:linear-gradient(145deg,#F2FBFF,#DDF1FA);color:#12658C}.receipt-capture{border-color:#08734F!important;background:linear-gradient(135deg,#087F5B,#18A477)!important;color:#fff;box-shadow:0 7px 18px rgba(8,127,91,.24)!important}
+.receipt-action-icon{display:grid;width:20px;height:20px;flex:0 0 20px;place-items:center;background:transparent;font-size:16px;font-weight:900;line-height:1;box-shadow:none}
+.receipt-action-icon svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.receipt-reset{border-color:#FFD4D0!important;background:linear-gradient(145deg,#FFF7F6,#FFE9E7)!important;color:#AC302A}.receipt-pdf{border-color:#BFDDEA!important;background:linear-gradient(145deg,#F2FBFF,#DDF1FA);color:#12658C}.receipt-capture{border-color:#08734F!important;background:linear-gradient(135deg,#087F5B,#18A477)!important;color:#fff;box-shadow:0 7px 18px rgba(8,127,91,.24)!important}
 .receipt-close{display:grid;place-items:center;border:1px solid rgba(189,206,219,.86);background:linear-gradient(145deg,#fff,#E8EFF4);color:#314B60;box-shadow:0 5px 15px rgba(31,61,83,.14);cursor:pointer;transition:transform .18s ease,background .18s ease,color .18s ease,box-shadow .18s ease}.receipt-close svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:2.25;stroke-linecap:round}.receipt-close:hover{background:linear-gradient(145deg,#FFF7F6,#FFE3E0);color:#B52B24;box-shadow:0 7px 18px rgba(181,43,36,.16);transform:rotate(5deg) scale(1.05)}.receipt-close:active{transform:scale(.94)}.receipt-close:focus-visible{outline:3px solid rgba(21,150,197,.3);outline-offset:2px}
-@media(max-width:600px){.receipt-editor-actions{grid-template-columns:.9fr 1.05fr 1.35fr;gap:6px;padding:6px}.receipt-editor-actions button{min-height:48px;gap:5px;border-radius:11px;font-size:10px;letter-spacing:0}.receipt-action-icon{width:21px;height:21px;flex-basis:21px;border-radius:7px;font-size:14px}.receipt-close{width:42px;height:42px;flex-basis:42px}}
+@media(max-width:600px){.receipt-editor-actions{grid-template-columns:.9fr 1.05fr 1.35fr;gap:6px;padding:6px}.receipt-editor-actions button{min-height:48px;gap:5px;border-radius:11px;font-size:10px;letter-spacing:0}.receipt-action-icon{width:19px;height:19px;flex-basis:19px}.receipt-action-icon svg{width:17px;height:17px}.receipt-close{width:42px;height:42px;flex-basis:42px}}
 @media(max-width:360px){.receipt-editor-actions button{font-size:9px}.receipt-action-icon{display:none}}
 </style>
 <style id="mobile-typography">
@@ -8939,7 +8940,7 @@ body #results .card .nguoi-ban-row.has-transaction .nv-role-badge .nv-role-icon{
     <header class="receipt-dialog-head"><h2 id="receiptDialogTitle">TẠO PHIẾU NHẬN MÁY</h2><button class="receipt-close" type="button" aria-label="Đóng" title="Đóng" onclick="closeReceiptPanel()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></header>
     <div class="receipt-workspace">
       <form class="receipt-editor" id="receiptEditor" onsubmit="event.preventDefault();captureReceiptImage(this.querySelector('.receipt-capture'))">
-        <div class="receipt-editor-actions"><button class="receipt-reset" type="button" onclick="resetReceiptDraft()"><span class="receipt-action-icon" aria-hidden="true">↻</span><span>LÀM MỚI</span></button><button class="receipt-save-draft" type="button" onclick="saveReceiptDraftExplicitly(this)"><span class="receipt-action-icon" aria-hidden="true">✓</span><span>LƯU NHÁP</span></button><button class="receipt-capture" type="submit"><span class="receipt-action-icon" aria-hidden="true">⌾</span><span>CHỤP BILL</span></button></div>
+        <div class="receipt-editor-actions"><button class="receipt-reset" type="button" onclick="resetReceiptDraft()"><span class="receipt-action-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M20 6v5h-5"/><path d="M19 11a7 7 0 1 0 1 5"/></svg></span><span>LÀM MỚI</span></button><button class="receipt-pdf" type="button" onclick="downloadReceiptPdf(this)"><span class="receipt-action-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 3h7l4 4v14H7z"/><path d="M14 3v5h5M12 11v6M9.5 14.5 12 17l2.5-2.5"/></svg></span><span>XUẤT PDF</span></button><button class="receipt-capture" type="submit"><span class="receipt-action-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 8h3l1.5-2h7L17 8h3v11H4z"/><circle cx="12" cy="13.5" r="3.25"/></svg></span><span>CHỤP BILL</span></button></div>
         <div class="receipt-editor-title">NHẬP THÔNG TIN PHIẾU</div>
         <label class="receipt-field"><span>Số phiếu</span><input id="receiptNumber" data-receipt-input="number" maxlength="40"></label>
         <label class="receipt-field"><span>Số tham khảo</span><input id="receiptReference" data-receipt-input="reference" maxlength="30"></label>
@@ -23331,6 +23332,7 @@ function createReceiptIdentity(){
 function formatReceiptValue(key,value){
   const text=String(value||"").trim();
   if(!text)return "—";
+  if(key==="phone")return formatReceiptPhone(text)||"—";
   if(key==="estimatedPrice"){
     const digits=text.replace(/\D/g,"");
     return digits?`${Number(digits).toLocaleString("vi-VN")} VNĐ`:"—";
@@ -23354,6 +23356,17 @@ function formatReceiptMoney(value){
   const digits=String(value||"").replace(/\D/g,"");
   return digits?Number(digits).toLocaleString("vi-VN"):"";
 }
+function formatReceiptPhone(value){
+  const digits=String(value||"").replace(/\D/g,"").slice(0,10);
+  if(!digits)return "";
+  return [digits.slice(0,4),digits.slice(4,7),digits.slice(7,10)].filter(Boolean).join(" ");
+}
+function formatReceiptInputValue(input){
+  if(!input)return;
+  const key=input.getAttribute("data-receipt-input");
+  if(key==="phone")input.value=formatReceiptPhone(input.value);
+  if(key==="estimatedPriceFrom"||key==="estimatedPriceTo")input.value=formatReceiptMoney(input.value);
+}
 function formatReceiptPriceRange(data){
   return formatReceiptCalculatedRange(data,1);
 }
@@ -23375,18 +23388,37 @@ function readReceiptForm(){
 function saveReceiptDraft(){
   try{localStorage.setItem(RECEIPT_DRAFT_KEY,JSON.stringify(readReceiptForm()));}catch(_error){}
 }
-function saveReceiptDraftExplicitly(button){
+async function downloadReceiptPdf(button){
+  const paper=document.getElementById("receiptPaper");if(!paper)return;
   const oldHtml=button?.innerHTML||"";
   try{
+    if(typeof window.pdfMake==="undefined")throw new Error("Chưa tải được công cụ PDF; hãy kiểm tra mạng và tải lại trang");
+    const number=readReceiptForm().number||"phieu-nhan-may";
+    const safeName=removeAccents(number).replace(/[^a-z0-9_-]+/gi,"-").replace(/^-+|-+$/g,"")||"phieu-nhan-may";
+    let saveHandle=null;
+    if(typeof window.showSaveFilePicker==="function"){
+      try{saveHandle=await window.showSaveFilePicker({suggestedName:`${safeName}.pdf`,types:[{description:"Tệp PDF",accept:{"application/pdf":[".pdf"]}}]});}
+      catch(error){if(error?.name==="AbortError")return;throw error;}
+    }
+    if(button){button.disabled=true;button.innerHTML='<span class="receipt-action-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 3h7l4 4v14H7z"/><path d="M14 3v5h5M12 11v6M9.5 14.5 12 17l2.5-2.5"/></svg></span><span>ĐANG TẠO…</span>';}
     updateReceiptPreview(true);
-    if(button){button.disabled=true;button.innerHTML='<span class="receipt-action-icon" aria-hidden="true">✓</span><span>ĐÃ LƯU</span>';}
-    showToast("✅ Đã lưu nháp phiếu trên thiết bị này",2600);
-  }catch(error){
-    console.error("Không lưu được nháp phiếu:",error);
-    showToast("⚠️ Không lưu được bản nháp",3200);
-  }finally{
-    if(button)setTimeout(()=>{button.disabled=false;button.innerHTML=oldHtml;},1200);
-  }
+    await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
+    const fit=updateReceiptA5FitState();
+    if(fit.overflow){document.querySelector(".receipt-preview-wrap")?.scrollIntoView({behavior:"smooth",block:"start"});showToast(`⚠️ Bill đang vượt khổ A5 (${fit.height}px/${fit.maxHeight}px). Hãy rút gọn nội dung trước khi tải PDF.`,6500);return;}
+    showToast("Đang tạo file PDF A5…",2200);
+    const imageUrl=await captureGroupDetailElementExact(paper,{scale:3});
+    const documentDefinition={pageSize:"A5",pageOrientation:"landscape",pageMargins:[0,0,0,0],content:[{image:imageUrl,width:595.28,height:419.53}]};
+    const pdf=window.pdfMake.createPdf(documentDefinition);
+    if(saveHandle){
+      const blob=await new Promise((resolve,reject)=>pdf.getBlob(blob=>blob?resolve(blob):reject(new Error("Không dựng được tệp PDF"))));
+      const writable=await saveHandle.createWritable();await writable.write(blob);await writable.close();
+      showToast("✅ Đã lưu file PDF vào vị trí đã chọn",4200);
+    }else{
+      pdf.download(`${safeName}.pdf`);
+      showToast("✅ Đã tạo file PDF — kiểm tra thư mục Tải xuống",4200);
+    }
+  }catch(error){console.error("Không tạo được PDF bill:",error);showToast(`⚠️ Không tạo được PDF: ${error?.message||error}`,5200);}
+  finally{if(button){button.disabled=false;button.innerHTML=oldHtml;}}
 }
 function updateReceiptPreview(save=true){
   const data=readReceiptForm();
@@ -23435,7 +23467,7 @@ function renderReceiptBarcode(value){
   catch(error){console.warn("Không tạo được barcode phiếu:",error);}
 }
 function fillReceiptForm(data){
-  RECEIPT_FIELDS.forEach(key=>{const input=document.querySelector(`[data-receipt-input="${key}"]`);if(input)input.value=String(data?.[key]||"");});
+  RECEIPT_FIELDS.forEach(key=>{const input=document.querySelector(`[data-receipt-input="${key}"]`);if(input){input.value=String(data?.[key]||"");formatReceiptInputValue(input);}});
   updateReceiptPreview(false);
 }
 function initReceiptDraft(){
@@ -23447,7 +23479,7 @@ function initReceiptDraft(){
   if(!String(initial.estimatedPriceFrom||"").trim()&&String(initial.estimatedPrice||"").trim())initial.estimatedPriceFrom=initial.estimatedPrice;
   if(!String(initial.receiver||"").trim())initial.receiver="HOÀNG GIA COMPUTER";
   fillReceiptForm(initial);
-  document.getElementById("receiptEditor")?.addEventListener("input",()=>updateReceiptPreview(true));
+  document.getElementById("receiptEditor")?.addEventListener("input",event=>{formatReceiptInputValue(event.target);updateReceiptPreview(true);});
   document.getElementById("receiptEditor")?.addEventListener("change",()=>updateReceiptPreview(true));
 }
 function openReceiptPanel(){
@@ -23472,9 +23504,9 @@ function showReceiptPreview(){
 }
 async function captureReceiptImage(button){
   const paper=document.getElementById("receiptPaper");if(!paper)return;
-  const oldText=button?.textContent||"📷 CHỤP BILL";
+  const oldHtml=button?.innerHTML||"CHỤP BILL";
   try{
-    if(button){button.disabled=true;button.textContent="ĐANG CHỤP…";}
+    if(button){button.disabled=true;button.innerHTML='<span class="receipt-action-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 8h3l1.5-2h7L17 8h3v11H4z"/><circle cx="12" cy="13.5" r="3.25"/></svg></span><span>ĐANG CHỤP…</span>';}
     updateReceiptPreview(true);
     await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
     const fit=updateReceiptA5FitState();
@@ -23490,7 +23522,7 @@ async function captureReceiptImage(button){
     const safeName=removeAccents(number).replace(/[^a-z0-9_-]+/gi,"-").replace(/^-+|-+$/g,"")||"phieu-nhan-may";
     openImageViewer(imageUrl,safeName);showImageSaveButton();showToast("✅ Đã chụp bill — kiểm tra rồi bấm Lưu ảnh",4200);
   }catch(error){console.error("Không chụp được bill:",error);showToast(`⚠️ Không chụp được bill: ${error?.message||error}`,5200);}
-  finally{if(button){button.disabled=false;button.textContent=oldText;}}
+  finally{if(button){button.disabled=false;button.innerHTML=oldHtml;}}
 }
 document.addEventListener("keydown",event=>{if(event.key==="Escape"&&document.getElementById("receiptOverlay")?.classList.contains("open")){event.preventDefault();closeReceiptPanel();}},true);
 initReceiptDraft();
