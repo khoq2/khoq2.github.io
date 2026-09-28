@@ -3701,12 +3701,21 @@ body {
 }
 @media(max-width:600px){
   /* Bộ nút cạnh trái gọn trên điện thoại, vẫn đủ vùng chạm nhưng không chiếm gần hết chiều cao. */
-  .quote-edge-btn,.receipt-edge-btn,.reminder-edge-btn{width:34px!important;min-height:64px!important;gap:3px!important;padding:5px 3px!important}
-  .quote-edge-btn{bottom:max(154px,calc(env(safe-area-inset-bottom) + 148px))!important}
-  .receipt-edge-btn{bottom:max(84px,calc(env(safe-area-inset-bottom) + 78px))!important}
+  .quote-edge-btn,.receipt-edge-btn,.reminder-edge-btn{width:30px!important;min-height:54px!important;gap:2px!important;padding:3px 2px!important}
+  .quote-edge-btn{bottom:max(130px,calc(env(safe-area-inset-bottom) + 124px))!important}
+  .receipt-edge-btn{bottom:max(72px,calc(env(safe-area-inset-bottom) + 66px))!important}
   .reminder-edge-btn{bottom:max(14px,calc(env(safe-area-inset-bottom) + 8px))!important}
-  .quote-edge-btn svg,.receipt-edge-btn svg,.reminder-edge-btn svg{width:18px!important;height:18px!important}
-  .quote-edge-label,.receipt-edge-label,.reminder-edge-label{font-size:7px!important;letter-spacing:.25px!important}
+  .quote-edge-btn svg,.receipt-edge-btn svg,.reminder-edge-btn svg{width:16px!important;height:16px!important}
+  .quote-edge-label,.receipt-edge-label,.reminder-edge-label{font-size:6.5px!important;letter-spacing:.2px!important}
+}
+@media(min-width:601px){
+  /* Máy tính: thu gọn và kéo ba công cụ cạnh trái lại gần nhau. */
+  .quote-edge-btn,.receipt-edge-btn,.reminder-edge-btn{width:38px!important;min-height:86px!important;gap:4px!important;padding:7px 4px!important}
+  .quote-edge-btn{bottom:max(198px,calc(env(safe-area-inset-bottom) + 190px))!important}
+  .receipt-edge-btn{bottom:max(108px,calc(env(safe-area-inset-bottom) + 100px))!important}
+  .reminder-edge-btn{bottom:max(18px,calc(env(safe-area-inset-bottom) + 10px))!important}
+  .quote-edge-btn svg,.receipt-edge-btn svg,.reminder-edge-btn svg{width:19px!important;height:19px!important}
+  .quote-edge-label,.receipt-edge-label,.reminder-edge-label{font-size:8px!important;letter-spacing:.35px!important}
 }
 .quick-quote-top{grid-template-columns:195px minmax(0,1fr) 230px}
 .quick-quote-logo img{width:180px;max-width:180px;max-height:108px;transform:scale(1.14);transform-origin:center;object-fit:contain}
@@ -8929,6 +8938,70 @@ body #results .card .nguoi-ban-row.has-transaction .nv-role-badge .nv-role-icon{
 #privateAccessOverlay .caps-lock-warning,#adminOverlay .caps-lock-warning{position:absolute!important;z-index:4;right:18px!important;bottom:77px!important;margin:0!important;padding:5px 7px!important;border:1px solid #F2D39E!important;border-radius:999px!important;background:#FFF8E8!important;box-shadow:0 4px 12px rgba(122,80,9,.1)!important;font-size:9px!important}
 @media(max-width:430px){#privateAccessOverlay,#adminOverlay{padding-right:max(13px,env(safe-area-inset-right))!important;padding-left:max(13px,env(safe-area-inset-left))!important}#privateAccessOverlay .auth-login-modal,#adminOverlay .auth-login-modal{width:100%!important;max-width:400px!important}#privateAccessOverlay .auth-login-modal::before,#adminOverlay .auth-login-modal::before{bottom:calc(100% + 13px)!important;min-width:112px!important;padding:9px 15px!important}#privateAccessOverlay .private-access-fields,#adminOverlay .private-access-fields{padding:18px 14px 4px!important}#privateAccessOverlay .private-access-heading,#adminOverlay .private-access-heading{padding:17px 14px 14px!important}#privateAccessOverlay .private-access-actions,#adminOverlay .private-access-actions{padding:4px 14px 14px!important}#privateAccessOverlay .private-access-error,#adminOverlay .private-access-error{padding-right:14px!important;padding-left:14px!important}}
 </style>
+<style id="owner-login-parity-style">
+/* Khung bấm logo 3/7 lần dùng cùng bố cục đăng nhập với công cụ Báo giá. */
+:is(#adminOverlay,#syncErrorOverlay.login-mode){box-sizing:border-box!important;align-items:center!important;justify-content:center!important;padding:18px max(13px,env(safe-area-inset-right)) 18px max(13px,env(safe-area-inset-left))!important;background:rgba(82,105,122,.92)!important;backdrop-filter:blur(7px)!important}
+:is(#adminOverlay,#syncErrorOverlay.login-mode) .auth-login-modal{position:relative!important;box-sizing:border-box!important;flex:0 1 400px!important;overflow:visible!important;width:min(400px,100%)!important;max-width:400px!important;margin:auto!important;padding:0!important;border:0!important;border-radius:4px!important;background:#F4F4F4!important;box-shadow:0 24px 70px rgba(5,20,31,.42)!important}
+:is(#adminOverlay,#syncErrorOverlay.login-mode) .auth-login-modal::before{position:absolute!important;display:block!important;right:auto!important;bottom:calc(100% + 18px)!important;left:50%!important;top:auto!important;width:auto!important;min-width:122px!important;height:auto!important;padding:11px 18px!important;border:0!important;border-radius:0!important;background:#2198CF!important;color:#fff!important;content:"ĐĂNG NHẬP"!important;font-size:14px!important;font-weight:900!important;line-height:1.2!important;text-align:center!important;transform:translateX(-50%)!important;box-shadow:0 8px 18px rgba(18,105,147,.22)!important}
+:is(#adminOverlay,#syncErrorOverlay.login-mode) .auth-login-modal::after{position:absolute!important;bottom:100%!important;left:50%!important;border-top:10px solid #2198CF!important;border-right:10px solid transparent!important;border-left:10px solid transparent!important;content:""!important;transform:translate(-50%,28px)!important}
+:is(#adminOverlay,#syncErrorOverlay.login-mode) .private-access-heading{margin:0!important;padding:20px 18px 17px!important;border:0!important;border-radius:0!important;background:linear-gradient(135deg,#2EA4D8,#188CC4)!important;text-align:center!important}
+:is(#adminOverlay,#syncErrorOverlay.login-mode) .private-access-badge{display:none!important}
+:is(#adminOverlay,#syncErrorOverlay.login-mode) .private-access-heading-copy{width:100%!important;text-align:center!important}
+:is(#adminOverlay,#syncErrorOverlay.login-mode) .private-access-title{margin:0!important;color:#fff!important;font-size:20px!important;font-weight:800!important;letter-spacing:.2px!important;text-align:center!important;text-shadow:none!important}
+:is(#adminOverlay,#syncErrorOverlay.login-mode) .private-access-subtitle{margin:5px 0 0!important;max-width:none!important;color:rgba(255,255,255,.84)!important;font-size:10.5px!important;text-align:center!important;text-shadow:none!important}
+:is(#adminOverlay,#syncErrorOverlay.login-mode) .private-access-fields{display:grid!important;gap:10px!important;margin:0!important;padding:22px 18px 5px!important;background:#F4F4F4!important}
+:is(#adminOverlay,#syncErrorOverlay.login-mode) .private-access-field{display:grid!important;gap:5px!important;margin:0!important;color:#536A7B!important;font-size:10px!important;font-weight:900!important}
+:is(#adminOverlay,#syncErrorOverlay.login-mode) .owner-login-email-wrap,
+:is(#adminOverlay,#syncErrorOverlay.login-mode) .admin-password-wrap{position:relative!important;width:100%!important;min-height:50px!important;margin:0!important;border:1px solid #CED7DD!important;border-radius:2px!important;background:#fff!important;box-shadow:inset 0 1px 3px rgba(30,60,80,.04)!important}
+:is(#adminOverlay,#syncErrorOverlay.login-mode) .owner-login-email-wrap:focus-within,
+:is(#adminOverlay,#syncErrorOverlay.login-mode) .admin-password-wrap:focus-within{border-color:#249DD2!important;box-shadow:0 0 0 3px rgba(36,157,210,.12)!important}
+:is(#adminOverlay,#syncErrorOverlay.login-mode) .owner-login-email-wrap>svg,
+:is(#adminOverlay,#syncErrorOverlay.login-mode) .owner-login-password-key{position:absolute;z-index:2;top:50%;left:13px;width:18px;height:18px;fill:none;stroke:#7890A0;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;transform:translateY(-50%);pointer-events:none}
+:is(#adminOverlay,#syncErrorOverlay.login-mode) .owner-login-email-wrap input,
+:is(#adminOverlay,#syncErrorOverlay.login-mode) .admin-password-wrap input{box-sizing:border-box!important;width:100%!important;min-height:48px!important;padding:10px 46px 10px 42px!important;border:0!important;border-radius:2px!important;background:transparent!important;color:#243C4D!important;font-size:14px!important;font-weight:700!important;letter-spacing:0!important;text-align:left!important;outline:none!important;box-shadow:none!important}
+:is(#adminOverlay,#syncErrorOverlay.login-mode) .private-access-error{min-height:20px!important;margin:0!important;padding:2px 18px!important;background:#F4F4F4!important;color:#C0392B!important;font-size:10.5px!important;text-align:center!important}
+:is(#adminOverlay,#syncErrorOverlay.login-mode) .private-access-actions{display:grid!important;grid-template-columns:.7fr 1.5fr!important;gap:9px!important;margin:0!important;padding:4px 18px 18px!important;background:#F4F4F4!important}
+:is(#adminOverlay,#syncErrorOverlay.login-mode) .private-access-actions button{min-height:48px!important;margin:0!important;border:0!important;border-radius:2px!important;font-size:11px!important;font-weight:900!important}
+:is(#adminOverlay,#syncErrorOverlay.login-mode) .private-access-actions .btn-cancel{background:#E1E7EA!important;color:#546A79!important}
+:is(#adminOverlay,#syncErrorOverlay.login-mode) .private-access-actions .btn-submit{background:#2198CF!important;color:#fff!important;box-shadow:0 8px 18px rgba(33,152,207,.2)!important}
+:is(#adminOverlay,#syncErrorOverlay.login-mode) .caps-lock-warning{position:absolute!important;z-index:4;right:18px!important;bottom:77px!important;margin:0!important;padding:5px 7px!important;border:1px solid #F2D39E!important;border-radius:999px!important;background:#FFF8E8!important;box-shadow:0 4px 12px rgba(122,80,9,.1)!important;font-size:9px!important}
+@media(max-width:430px){:is(#adminOverlay,#syncErrorOverlay.login-mode){padding-right:max(13px,env(safe-area-inset-right))!important;padding-left:max(13px,env(safe-area-inset-left))!important}:is(#adminOverlay,#syncErrorOverlay.login-mode) .auth-login-modal{width:100%!important;max-width:400px!important}:is(#adminOverlay,#syncErrorOverlay.login-mode) .auth-login-modal::before{bottom:calc(100% + 13px)!important;min-width:112px!important;padding:9px 15px!important}:is(#adminOverlay,#syncErrorOverlay.login-mode) .private-access-fields{padding:18px 14px 4px!important}:is(#adminOverlay,#syncErrorOverlay.login-mode) .private-access-heading{padding:17px 14px 14px!important}:is(#adminOverlay,#syncErrorOverlay.login-mode) .private-access-actions{padding:4px 14px 14px!important}:is(#adminOverlay,#syncErrorOverlay.login-mode) .private-access-error{padding-right:14px!important;padding-left:14px!important}}
+</style>
+<style id="home-utility-dock-spacing">
+/* Khoảng cách dọc ổn định giữa Khách hàng / Đối tác / QR trên mọi kích thước. */
+.side-control-rail .macos-dock{gap:10px!important}
+</style>
+<style id="category-view-compact-final">
+/* Hai nút Dạng lưới / Dạng danh sách nhỏ hơn và thấp hơn một nhịp. */
+.side-control-rail .category-view-bar{
+  --category-view-size:27px;
+  --category-view-icon-size:12px;
+  top:18px!important;
+}
+.side-control-rail .category-view-bar .view-mode-switch{
+  width:calc(var(--category-view-size) + var(--side-control-shell-pad) + var(--side-control-shell-pad) + 2px)!important;
+  min-width:calc(var(--category-view-size) + var(--side-control-shell-pad) + var(--side-control-shell-pad) + 2px)!important;
+}
+.side-control-rail .category-view-bar .view-mode-btn{
+  flex:0 0 var(--category-view-size)!important;
+  width:var(--category-view-size)!important;
+  min-width:var(--category-view-size)!important;
+  max-width:var(--category-view-size)!important;
+  height:var(--category-view-size)!important;
+  min-height:var(--category-view-size)!important;
+  max-height:var(--category-view-size)!important;
+}
+body .side-control-rail .category-view-bar .view-mode-btn>svg{
+  width:var(--category-view-icon-size)!important;
+  height:var(--category-view-icon-size)!important;
+}
+@media(max-width:600px){
+  .side-control-rail .category-view-bar{
+    --category-view-size:17px;
+    --category-view-icon-size:8px;
+  }
+}
+</style>
 </head>
 <body class="home-landing-mode">
 <div class="sticky">
@@ -9988,7 +10061,9 @@ body.fab-menu-open #fabToggleBtn{background:linear-gradient(145deg,#267FF0,#0B62
       <div class="private-access-heading-copy"><h2 class="private-access-title" id="adminLoginTitle">ĐĂNG NHẬP ADMIN</h2><p class="private-access-subtitle">Xác thực quyền quản trị để chỉnh sửa hệ thống.</p></div>
     </div>
     <div class="private-access-fields">
-      <label class="private-access-field" for="adminPass"><span>Mật khẩu quản trị</span><div class="admin-password-wrap">
+      <label class="private-access-field" for="adminEmail"><span>Email</span><div class="owner-login-email-wrap"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16v12H4z"></path><path d="m4 7 8 6 8-6"></path></svg><input id="adminEmail" type="email" value="chuongit.com@gmail.com" autocomplete="username" aria-label="Email đăng nhập Admin"></div></label>
+      <label class="private-access-field" for="adminPass"><span>Mật khẩu</span><div class="admin-password-wrap">
+        <svg class="owner-login-password-key" viewBox="0 0 24 24" aria-hidden="true"><circle cx="8" cy="12" r="4"></circle><path d="m12 12 8 0M17 12v3M20 12v2"></path></svg>
         <input type="password" id="adminPass" placeholder="Nhập mật khẩu quản trị" autocomplete="current-password" onkeydown="updateCapsLockHint(event,'adminCapsLock');if(event.key==='Enter')submitAdminPass()" onkeyup="updateCapsLockHint(event,'adminCapsLock')" onblur="hideCapsLockHint('adminCapsLock')">
         <button type="button" class="admin-password-toggle" aria-label="Hiện hoặc ẩn mật khẩu" title="Hiện hoặc ẩn mật khẩu" onclick="const input=document.getElementById('adminPass');input.type=input.type==='password'?'text':'password';this.classList.toggle('password-visible',input.type==='text')"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"></path><circle cx="12" cy="12" r="2.7"></circle></svg></button>
       </div></label>
@@ -9996,8 +10071,8 @@ body.fab-menu-open #fabToggleBtn{background:linear-gradient(145deg,#267FF0,#0B62
     </div>
     <div class="private-access-error" id="adminLoginError" aria-live="polite"></div>
     <div class="private-access-actions admin-login-actions">
-      <button class="btn-cancel btn-cancel-danger" type="button" onclick="closeOverlay('adminOverlay')">Hủy</button>
-      <button class="btn-submit" id="adminLoginSubmit" type="button" aria-live="polite" aria-busy="false" onclick="submitAdminPass()">Đăng nhập</button>
+      <button class="btn-cancel btn-cancel-danger" type="button" onclick="closeOverlay('adminOverlay')">HỦY</button>
+      <button class="btn-submit" id="adminLoginSubmit" type="button" aria-live="polite" aria-busy="false" onclick="submitAdminPass()">ĐĂNG NHẬP</button>
     </div>
   </div>
 </div>
@@ -10010,7 +10085,9 @@ body.fab-menu-open #fabToggleBtn{background:linear-gradient(145deg,#267FF0,#0B62
         <div class="private-access-heading-copy"><h2 class="private-access-title" id="syncErrorLoginTitle">BÁO CÁO ĐỒNG BỘ</h2><p class="private-access-subtitle">Xác thực quyền quản trị để xem nhật ký lỗi thiết bị.</p></div>
       </div>
       <div class="private-access-fields">
-        <label class="private-access-field" for="syncErrorPassword"><span>Mật khẩu quản trị</span><div class="admin-password-wrap">
+        <label class="private-access-field" for="syncErrorEmail"><span>Email</span><div class="owner-login-email-wrap"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16v12H4z"></path><path d="m4 7 8 6 8-6"></path></svg><input id="syncErrorEmail" type="email" value="chuongit.com@gmail.com" autocomplete="username" aria-label="Email đăng nhập báo cáo đồng bộ"></div></label>
+        <label class="private-access-field" for="syncErrorPassword"><span>Mật khẩu</span><div class="admin-password-wrap">
+          <svg class="owner-login-password-key" viewBox="0 0 24 24" aria-hidden="true"><circle cx="8" cy="12" r="4"></circle><path d="m12 12 8 0M17 12v3M20 12v2"></path></svg>
           <input id="syncErrorPassword" type="password" autocomplete="current-password" placeholder="Nhập mật khẩu quản trị" onkeydown="updateCapsLockHint(event,'syncErrorCapsLock');if(event.key==='Enter') verifySyncErrorPassword()" onkeyup="updateCapsLockHint(event,'syncErrorCapsLock')" onblur="hideCapsLockHint('syncErrorCapsLock')">
           <button type="button" class="admin-password-toggle sync-error-password-toggle" aria-label="Hiện hoặc ẩn mật khẩu" title="Hiện hoặc ẩn mật khẩu" onclick="const input=document.getElementById('syncErrorPassword');input.type=input.type==='password'?'text':'password';this.classList.toggle('password-visible',input.type==='text')"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"></path><circle cx="12" cy="12" r="2.7"></circle></svg></button>
         </div></label>
@@ -10018,8 +10095,8 @@ body.fab-menu-open #fabToggleBtn{background:linear-gradient(145deg,#267FF0,#0B62
       </div>
       <div class="private-access-error" id="syncErrorLoginError" aria-live="polite"></div>
       <div class="private-access-actions admin-login-actions">
-        <button type="button" class="btn-cancel btn-cancel-danger" onclick="closeSyncErrorLog()">Hủy</button>
-        <button type="button" class="btn-submit" id="syncErrorLoginSubmit" aria-live="polite" aria-busy="false" onclick="verifySyncErrorPassword()">Đăng nhập</button>
+        <button type="button" class="btn-cancel btn-cancel-danger" onclick="closeSyncErrorLog()">HỦY</button>
+        <button type="button" class="btn-submit" id="syncErrorLoginSubmit" aria-live="polite" aria-busy="false" onclick="verifySyncErrorPassword()">ĐĂNG NHẬP</button>
       </div>
     </div>
     <div id="syncErrorContent" style="display:none">
@@ -10906,15 +10983,17 @@ function onAdminBtnClick(){
       showToast("Đã khóa quyền chỉnh sửa");
     }
   } else {
+    const adminEmail=document.getElementById("adminEmail");
     const adminPass=document.getElementById("adminPass");
     const adminError=document.getElementById("adminLoginError");
     const submit=document.getElementById("adminLoginSubmit");
+    if(adminEmail){ adminEmail.value="chuongit.com@gmail.com"; adminEmail.disabled=false; }
     adminPass.value="";
     adminPass.type="password";
     adminPass.disabled=false;
     hideCapsLockHint("adminCapsLock");
     if(adminError) adminError.textContent="";
-    if(submit){ submit.disabled=false; submit.classList.remove("is-loading"); submit.setAttribute("aria-busy","false"); submit.textContent="Đăng nhập"; }
+    if(submit){ submit.disabled=false; submit.classList.remove("is-loading"); submit.setAttribute("aria-busy","false"); submit.textContent="ĐĂNG NHẬP"; }
     const passwordToggle=document.querySelector("#adminOverlay .admin-password-toggle");
     if(passwordToggle) passwordToggle.classList.remove("password-visible");
     document.getElementById("adminOverlay").classList.add("open");
@@ -10922,11 +11001,14 @@ function onAdminBtnClick(){
   }
 }
 async function submitAdminPass(){
+  const emailInput = document.getElementById("adminEmail");
   const input = document.getElementById("adminPass");
   const submit = document.getElementById("adminLoginSubmit");
   const errorBox = document.getElementById("adminLoginError");
   if(submit?.disabled) return;
+  const email=String(emailInput?.value||"").trim().toLowerCase();
   const val = input.value;
+  if(email!=="chuongit.com@gmail.com"){ if(errorBox) errorBox.textContent="Email đăng nhập không chính xác."; emailInput?.focus(); return; }
   if(!val){ if(errorBox) errorBox.textContent="Vui lòng nhập mật khẩu quản trị."; input.focus(); return; }
   if(errorBox) errorBox.textContent="";
   let completed=false;
@@ -10968,7 +11050,7 @@ async function submitAdminPass(){
       submit.disabled=false;
       submit.classList.remove("is-loading");
       submit.setAttribute("aria-busy","false");
-      submit.textContent="Đăng nhập";
+      submit.textContent="ĐĂNG NHẬP";
     }
   }
 }
@@ -11006,7 +11088,7 @@ async function checkAdminSession(){
 
 // Dòng URL duy nhất
 const SHEET_API_URL = "https://script.google.com/macros/s/AKfycby6YH69F7sfO1ZoUJsDm4BeX6Luj2GrhUfYWWJWNvqjraAEhkBck16EphrPBBm1BT3YqA/exec";
-const REQUIRED_API_VERSION = "2026.09.14-appscript-read-recovery-27";
+const REQUIRED_API_VERSION = "2026.09.03-reminder-cancel-kpi-collapse-25";
 // Apps Script có thể phải chờ khóa ghi khi nhiều thao tác diễn ra gần nhau.
 // 45 giây dài hơn thời gian chờ khóa phía máy chủ, tránh báo lỗi giả trong khi Sheet vẫn đang ghi.
 const SHEET_TIMEOUT_MS = 45000;
@@ -11145,9 +11227,10 @@ function getSyncErrorText(){
 function openSyncErrorLog(){
   syncErrorAuthToken = "";
   serverSyncErrorLogs = [];
-  const gate=document.getElementById("syncErrorGate"), content=document.getElementById("syncErrorContent"), password=document.getElementById("syncErrorPassword"), submit=document.getElementById("syncErrorLoginSubmit"), errorBox=document.getElementById("syncErrorLoginError");
+  const gate=document.getElementById("syncErrorGate"), content=document.getElementById("syncErrorContent"), email=document.getElementById("syncErrorEmail"), password=document.getElementById("syncErrorPassword"), submit=document.getElementById("syncErrorLoginSubmit"), errorBox=document.getElementById("syncErrorLoginError");
   if(gate) gate.style.display="";
   if(content) content.style.display="none";
+  if(email){ email.disabled=false; email.value="chuongit.com@gmail.com"; }
   if(password){ password.disabled=false; password.value=""; password.type="password"; }
   hideCapsLockHint("syncErrorCapsLock");
   if(errorBox) errorBox.textContent="";
@@ -11155,18 +11238,21 @@ function openSyncErrorLog(){
     submit.disabled=false;
     submit.classList.remove("is-loading");
     submit.setAttribute("aria-busy","false");
-    submit.textContent="Đăng nhập";
+    submit.textContent="ĐĂNG NHẬP";
   }
   document.querySelector("#syncErrorOverlay .sync-error-password-toggle")?.classList.remove("password-visible");
-  document.getElementById("syncErrorOverlay")?.classList.add("open");
+  document.getElementById("syncErrorOverlay")?.classList.add("open","login-mode");
   requestAnimationFrame(()=>password?.focus({preventScroll:true}));
 }
 async function verifySyncErrorPassword(){
+  const emailInput=document.getElementById("syncErrorEmail");
   const input=document.getElementById("syncErrorPassword");
   const submit=document.getElementById("syncErrorLoginSubmit");
   const errorBox=document.getElementById("syncErrorLoginError");
   if(!input || submit?.disabled) return;
+  const email=String(emailInput?.value||"").trim().toLowerCase();
   const password=input.value || "";
+  if(email!=="chuongit.com@gmail.com"){ if(errorBox) errorBox.textContent="Email đăng nhập không chính xác."; emailInput?.focus(); return; }
   if(!password){ if(errorBox) errorBox.textContent="Vui lòng nhập mật khẩu quản trị."; input.focus(); return; }
   if(errorBox) errorBox.textContent="";
   let completed=false;
@@ -11192,6 +11278,7 @@ async function verifySyncErrorPassword(){
     serverSyncErrorLogs=Array.isArray(result.logs)?result.logs:[];
     document.getElementById("syncErrorGate").style.display="none";
     document.getElementById("syncErrorContent").style.display="";
+    document.getElementById("syncErrorOverlay")?.classList.remove("login-mode");
     document.getElementById("syncErrorText").value=getSyncErrorText();
     input.value="";
     completed=true;
@@ -11204,7 +11291,7 @@ async function verifySyncErrorPassword(){
       submit.disabled=false;
       submit.classList.remove("is-loading");
       submit.setAttribute("aria-busy","false");
-      submit.textContent="Đăng nhập";
+      submit.textContent="ĐĂNG NHẬP";
     }
     if(!completed) requestAnimationFrame(()=>{ input.focus({preventScroll:true}); input.select(); });
   }
@@ -11249,7 +11336,7 @@ async function handleSyncBadgeActivation(){
   if(syncBadgeActivationCount >= 3){syncBadgeActivationCount=0;syncBadgeActivationTimer=null;openSyncErrorLog();return;}
   syncBadgeActivationTimer=setTimeout(()=>{syncBadgeActivationCount=0;syncBadgeActivationTimer=null;},6000);
 }
-function closeSyncErrorLog(){ document.getElementById("syncErrorOverlay")?.classList.remove("open"); hideCapsLockHint("syncErrorCapsLock"); syncErrorAuthToken=""; serverSyncErrorLogs=[]; }
+function closeSyncErrorLog(){ document.getElementById("syncErrorOverlay")?.classList.remove("open","login-mode"); hideCapsLockHint("syncErrorCapsLock"); syncErrorAuthToken=""; serverSyncErrorLogs=[]; }
 async function copySyncErrorLog(){
   const text = getSyncErrorText();
   try{
