@@ -7409,14 +7409,24 @@ body.fab-menu-open .side-control-rail{
   max-height:none;
   padding:4px;
   overflow:visible;
-  border:1px solid rgba(116,145,173,.28);
+  border:0;
   border-radius:14px;
-  background:rgba(255,255,255,.88);
-  box-shadow:0 8px 24px rgba(20,55,90,.14);
-  -webkit-backdrop-filter:blur(14px) saturate(1.15);
-  backdrop-filter:blur(14px) saturate(1.15);
+  background:transparent;
+  box-shadow:none;
+  -webkit-backdrop-filter:none;
+  backdrop-filter:none;
   transform:none!important;
   animation:none!important;
+}
+/* Cụm Khách hàng / Đối tác / QR chỉ xuất hiện ở Trang chủ. */
+.side-control-rail>.macos-dock{
+  display:none!important;
+  margin-top:0!important;
+}
+body.home-landing-mode .side-control-rail>.macos-dock,
+body.loading-layout-mode .side-control-rail>.macos-dock{
+  display:grid!important;
+  margin-top:84px!important;
 }
 .side-control-rail .macos-dock-app{
   position:relative;
@@ -8503,9 +8513,13 @@ body .warehouse-switch.warehouse-switch-changing .warehouse-pin{
     gap:4px!important;
   }
   body .side-control-rail .category-view-bar .view-mode-switch,
-  body .side-control-rail .macos-dock,
   body .side-control-rail .scroll-btns{
     gap:1px!important;
+    padding:2px!important;
+    border-radius:9px!important;
+  }
+  body .side-control-rail .macos-dock{
+    gap:7px!important;
     padding:2px!important;
     border-radius:9px!important;
   }
@@ -8893,8 +8907,8 @@ body #results .card .nguoi-ban-row.has-transaction .nv-role-badge .nv-role-icon{
 }
 </style>
 <style id="unified-auth-login-style">
-#privateAccessOverlay,#adminOverlay{background:rgba(82,105,122,.92)!important;backdrop-filter:blur(7px)!important}
-#privateAccessOverlay .auth-login-modal,#adminOverlay .auth-login-modal{position:relative!important;overflow:visible!important;width:min(400px,calc(100vw - 30px))!important;max-width:400px!important;padding:0!important;border:0!important;border-radius:4px!important;background:#F4F4F4!important;box-shadow:0 24px 70px rgba(5,20,31,.42)!important}
+#privateAccessOverlay,#adminOverlay{box-sizing:border-box!important;align-items:center!important;justify-content:center!important;padding:18px max(13px,env(safe-area-inset-right)) 18px max(13px,env(safe-area-inset-left))!important;background:rgba(82,105,122,.92)!important;backdrop-filter:blur(7px)!important}
+#privateAccessOverlay .auth-login-modal,#adminOverlay .auth-login-modal{position:relative!important;box-sizing:border-box!important;flex:0 1 400px!important;overflow:visible!important;width:min(400px,100%)!important;max-width:400px!important;margin:auto!important;padding:0!important;border:0!important;border-radius:4px!important;background:#F4F4F4!important;box-shadow:0 24px 70px rgba(5,20,31,.42)!important}
 #privateAccessOverlay .auth-login-modal::before,#adminOverlay .auth-login-modal::before{position:absolute!important;display:block!important;right:auto!important;bottom:calc(100% + 18px)!important;left:50%!important;top:auto!important;width:auto!important;min-width:122px!important;height:auto!important;padding:11px 18px!important;border:0!important;border-radius:0!important;background:#2198CF!important;color:#fff!important;content:"ĐĂNG NHẬP"!important;font-size:14px!important;font-weight:900!important;line-height:1.2!important;text-align:center!important;transform:translateX(-50%)!important;box-shadow:0 8px 18px rgba(18,105,147,.22)!important}
 #privateAccessOverlay .auth-login-modal::after,#adminOverlay .auth-login-modal::after{position:absolute;bottom:100%;left:50%;border-top:10px solid #2198CF;border-right:10px solid transparent;border-left:10px solid transparent;content:"";transform:translate(-50%,28px)}
 #privateAccessOverlay .private-access-heading,#adminOverlay .private-access-heading{margin:0!important;padding:20px 18px 17px!important;border:0!important;border-radius:0!important;background:linear-gradient(135deg,#2EA4D8,#188CC4)!important;text-align:center!important}
@@ -8913,10 +8927,10 @@ body #results .card .nguoi-ban-row.has-transaction .nv-role-badge .nv-role-icon{
 #privateAccessOverlay .private-access-actions .btn-cancel,#adminOverlay .private-access-actions .btn-cancel{background:#E1E7EA!important;color:#546A79!important}
 #privateAccessOverlay .private-access-actions .btn-submit,#adminOverlay .private-access-actions .btn-submit{background:#2198CF!important;color:#fff!important;box-shadow:0 8px 18px rgba(33,152,207,.2)!important}
 #privateAccessOverlay .caps-lock-warning,#adminOverlay .caps-lock-warning{position:absolute!important;z-index:4;right:18px!important;bottom:77px!important;margin:0!important;padding:5px 7px!important;border:1px solid #F2D39E!important;border-radius:999px!important;background:#FFF8E8!important;box-shadow:0 4px 12px rgba(122,80,9,.1)!important;font-size:9px!important}
-@media(max-width:430px){#privateAccessOverlay .auth-login-modal,#adminOverlay .auth-login-modal{width:calc(100vw - 26px)!important}#privateAccessOverlay .auth-login-modal::before,#adminOverlay .auth-login-modal::before{bottom:calc(100% + 13px)!important;min-width:112px!important;padding:9px 15px!important}#privateAccessOverlay .private-access-fields,#adminOverlay .private-access-fields{padding:18px 14px 4px!important}#privateAccessOverlay .private-access-heading,#adminOverlay .private-access-heading{padding:17px 14px 14px!important}#privateAccessOverlay .private-access-actions,#adminOverlay .private-access-actions{padding:4px 14px 14px!important}#privateAccessOverlay .private-access-error,#adminOverlay .private-access-error{padding-right:14px!important;padding-left:14px!important}}
+@media(max-width:430px){#privateAccessOverlay,#adminOverlay{padding-right:max(13px,env(safe-area-inset-right))!important;padding-left:max(13px,env(safe-area-inset-left))!important}#privateAccessOverlay .auth-login-modal,#adminOverlay .auth-login-modal{width:100%!important;max-width:400px!important}#privateAccessOverlay .auth-login-modal::before,#adminOverlay .auth-login-modal::before{bottom:calc(100% + 13px)!important;min-width:112px!important;padding:9px 15px!important}#privateAccessOverlay .private-access-fields,#adminOverlay .private-access-fields{padding:18px 14px 4px!important}#privateAccessOverlay .private-access-heading,#adminOverlay .private-access-heading{padding:17px 14px 14px!important}#privateAccessOverlay .private-access-actions,#adminOverlay .private-access-actions{padding:4px 14px 14px!important}#privateAccessOverlay .private-access-error,#adminOverlay .private-access-error{padding-right:14px!important;padding-left:14px!important}}
 </style>
 </head>
-<body>
+<body class="home-landing-mode">
 <div class="sticky">
 <div class="header-collapsible">
   <div class="header">
@@ -9026,8 +9040,9 @@ body #results .card .nguoi-ban-row.has-transaction .nv-role-badge .nv-role-icon{
       <span class="macos-dock-tooltip" aria-hidden="true">QR CODE</span>
     </button>
   </nav>
+</aside>
 
-  <div class="scroll-btns">
+<div class="scroll-btns">
     <button class="scroll-btn" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Lên đầu trang">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5"></path><path d="M6 11l6-6 6 6"></path></svg>
       <span class="macos-dock-tooltip" aria-hidden="true">LÊN NHANH</span>
@@ -9036,8 +9051,7 @@ body #results .card .nguoi-ban-row.has-transaction .nv-role-badge .nv-role-icon{
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14"></path><path d="M18 13l-6 6-6-6"></path></svg>
       <span class="macos-dock-tooltip" aria-hidden="true">XUỐNG NHANH</span>
     </button>
-  </div>
-</aside>
+</div>
 
 <div class="edge-action-tooltip" id="edgeActionTooltip" role="tooltip" aria-hidden="true"></div>
 <div class="edge-tool-lock" id="edgeToolLock" aria-hidden="true" onclick="if(event.target===this)closeEdgeToolLock()"><form class="edge-tool-lock-card" id="edgeToolLockCard" onsubmit="event.preventDefault();submitEdgeToolPassword()"><div class="edge-tool-login-tab">ĐĂNG NHẬP</div><header class="edge-tool-login-head"><h3 id="edgeToolLockTitle">MỞ CÔNG CỤ</h3><p>Xác thực quyền truy cập để tiếp tục</p></header><div class="edge-tool-login-body"><label class="edge-tool-login-field"><span>Email</span><div class="edge-tool-email-wrap"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16v12H4z"></path><path d="m4 7 8 6 8-6"></path></svg><input id="edgeToolEmail" type="email" value="chuongit.com@gmail.com" autocomplete="username" aria-label="Email đăng nhập" oninput="scheduleEdgeToolAutoUnlock()"></div></label><label class="edge-tool-login-field"><span>Mật khẩu</span><div class="edge-tool-password-wrap"><svg class="edge-tool-password-key" viewBox="0 0 24 24" aria-hidden="true"><circle cx="8" cy="12" r="4"></circle><path d="m12 12 8 0M17 12v3M20 12v2"></path></svg><input id="edgeToolPassword" type="password" autocomplete="current-password" placeholder="Nhập mật khẩu" aria-label="Mật khẩu mở công cụ" oninput="scheduleEdgeToolAutoUnlock()" onkeydown="updateCapsLockHint(event,'edgeToolCapsLock')" onkeyup="updateCapsLockHint(event,'edgeToolCapsLock')" onblur="hideCapsLockHint('edgeToolCapsLock')"><button class="edge-tool-password-toggle" id="edgeToolPasswordToggle" type="button" aria-label="Hiện hoặc ẩn mật khẩu" onclick="toggleEdgeToolPassword()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"></path><circle cx="12" cy="12" r="2.7"></circle></svg></button></div></label><div class="caps-lock-warning edge-tool-caps" id="edgeToolCapsLock" role="status" aria-live="polite" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 5 10h4v4h6v-4h4l-7-7Z"></path><path d="M7 19h10"></path></svg><span>Caps Lock đang bật</span></div><div class="edge-tool-lock-error" id="edgeToolLockError" aria-live="polite"></div><div class="edge-tool-lock-actions"><button class="edge-tool-lock-cancel" type="button" onclick="closeEdgeToolLock()">HỦY</button><button class="edge-tool-lock-open" id="edgeToolUnlockButton" type="submit"><span>ĐĂNG NHẬP</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></button></div></div></form></div>
@@ -15889,7 +15903,6 @@ function renderRestockOverview(el){
 function render(){
   hideRelatedProductTooltip(true);
   restoreBuildDraftFromStorage();
-  document.body.classList.remove("loading-layout-mode");
   setTimeout(refreshEmployeePermissionUI,0);
   syncWarehouseBranchUI();
   syncProductViewModeButton();
@@ -15904,6 +15917,9 @@ function render(){
   const auditContext=currentStatus==="AUDIT"&&!kwTokens.length ? buildInventoryAuditContext() : null;
   const homeLandingMode = !bulkSelectMode && !kw && currentTab==="ALL" && currentStatus==="ALL" && !restockOnly && !totalStockView && !activeKpiView;
   document.body.classList.toggle("home-landing-mode", homeLandingMode);
+  // Giữ nguyên vị trí cụm tiện ích trong lúc tải: chỉ bỏ trạng thái loading
+  // sau khi trạng thái Trang chủ đã được xác định, tránh nhảy từ trên xuống khi F5.
+  document.body.classList.remove("loading-layout-mode");
   const reminderEdgeButton=document.getElementById("reminderEdgeButton");
   const receiptEdgeButton=document.getElementById("receiptEdgeButton");
   const quoteEdgeButton=document.getElementById("quoteEdgeButton");
@@ -22387,7 +22403,7 @@ setupHeaderAutoCollapse();
 
 let scrollBtnsTimer;
 function setupScrollButtonsAutoHide(){
-  const controls = [...document.querySelectorAll(".side-control-rail")];
+  const controls = [...document.querySelectorAll(".side-control-rail,.scroll-btns")];
   if(!controls.length) return;
   let ticking=false;
   let previousY=Math.max(0,window.scrollY);
