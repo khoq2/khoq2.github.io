@@ -18659,6 +18659,7 @@ function getStockStatusLabel(ton, lowLimit=2){
 }
 
 let TX_HISTORY_STATE = { idx: -1, date: "", nv: "", sort: "newest" };
+let TX_HISTORY_STABLE_ROWS = [];
 
 function parseTxDateKey(value){
   if(value == null || value === "") return "";
@@ -18820,7 +18821,9 @@ function renderTxHistory(){
   const idx = TX_HISTORY_STATE.idx;
   if(idx < 0 || !DATA[idx]) return;
   const r = DATA[idx];
-  const txs = getTransactionsForProduct(r);
+  const liveTxs = getTransactionsForProduct(r);
+  if(liveTxs.length) TX_HISTORY_STABLE_ROWS=liveTxs.slice();
+  const txs = liveTxs.length ? liveTxs : (TX_HISTORY_STABLE_ROWS||[]);
   const filtered = sortTxHistoryRows(txHistoryFilteredRows(txs));
   const nvOptions = [...new Set(txs.map(t=>t.nv).filter(Boolean))];
   document.getElementById("txModalTitle").innerHTML = `<span class="tx-title-icon">${txHistoryIcon("history","blue")}</span><span class="tx-title-text">${renderProductTitleWithCondition(r[2] || "Chưa có tên")}</span>`;
@@ -18876,7 +18879,7 @@ function renderTxHistory(){
 	            <span class="tx-nv"><span class="tx-person">${renderNVAvatar(t.nv)} <span class="tx-name">${escapeHtml(t.nv || "")}</span> ${renderNVRoleBadge(t.nv)}</span><span class="tx-pill tx-kind" style="${getTransactionKind(t)==="IMPORT" ? "background:#FFF4DD;color:#B96800;border:1px solid #F3C87A;" : getTransactionKind(t)==="ADJUST" ? "background:#F2EAFC;color:#6F42A5;border:1px solid #D9C2F0;" : "background:#E7F8ED;color:#147A39;border:1px solid #A9DCB9;"}">${txHistoryIcon(kindView.icon,kindView.tone)}<span>${getTransactionKindLabel(t)}</span></span></span>
             <div class="tx-head-right">
               <span class="tx-time">${txHistoryIcon("clock","blue")}<span>${formatTxTime(t.time)}</span></span>
-              ${hasEmployeePermission("TRANSACTION_EDIT")?`<button class="tx-action tx-edit" title="Sửa ngày giờ và thông tin giao dịch" onclick="event.stopPropagation(); editTX('${escapeHtml(t.id)}')">${txHistoryIcon("edit","blue")}<span class="tx-action-label">Sửa ngày giờ</span></button><button class="tx-action tx-delete" title="Xóa giao dịch" aria-label="Xóa giao dịch" onclick="event.stopPropagation(); deleteTX('${escapeHtml(t.id)}')">${txHistoryIcon("trash","red")}</button>`:""}
+              ${hasEmployeePermission("TRANSACTION_EDIT")?`<button class="tx-action tx-edit" title="Sửa ngày giờ và thông tin giao dịch" onclick="event.stopPropagation(); editTX('${escapeHtml(t.id)}')">${txHistoryIcon("edit","blue")}<span class="tx-action-label">Sửa ngày giờ</span></button>`:""}${isAdminMode()?`<button class="tx-action tx-delete" title="Admin: Xóa lịch sử và hoàn tác tồn kho" aria-label="Xóa giao dịch và hoàn tác tồn kho" onclick="event.stopPropagation(); deleteTX('${escapeHtml(t.id)}')">${txHistoryIcon("trash","red")}</button>`:""}
             </div>
           </div>
 	          <div class="tx-detail-grid">
@@ -18939,6 +18942,9 @@ function showTxHistory(idx){
   TX_HISTORY_STATE.date = "";
   TX_HISTORY_STATE.nv = "";
   TX_HISTORY_STATE.sort = "newest";
+  // Giữ bản giao dịch đang có ngay khi người dùng bấm mở. Đồng bộ nền không
+  // được phép làm cửa sổ đang xem nhảy thành “Chưa có giao dịch nào”.
+  TX_HISTORY_STABLE_ROWS=DATA[idx]?getTransactionsForProduct(DATA[idx]).slice():[];
   renderTxHistory();
   document.documentElement.classList.add("tx-overlay-open");
   document.body.classList.add("tx-overlay-open");
@@ -19248,39 +19254,48 @@ const finishImageViewerMousePan=event=>{
 };
 imageViewerImg.addEventListener("pointerup",finishImageViewerMousePan);
 imageViewerImg.addEventListener("pointercancel",finishImageViewerMousePan);
-async function deleteTX(id){ if(!requireActionPermission("TRANSACTION_EDIT","xóa giao dịch")) return;
+async function deleteTX(id){
+  // Máy chủ mới là nguồn quyết định tồn kho khi hoàn tác. Ở đây chỉ kiểm tra
+  // đúng vai trò Admin, tránh chặn nhầm vì snapshot private trên trình duyệt
+  // vừa hết hạn hoặc đang được tải lại.
+  if(!requireAdmin()) return;
   const tx = TX_DATA.find(t=>String(t.id)===String(id));
   if(!tx){ showToast("Không tìm thấy giao dịch"); return; }
   const txBranch = String(tx.branch || "Q2").trim().toUpperCase() === "Q5" ? "Q5" : "Q2";
   const idx = DATA.findIndex(r=>r[1]===tx.ma && (r[13]||"Q2")===txBranch);
   const qty = Number(tx.qty) || 0;
+  const txNote = String(tx.ghi || "").trim().toUpperCase();
+  const isAdminAdjustment = String(tx.id || "").toUpperCase().startsWith("ADJ-ADMIN-") || txNote.startsWith("[ĐIỀU CHỈNH]");
   const currentStock = idx >= 0 ? Number(DATA[idx][5]) || 0 : 0;
-  const reversedStock = currentStock + qty;
-  if(idx >= 0 && qty !== 0 && reversedStock < 0){
+  const reversedStock = isAdminAdjustment ? currentStock : currentStock + qty;
+  if(!isAdminAdjustment && idx >= 0 && qty !== 0 && reversedStock < 0){
     alert(`Không thể xóa giao dịch này vì tồn kho hiện chỉ còn ${currentStock}. Hoàn tác giao dịch sẽ làm tồn kho thành ${reversedStock}. Vui lòng kiểm kê hoặc điều chỉnh tồn trước.`);
     return;
   }
-  const stockChangeText = qty > 0
+  const stockChangeText = isAdminAdjustment
+    ? `Số tồn hiện tại của "${DATA[idx]?.[2] || tx.ten}" vẫn được giữ nguyên; chỉ xóa dòng lịch sử điều chỉnh.`
+    : qty > 0
     ? `Tồn kho "${DATA[idx]?.[2] || tx.ten}" sẽ được cộng lại +${qty}.`
     : qty < 0
       ? `Tồn kho "${DATA[idx]?.[2] || tx.ten}" sẽ bị trừ ${Math.abs(qty)} để hoàn tác lượng đã nhập.`
       : "Giao dịch này không làm thay đổi số lượng tồn.";
   const confirmMsg = idx >= 0
     ? `Xóa giao dịch này? ${stockChangeText}`
-    : `Không tìm thấy mã hàng ${tx.ma} trong kho. Không thể hoàn tác an toàn giao dịch này.`;
-  if(idx < 0){ alert(confirmMsg); return; }
+    : `Xóa giao dịch này? Máy chủ sẽ kiểm tra sản phẩm ${tx.ma} và tự hoàn tác tồn kho theo dữ liệu mới nhất.`;
   if(!confirm(confirmMsg)) return;
   try{
     await ensureAtomicApi();
     const result = await resilientMutationPost("delete_inventory_transaction",{id,requestId:`delete-tx-${id}`},60000);
     if(result.fingerprint) SERVER_DATA_FINGERPRINT=result.fingerprint;
     TX_DATA = TX_DATA.filter(t=>String(t.id)!==String(id));
-    DATA[idx][5] = Number(result.stock);
-    DATA[idx][6] = getStockStatusValue(DATA[idx][5],DATA[idx][12]);
+    if(idx >= 0){
+      DATA[idx][5] = Number(result.stock);
+      DATA[idx][6] = getStockStatusValue(DATA[idx][5],DATA[idx][12]);
+    }
     cacheAtomicInventoryState();
     render();
     renderTxHistory();
-    const doneText = qty===0 ? "Đã xóa giao dịch" : qty>0 ? `Đã xóa giao dịch, cộng lại +${qty} tồn kho` : `Đã xóa giao dịch, trừ ${Math.abs(qty)} tồn kho đã nhập`;
+    const doneText = result.historyOnly ? "Đã xóa lịch sử điều chỉnh; số tồn được giữ nguyên" : qty===0 ? "Đã xóa giao dịch" : qty>0 ? `Đã xóa giao dịch, cộng lại +${qty} tồn kho` : `Đã xóa giao dịch, trừ ${Math.abs(qty)} tồn kho đã nhập`;
     showToast(doneText);
   }catch(e){ setSyncBadge("error",String(e)); showToast("⚠️ Không xóa giao dịch: "+String(e),5000); }
 }
