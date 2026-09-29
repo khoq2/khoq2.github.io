@@ -11827,7 +11827,7 @@ async function fetchSheetJson(url, options={}, timeoutMs=SHEET_TIMEOUT_MS){
   const safeReadPost=new Set(["private_products","private_customers","private_customer_records","private_reminders","private_partners","private_partner_jobs","private_recent_activity","private_transaction_details","private_transaction_by_id","private_tx","private_nv","private_units","private_transfers","private_product_activity","validate_admin_session","validate_employee_session","get_error_logs"]).has(context.action);
   // replace_all có fingerprint và có thể đối chiếu noop sau khi phản hồi bị mất,
   // vì vậy retry 404/timeout an toàn hơn để người dùng không phải chờ chu kỳ hôm sau.
-  const safeIdempotentWritePost=new Set(["replace_all","upsert_product","delete_product","delete_products","delete_products_by_branch","create_units","restore_trash","delete_customer","delete_customer_record","delete_partner_job","delete_inventory_transaction","commit_inventory_transaction","transfer_inventory","save_config","save_product_links","rename_group","rename_quick_tag","cancel_reminder"]).has(context.action);
+  const safeIdempotentWritePost=new Set(["replace_all","upsert_product","delete_product","delete_products","delete_products_by_branch","create_units","restore_trash","delete_customer","delete_customer_record","delete_partner_job","delete_inventory_transaction","toggle_adjustment_visibility","commit_inventory_transaction","transfer_inventory","save_config","save_product_links","rename_group","rename_quick_tag","cancel_reminder"]).has(context.action);
   // Request đọc có thể gặp trang HTML 404 tạm thời ở lớp redirect của Google.
   // Thử lại có cache-buster; đây đều là thao tác đọc nên không tạo dữ liệu trùng.
   const startupReadTypes=new Set(["data","config","product_links","recent_activity"]);
@@ -18786,6 +18786,8 @@ const TX_HISTORY_ICON_PATHS={
   note:'<path d="M5 3h11l3 3v15H5z"></path><path d="M15 3v5h4M8 12h8M8 16h6"></path>',
   edit:'<path d="m4 20 4.5-1 10-10-3.5-3.5-10 10L4 20Z"></path><path d="m13.5 7 3.5 3.5"></path>',
   trash:'<path d="M4 7h16M9 7V4h6v3M7 7l1 13h8l1-13M10 11v5M14 11v5"></path>',
+  eye:'<path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"></path><circle cx="12" cy="12" r="2.5"></circle>',
+  eyeOff:'<path d="m3 3 18 18M10.6 6.2A10 10 0 0 1 12 6c6 0 9.5 6 9.5 6a17 17 0 0 1-2.2 2.8M6.2 6.2C3.8 8 2.5 12 2.5 12s3.5 6 9.5 6a10 10 0 0 0 3-.5M9.8 9.8a3 3 0 0 0 4.4 4.4"></path>',
   clock:'<circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path>'
 };
 function txHistoryIcon(name,tone="blue"){
@@ -18879,7 +18881,7 @@ function renderTxHistory(){
 	            <span class="tx-nv"><span class="tx-person">${renderNVAvatar(t.nv)} <span class="tx-name">${escapeHtml(t.nv || "")}</span> ${renderNVRoleBadge(t.nv)}</span><span class="tx-pill tx-kind" style="${getTransactionKind(t)==="IMPORT" ? "background:#FFF4DD;color:#B96800;border:1px solid #F3C87A;" : getTransactionKind(t)==="ADJUST" ? "background:#F2EAFC;color:#6F42A5;border:1px solid #D9C2F0;" : "background:#E7F8ED;color:#147A39;border:1px solid #A9DCB9;"}">${txHistoryIcon(kindView.icon,kindView.tone)}<span>${getTransactionKindLabel(t)}</span></span></span>
             <div class="tx-head-right">
               <span class="tx-time">${txHistoryIcon("clock","blue")}<span>${formatTxTime(t.time)}</span></span>
-              ${hasEmployeePermission("TRANSACTION_EDIT")?`<button class="tx-action tx-edit" title="Sửa ngày giờ và thông tin giao dịch" onclick="event.stopPropagation(); editTX('${escapeHtml(t.id)}')">${txHistoryIcon("edit","blue")}<span class="tx-action-label">Sửa ngày giờ</span></button>`:""}${isAdminMode()?`<button class="tx-action tx-delete" title="Admin: Xóa lịch sử và hoàn tác tồn kho" aria-label="Xóa giao dịch và hoàn tác tồn kho" onclick="event.stopPropagation(); deleteTX('${escapeHtml(t.id)}')">${txHistoryIcon("trash","red")}</button>`:""}
+              ${hasEmployeePermission("TRANSACTION_EDIT")?`<button class="tx-action tx-edit" title="Sửa ngày giờ và thông tin giao dịch" onclick="event.stopPropagation(); editTX('${escapeHtml(t.id)}')">${txHistoryIcon("edit","blue")}<span class="tx-action-label">Sửa ngày giờ</span></button>`:""}${isAdminMode()&&getTransactionKind(t)==="ADJUST"?`<button class="tx-action" title="${t.hidden?"Cho mọi người xem lại":"Ẩn lịch sử này với mọi người"}" aria-label="${t.hidden?"Hiện lịch sử điều chỉnh":"Ẩn lịch sử điều chỉnh"}" onclick="event.stopPropagation(); toggleAdjustmentVisibility('${escapeHtml(t.id)}',${t.hidden?"false":"true"})">${txHistoryIcon(t.hidden?"eye":"eyeOff",t.hidden?"green":"purple")}<span class="tx-action-label">${t.hidden?"Hiện":"Ẩn"}</span></button>`:""}${isAdminMode()?`<button class="tx-action tx-delete" title="Admin: Xóa lịch sử và hoàn tác tồn kho" aria-label="Xóa giao dịch và hoàn tác tồn kho" onclick="event.stopPropagation(); deleteTX('${escapeHtml(t.id)}')">${txHistoryIcon("trash","red")}</button>`:""}
             </div>
           </div>
 	          <div class="tx-detail-grid">
@@ -19254,6 +19256,20 @@ const finishImageViewerMousePan=event=>{
 };
 imageViewerImg.addEventListener("pointerup",finishImageViewerMousePan);
 imageViewerImg.addEventListener("pointercancel",finishImageViewerMousePan);
+async function toggleAdjustmentVisibility(id,hidden){
+  if(!requireAdmin()) return;
+  const tx=TX_DATA.find(item=>String(item.id)===String(id));
+  if(!tx || getTransactionKind(tx)!=="ADJUST"){showToast("Không tìm thấy lịch sử Điều chỉnh kho");return;}
+  try{
+    await ensureAtomicApi();
+    const result=await resilientMutationPost("toggle_adjustment_visibility",{id,hidden:!!hidden,requestId:`toggle-adjustment-${id}-${hidden?"hide":"show"}-${Date.now()}`},45000);
+    tx.hidden=!!result.hidden;
+    const stable=TX_HISTORY_STABLE_ROWS.find(item=>String(item.id)===String(id));
+    if(stable) stable.hidden=!!result.hidden;
+    renderTxHistory();
+    showToast(result.hidden?"Đã ẩn lịch sử điều chỉnh với mọi người":"Đã cho mọi người xem lại lịch sử điều chỉnh");
+  }catch(e){setSyncBadge("error",String(e));showToast("⚠️ Không đổi được trạng thái hiển thị: "+String(e),5000);}
+}
 async function deleteTX(id){
   // Máy chủ mới là nguồn quyết định tồn kho khi hoàn tác. Ở đây chỉ kiểm tra
   // đúng vai trò Admin, tránh chặn nhầm vì snapshot private trên trình duyệt
