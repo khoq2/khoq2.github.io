@@ -18658,7 +18658,7 @@ function getStockStatusLabel(ton, lowLimit=2){
   return "✅ Còn hàng";
 }
 
-let TX_HISTORY_STATE = { idx: -1, date: "", nv: "", sort: "newest" };
+let TX_HISTORY_STATE = { idx: -1, date: "", nv: "", sort: "all" };
 let TX_HISTORY_STABLE_ROWS = [];
 
 function parseTxDateKey(value){
@@ -18704,7 +18704,7 @@ function txTimeSortValue(tx){
   return Number.isFinite(time) ? time : Number(tx?.id) || 0;
 }
 function sortTxHistoryRows(txs){
-  const mode = TX_HISTORY_STATE.sort || "newest";
+  const mode = TX_HISTORY_STATE.sort || "all";
   return [...txs].sort((a,b)=>{
     const timeDiff = txTimeSortValue(b) - txTimeSortValue(a);
     if(mode === "oldest") return -timeDiff;
@@ -18832,7 +18832,7 @@ function renderTxHistory(){
   const dateVal = TX_HISTORY_STATE.date || "";
   const dateDisplay = txHistoryDateDisplay(dateVal);
   const nvVal = TX_HISTORY_STATE.nv || "";
-  const sortVal = TX_HISTORY_STATE.sort || "newest";
+  const sortVal = TX_HISTORY_STATE.sort || "all";
   const filterBar = `<div class="tx-filter">
     <div class="tx-filter-field">
       <label class="tx-filter-label" for="txFilterDate">Chọn ngày giao dịch</label>
@@ -18848,6 +18848,7 @@ function renderTxHistory(){
     <div class="tx-filter-field">
       <label class="tx-filter-label" for="txFilterSort">Sắp xếp</label>
       <select id="txFilterSort" aria-label="Sắp xếp giao dịch" onchange="applyTxHistoryFilters()">
+        <option value="all" ${sortVal==="all"?"selected":""}>Tất cả</option>
         <option value="newest" ${sortVal==="newest"?"selected":""}>Mới nhất</option>
         <option value="oldest" ${sortVal==="oldest"?"selected":""}>Cũ nhất</option>
         <option value="employee" ${sortVal==="employee"?"selected":""}>Theo nhân viên</option>
@@ -18929,21 +18930,22 @@ function applyTxHistoryFilters(){
     TX_HISTORY_STATE.date=parsedDate;
   }
   if(nvEl) TX_HISTORY_STATE.nv = nvEl.value || "";
-  if(sortEl) TX_HISTORY_STATE.sort = sortEl.value || "newest";
+  if(sortEl) TX_HISTORY_STATE.sort = sortEl.value || "all";
   renderTxHistory();
 }
 
 function clearTxHistoryFilters(){
   TX_HISTORY_STATE.date = "";
   TX_HISTORY_STATE.nv = "";
+  TX_HISTORY_STATE.sort = "all";
   renderTxHistory();
 }
 
-function showTxHistory(idx){
+async function showTxHistory(idx){
   TX_HISTORY_STATE.idx = idx;
   TX_HISTORY_STATE.date = "";
   TX_HISTORY_STATE.nv = "";
-  TX_HISTORY_STATE.sort = "newest";
+  TX_HISTORY_STATE.sort = "all";
   // Giữ bản giao dịch đang có ngay khi người dùng bấm mở. Đồng bộ nền không
   // được phép làm cửa sổ đang xem nhảy thành “Chưa có giao dịch nào”.
   TX_HISTORY_STABLE_ROWS=DATA[idx]?getTransactionsForProduct(DATA[idx]).slice():[];
@@ -18951,7 +18953,15 @@ function showTxHistory(idx){
   document.documentElement.classList.add("tx-overlay-open");
   document.body.classList.add("tx-overlay-open");
   document.getElementById("txOverlay").classList.add("open");
-  if(!isAdminMode()) void loadPublicTransactionDetailsForProduct(idx);
+  if(isAdminMode()){
+    try{
+      await loadTXFromSheet();
+      TX_HISTORY_STABLE_ROWS=DATA[idx]?getTransactionsForProduct(DATA[idx]).slice():TX_HISTORY_STABLE_ROWS;
+      renderTxHistory();
+    }catch(error){console.warn("Chưa tải được toàn bộ lịch sử Admin:",error);}
+  }else{
+    void loadPublicTransactionDetailsForProduct(idx);
+  }
 }
 function editTX(id){ if(!requireActionPermission("TRANSACTION_EDIT","sửa giao dịch")) return;
   const tx = TX_DATA.find(t=>String(t.id)===String(id));
