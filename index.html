@@ -638,6 +638,7 @@ button:disabled,input:disabled,select:disabled,[aria-disabled="true"] { cursor:n
 .tx-date-input { position:relative; }
 .tx-filter button { border: none; border-radius: 8px; padding: 9px 12px; background: #F4F6F9; color: #34495E; font-size: 13px; font-weight: 700; cursor: pointer; }
 .tx-filter button:active { transform: scale(.98); }
+.tx-history-loading{display:flex;align-items:center;justify-content:center;gap:8px;margin:0 0 10px;padding:9px 12px;border:1px solid #B9D9ED;border-radius:10px;background:#EEF8FE;color:#1E5D83;font-size:12px;font-weight:850}.tx-history-loading::before{content:"";width:14px;height:14px;flex:0 0 14px;border:2px solid #A9D4EA;border-top-color:#1976A8;border-radius:50%;animation:adminLoginSpin .75s linear infinite}
 .tx-row { position:relative; padding:10px 0 15px; margin-bottom:4px; border-bottom:0; font-size:12px; }
 .tx-row::after { content:""; position:absolute; left:4%; right:4%; bottom:0; height:2px; background:linear-gradient(90deg,#ff3b30,#ff9500,#ffd60a,#34c759,#00c7be,#0a84ff,#5e5ce6,#bf5af2,#ff3b30); background-size:220% 100%; clip-path:polygon(0 50%,8% 18%,50% 0,92% 18%,100% 50%,92% 82%,50% 100%,8% 82%); filter:drop-shadow(0 0 2px rgba(10,132,255,.58)); opacity:.94; animation:txRainbowDivider 1.25s linear infinite; pointer-events:none; }
 .tx-row:last-child { margin-bottom:0; padding-bottom:10px; }
@@ -17466,8 +17467,8 @@ function applyPublicRecentActivity(data){
   });
   TRANSFER_DATA=(Array.isArray(data?.transfers)?data.transfers:[]).map(toPublicRecentTransferItem).filter(item=>item && item.id && item.status==="COMPLETED");
   NV_LIST=(Array.isArray(data?.nv)?data.nv:[]).map(toPublicRecentEmployee).filter(Boolean);
-  // Lần mở lịch sử kế tiếp phải kiểm tra lại để giao dịch mới cũng có ghi chú/ảnh.
-  PUBLIC_TX_DETAILS_LOADED.clear();
+  // Giữ lịch sử đầy đủ đã tải trong suốt phiên. Giao dịch mới từ đồng bộ nền
+  // vẫn được ghép qua TX_DATA; không bắt người dùng chờ gọi lại API mỗi 90 giây.
   PUBLIC_TX_DETAILS_ERRORS.clear();
   refreshRecentActivityNotification();
 }
@@ -17498,11 +17499,14 @@ async function loadPublicRecentActivityFromSheet(){
 const PUBLIC_TX_DETAILS_LOADED=new Set();
 const PUBLIC_TX_DETAILS_LOADING=new Set();
 const PUBLIC_TX_DETAILS_ERRORS=new Map();
+// Lịch sử đầy đủ theo từng sản phẩm phải độc lập với TX_DATA (danh sách hoạt
+// động gần đây). Nếu dùng chung, lần đồng bộ nền sẽ ghi đè và làm mất các giao
+// dịch cũ vừa tải — ví dụ HOPMUC016 từ 3 dòng bị tụt lại còn 2 dòng.
+const FULL_TX_HISTORY_BY_PRODUCT=new Map();
 function publicTransactionDetailKey(row){
   return `${String(row?.[13]||"Q2").toUpperCase()}|${normalizeProductCode(row?.[1]||"")}`;
 }
 async function loadPublicTransactionDetailsForProduct(index){
-  if(isAdminMode()) return true;
   const canReadPrivate=employeeSessionValidated&&["SALE","RESTOCK","STOCK_ADJUST","TRANSACTION_EDIT"].some(hasEmployeePermission);
   const row=DATA[index];
   if(!row) return false;
@@ -17513,12 +17517,16 @@ async function loadPublicTransactionDetailsForProduct(index){
   if(TX_HISTORY_STATE.idx===index) renderTxHistory();
   try{
     const all=[];let offset=0,revision="";
-    do {const json=await fetchSheetJson(sheetUrl({type:"transaction_details",code:row[1],branch:row[13]||"Q2",limit:200,offset,_ts:Date.now()}),{},35000);
+    do {const json=(isAdminMode()||canReadPrivate)
+      ? await privateSheet("private_transaction_details",{code:row[1],branch:row[13]||"Q2",limit:200,offset},35000)
+      : await fetchSheetJson(sheetUrl({type:"transaction_details",code:row[1],branch:row[13]||"Q2",limit:200,offset,_ts:Date.now()}),{},35000);
       if(!Array.isArray(json.details))throw new Error("API chưa hỗ trợ phân trang");
       if(revision && revision!==json.revision)throw new Error("Lịch sử vừa thay đổi; mở lại để tải nhất quán");revision=json.revision;
       all.push(...json.details);if(!json.hasMore)break;offset=json.nextOffset;
     }while(true);
-    const byId=new Map(TX_DATA.map(t=>[String(t.id),t]));all.forEach(t=>byId.set(String(t.id),normalizeTxItem(t)));TX_DATA=[...byId.values()];
+    const normalizedAll=all.map(normalizeTxItem).filter(Boolean);
+    FULL_TX_HISTORY_BY_PRODUCT.set(key,normalizedAll);
+    const byId=new Map(TX_DATA.map(t=>[String(t.id),t]));normalizedAll.forEach(t=>byId.set(String(t.id),t));TX_DATA=[...byId.values()];
     PUBLIC_TX_DETAILS_LOADED.add(key);
     return true;
   }catch(error){
@@ -17608,6 +17616,7 @@ function normalizeTxItem(tx){
       warranty1: String(tx.warranty1 || ""), warranty2: String(tx.warranty2 || ""), unitIds:Array.isArray(tx.unitIds)?tx.unitIds.map(String):String(tx.unitIds||"").split(/\s*\|\s*/).filter(Boolean),
       unitDetails:Array.isArray(tx.unitDetails)?tx.unitDetails.map(item=>({id:String(item?.id||""),serial:String(item?.serial||"")})).filter(item=>item.id):[],
       kind:String(tx.kind||"").trim().toUpperCase(),unitCost:tx.unitCost??null,orderId:String(tx.orderId||""),discount:Number(tx.discount)||0,paid:tx.paid??null,originalId:String(tx.originalId||""),version:String(tx.version||"")
+      ,hidden:tx.hidden===true
     };
   }
   return null;
@@ -18375,7 +18384,10 @@ function getTransactionKindLabel(tx){
 function getTransactionsForProduct(row){
   const code = String(row?.[1] || "").trim();
   const branch = String(row?.[13] || "Q2").trim().toUpperCase() === "Q5" ? "Q5" : "Q2";
-  return TX_DATA
+  const fullKey=`${branch}|${normalizeProductCode(code)}`;
+  const combined=TX_DATA.concat(FULL_TX_HISTORY_BY_PRODUCT.get(fullKey)||[]);
+  const unique=[...new Map(combined.map(tx=>[String(tx?.id||""),tx])).values()];
+  return unique
     .filter(tx=>String(tx.ma || "").trim() === code && (String(tx.branch || "Q2").trim().toUpperCase() === "Q5" ? "Q5" : "Q2") === branch)
     // Trang chủ phải dựa vào thời gian giao dịch thật, không dựa vào vị trí
     // dòng trong Google Sheet hoặc thứ tự mảng cục bộ.
@@ -18658,7 +18670,7 @@ function getStockStatusLabel(ton, lowLimit=2){
   return "✅ Còn hàng";
 }
 
-let TX_HISTORY_STATE = { idx: -1, date: "", nv: "", sort: "all" };
+let TX_HISTORY_STATE = { idx: -1, date: "", nv: "", sort: "newest" };
 let TX_HISTORY_STABLE_ROWS = [];
 
 function parseTxDateKey(value){
@@ -18704,7 +18716,7 @@ function txTimeSortValue(tx){
   return Number.isFinite(time) ? time : Number(tx?.id) || 0;
 }
 function sortTxHistoryRows(txs){
-  const mode = TX_HISTORY_STATE.sort || "all";
+  const mode = TX_HISTORY_STATE.sort || "newest";
   return [...txs].sort((a,b)=>{
     const timeDiff = txTimeSortValue(b) - txTimeSortValue(a);
     if(mode === "oldest") return -timeDiff;
@@ -18832,7 +18844,10 @@ function renderTxHistory(){
   const dateVal = TX_HISTORY_STATE.date || "";
   const dateDisplay = txHistoryDateDisplay(dateVal);
   const nvVal = TX_HISTORY_STATE.nv || "";
-  const sortVal = TX_HISTORY_STATE.sort || "all";
+  const sortVal = TX_HISTORY_STATE.sort || "newest";
+  const historyKey=publicTransactionDetailKey(r);
+  const loadingFullHistory=PUBLIC_TX_DETAILS_LOADING.has(historyKey);
+  const loadingNotice=loadingFullHistory?`<div class="tx-history-loading" role="status">Đang tải đầy đủ lịch sử giao dịch…</div>`:"";
   const filterBar = `<div class="tx-filter">
     <div class="tx-filter-field">
       <label class="tx-filter-label" for="txFilterDate">Chọn ngày giao dịch</label>
@@ -18848,16 +18863,15 @@ function renderTxHistory(){
     <div class="tx-filter-field">
       <label class="tx-filter-label" for="txFilterSort">Sắp xếp</label>
       <select id="txFilterSort" aria-label="Sắp xếp giao dịch" onchange="applyTxHistoryFilters()">
-        <option value="all" ${sortVal==="all"?"selected":""}>Tất cả</option>
         <option value="newest" ${sortVal==="newest"?"selected":""}>Mới nhất</option>
         <option value="oldest" ${sortVal==="oldest"?"selected":""}>Cũ nhất</option>
-        <option value="employee" ${sortVal==="employee"?"selected":""}>Theo nhân viên</option>
+        <option value="employee" ${sortVal==="employee"?"selected":""}>Tên nhân viên A → Z</option>
       </select>
     </div>
     <button type="button" class="tx-clear-filter" onclick="clearTxHistoryFilters()">${txHistoryIcon("trash","red")}<span>Xóa lọc</span></button>
   </div>`;
   if(!txs.length){
-    document.getElementById("txModalBody").innerHTML = filterBar + `<div style="text-align: center; padding: 20px; color: #888;">Chưa có giao dịch nào</div>`;
+    document.getElementById("txModalBody").innerHTML = filterBar + loadingNotice + (loadingFullHistory?"":`<div style="text-align: center; padding: 20px; color: #888;">Chưa có giao dịch nào</div>`);
     return;
   }
   const soldRows = filtered.filter(t=>getTransactionKind(t)==="SALE");
@@ -18910,7 +18924,7 @@ function renderTxHistory(){
           </div>`:""}
         </div>`;
       }).join("") : `<div style="text-align: center; padding: 20px; color: #888;">Không có giao dịch phù hợp bộ lọc</div>`;
-  document.getElementById("txModalBody").innerHTML = filterBar + summary + rows;
+  document.getElementById("txModalBody").innerHTML = filterBar + loadingNotice + summary + rows;
 }
 
 function applyTxHistoryFilters(){
@@ -18930,14 +18944,14 @@ function applyTxHistoryFilters(){
     TX_HISTORY_STATE.date=parsedDate;
   }
   if(nvEl) TX_HISTORY_STATE.nv = nvEl.value || "";
-  if(sortEl) TX_HISTORY_STATE.sort = sortEl.value || "all";
+  if(sortEl) TX_HISTORY_STATE.sort = sortEl.value || "newest";
   renderTxHistory();
 }
 
 function clearTxHistoryFilters(){
   TX_HISTORY_STATE.date = "";
   TX_HISTORY_STATE.nv = "";
-  TX_HISTORY_STATE.sort = "all";
+  TX_HISTORY_STATE.sort = "newest";
   renderTxHistory();
 }
 
@@ -18945,7 +18959,7 @@ async function showTxHistory(idx){
   TX_HISTORY_STATE.idx = idx;
   TX_HISTORY_STATE.date = "";
   TX_HISTORY_STATE.nv = "";
-  TX_HISTORY_STATE.sort = "all";
+  TX_HISTORY_STATE.sort = "newest";
   // Giữ bản giao dịch đang có ngay khi người dùng bấm mở. Đồng bộ nền không
   // được phép làm cửa sổ đang xem nhảy thành “Chưa có giao dịch nào”.
   TX_HISTORY_STABLE_ROWS=DATA[idx]?getTransactionsForProduct(DATA[idx]).slice():[];
@@ -18953,15 +18967,9 @@ async function showTxHistory(idx){
   document.documentElement.classList.add("tx-overlay-open");
   document.body.classList.add("tx-overlay-open");
   document.getElementById("txOverlay").classList.add("open");
-  if(isAdminMode()){
-    try{
-      await loadTXFromSheet();
-      TX_HISTORY_STABLE_ROWS=DATA[idx]?getTransactionsForProduct(DATA[idx]).slice():TX_HISTORY_STABLE_ROWS;
-      renderTxHistory();
-    }catch(error){console.warn("Chưa tải được toàn bộ lịch sử Admin:",error);}
-  }else{
-    void loadPublicTransactionDetailsForProduct(idx);
-  }
+  // Mở cửa sổ ngay bằng cache hiện có, sau đó chỉ tải đầy đủ lịch sử của đúng
+  // sản phẩm đang xem. Không bắt Admin chờ tải toàn bộ giao dịch của cả kho.
+  void loadPublicTransactionDetailsForProduct(idx);
 }
 function editTX(id){ if(!requireActionPermission("TRANSACTION_EDIT","sửa giao dịch")) return;
   const tx = TX_DATA.find(t=>String(t.id)===String(id));
@@ -19314,6 +19322,7 @@ async function deleteTX(id){
     const result = await resilientMutationPost("delete_inventory_transaction",{id,requestId:`delete-tx-${id}`},60000);
     if(result.fingerprint) SERVER_DATA_FINGERPRINT=result.fingerprint;
     TX_DATA = TX_DATA.filter(t=>String(t.id)!==String(id));
+    FULL_TX_HISTORY_BY_PRODUCT.forEach((items,key)=>FULL_TX_HISTORY_BY_PRODUCT.set(key,items.filter(t=>String(t.id)!==String(id))));
     if(idx >= 0){
       DATA[idx][5] = Number(result.stock);
       DATA[idx][6] = getStockStatusValue(DATA[idx][5],DATA[idx][12]);
