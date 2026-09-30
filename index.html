@@ -523,6 +523,7 @@ button:disabled,input:disabled,select:disabled,[aria-disabled="true"] { cursor:n
 }
 .nguoi-ban-row { display:flex; align-items:center; justify-content:center; flex-wrap:nowrap; gap:6px; margin-top:7px; padding:7px 8px; background:#F4F6F9; border:1px solid #E1E8EF; border-left:3px solid #5B8DB8; border-radius:8px; cursor:pointer; color:#555; font-size:12px; text-align:center; }
 .nguoi-ban-row:active { background: #E8ECF1; }
+.nguoi-ban-loading-text{display:none;align-items:center;justify-content:center;gap:7px;color:#176A96;font-weight:900}.nguoi-ban-loading-text::before{content:"";width:14px;height:14px;flex:0 0 14px;border:2px solid #B4D9EA;border-top-color:#1976A8;border-radius:50%;animation:adminLoginSpin .72s linear infinite}.nguoi-ban-row.history-loading{cursor:wait;background:#EAF6FD;border-color:#9DCCE4}.nguoi-ban-row.history-loading>.nguoi-ban-kind-icon,.nguoi-ban-row.history-loading>.nv-avatar-latest,.nguoi-ban-row.history-loading>.nguoi-ban-label,.nguoi-ban-row.history-loading>.nguoi-ban-count{display:none!important}.nguoi-ban-row.history-loading>.nguoi-ban-loading-text{display:inline-flex}
 
 /* Desktop: hai the tren mot hang de thong tin khong bi keo dai va de quet mat. */
 @media (min-width: 1100px) {
@@ -15093,7 +15094,7 @@ function renderCard(r,i,displayNo){
   const latestTransaction = productTransactions.find(tx=>getTransactionKind(tx)==="SALE");
   const latestTransactionText = latestTransaction
     ? `${latestTransaction.nv || "Chưa rõ nhân viên"} · ${formatTxTime(latestTransaction.time) || "Chưa rõ thời gian"}`
-    : "Chưa có giao dịch bán";
+    : "Bấm để tải lịch sử";
   const latestEmployeeAvatarHtml = latestTransaction
     ? renderNVAvatar(latestTransaction.nv, "nv-avatar-latest")
     : "";
@@ -15168,11 +15169,12 @@ function renderCard(r,i,displayNo){
         <button class="btn-ton btn-plus admin-only" data-permission="RESTOCK" title="Nhập thêm hàng" aria-label="Nhập thêm hàng" onclick="openRestockModal(${i})">+</button>
       </div>
       <div class="card-price-mobile">${priceHtml}</div>
-      <div class="nguoi-ban-row ${latestTransaction ? "has-transaction" : "no-transaction"}" ${latestTransaction ? `role="button" tabindex="0" aria-haspopup="dialog" title="Bấm để xem giao dịch gần đây" aria-label="Xem giao dịch gần đây của ${escapeHtml(ten)}" onclick="showTxHistory(${i})" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();showTxHistory(${i})}"` : ""}>
+      <div class="nguoi-ban-row ${latestTransaction ? "has-transaction" : "no-transaction"}" role="button" tabindex="0" aria-haspopup="dialog" title="Bấm để xem toàn bộ lịch sử giao dịch" aria-label="Xem toàn bộ lịch sử giao dịch của ${escapeHtml(ten)}" onclick="showTxHistory(${i})" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();showTxHistory(${i})}">
         <img class="nguoi-ban-kind-icon" src="https://drive.google.com/thumbnail?id=1gDQYpyWqwlHtJbDhSNHBRybWKkIjimXd&sz=w128" alt="" aria-label="Giao dịch nhân viên" referrerpolicy="no-referrer" onerror="this.outerHTML='<span class=\\'nguoi-ban-kind-icon\\' aria-hidden=\\'true\\'>👤</span>';">
         ${latestEmployeeAvatarHtml}
-        <span class="nguoi-ban-label">${latestTransaction ? "Giao dịch gần đây" : "Người bán"}</span>
+        <span class="nguoi-ban-label">${latestTransaction ? "Giao dịch gần đây" : "Lịch sử giao dịch"}</span>
         <span class="nguoi-ban-count" title="${escapeHtml(latestTransactionText)}">${latestTransactionHtml}</span>
+        <span class="nguoi-ban-loading-text" role="status">Đang tải lịch sử…</span>
         <button type="button" class="nguoi-ban-history-link admin-only" aria-label="Xem lịch sử thay đổi sản phẩm" onclick="event.stopPropagation();openProductActivity(${i})">Xem lịch sử ›</button>
       </div>
       <div class="card-actions admin-only" data-permission="PRODUCT_EDIT,PRODUCT_DELETE,TRANSFER">
@@ -17503,6 +17505,12 @@ const PUBLIC_TX_DETAILS_ERRORS=new Map();
 // động gần đây). Nếu dùng chung, lần đồng bộ nền sẽ ghi đè và làm mất các giao
 // dịch cũ vừa tải — ví dụ HOPMUC016 từ 3 dòng bị tụt lại còn 2 dòng.
 const FULL_TX_HISTORY_BY_PRODUCT=new Map();
+function setProductHistoryLoading(index,loading){
+  const row=document.querySelector(`#results .card[data-index="${index}"] .nguoi-ban-row`);
+  if(!row)return;
+  row.classList.toggle("history-loading",!!loading);
+  row.setAttribute("aria-busy",String(!!loading));
+}
 function publicTransactionDetailKey(row){
   return `${String(row?.[13]||"Q2").toUpperCase()}|${normalizeProductCode(row?.[1]||"")}`;
 }
@@ -17513,6 +17521,7 @@ async function loadPublicTransactionDetailsForProduct(index){
   const key=publicTransactionDetailKey(row);
   if(PUBLIC_TX_DETAILS_LOADED.has(key)||PUBLIC_TX_DETAILS_LOADING.has(key)) return true;
   PUBLIC_TX_DETAILS_LOADING.add(key);
+  setProductHistoryLoading(index,true);
   PUBLIC_TX_DETAILS_ERRORS.delete(key);
   if(TX_HISTORY_STATE.idx===index) renderTxHistory();
   try{
@@ -17526,8 +17535,10 @@ async function loadPublicTransactionDetailsForProduct(index){
     }while(true);
     const normalizedAll=all.map(normalizeTxItem).filter(Boolean);
     FULL_TX_HISTORY_BY_PRODUCT.set(key,normalizedAll);
+    if(TX_HISTORY_STATE.idx===index) TX_HISTORY_STABLE_ROWS=normalizedAll.slice();
     const byId=new Map(TX_DATA.map(t=>[String(t.id),t]));normalizedAll.forEach(t=>byId.set(String(t.id),t));TX_DATA=[...byId.values()];
     PUBLIC_TX_DETAILS_LOADED.add(key);
+    if(TX_HISTORY_STATE.idx===index) showToast(`Đã tải đủ ${normalizedAll.length} giao dịch của sản phẩm`);
     return true;
   }catch(error){
     PUBLIC_TX_DETAILS_ERRORS.set(key,String(error));
@@ -17536,6 +17547,7 @@ async function loadPublicTransactionDetailsForProduct(index){
     return false;
   }finally{
     PUBLIC_TX_DETAILS_LOADING.delete(key);
+    setProductHistoryLoading(index,false);
     if(TX_HISTORY_STATE.idx===index) renderTxHistory();
   }
 }
@@ -18969,6 +18981,8 @@ async function showTxHistory(idx){
   document.getElementById("txOverlay").classList.add("open");
   // Mở cửa sổ ngay bằng cache hiện có, sau đó chỉ tải đầy đủ lịch sử của đúng
   // sản phẩm đang xem. Không bắt Admin chờ tải toàn bộ giao dịch của cả kho.
+  // Luôn xác minh lại khi mở để cache cũ không giữ sản phẩm ở 1–2 dòng.
+  if(DATA[idx]) PUBLIC_TX_DETAILS_LOADED.delete(publicTransactionDetailKey(DATA[idx]));
   void loadPublicTransactionDetailsForProduct(idx);
 }
 function editTX(id){ if(!requireActionPermission("TRANSACTION_EDIT","sửa giao dịch")) return;
